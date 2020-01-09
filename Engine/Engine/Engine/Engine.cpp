@@ -2,11 +2,16 @@
 //
 
 #include "Engine.h"
+#include <GLFW/glfw3.h>
+
 
 using namespace std;
 
 int main()
 {
-	cout << "Hello CMake." << endl;
-	return 0;
+	if (!glfwInit())
+	{
+		return -1;
+		// Initialization failed
+	}
 }
