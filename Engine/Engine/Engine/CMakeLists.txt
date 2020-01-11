@@ -18,6 +18,13 @@ set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
 # GAME ASSETS
 # copy glsl shader assets into build directory
 
+FILE(GLOB PROGRAMS Assets/Programs/*.shader)
+
+foreach(file ${PROGRAMS})
+    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${PROGRAMS})
+    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
+endforeach()
+
 FILE(GLOB SHADERS Assets/Shaders/*.vert Assets/Shaders/*.frag)
 
 foreach(SHADER ${SHADERS})
@@ -41,7 +48,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/PhysXGpu_64.dll" PhysXG
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/pxshared/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/include/")
-
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/include")
 
 

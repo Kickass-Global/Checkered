@@ -21,6 +21,52 @@ namespace Rendering {
 
     class RenderingSystem;
 
+
+    class Shader {
+        GLuint m_id;
+
+    public:
+
+        Shader() : m_id(-1) {}
+
+        GLuint id() const { return m_id; }
+        Shader(GLenum shader_type, std::vector<std::string> &lines) {
+
+            m_id = glCreateShader(shader_type);
+            system_calls::log<module>("Creating shader ", m_id);
+
+            std::vector<const GLchar *> cstrings;
+            std::vector<int> lengths;
+
+            for (auto &&line : lines) {
+                cstrings.push_back(line.c_str());
+                lengths.push_back(line.size());
+            }
+
+            glShaderSource(m_id, lines.size(), cstrings.data(), lengths.data());
+            glCompileShader(m_id);
+
+            GLint success;
+            glGetShaderiv(m_id, GL_COMPILE_STATUS, &success);
+
+            if(!success) {
+                GLint maxLength = 0;
+                glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
+
+                std::vector<GLchar> infoLog(maxLength);
+                glGetShaderInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
+
+                system_calls::log<module>(std::string(infoLog.begin(), infoLog.end()));
+            }
+            assert(success != GL_FALSE, "shader creation");
+        }
+
+        ~Shader() {
+            system_calls::log<module>("Deleting shader ", m_id);
+            glDeleteShader(m_id);
+        }
+    };
+
     class Program {
         GLuint id;
 
@@ -52,64 +98,40 @@ namespace Rendering {
     public:
 
         template <typename... Ts>
-        explicit Program(Ts&... shaders) {
+        explicit Program(std::vector<std::unique_ptr<Rendering::Shader>> shaders) {
 
             id = glCreateProgram();
 
             system_calls::log<module>("Creating program ", id);
 
-            attach(shaders...);
+            for(auto&& shader : shaders) glAttachShader(id, shader->id());
 
             glLinkProgram(id);
 
             GLint successful_link;
             glGetProgramiv(id, GL_LINK_STATUS, &successful_link);
 
-            assert(successful_link == GL_FALSE, "Link shader program");
+            if (!successful_link) {
+                GLint maxLength = 0;
+                glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 
-            detach(shaders...);
+                std::vector<GLchar> infoLog(maxLength);
+                glGetProgramInfoLog(id, maxLength, &maxLength, &infoLog[0]);
+                system_calls::log<module>(std::string(infoLog.begin(), infoLog.end()));
+            }
+            assert(successful_link != GL_FALSE, "Link shader program");
 
+            for(auto&& shader : shaders) glDetachShader(id, shader->id());
         }
 
         void bind() {
+            system_calls::log<module>("Binding program ", id);
             glUseProgram(id);
         }
 
         ~Program() {
             system_calls::log<module>("Deleting program ", id);
             glDeleteProgram(id);
-        }
-    };
-
-    class Shader {
-        GLuint m_id;
-    public:
-        GLuint id() const { return m_id; }
-        Shader(GLenum shader_type, std::vector<std::string> &lines) {
-
-            m_id = glCreateShader(shader_type);
-            system_calls::log<module>("Creating shader ", m_id);
-
-            std::vector<const GLchar *> cstrings(lines.size());
-            std::vector<int> lengths(lines.size());
-
-            for (auto &&line : lines) {
-                cstrings.push_back(line.c_str());
-                lengths.push_back(line.size());
-            }
-
-            glShaderSource(m_id, lines.size(), cstrings.data(), lengths.data());
-            glCompileShader(m_id);
-
-            GLint success;
-            glGetShaderiv(m_id, GL_COMPILE_STATUS, &success);
-
-            assert(success, "shader creation");
-        }
-
-        ~Shader() {
-            system_calls::log<module>("Deleting shader ", m_id);
-            glDeleteShader(m_id);
         }
     };
 
