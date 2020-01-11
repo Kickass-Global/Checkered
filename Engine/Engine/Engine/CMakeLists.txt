@@ -1,18 +1,29 @@
 ﻿# CMakeList.txt : CMake project for Engine, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.13)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c)
+set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c Systems/Pipeline/ShaderLoader.cpp Systems/Pipeline/ShaderLoader.h Components/Shader.cpp Components/Shader.h Components/ComponentId.cpp Components/ComponentId.h)
 
 # Add source to this project's executable.
 add_executable (Engine "Engine.cpp" "Engine.h"
-        Systems/PhysicsSystem.cpp Systems/PhysicsSystem.h Systems/RenderingSystem.cpp Systems/RenderingSystem.h SystemCalls.cpp SystemCalls.h
+        Systems/PhysicsSystem.cpp Systems/PhysicsSystem.h Systems/Rendering/RenderingSystem.cpp Systems/Rendering/RenderingSystem.h SystemCalls.cpp SystemCalls.h
+        Systems/Rendering/RenderingBatch.h Systems/Rendering/RenderingBatch.cpp
         ${GLAD}
         )
 
-# TODO: Add tests and install targets if needed.
+set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
+
+# GAME ASSETS
+# copy glsl shader assets into build directory
+
+FILE(GLOB SHADERS Assets/Shaders/*.vert Assets/Shaders/*.frag)
+
+foreach(SHADER ${SHADERS})
+    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${SHADER})
+    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
+endforeach()
 
 set(PHYSX_HOME PATH "")
 
