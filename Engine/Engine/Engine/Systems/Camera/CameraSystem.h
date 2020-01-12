@@ -86,7 +86,7 @@ namespace Camera {
 
                 //if camera view matrix has changed mark it as dirty
                 Component::Index::addComponent(camera, Component::Dirty::id());
-                system_calls::log<module, system_calls::Importance::low>("Marking Camera ", camera, " dirty");
+                Engine::log<module, Engine::Importance::low>("Marking Camera ", camera, " dirty");
                 
                 x = 0;
                 y = 0;
