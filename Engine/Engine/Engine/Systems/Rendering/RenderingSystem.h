@@ -168,6 +168,7 @@ namespace Rendering {
         }
 
         void update(frametime elapsedTime) {
+            glClearColor(0, 0, 0.5f, 1);
             glClear(GL_COLOR_BUFFER_BIT);
 
             for (auto &&batch : batches) {
@@ -188,11 +189,13 @@ namespace Rendering {
                             auto perspective_matrix = glm::perspective(
                                 45.0f, 
                                 static_cast<float>(data->viewport.width) / data->viewport.height, 
-                                0.001f, 
+                                0.1f, 
                                 100.0f
                             );
 
                             view_matrix = world_matrix * view_matrix;
+
+                            glViewport(0, 0, data->viewport.width, data->viewport.height);
 
                             glUseProgram(program);
                             glUniformMatrix4fv(glGetUniformLocation(program, "M_View"),

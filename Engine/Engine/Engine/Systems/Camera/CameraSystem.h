@@ -101,7 +101,7 @@ namespace Camera {
             {
                 auto data = Component::Index::entityData<Component::Camera>(camera);
                 data->viewport.width = width;
-                data->viewport.width = height;
+                data->viewport.height = height;
 
                 Component::Index::addComponent(camera, Component::Dirty::id());
             }
