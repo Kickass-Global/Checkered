@@ -4,12 +4,20 @@
 cmake_minimum_required (VERSION 3.13)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c Systems/Pipeline/ShaderLoader.cpp Systems/Pipeline/ShaderLoader.h Components/Shader.cpp Components/Shader.h Components/ComponentId.cpp Components/ComponentId.h)
+set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c)
 
 # Add source to this project's executable.
 add_executable (Engine "Engine.cpp" "Engine.h"
-        Systems/PhysicsSystem.cpp Systems/PhysicsSystem.h Systems/Rendering/RenderingSystem.cpp Systems/Rendering/RenderingSystem.h SystemCalls.cpp SystemCalls.h
+        SystemCalls.cpp SystemCalls.h
+        Systems/PhysicsSystem.cpp Systems/PhysicsSystem.h
+        Systems/Rendering/RenderingSystem.cpp Systems/Rendering/RenderingSystem.h
         Systems/Rendering/RenderingBatch.h Systems/Rendering/RenderingBatch.cpp
+        Systems/Pipeline/ShaderLoader.cpp Systems/Pipeline/ShaderLoader.h
+        Systems/Camera/CameraSystem.cpp Systems/Camera/CameraSystem.h
+        Systems/Input/InputSystem.cpp Systems/Input/InputSystem.h
+        Components/Shader.cpp Components/Shader.h
+        Components/ComponentId.cpp Components/ComponentId.h
+        Components/Camera.cpp Components/Camera.h
         ${GLAD}
         )
 
@@ -49,6 +57,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/PhysXGpu_64.dll" PhysXG
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/pxshared/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glm/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/include")
 
 

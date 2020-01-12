@@ -125,7 +125,7 @@ namespace Rendering {
         }
 
         void bind() {
-            system_calls::log<module>("Binding program ", id);
+//            system_calls::log<module>("Binding program ", id);
             glUseProgram(id);
         }
 
@@ -136,7 +136,8 @@ namespace Rendering {
     };
 
     class RenderingSystem {
-        GLFWwindow *window;
+
+        GLFWwindow* window;
 
         std::vector<Rendering::RenderBatch> batches;
         std::map<Component::ComponentId, std::unique_ptr<Rendering::Program>> shader_programs;
@@ -160,9 +161,14 @@ namespace Rendering {
             assert(glfwInit(), "initialize GLFW");
 
             window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+
             glfwMakeContextCurrent(window);
 
             assert(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
+        }
+
+        GLFWwindow* getWindow() {
+            return window;
         }
 
         void update() {

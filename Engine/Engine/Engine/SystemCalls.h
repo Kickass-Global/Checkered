@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <utility>
 
+#undef assert
+
 namespace system_calls {
 
     struct Name {
@@ -34,10 +36,6 @@ namespace system_calls {
             std::cerr << Name(module) << msg << " " << result << std::endl;
             exit(-1);
         }
-        else {
-            std::cout << Name(module) << msg << " " << result << std::endl;
-        }
-
     }
 
     template<char const *module, typename ... Ts>
