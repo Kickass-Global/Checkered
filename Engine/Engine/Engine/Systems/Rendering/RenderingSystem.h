@@ -12,7 +12,13 @@
 #include <map>
 #include "../../SystemCalls.h"
 #include "../../Components/Shader.h"
+#include "../../Components/Camera.h"
 #include "RenderingBatch.h"
+#include "../../Components/Index.h"
+#include "../../Components/Dirty.h"
+#include "glm/glm.hpp"
+#include "glm/gtx/quaternion.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace Rendering {
 
@@ -68,31 +74,31 @@ namespace Rendering {
     };
 
     class Program {
-        GLuint id;
+        GLuint m_id;
 
         template <typename T>
         void attach(T& shader)
         {
-            glAttachShader(id, shader.id());
+            glAttachShader(m_id, shader.id());
         }
         template <typename T, typename... Ts>
 
         void attach(T& shader, Ts&... shaders)
         {
-            glAttachShader(id, shader.id());
+            glAttachShader(m_id, shader.id());
             return attach(shaders...);
         }
 
         template <typename T>
         void detach(T& shader)
         {
-            glDetachShader(id, shader.id());
+            glDetachShader(m_id, shader.id());
         }
         template <typename T, typename... Ts>
 
         void detach(T& shader, Ts&... shaders)
         {
-            glDetachShader(id, shader.id());
+            glDetachShader(m_id, shader.id());
             return detach(shaders...);
         }
     public:
@@ -100,38 +106,42 @@ namespace Rendering {
         template <typename... Ts>
         explicit Program(std::vector<std::unique_ptr<Rendering::Shader>> shaders) {
 
-            id = glCreateProgram();
+            m_id = glCreateProgram();
 
-            system_calls::log<module>("Creating program ", id);
+            system_calls::log<module>("Creating program ", m_id);
 
-            for(auto&& shader : shaders) glAttachShader(id, shader->id());
+            for(auto&& shader : shaders) glAttachShader(m_id, shader->id());
 
-            glLinkProgram(id);
+            glLinkProgram(m_id);
 
             GLint successful_link;
-            glGetProgramiv(id, GL_LINK_STATUS, &successful_link);
+            glGetProgramiv(m_id, GL_LINK_STATUS, &successful_link);
 
             if (!successful_link) {
                 GLint maxLength = 0;
-                glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
+                glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
 
                 std::vector<GLchar> infoLog(maxLength);
-                glGetProgramInfoLog(id, maxLength, &maxLength, &infoLog[0]);
+                glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
                 system_calls::log<module>(std::string(infoLog.begin(), infoLog.end()));
             }
             assert(successful_link != GL_FALSE, "Link shader program");
 
-            for(auto&& shader : shaders) glDetachShader(id, shader->id());
+            for(auto&& shader : shaders) glDetachShader(m_id, shader->id());
+        }
+
+        GLuint id() {
+            return m_id;
         }
 
         void bind() {
 //            system_calls::log<module>("Binding program ", id);
-            glUseProgram(id);
+            glUseProgram(m_id);
         }
 
         ~Program() {
-            system_calls::log<module>("Deleting program ", id);
-            glDeleteProgram(id);
+            system_calls::log<module>("Deleting program ", m_id);
+            glDeleteProgram(m_id);
         }
     };
 
@@ -177,6 +187,25 @@ namespace Rendering {
             for (auto &&batch : batches) {
                 // if batch should be drawn
                 {
+                    auto program = shader_programs[batch.shader]->id();
+                    for(auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+                    {
+                        auto is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
+                        if(is_dirty)
+                        {
+                            auto data = Component::Index::entityData<Component::Camera>(camera);
+                            auto view_matrix = glm::toMat4(data->rotation);
+
+                            glUseProgram(program);
+                            glUniformMatrix4fv(glGetUniformLocation(program, "View"),
+                                    1, false, glm::value_ptr(view_matrix));
+
+//                            system_calls::log<module>("Camera ", camera, " is dirty");
+                            // update program uniforms, etc.
+                            Component::Index::removeComponent(camera, Component::Dirty::id());
+                        }
+                    }
+
                     // bind programs, textures, and uniforms needed to render the batch
                     batch.bind(*this);
                     batch.draw(*this);

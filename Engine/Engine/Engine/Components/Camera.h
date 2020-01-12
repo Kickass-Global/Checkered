@@ -8,11 +8,24 @@
 #include <vector>
 #include "ComponentId.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
+#include "glm/gtx/quaternion.hpp"
+
+#undef assert
+
 namespace Component {
 
-    class Camera {
-        std::vector<Component::ComponentId> components;
+    struct Camera {
+        Component::ComponentId m_id;
+
+        glm::vec3 position;
+        glm::quat rotation;
+
+        Camera() : m_id(true), position(), rotation(1,0,0,0) {  }
+        Component::ComponentId id() { return m_id; }
     };
+
 }
 
 #endif //ENGINE_CAMERA_H

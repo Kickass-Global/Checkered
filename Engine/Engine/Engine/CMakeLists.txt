@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 3.13)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c)
+set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c Components/Index.cpp Components/Index.h Components/Dirty.cpp Components/Dirty.h)
 
 # Add source to this project's executable.
 add_executable (Engine "Engine.cpp" "Engine.h"
@@ -57,7 +57,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/PhysXGpu_64.dll" PhysXG
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/pxshared/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glm/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glminclude/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/include")
 
 

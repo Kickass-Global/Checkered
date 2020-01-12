@@ -22,10 +22,10 @@ namespace Rendering {
         int fill;
         int stride = 12;
 
-        Component::ComponentId shader;
 
     public:
 
+        Component::ComponentId shader;
         RenderBatch(int bufferMaxSize);
 
         void push_back(void *data, int size);
