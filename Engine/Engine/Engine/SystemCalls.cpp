@@ -6,7 +6,7 @@
 #include <sstream>
 #include <algorithm>
 
-std::ostream &system_calls::operator<<(std::ostream &out, system_calls::Name name) {
+std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
     const unsigned int width = 13;
 
     std::ostringstream buff;

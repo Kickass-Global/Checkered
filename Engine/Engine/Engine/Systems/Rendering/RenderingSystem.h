@@ -25,7 +25,7 @@
 namespace Rendering {
 
     constexpr char module[] = "RenderingSystem";
-    constexpr auto assert = system_calls::assert<module>;
+    constexpr auto assert = Engine::assert<module>;
 
     class RenderingSystem;
 
@@ -41,7 +41,7 @@ namespace Rendering {
         Shader(GLenum shader_type, std::vector<std::string> &lines) {
 
             m_id = glCreateShader(shader_type);
-            system_calls::log<module>("Creating shader ", m_id);
+            Engine::log<module>("Creating shader ", m_id);
 
             std::vector<const GLchar *> cstrings;
             std::vector<int> lengths;
@@ -64,13 +64,13 @@ namespace Rendering {
                 std::vector<GLchar> infoLog(maxLength);
                 glGetShaderInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
 
-                system_calls::log<module>(std::string(infoLog.begin(), infoLog.end()));
+                Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
             }
             assert(success != GL_FALSE, "shader creation");
         }
 
         ~Shader() {
-            system_calls::log<module>("Deleting shader ", m_id);
+            Engine::log<module>("Deleting shader ", m_id);
             glDeleteShader(m_id);
         }
     };
@@ -85,7 +85,7 @@ namespace Rendering {
 
             m_id = glCreateProgram();
 
-            system_calls::log<module>("Creating program ", m_id);
+            Engine::log<module>("Creating program ", m_id);
 
             for(auto&& shader : shaders) glAttachShader(m_id, shader->id());
 
@@ -100,7 +100,7 @@ namespace Rendering {
 
                 std::vector<GLchar> infoLog(maxLength);
                 glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
-                system_calls::log<module>(std::string(infoLog.begin(), infoLog.end()));
+                Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
             }
             assert(successful_link != GL_FALSE, "Link shader program");
 
@@ -112,12 +112,12 @@ namespace Rendering {
         }
 
         void bind() {
-            system_calls::log<module, system_calls::Importance::low>("Binding program ", m_id);
+            Engine::log<module, Engine::Importance::low>("Binding program ", m_id);
             glUseProgram(m_id);
         }
 
         ~Program() {
-            system_calls::log<module>("Deleting program ", m_id);
+            Engine::log<module>("Deleting program ", m_id);
             glDeleteProgram(m_id);
         }
     };

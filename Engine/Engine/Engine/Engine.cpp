@@ -13,6 +13,8 @@ using Type = Component::Index::Type;
 
 int main() {
 
+    using namespace Engine;
+    
     auto running = true;
 
     Rendering::RenderingSystem renderingSystem;
@@ -36,11 +38,11 @@ int main() {
     renderingSystem.onWindowSizeChanged += std::bind(&Camera::CameraSystem::onWindowSizeChanged,
         &cameraSystem, std::placeholders::_1, std::placeholders::_2);
 
-    // simulate content pipeline loading
-    Pipeline::ProgramLoader loader;
-
     // Component to reference the shader
     Component::Shader shader;
+
+    // simulate content pipeline loading
+    Pipeline::ProgramLoader loader;
 
     // load a simple shader program
     renderingSystem.push_back(
@@ -59,15 +61,16 @@ int main() {
     // push batch data and assign shader program to batch
     batch.push_back(vertex_data, sizeof(vertex_data));
     batch.assign_shader(shader);
-
-    // make a default camera
-    std::shared_ptr<Component::Camera> camera = std::make_shared<Component::Camera>();
-    Component::Index::push_entity(Type::Camera, camera->id(), camera);
-
+    
     renderingSystem.push_back(batch);
 
+    // make a default camera
+    auto camera = std::make_shared<Component::Camera>();
+    Component::Index::push_entity(Type::Camera, camera->id(), camera);
+
+    // setup a game clock
     std::chrono::high_resolution_clock clock;
-    
+   
     auto start = clock.now();
     auto end = start;
 
@@ -75,11 +78,10 @@ int main() {
 
     while (running) {
 
+        // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
         frametime elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 16.6666667f;
+        log<module, Importance::low>("Frametime: ", elapsed);
 
-        system_calls::log<module, system_calls::Importance::low>("Frametime: ", elapsed);
-
-        // when a camera is dirty we need a way to let the rendering system know...
         cameraSystem.update(elapsed);
         renderingSystem.update(elapsed);
         

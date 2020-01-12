@@ -18,7 +18,7 @@
 namespace Pipeline {
 
     constexpr char module[] = "Pipeline";
-    constexpr auto assert = system_calls::assert<module>;
+    constexpr auto assert = Engine::assert<module>;
 
     class ShaderLoader {
     public:

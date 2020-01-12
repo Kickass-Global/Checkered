@@ -19,13 +19,13 @@ namespace Input {
 
         static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
             if (action == GLFW_RELEASE) {
-                system_calls::log<module, system_calls::Importance::low>("onKeyPress: ", key);
+                Engine::log<module, Engine::Importance::low>("onKeyPress: ", key);
                 onKeyPress(key);
                 onKeyUp(key);
             }
             if (action == GLFW_PRESS)
             {
-                system_calls::log<module, system_calls::Importance::low>("onKeyDown: ", key);
+                Engine::log<module, Engine::Importance::low>("onKeyDown: ", key);
                 onKeyDown(key);
             }
         }
