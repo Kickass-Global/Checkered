@@ -58,6 +58,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/pxshared/in
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glminclude/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/assimp/include/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/include")
 
 

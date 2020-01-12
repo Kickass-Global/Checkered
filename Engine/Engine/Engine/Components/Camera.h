@@ -19,10 +19,14 @@ namespace Component {
     struct Camera {
         Component::ComponentId m_id;
 
+        struct Viewport {
+            int x, y, width, height;
+        } viewport;
+
         glm::vec3 position;
         glm::quat rotation;
 
-        Camera() : m_id(true), position(), rotation(1,0,0,0) {  }
+        Camera() : m_id(true), position(), rotation(1, 0, 0, 0), viewport { 0, 0, 640, 480 } {  }
         Component::ComponentId id() { return m_id; }
     };
 

@@ -38,12 +38,34 @@ namespace system_calls {
         }
     }
 
+
+    enum Importance {
+        low,
+        medium,
+        high
+    };
+
+    inline static Importance loggingLevel = medium;
+
     template<char const *module, typename ... Ts>
     void log(Ts...args)
     {
-        std::cout << Name(module);
-        (std::cout << ... << args);
-        std::cout << std::endl;
+        if (loggingLevel >= medium)
+        {
+            std::cout << Name(module);
+            (std::cout << ... << args);
+            std::cout << std::endl;
+        }
+    }
+    
+    template<char const* module, Importance importance, typename ... Ts>
+    void log(Ts...args)
+    {
+        if (importance >= loggingLevel) {
+            std::cout << Name(module);
+            (std::cout << ... << args);
+            std::cout << std::endl;
+        }
     }
 }
 #endif //ENGINE_SYSTEMCALLS_H
