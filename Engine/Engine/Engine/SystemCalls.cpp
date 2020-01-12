@@ -12,7 +12,7 @@ std::ostream &system_calls::operator<<(std::ostream &out, system_calls::Name nam
     std::ostringstream buff;
     buff << "[";
     std::copy_n(name.value.begin(),
-            std::min(name.value.size(), width - 3),
+            std::min(name.value.size(), static_cast<size_t>(width - 3)),
             std::ostreambuf_iterator(buff));
     buff << "] ";
 
