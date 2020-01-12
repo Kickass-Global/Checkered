@@ -23,8 +23,18 @@ int main() {
 
     // hookup key press event with camera system
     Camera::CameraSystem cameraSystem;
+
     Input::InputSystem::onKeyPress += std::bind(&Camera::CameraSystem::onKeyPress,
             &cameraSystem, std::placeholders::_1);
+
+    Input::InputSystem::onKeyDown += std::bind(&Camera::CameraSystem::onKeyDown,
+        &cameraSystem, std::placeholders::_1);
+
+    Input::InputSystem::onKeyUp += std::bind(&Camera::CameraSystem::onKeyUp,
+        &cameraSystem, std::placeholders::_1);
+
+    renderingSystem.onWindowSizeChanged += std::bind(&Camera::CameraSystem::onWindowSizeChanged,
+        &cameraSystem, std::placeholders::_1, std::placeholders::_2);
 
     // simulate content pipeline loading
     Pipeline::ProgramLoader loader;
@@ -56,11 +66,24 @@ int main() {
 
     renderingSystem.push_back(batch);
 
+    std::chrono::high_resolution_clock clock;
+    
+    auto start = clock.now();
+    auto end = start;
+
+    //system_calls::loggingLevel = system_calls::Importance::low;
+
     while (running) {
 
-        // when a camera is dirty we need a way to let the rendering system know...
-        cameraSystem.update();
-        renderingSystem.update();
+        frametime elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 16.6666667f;
 
+        system_calls::log<module, system_calls::Importance::low>("Frametime: ", elapsed);
+
+        // when a camera is dirty we need a way to let the rendering system know...
+        cameraSystem.update(elapsed);
+        renderingSystem.update(elapsed);
+        
+        start = end;
+        end = clock.now();
     }
 }

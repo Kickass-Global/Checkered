@@ -8,8 +8,13 @@
 #include <map>
 #include <algorithm>
 #include <string>
+#include <chrono>
 #include <GLFW/glfw3.h>
+#define _USE_MATH_DEFINES
 
+#include <math.h>
+
+#include "../../Engine.h"
 #include "../../Components/ComponentId.h"
 #include "../../Components/Camera.h"
 #include "../../SystemCalls.h"
@@ -26,49 +31,91 @@ namespace Camera {
 
         float x = 0;
         float y = 0;
+        float u = 0;
 
-        void update() {
+        float sensitivity = 50.0f;
+        float increment = M_PI / 180.0f;
 
-            float x_rotation = x;
-            float y_rotation = y;
+        std::set<int> keys;
 
-            for(auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+        void update(frametime elapsed) {
+            for (auto&& key : keys)
             {
-                if(x_rotation == 0.0 && y_rotation == 0.0) continue;
+                if (!keys.count(key)) continue;
+
+                switch (key)
+                {
+                case GLFW_KEY_RIGHT:
+                    x += increment;
+                    break;
+                case GLFW_KEY_DOWN:
+                    y -= increment;
+                    break;
+                case GLFW_KEY_LEFT:
+                    x -= increment;
+                    break;
+                case GLFW_KEY_UP:
+                    y += increment;
+                    break;
+                case GLFW_KEY_PAGE_UP:
+                    u += increment;
+                    break;
+                case GLFW_KEY_PAGE_DOWN:
+                    u -= increment;
+                    break;
+                }
+            }
+
+            float x_rotation = x / sensitivity * elapsed;
+            float y_rotation = y / sensitivity * elapsed;
+            float zoom = u / sensitivity * elapsed;
+            
+
+            for (auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+            {
+                //if (x_rotation == 0.0 && y_rotation == 0.0) continue;
 
                 auto data = Component::Index::entityData<Component::Camera>(camera);
-                
+
                 auto delta = glm::quat(glm::vec3(
                     glm::degrees(x_rotation),
                     glm::degrees(y_rotation), 0));
-                
+
                 data->rotation *= delta;
+                data->position.z += u;
 
                 //if camera view matrix has changed mark it as dirty
                 Component::Index::addComponent(camera, Component::Dirty::id());
-//                system_calls::log<module>("Marking Camera ", camera, " dirty");
-x = 0;
-y = 0;
+                system_calls::log<module, system_calls::Importance::low>("Marking Camera ", camera, " dirty");
+                
+                x = 0;
+                y = 0;
+                u = 0;
             }
 
         }
 
+        void onWindowSizeChanged(int width, int height) {
+
+            for (auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+            {
+                auto data = Component::Index::entityData<Component::Camera>(camera);
+                data->viewport.width = width;
+                data->viewport.width = height;
+
+                Component::Index::addComponent(camera, Component::Dirty::id());
+            }
+        }
+
+        void onKeyDown(int key) {
+            keys.emplace(key);
+        }
+
+        void onKeyUp(int key) {
+            keys.erase(key);
+        }
+
         void onKeyPress(int key) {
-
-            system_calls::log<module>("onKeyPress: ", key);
-
-            if (key == GLFW_KEY_RIGHT) {
-                x += 0.1f;
-            } else if (key == GLFW_KEY_LEFT) {
-                x -= 0.1f;
-            }
-
-            if (key == GLFW_KEY_UP) {
-                y += 0.1f;
-            } else if (key == GLFW_KEY_DOWN) {
-                y -= 0.1f;
-            }
-
         }
 
     };

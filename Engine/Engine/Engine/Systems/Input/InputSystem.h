@@ -6,6 +6,7 @@
 #define ENGINE_INPUTSYSTEM_H
 
 #include "GLFW/glfw3.h"
+#include "../../Engine.h"
 #include "../../SystemCalls.h"
 #include <memory>
 #include <functional>
@@ -14,32 +15,25 @@ namespace Input {
 
     constexpr char module[] = "Input";
 
-    template<typename... Args>
-    class Event {
-        std::vector<std::function<void(Args...)>> handlers;
-    public:
-        void operator()(Args &... args) {
-            for (auto &&handler : handlers) {
-                if (handler) handler(std::forward<Args>(args)...);
-            }
-        }
-
-        void operator+=(std::function<void(Args...)> handler) {
-            handlers.push_back(handler);
-        }
-    };
-
     class InputSystem {
 
         static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
             if (action == GLFW_RELEASE) {
-                system_calls::log<module>("onKeyPress: ", key);
+                system_calls::log<module, system_calls::Importance::low>("onKeyPress: ", key);
                 onKeyPress(key);
+                onKeyUp(key);
+            }
+            if (action == GLFW_PRESS)
+            {
+                system_calls::log<module, system_calls::Importance::low>("onKeyDown: ", key);
+                onKeyDown(key);
             }
         }
 
     public:
         inline static Event<int> onKeyPress;
+        inline static Event<int> onKeyDown;
+        inline static Event<int> onKeyUp;
 
         static void initialize(GLFWwindow* window) {
             glfwSetKeyCallback(window, keyHandler);

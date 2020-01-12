@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "../../Engine.h"
 #include "../../SystemCalls.h"
 #include "../../Components/Shader.h"
 #include "../../Components/Camera.h"
@@ -18,6 +19,7 @@
 #include "../../Components/Dirty.h"
 #include "glm/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 namespace Rendering {
@@ -76,31 +78,6 @@ namespace Rendering {
     class Program {
         GLuint m_id;
 
-        template <typename T>
-        void attach(T& shader)
-        {
-            glAttachShader(m_id, shader.id());
-        }
-        template <typename T, typename... Ts>
-
-        void attach(T& shader, Ts&... shaders)
-        {
-            glAttachShader(m_id, shader.id());
-            return attach(shaders...);
-        }
-
-        template <typename T>
-        void detach(T& shader)
-        {
-            glDetachShader(m_id, shader.id());
-        }
-        template <typename T, typename... Ts>
-
-        void detach(T& shader, Ts&... shaders)
-        {
-            glDetachShader(m_id, shader.id());
-            return detach(shaders...);
-        }
     public:
 
         template <typename... Ts>
@@ -135,7 +112,7 @@ namespace Rendering {
         }
 
         void bind() {
-//            system_calls::log<module>("Binding program ", id);
+            system_calls::log<module, system_calls::Importance::low>("Binding program ", m_id);
             glUseProgram(m_id);
         }
 
@@ -153,6 +130,8 @@ namespace Rendering {
         std::map<Component::ComponentId, std::unique_ptr<Rendering::Program>> shader_programs;
 
     public:
+
+        inline static Event<int, int> onWindowSizeChanged;
 
         void bind_shader(Component::ComponentId id)
         {
@@ -172,36 +151,56 @@ namespace Rendering {
 
             window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
 
+            glfwSetWindowSizeCallback(window, windowSizeHandler);
+
             glfwMakeContextCurrent(window);
 
             assert(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
+        }
+
+        static void windowSizeHandler(GLFWwindow* window, int width, int height)
+        {
+            onWindowSizeChanged(width, height);
         }
 
         GLFWwindow* getWindow() {
             return window;
         }
 
-        void update() {
+        void update(frametime elapsedTime) {
             glClear(GL_COLOR_BUFFER_BIT);
 
             for (auto &&batch : batches) {
+                
                 // if batch should be drawn
                 {
                     auto program = shader_programs[batch.shader]->id();
                     for(auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
                     {
-                        auto is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
-                        if(is_dirty)
+                        auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
+
+                        if(camera_is_dirty)
                         {
                             auto data = Component::Index::entityData<Component::Camera>(camera);
-                            auto view_matrix = glm::toMat4(data->rotation);
+                            auto view_matrix =  glm::toMat4(data->rotation);
+                            auto world_matrix = glm::translate(data->position);
+
+                            auto perspective_matrix = glm::perspective(
+                                45.0f, 
+                                static_cast<float>(data->viewport.width) / data->viewport.height, 
+                                0.001f, 
+                                100.0f
+                            );
+
+                            view_matrix = world_matrix * view_matrix;
 
                             glUseProgram(program);
-                            glUniformMatrix4fv(glGetUniformLocation(program, "View"),
-                                    1, false, glm::value_ptr(view_matrix));
+                            glUniformMatrix4fv(glGetUniformLocation(program, "M_View"),
+                                1, false, glm::value_ptr(view_matrix));
 
-//                            system_calls::log<module>("Camera ", camera, " is dirty");
-                            // update program uniforms, etc.
+                            glUniformMatrix4fv(glGetUniformLocation(program, "M_Perspective"),
+                                1, false, glm::value_ptr(perspective_matrix));
+
                             Component::Index::removeComponent(camera, Component::Dirty::id());
                         }
                     }
