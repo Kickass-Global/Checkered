@@ -31,11 +31,21 @@ namespace Rendering {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
 
         glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
-        glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
 
+        glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
+        
         glEnableVertexAttribArray(0);
         glVertexAttribFormat(0, 3, GL_FLOAT, false, 0);
         glVertexAttribBinding(0, 0);
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribFormat(1, 3, GL_FLOAT, false, 1 * sizeof(glm::vec3));
+        glVertexAttribBinding(1, 0);
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribFormat(2, 3, GL_FLOAT, false, 2 * sizeof(glm::vec3));
+        glVertexAttribBinding(2, 0);
+
 
         glBindVertexArray(0);
     }

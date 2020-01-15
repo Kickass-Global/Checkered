@@ -148,7 +148,7 @@ namespace Rendering {
         void initialize() {
 
             assert(glfwInit(), "initialize GLFW");
-
+            
             window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
 
             glfwSetWindowSizeCallback(window, windowSizeHandler);
@@ -156,6 +156,10 @@ namespace Rendering {
             glfwMakeContextCurrent(window);
 
             assert(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
+
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
+
         }
 
         static void windowSizeHandler(GLFWwindow* window, int width, int height)
@@ -169,7 +173,7 @@ namespace Rendering {
 
         void update(frametime elapsedTime) {
             glClearColor(0, 0, 0.5f, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             for (auto &&batch : batches) {
                 

@@ -5,6 +5,8 @@
 #ifndef ENGINE_RENDERINGBATCH_H
 #define ENGINE_RENDERINGBATCH_H
 
+#include <vector>
+
 #include "../../Components/ComponentId.h"
 #include "../../Components/Shader.h"
 
@@ -33,12 +35,13 @@ namespace Rendering {
         }
 
         template <typename T>
-        void push_back(T* data, int size) {
+        void push_back(std::vector<T> data) {
             
             glBindBuffer(m_type, m_id);
-            glBufferSubData(m_type, m_fill, size, data);
-            m_fill += size;
+            glBufferSubData(m_type, m_fill, sizeof(T) * data.size(), data.data());
+            m_fill += data.size() * sizeof(T);
         
+            assert(m_fill <= m_size, "Checking buffer fill");
         }
 
         GLuint id() {
