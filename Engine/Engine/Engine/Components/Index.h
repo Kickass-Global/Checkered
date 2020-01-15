@@ -12,6 +12,9 @@
 
 namespace Component {
 
+    struct ComponentId;
+    enum class ClassId;
+
     class Index {
     public:
 
@@ -38,29 +41,15 @@ namespace Component {
             meta[id] = data;
         }
 
-        static const std::set<Component::ComponentId>& entitiesOf(Component::ClassId cid) {
-            return entities[cid];
-        }
+        static const std::set<Component::ComponentId>& entitiesOf(Component::ClassId cid);
 
-        static const std::set<Component::ComponentId>& componentsOf(Component::ComponentId id)
-        {
-            return entityComponents[id];
-        }
+        static const std::set<Component::ComponentId>& componentsOf(Component::ComponentId id);
 
-        static bool hasComponent(Component::ComponentId id, Component::ComponentId componentId)
-        {
-            return entityComponents[id].count(componentId) > 0;
-        }
+        static bool hasComponent(Component::ComponentId id, Component::ComponentId componentId);
 
-        static void addComponent(Component::ComponentId eid, Component::ComponentId cid)
-        {
-            entityComponents[eid].emplace(cid);
-        }
+        static void addComponent(Component::ComponentId eid, Component::ComponentId cid);
 
-        static void removeComponent(Component::ComponentId eid, Component::ComponentId cid)
-        {
-            entityComponents[eid].erase(cid);
-        }
+        static void removeComponent(Component::ComponentId eid, Component::ComponentId cid);
 
         template<typename T>
         static std::shared_ptr<T> entityData(const Component::ComponentId &componentId) {
