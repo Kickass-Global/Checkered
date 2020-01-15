@@ -6,7 +6,6 @@
 #define ENGINE_COMPONENTID_H
 
 #include <ostream>
-#include "Index.h"
 
 namespace Component {
 

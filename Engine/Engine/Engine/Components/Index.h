@@ -12,9 +12,6 @@
 
 namespace Component {
 
-    struct ComponentId;
-    enum class ClassId;
-
     class Index {
     public:
 
