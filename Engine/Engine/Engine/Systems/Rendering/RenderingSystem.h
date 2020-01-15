@@ -21,11 +21,12 @@
 #include "glm/gtx/quaternion.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "../../Components/Mesh.h"
 
 namespace Rendering {
 
     constexpr char module[] = "RenderingSystem";
-    constexpr auto assert = Engine::assert<module>;
+    constexpr auto assert = Engine::assertLog<module>;
 
     class RenderingSystem;
 
@@ -131,7 +132,7 @@ namespace Rendering {
 
     public:
 
-        inline static Event<int, int> onWindowSizeChanged;
+        inline static Engine::Event<int, int> onWindowSizeChanged;
 
         void bind_shader(Component::ComponentId id)
         {
@@ -171,7 +172,26 @@ namespace Rendering {
             return window;
         }
 
-        void update(frametime elapsedTime) {
+        void buffer(const Component::Mesh& data ) {
+
+            // if the data is already buffered we want to update the existing buffer data
+            auto id = data.id();
+            auto match = std::find_if(batches.begin(), batches.end(), [id](const auto &batch) {
+                return batch.contains(id);
+            });
+
+            if (match != batches.end()) {
+                // mark/remove buffered data so its not used
+                match->remove(id);
+            }
+
+            // find a batch that can hold the data, or make one
+            auto batch = findSuitableBufferFor(data);
+            batch.push_back(data);
+
+        }
+
+        void update(Engine::frametime elapsedTime) {
             glClearColor(0, 0, 0.5f, 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -180,7 +200,7 @@ namespace Rendering {
                 // if batch should be drawn
                 {
                     auto program = shader_programs[batch.shader]->id();
-                    for(auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+                    for(auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
                     {
                         auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
@@ -226,8 +246,27 @@ namespace Rendering {
             glfwDestroyWindow(window);
         }
 
-        void push_back(RenderBatch &batch) {
+        Rendering::RenderBatch& findSuitableBufferFor(const Component::Mesh& data) {
+
+            auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
+                    100000,
+                    sizeof(data.vertices[0]),
+                    GL_ARRAY_BUFFER
+            );
+
+            auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
+                    100000,
+                    sizeof(data.indices[0]),
+                    GL_ELEMENT_ARRAY_BUFFER
+            );
+
+            Rendering::RenderBatch batch(arrayBuffer, elementBuffer);
+            return push_back(batch);
+        }
+
+        Rendering::RenderBatch& push_back(RenderBatch &batch) {
             batches.push_back(batch);
+            return batches.back();
         }
 
     };

@@ -7,7 +7,7 @@
 #include <algorithm>
 
 std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
-    const unsigned int width = 13;
+    const unsigned int width = 20;
 
     std::ostringstream buff;
     buff << "[";

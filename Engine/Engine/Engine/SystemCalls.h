@@ -10,8 +10,6 @@
 #include <iomanip>
 #include <utility>
 
-#undef assert
-
 namespace Engine {
 
     struct Name {
@@ -28,7 +26,7 @@ namespace Engine {
      * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
      */
     template<char const *module>
-    void assert(bool test, std::string msg) {
+    void assertLog(bool test, std::string msg) {
 
         auto result = test ? "SUCCEEDED" : "FAILED";
 

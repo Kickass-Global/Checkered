@@ -8,6 +8,8 @@
 #include <ostream>
 
 namespace Component {
+
+
     static int next_id = 1;
 
     struct EntityId {
@@ -44,6 +46,39 @@ namespace Component {
             return out << id.id;
         }
     private:
+    };
+
+    enum class ClassId : int {
+        Camera,
+        Shader,
+        Mesh,
+        GameObject
+
+
+    };
+
+    std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
+
+
+    template <ClassId E>
+    class ComponentBase {
+        const static ClassId m_class = E;
+        ComponentId m_id;
+
+    public:
+
+        ComponentId id() const { return m_id; }
+        ClassId cid() const { return m_class; }
+
+        void attachComponent(Component::ComponentId id) {
+            Component::Index::addComponent(m_id, id);
+        }
+
+        void detachComponent(Component::ComponentId id) {
+            Component::Index::removeComponent(m_id, id);
+        }
+
+        explicit ComponentBase() : m_id(true) {}
     };
 }
 

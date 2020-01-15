@@ -13,12 +13,10 @@
 
 #include "nlohmann/json.hpp"
 
-#undef assert
-
 namespace Pipeline {
 
     constexpr char module[] = "Pipeline";
-    constexpr auto assert = Engine::assert<module>;
+    constexpr auto assert = Engine::assertLog<module>;
 
     class ShaderLoader {
     public:
