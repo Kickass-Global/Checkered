@@ -10,6 +10,9 @@
 #include "Systems/Camera/CameraSystem.h"
 #include "Systems/Pipeline/MeshLoader.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 using Type = Component::Index::Type;
 
 int main() {
@@ -50,18 +53,39 @@ int main() {
             shader.id(),
             loader.load("Assets/Programs/basic.shader")
     );
+
+    Pipeline::MeshLoader meshLoader;
+    auto box = meshLoader.load("Assets/Meshes/box.obj");
+
+    // ...
+
+    auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
+        box->vertices.size() * sizeof(box->vertices[0]), 
+        sizeof(box->vertices[0]), 
+        GL_ARRAY_BUFFER
+    );
+
+    arrayBuffer->push_back(
+        box->vertices.data(), 
+        box->vertices.size() * sizeof(box->vertices[0])
+    );
     
+    auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
+        box->indices.size() * sizeof(box->indices[0]), 
+        sizeof(box->indices[0]),
+        GL_ELEMENT_ARRAY_BUFFER
+    );
+    
+    elementBuffer->push_back(
+        box->indices.data(), 
+        box->indices.size() * sizeof(box->indices[0])
+    );
 
-    Rendering::RenderBatch batch(1000);
 
-    float vertex_data[] = {
-            0.9f, -0.9f, 0,
-            -0.9f, -0.9f, 0,
-            0, 0.9f, 0
-    };
+    Rendering::RenderBatch batch(arrayBuffer, elementBuffer);
 
     // push batch data and assign shader program to batch
-    batch.push_back(vertex_data, sizeof(vertex_data));
+
     batch.assign_shader(shader);
     
     renderingSystem.push_back(batch);

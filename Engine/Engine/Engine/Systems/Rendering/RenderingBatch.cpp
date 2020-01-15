@@ -12,7 +12,7 @@ namespace Rendering {
     }
 
     void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
-        glDrawArrays(GL_TRIANGLES, 0, fill / stride);
+        glDrawElements(GL_TRIANGLES, elementBuffer->count(), GL_UNSIGNED_INT, 0);
     }
 
     void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
@@ -20,22 +20,18 @@ namespace Rendering {
         glBindVertexArray(vao);
     }
 
-    void RenderBatch::push_back(void *data, int size) {
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_data_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, fill, size, data);
-        fill += size;
-    }
 
-    RenderBatch::RenderBatch(int bufferMaxSize) : size(bufferMaxSize), fill(0) {
-        glGenBuffers(1, &vertex_data_buffer);
+    RenderBatch::RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
+            std::shared_ptr<Rendering::BatchBuffer> elementBuffer) 
+        : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer) {
         glGenVertexArrays(1, &vao);
 
         glBindVertexArray(vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_data_buffer);
-        glBufferData(GL_ARRAY_BUFFER, bufferMaxSize, nullptr, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
 
-        glBindVertexBuffer(0, vertex_data_buffer, 0, sizeof(float) * 3);
+        glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
+        glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
 
         glEnableVertexAttribArray(0);
         glVertexAttribFormat(0, 3, GL_FLOAT, false, 0);
