@@ -38,7 +38,7 @@ namespace Camera {
 
         std::set<int> keys;
 
-        void update(frametime elapsed) {
+        void update(Engine::frametime elapsed) {
             for (auto&& key : keys)
             {
                 if (!keys.count(key)) continue;
@@ -71,7 +71,7 @@ namespace Camera {
             float zoom = u / sensitivity * elapsed;
             
 
-            for (auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+            for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
             {
                 //if (x_rotation == 0.0 && y_rotation == 0.0) continue;
 
@@ -97,7 +97,7 @@ namespace Camera {
 
         void onWindowSizeChanged(int width, int height) {
 
-            for (auto&& camera : Component::Index::entitiesOf(Component::Index::Type::Camera))
+            for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
             {
                 auto data = Component::Index::entityData<Component::Camera>(camera);
                 data->viewport.width = width;

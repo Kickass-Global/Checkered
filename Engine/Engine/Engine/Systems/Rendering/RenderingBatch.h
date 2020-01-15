@@ -11,11 +11,19 @@
 #include "../../Components/Shader.h"
 
 #include "glad/glad.h"
+#include "../../Components/Mesh.h"
 #include <GLFW/glfw3.h>
+#include <map>
 
 namespace Rendering {
     class RenderingSystem;
-
+    
+    struct BufferDetails
+    {
+        int offset;
+        int count;
+    };
+    
     class BatchBuffer {
         
         GLuint m_id;
@@ -35,13 +43,17 @@ namespace Rendering {
         }
 
         template <typename T>
-        void push_back(std::vector<T> data) {
+        BufferDetails push_back(std::vector<T> data) {
             
             glBindBuffer(m_type, m_id);
             glBufferSubData(m_type, m_fill, sizeof(T) * data.size(), data.data());
+
+            auto offset = m_fill;
             m_fill += data.size() * sizeof(T);
         
-            assert(m_fill <= m_size, "Checking buffer fill");
+            //assert(m_fill <= m_size, "Checking buffer fill");
+            
+            return {offset, static_cast<int>(data.size()) };
         }
 
         GLuint id() {
@@ -67,9 +79,16 @@ namespace Rendering {
         std::shared_ptr<Rendering::BatchBuffer> arrayBuffer;
         std::shared_ptr<Rendering::BatchBuffer> elementBuffer;
 
+        std::map<Component::ComponentId, BufferDetails[2]> details;
+
         RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
             std::shared_ptr<Rendering::BatchBuffer> elementBuffer);
 
+        void push_back(const Component::Mesh& mesh)
+        {
+            details[mesh.id()][0] = arrayBuffer->push_back(mesh.vertices);
+            details[mesh.id()][1] = elementBuffer->push_back(mesh.indices);
+        }
 
         /**
          * Binds the VAO and sets up all resources needed to draw the geometry in the batch.
@@ -80,6 +99,16 @@ namespace Rendering {
          * Calls appropriate glDraw* command to draw the geometry in the batch.
          */
         void draw(Rendering::RenderingSystem &renderingSystem);
+
+        bool contains(Component::ComponentId id) const
+        {
+            return details.count(id) > 0;
+        }
+
+        void remove(Component::ComponentId id)
+        {
+            details.erase(id);
+        }
 
         void assign_shader(Component::Shader shader);
     };

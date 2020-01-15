@@ -5,7 +5,6 @@
 #ifndef ENGINE_SHADER_H
 #define ENGINE_SHADER_H
 
-
 #include <string>
 #include "ComponentId.h"
 

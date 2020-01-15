@@ -12,6 +12,8 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
+#include "ComponentId.h"
+
 namespace Component {
 
     class Vertex {
@@ -27,7 +29,7 @@ namespace Component {
             texcoord(texcoord.x, texcoord.y, texcoord.z) {}
     };
 
-    class Mesh {
+    class Mesh : public ComponentBase<ClassId::Mesh> {
 
     public:
 

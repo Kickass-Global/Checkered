@@ -31,9 +31,9 @@ namespace Input {
         }
 
     public:
-        inline static Event<int> onKeyPress;
-        inline static Event<int> onKeyDown;
-        inline static Event<int> onKeyUp;
+        inline static Engine::Event<int> onKeyPress;
+        inline static Engine::Event<int> onKeyDown;
+        inline static Engine::Event<int> onKeyUp;
 
         static void initialize(GLFWwindow* window) {
             glfwSetKeyCallback(window, keyHandler);

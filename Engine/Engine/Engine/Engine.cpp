@@ -12,8 +12,8 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-
-using Type = Component::Index::Type;
+#include "Components/GameObject.h"
+#include "Systems/Debug/LiveReloadSystem.h"
 
 int main() {
 
@@ -23,6 +23,8 @@ int main() {
 
     Rendering::RenderingSystem renderingSystem;
     renderingSystem.initialize();
+
+    Debug::LiveReloadSystem liveReloadSystem;
 
     // hookup inputs from current window
     Input::InputSystem::initialize(renderingSystem.getWindow());
@@ -54,39 +56,41 @@ int main() {
             loader.load("Assets/Programs/basic.shader")
     );
 
+    // simulate loading a complex game object
+
     Pipeline::MeshLoader meshLoader;
-    auto box = meshLoader.load("Assets/Meshes/box.obj");
-
-    // create two buffers to store our mesh data into
-
-    auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-        100000, 
-        sizeof(box->vertices[0]), 
-        GL_ARRAY_BUFFER
+    auto box = Engine::createComponent(
+            meshLoader.load("Assets/Meshes/box.obj")
     );
 
-    auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-        100000, 
-        sizeof(box->indices[0]),
-        GL_ELEMENT_ARRAY_BUFFER
-    );
-    
-    // buffer mesh data...
+    auto box_object = Engine::createComponent<Component::GameObject>();
+    box_object->attachComponent(box->id());
 
-    arrayBuffer->push_back(box->vertices);
-    elementBuffer->push_back(box->indices);
+    liveReloadSystem.watch("Assets/Meshes/box.obj", Component::ClassId::Mesh, box->id());
+    liveReloadSystem.onAssetModified += [&renderingSystem](
+            const std::string& filename,
+            const Component::ClassId& classId,
+            const Component::ComponentId& componentId
+            )
+    {
+        if(classId == Component::ClassId::Mesh)
+        {
+            Pipeline::MeshLoader meshLoader;
+            auto meshComponent = Engine::replaceComponent(componentId,
+                    meshLoader.load(filename)
+            );
 
-    Rendering::RenderBatch batch(arrayBuffer, elementBuffer);
+            renderingSystem.buffer(*meshComponent);
+            // unload existing data
+            // load new data
+        }
+    };
 
-    // assign shader program to batch
-
-    batch.assign_shader(shader);
-    
-    renderingSystem.push_back(batch);
+    // send data to rendering system for drawing...
+    renderingSystem.buffer(*box);
 
     // make a default camera
-    auto camera = std::make_shared<Component::Camera>();
-    Component::Index::push_entity(Type::Camera, camera->id(), camera);
+    auto camera = Engine::createComponent<Component::Camera>();
 
     // setup a game clock
     std::chrono::high_resolution_clock clock;
@@ -102,6 +106,7 @@ int main() {
         frametime elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 16.6666667f;
         log<module, Importance::low>("Frametime: ", elapsed);
 
+        liveReloadSystem.update(elapsed);
         cameraSystem.update(elapsed);
         renderingSystem.update(elapsed);
         

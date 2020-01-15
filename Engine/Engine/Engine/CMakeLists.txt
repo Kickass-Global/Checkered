@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 3.13)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c Components/Index.cpp Components/Index.h Components/Dirty.cpp Components/Dirty.h Components/Mesh.cpp Components/Mesh.h)
+set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c Components/Index.cpp Components/Index.h Components/Dirty.cpp Components/Dirty.h Components/Mesh.cpp Components/Mesh.h Components/GameObject.cpp Components/GameObject.h Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h)
 
 # Add source to this project's executable.
 add_executable (Engine "Engine.cpp" "Engine.h"
