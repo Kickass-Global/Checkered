@@ -6,45 +6,25 @@
 #define ENGINE_COMPONENTID_H
 
 #include <ostream>
+#include "Index.h"
 
 namespace Component {
 
-
-    static int next_id = 1;
-
-    struct EntityId {
-        int id;
-
-        EntityId() : id(-1){}
-
-        EntityId Create() {
-            return EntityId(true);
-        }
-
-        EntityId(bool) : id(Component::next_id++) {}
-    };
+    inline static int next_id = 1;
 
     struct ComponentId {
         int id;
 
         ComponentId() : id(-1) {        }
-        ComponentId(const ComponentId& other) {
-            id = other.id;
-        }
+        ComponentId(const ComponentId& other);
 
-        ComponentId Create() {
-            return ComponentId(true);
-        }
+        ComponentId Create();
 
-        ComponentId(bool) noexcept : id(Component::next_id++) {}
+        ComponentId(bool) noexcept;
 
-        bool operator < (const ComponentId& other) const {
-            return this->id < other.id;
-        }
+        bool operator < (const ComponentId& other) const;
 
-        friend std::ostream& operator<<(std::ostream& out, const Component::ComponentId& id) {
-            return out << id.id;
-        }
+        friend std::ostream& operator<<(std::ostream& out, const Component::ComponentId& id);
     private:
     };
 
@@ -67,19 +47,28 @@ namespace Component {
 
     public:
 
-        ComponentId id() const { return m_id; }
-        ClassId cid() const { return m_class; }
+        [[nodiscard]] ComponentId id() const { return m_id; }
+        [[nodiscard]] ClassId cid() const;
 
-        void attachComponent(Component::ComponentId id) {
-            Component::Index::addComponent(m_id, id);
-        }
+        void attachComponent(Component::ComponentId id);
 
-        void detachComponent(Component::ComponentId id) {
-            Component::Index::removeComponent(m_id, id);
-        }
+        void detachComponent(Component::ComponentId id);
 
         explicit ComponentBase() : m_id(true) {}
     };
+
+    template<ClassId E>
+    ClassId ComponentBase<E>::cid() const { return m_class; }
+
+    template<ClassId E>
+    void ComponentBase<E>::attachComponent(Component::ComponentId id) {
+        Component::Index::addComponent(m_id, id);
+    }
+
+    template<ClassId E>
+    void ComponentBase<E>::detachComponent(Component::ComponentId id) {
+        Component::Index::removeComponent(m_id, id);
+    }
 }
 
 
