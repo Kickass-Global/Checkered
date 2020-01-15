@@ -14,6 +14,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "Components/GameObject.h"
 #include "Systems/Debug/LiveReloadSystem.h"
+#include "Components/ComponentBase.h"
 
 int main() {
 

@@ -13,6 +13,7 @@
 #include "assimp/postprocess.h"
 
 #include "ComponentId.h"
+#include "ComponentBase.h"
 
 namespace Component {
 

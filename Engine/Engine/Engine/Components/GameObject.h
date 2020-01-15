@@ -6,10 +6,11 @@
 #define ENGINE_GAMEOBJECT_H
 
 #include "ComponentId.h"
+#include "ComponentBase.h"
 
 namespace Component {
 
-    class GameObject : public Component::ComponentBase<ClassId::GameObject> {
+    class GameObject : public ComponentBase<ClassId::GameObject> {
     };
 
 }
