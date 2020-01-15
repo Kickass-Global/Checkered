@@ -6,6 +6,7 @@
 #define ENGINE_COMPONENTBASE_H
 
 #include "ComponentId.h"
+#include "Index.h"
 
 namespace Component {
 
