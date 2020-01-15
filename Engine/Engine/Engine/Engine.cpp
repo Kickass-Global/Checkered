@@ -57,34 +57,28 @@ int main() {
     Pipeline::MeshLoader meshLoader;
     auto box = meshLoader.load("Assets/Meshes/box.obj");
 
-    // ...
+    // create two buffers to store our mesh data into
 
     auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-        box->vertices.size() * sizeof(box->vertices[0]), 
+        100000, 
         sizeof(box->vertices[0]), 
         GL_ARRAY_BUFFER
     );
 
-    arrayBuffer->push_back(
-        box->vertices.data(), 
-        box->vertices.size() * sizeof(box->vertices[0])
-    );
-    
     auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-        box->indices.size() * sizeof(box->indices[0]), 
+        100000, 
         sizeof(box->indices[0]),
         GL_ELEMENT_ARRAY_BUFFER
     );
     
-    elementBuffer->push_back(
-        box->indices.data(), 
-        box->indices.size() * sizeof(box->indices[0])
-    );
+    // buffer mesh data...
 
+    arrayBuffer->push_back(box->vertices);
+    elementBuffer->push_back(box->indices);
 
     Rendering::RenderBatch batch(arrayBuffer, elementBuffer);
 
-    // push batch data and assign shader program to batch
+    // assign shader program to batch
 
     batch.assign_shader(shader);
     

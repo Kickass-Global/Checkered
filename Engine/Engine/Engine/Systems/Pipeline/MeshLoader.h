@@ -13,6 +13,7 @@ namespace Pipeline {
 
 	class MeshLoader {
 	public:
+
 		std::shared_ptr<Component::Mesh> load(std::string filename)
 		{
 			Assimp::Importer importer;
@@ -22,24 +23,37 @@ namespace Pipeline {
                                                       aiProcess_JoinIdenticalVertices  |
                                                       aiProcess_SortByPType);
 
-            // If the import failed, report it
             if(!scene)
             {
                 Engine::log<module, Engine::Importance::high>( importer.GetErrorString());
-                assert(scene, "Loading resource " + filename);
             }
-
-            Component::Mesh mesh;
-            mesh.vertices.assign((glm::vec3*)scene->mMeshes[0]->mVertices,
-                                 (glm::vec3*)scene->mMeshes[0]->mVertices + scene->mMeshes[0]->mNumVertices);
-
+            assert(scene, "Loading resource " + filename);
 
             auto&& data = scene->mMeshes[0];
+            assert(data, "Loading mesh data");
+
+            Component::Mesh mesh;
+
+            // todo: error checking & sanity
+
+            for (auto i = 0; i < data->mNumVertices; ++i)
+            {
+                mesh.vertices.emplace_back(
+                    data->mVertices[i],
+                    data->mNormals[i],
+                    data->mTextureCoords[0][i]
+                );
+            }
+
             for (auto i = 0; i < data->mNumFaces; ++i)
             {
                 auto&& face = data->mFaces[i];
+                assert(face.mNumIndices == 3, "Mesh face is triangulated");
+
                 for (auto j = 0; j < face.mNumIndices; ++j)
+                {
                     mesh.indices.push_back(face.mIndices[j]);
+                }
             }
 
             return std::make_shared<Component::Mesh>(mesh);
