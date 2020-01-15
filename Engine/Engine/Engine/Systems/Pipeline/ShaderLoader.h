@@ -16,7 +16,7 @@
 namespace Pipeline {
 
     constexpr char module[] = "Pipeline";
-    constexpr auto assert = Engine::assertLog<module>;
+    constexpr auto assertLog = Engine::assertLog<module>;
 
     class ShaderLoader {
     public:
@@ -25,7 +25,7 @@ namespace Pipeline {
         std::unique_ptr<Rendering::Shader> load(std::string filename) {
 
             std::ifstream ifs(filename);
-            assert(ifs.is_open(), "load shader file " + filename);
+            assertLog(ifs.is_open(), "load shader file " + filename);
 
             std::vector<std::string> lines;
             std::string line;
@@ -43,7 +43,7 @@ namespace Pipeline {
         std::unique_ptr<Rendering::Program> load(std::string filename) {
 
         std::ifstream ifs(filename);
-        assert(ifs.is_open(), "load program description file " + filename);
+        assertLog(ifs.is_open(), "load program description file " + filename);
 
         nlohmann::json json;
         ifs >> json;

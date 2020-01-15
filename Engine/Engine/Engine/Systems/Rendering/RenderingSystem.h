@@ -26,7 +26,7 @@
 namespace Rendering {
 
     constexpr char module[] = "RenderingSystem";
-    constexpr auto assert = Engine::assertLog<module>;
+    constexpr auto assertLog = Engine::assertLog<module>;
 
     class RenderingSystem;
 
@@ -67,7 +67,7 @@ namespace Rendering {
 
                 Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
             }
-            assert(success != GL_FALSE, "shader creation");
+            assertLog(success != GL_FALSE, "shader creation");
         }
 
         ~Shader() {
@@ -103,7 +103,7 @@ namespace Rendering {
                 glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
                 Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
             }
-            assert(successful_link != GL_FALSE, "Link shader program");
+            assertLog(successful_link != GL_FALSE, "Link shader program");
 
             for(auto&& shader : shaders) glDetachShader(m_id, shader->id());
         }
@@ -137,7 +137,7 @@ namespace Rendering {
         void bind_shader(Component::ComponentId id)
         {
             auto it = shader_programs.find(id);
-            assert(it != shader_programs.end(), "Binding shader");
+            assertLog(it != shader_programs.end(), "Binding shader");
 
             it->second->bind();
         }
@@ -148,7 +148,7 @@ namespace Rendering {
 
         void initialize() {
 
-            assert(glfwInit(), "initialize GLFW");
+            assertLog(glfwInit(), "initialize GLFW");
             
             window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
 
@@ -156,7 +156,7 @@ namespace Rendering {
 
             glfwMakeContextCurrent(window);
 
-            assert(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
+            assertLog(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
 
             glEnable(GL_DEPTH_TEST);
             glDepthFunc(GL_LESS);
