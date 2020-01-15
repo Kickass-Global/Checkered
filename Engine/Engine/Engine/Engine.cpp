@@ -8,6 +8,7 @@
 #include "Systems/Rendering/RenderingBatch.h"
 #include "Systems/Input/InputSystem.h"
 #include "Systems/Camera/CameraSystem.h"
+#include "Systems/Pipeline/MeshLoader.h"
 
 using Type = Component::Index::Type;
 
@@ -49,6 +50,7 @@ int main() {
             shader.id(),
             loader.load("Assets/Programs/basic.shader")
     );
+    
 
     Rendering::RenderBatch batch(1000);
 
