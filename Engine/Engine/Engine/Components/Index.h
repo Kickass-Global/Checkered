@@ -13,18 +13,17 @@
 namespace Component {
 
     class Index {
-    public:
 
     private:
 
-        inline static std::map<Component::ComponentId, std::set<Component::ComponentId>> entityComponents;
-        inline static std::map<Component::ClassId, std::set<Component::ComponentId>> entities;
-        inline static std::map<Component::ComponentId, std::shared_ptr<void>> meta;
+        static std::map<Component::ComponentId, std::set<Component::ComponentId>> entityComponents;
+        static std::map<Component::ClassId, std::set<Component::ComponentId>> entities;
+        static std::map<Component::ComponentId, std::shared_ptr<void>> meta;
 
     public:
 
-        template <typename T>
-        static void push_entity(Component::ClassId cid, Component::ComponentId id, std::shared_ptr<T>& data) {
+        template<typename T>
+        static void push_entity(Component::ClassId cid, Component::ComponentId id, std::shared_ptr<T> &data) {
 
             meta[id] = data;
             entities[cid].emplace(id);
@@ -32,15 +31,17 @@ namespace Component {
 
         }
 
-        template <typename T>
-        static void replace_component_data(Component::ComponentId id, std::shared_ptr<T>& data)
-        {
+        template<typename T>
+        static void replace_component_data(Component::ComponentId id, std::shared_ptr<T> &data) {
+            
+            data->clone(id);
             meta[id] = data;
+
         }
 
-        static const std::set<Component::ComponentId>& entitiesOf(Component::ClassId cid);
+        static const std::set<Component::ComponentId> &entitiesOf(Component::ClassId cid);
 
-        static const std::set<Component::ComponentId>& componentsOf(Component::ComponentId id);
+        static const std::set<Component::ComponentId> &componentsOf(Component::ComponentId id);
 
         static bool hasComponent(Component::ComponentId id, Component::ComponentId componentId);
 

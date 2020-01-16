@@ -4,6 +4,10 @@
 
 #include "Index.h"
 
+std::map<Component::ComponentId, std::set<Component::ComponentId>> Component::Index::entityComponents;
+std::map<Component::ClassId, std::set<Component::ComponentId>> Component::Index::entities;
+std::map<Component::ComponentId, std::shared_ptr<void>> Component::Index::meta;
+
 const std::set<Component::ComponentId> &Component::Index::entitiesOf(Component::ClassId cid) {
     return entities[cid];
 }

@@ -34,7 +34,7 @@ namespace Camera {
         float u = 0;
 
         float sensitivity = 50.0f;
-        float increment = M_PI / 180.0f;
+        float increment = static_cast<float>(M_PI) / 180.0f;
 
         std::set<int> keys;
 
@@ -68,7 +68,7 @@ namespace Camera {
 
             float x_rotation = x / sensitivity * elapsed;
             float y_rotation = y / sensitivity * elapsed;
-            float zoom = u / sensitivity * elapsed;
+//            float zoom = u / sensitivity * elapsed;
             
 
             for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
@@ -115,7 +115,7 @@ namespace Camera {
             keys.erase(key);
         }
 
-        void onKeyPress(int key) {
+        void onKeyPress(int /*key*/) {
         }
 
     };

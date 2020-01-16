@@ -4,11 +4,15 @@
 cmake_minimum_required (VERSION 3.13)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c Components/Index.cpp Components/Index.h Components/Dirty.cpp Components/Dirty.h Components/Mesh.cpp Components/Mesh.h Components/GameObject.cpp Components/GameObject.h Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h
-        Components/ComponentBase.h Components/ComponentBase.cpp )
+set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c  )
 
-# Add source to this project's executable.
-add_executable (Engine "Engine.cpp" "Engine.h"
+set(SRC Engine.cpp Engine.h
+        Components/Index.cpp Components/Index.h
+        Components/Dirty.cpp Components/Dirty.h
+        Components/Mesh.cpp Components/Mesh.h
+        Components/GameObject.cpp Components/GameObject.h
+        Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h
+        Components/ComponentBase.h Components/ComponentBase.cpp
         SystemCalls.cpp SystemCalls.h
         Systems/PhysicsSystem.cpp Systems/PhysicsSystem.h
         Systems/Rendering/RenderingSystem.cpp Systems/Rendering/RenderingSystem.h
@@ -19,15 +23,24 @@ add_executable (Engine "Engine.cpp" "Engine.h"
         Systems/Pipeline/MeshLoader.h
         Components/Shader.cpp Components/Shader.h
         Components/ComponentId.cpp Components/ComponentId.h
-        Components/Camera.cpp Components/Camera.h
+        Components/Camera.cpp Components/Camera.h Systems/Rendering/Rendering.h)
+
+# Add source to this project's executable.
+add_executable (Engine
         ${GLAD}
-        )
+        ${SRC})
 
 set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
 
-# GAME ASSETS
-# copy glsl shader assets into build directory
 
+if(MSVC)
+    target_compile_options(Engine PRIVATE /W4)
+else()
+    target_compile_options(Engine PRIVATE -Wall -Wextra -pedantic)
+endif()
+
+# GAME ASSETS
+# copy assets into build directory
 
 FILE(GLOB_RECURSE MESHES Assets/*.obj)
 
@@ -55,7 +68,6 @@ set(PHYSX_HOME PATH "")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glfw-3.3.1" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
 

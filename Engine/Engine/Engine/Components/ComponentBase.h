@@ -5,40 +5,53 @@
 #ifndef ENGINE_COMPONENTBASE_H
 #define ENGINE_COMPONENTBASE_H
 
-#include "ComponentId.h"
 #include "Index.h"
+#include "ComponentId.h"
 
 namespace Component {
 
+    class ComponentInterface {
+        [[nodiscard]] virtual Component::ComponentId id() const  = 0;
+        [[nodiscard]] virtual Component::ClassId classId() const = 0;
+        virtual void attachComponent(Component::ComponentId id) const = 0;
+        virtual void detachComponent(Component::ComponentId id) const = 0;
+        virtual void clone(Component::ComponentId id) = 0;
+    };
+
     template<ClassId E>
-    class ComponentBase {
+    class ComponentBase : public ComponentInterface {
         const static Component::ClassId m_class = E;
         Component::ComponentId m_id;
 
     public:
 
-        [[nodiscard]] Component::ComponentId id() const { return m_id; }
-
-        [[nodiscard]] Component::ClassId cid() const;
-
-        void attachComponent(Component::ComponentId id);
-
-        void detachComponent(Component::ComponentId id);
-
-        explicit ComponentBase() : m_id(true) {}
+        [[nodiscard]] Component::ComponentId id() const override;
+        [[nodiscard]] Component::ClassId classId() const override;
+        void attachComponent(Component::ComponentId id) const override;
+        void detachComponent(Component::ComponentId id) const override;
+        void clone(Component::ComponentId id) override;
+        ComponentBase() : m_id(true) {}
     };
 
     template<Component::ClassId E>
-    Component::ClassId ComponentBase<E>::cid() const { return m_class; }
+    Component::ClassId ComponentBase<E>::classId() const { return m_class; }
 
     template<Component::ClassId E>
-    void ComponentBase<E>::attachComponent(Component::ComponentId id) {
+    void ComponentBase<E>::attachComponent(Component::ComponentId id) const {
         Component::Index::addComponent(m_id, id);
     }
 
     template<Component::ClassId E>
-    void ComponentBase<E>::detachComponent(Component::ComponentId id) {
+    void ComponentBase<E>::detachComponent(Component::ComponentId id) const {
         Component::Index::removeComponent(m_id, id);
+    }
+
+    template<Component::ClassId E>
+    Component::ComponentId ComponentBase<E>::id() const { return m_id; }
+
+    template<Component::ClassId E>
+    void ComponentBase<E>::clone(Component::ComponentId id) {
+        m_id = id;
     }
 }
 

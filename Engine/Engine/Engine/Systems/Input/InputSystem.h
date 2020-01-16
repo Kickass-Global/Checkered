@@ -17,7 +17,8 @@ namespace Input {
 
     class InputSystem {
 
-        static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
+        static void keyHandler(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/) {
+
             if (action == GLFW_RELEASE) {
                 Engine::log<module, Engine::Importance::low>("onKeyPress: ", key);
                 onKeyPress(key);

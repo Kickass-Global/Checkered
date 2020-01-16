@@ -37,7 +37,8 @@ namespace Debug {
             modified[filename] = {std::filesystem::last_write_time(filename), classId, componentId};
         }
 
-        void update(Engine::frametime elapsed) {
+        void update(Engine::frametime /*elapsed*/) {
+
             for (const auto&[filename, details] : modified) {
                 try {
                     auto last_modified_time = std::filesystem::last_write_time(filename);
@@ -51,7 +52,7 @@ namespace Debug {
                         onAssetModified(filename, details.classId, details.componentId);
 
                     }
-                } catch (std::exception &ignored) {
+                } catch (std::exception &/*ignored*/) {
                     continue;
                 }
             }
