@@ -32,21 +32,22 @@ namespace Engine {
     template<typename T>
     std::shared_ptr<T> createComponent() {
         auto component = std::make_shared<T>();
-        Component::Index::push_entity(component->cid(), component->id(), component);
+        Component::Index::push_entity(component->classId(), component->id(), component);
 
         return component;
     }
 
     template<typename T>
     std::shared_ptr<T> createComponent(std::shared_ptr<T> component) {
-        Component::Index::push_entity(component->cid(), component->id(), component);
+        Component::Index::push_entity(component->classId(), component->id(), component);
         return component;
     }
+    
     template <typename T>
     std::shared_ptr<T> replaceComponent(Component::ComponentId id, std::shared_ptr<T> component) {
-
         Component::Index::replace_component_data(id, component);
-        return Component::Index::entityData<T>(id);
+        auto result =  Component::Index::entityData<T>(id);
+        return result;
 
     }
 

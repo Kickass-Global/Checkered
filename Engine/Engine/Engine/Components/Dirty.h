@@ -6,15 +6,13 @@
 #define ENGINE_DIRTY_H
 
 #include "ComponentId.h"
+#include "ComponentBase.h"
 
 namespace Component {
 
     class Dirty {
-
-        inline static Component::ComponentId m_id = Component::ComponentId(true);
-
     public:
-        static Component::ComponentId id() { return m_id; }
+        static ComponentId id() { return {true, 0xAAAA0001};}
     };
 
 }

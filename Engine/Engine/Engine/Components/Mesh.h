@@ -18,22 +18,20 @@
 namespace Component {
 
     class Vertex {
+
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec3 texcoord;
     
     public:
-
-        Vertex(aiVector3D position, aiVector3D normal, aiVector3D texcoord) :
-            position(position.x, position.y, position.z), 
-            normal(normal.x, normal.y, normal.z), 
-            texcoord(texcoord.x, texcoord.y, texcoord.z) {}
+        Vertex(aiVector3D position, aiVector3D normal, aiVector3D texcoord);
     };
 
     class Mesh : public ComponentBase<ClassId::Mesh> {
 
     public:
 
+        Component::ComponentId shader;
         std::vector<Vertex> vertices;
         std::vector<int> indices;
 

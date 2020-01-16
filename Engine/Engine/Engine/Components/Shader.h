@@ -7,14 +7,11 @@
 
 #include <string>
 #include "ComponentId.h"
+#include "ComponentBase.h"
 
 namespace Component {
 
-    class Shader {
-        ComponentId m_id;
-
-    public:
-        ComponentId id() const { return m_id; }
+    class Shader : public ComponentBase<ClassId::Shader> {
     };
 
 }

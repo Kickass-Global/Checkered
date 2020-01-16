@@ -9,29 +9,31 @@
 
 namespace Component {
 
-    inline static int next_id = 1;
+    extern unsigned int next_id;
 
     struct ComponentId {
-        int id;
 
-        ComponentId() : id(-1) {        }
+        unsigned int id;
+
+        ComponentId();
         ComponentId(const ComponentId& other);
+        ComponentId(bool, unsigned int) noexcept;
 
         ComponentId Create();
 
-        ComponentId(bool) noexcept;
-
+        explicit ComponentId(bool) noexcept;
         bool operator < (const ComponentId& other) const;
 
         friend std::ostream& operator<<(std::ostream& out, const Component::ComponentId& id);
-    private:
     };
 
-    enum class ClassId : int {
-        Camera,
+    enum class ClassId : unsigned int {
+        Camera = 0xBEEF0000,
         Shader,
         Mesh,
-        GameObject
+        GameObject,
+        Dirty,
+        Null = 0xFFFFFFFF,
     };
 
     std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);

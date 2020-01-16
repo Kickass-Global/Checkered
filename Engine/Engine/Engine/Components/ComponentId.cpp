@@ -4,6 +4,8 @@
 
 #include "ComponentId.h"
 
+unsigned int Component::next_id = 0xFEED0000;
+
 std::ostream &Component::operator<<(std::ostream &out, const Component::ClassId &id) {
     return out << (int)id;
 }
@@ -25,3 +27,7 @@ std::ostream &Component::operator<<(std::ostream &out, const Component::Componen
 }
 
 Component::ComponentId::ComponentId(bool) noexcept : id(Component::next_id++) {}
+
+Component::ComponentId::ComponentId() : id(0xFFFFFFFFu) {        }
+
+Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}

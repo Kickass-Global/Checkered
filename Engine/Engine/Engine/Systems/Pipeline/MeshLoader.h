@@ -36,7 +36,7 @@ namespace Pipeline {
 
             // todo: error checking & sanity
 
-            for (auto i = 0; i < data->mNumVertices; ++i)
+            for (auto i = 0u; i < data->mNumVertices; ++i)
             {
                 mesh.vertices.emplace_back(
                     data->mVertices[i],
@@ -45,17 +45,22 @@ namespace Pipeline {
                 );
             }
 
-            for (auto i = 0; i < data->mNumFaces; ++i)
+            for (auto i = 0u; i < data->mNumFaces; ++i)
             {
                 auto&& face = data->mFaces[i];
                 assertLog(face.mNumIndices == 3, "Mesh face is triangulated");
 
-                for (auto j = 0; j < face.mNumIndices; ++j)
+                for (auto j = 0u; j < face.mNumIndices; ++j)
                 {
                     mesh.indices.push_back(face.mIndices[j]);
                 }
             }
 
+            auto shaders = Component::Index::entitiesOf(Component::ClassId::Shader);
+            if (shaders.size() > 0)
+            {
+                mesh.shader = *(shaders.begin());
+            }
             return std::make_shared<Component::Mesh>(mesh);
 		}
 	};

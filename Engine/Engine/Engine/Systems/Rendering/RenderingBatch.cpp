@@ -12,7 +12,9 @@ namespace Rendering {
     }
 
     void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
-        glDrawElements(GL_TRIANGLES, elementBuffer->count(), GL_UNSIGNED_INT, 0);
+        for(auto [key, detail] : details) {
+            glDrawElementsBaseVertex(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0, detail[1].offset);
+        }
     }
 
     void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
@@ -48,5 +50,39 @@ namespace Rendering {
 
 
         glBindVertexArray(0);
+    }
+
+    void RenderBatch::push_back(const Component::Mesh &mesh) {
+        details[mesh.id()][0] = arrayBuffer->push_back(mesh.vertices);
+        details[mesh.id()][1] = elementBuffer->push_back(mesh.indices);
+    }
+
+    bool RenderBatch::contains(Component::ComponentId id) const {
+        return details.count(id) > 0;
+    }
+
+    void RenderBatch::remove(Component::ComponentId id) {
+        details.erase(id);
+    }
+
+    BatchBuffer::BatchBuffer(int bufferMaxSize, int stride, int type)
+    : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
+
+        glGenBuffers(1, &m_id);
+        glBindBuffer(m_type, m_id);
+        glBufferData(m_type, m_size, nullptr, GL_STATIC_DRAW);
+
+    }
+
+    GLuint BatchBuffer::id() {
+        return m_id;
+    }
+
+    size_t BatchBuffer::stride() {
+        return m_stride;
+    }
+
+    size_t BatchBuffer::count() {
+        return m_fill / m_stride;
     }
 }

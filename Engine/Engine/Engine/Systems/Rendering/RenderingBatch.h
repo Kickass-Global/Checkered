@@ -5,17 +5,19 @@
 #ifndef ENGINE_RENDERINGBATCH_H
 #define ENGINE_RENDERINGBATCH_H
 
+#include <map>
 #include <vector>
 
 #include "../../Components/ComponentId.h"
+#include "../../Components/Mesh.h"
 #include "../../Components/Shader.h"
+#include "Rendering.h"
 
 #include "glad/glad.h"
-#include "../../Components/Mesh.h"
 #include <GLFW/glfw3.h>
-#include <map>
 
 namespace Rendering {
+
     class RenderingSystem;
     
     struct BufferDetails
@@ -34,13 +36,7 @@ namespace Rendering {
 
     public:
 
-        BatchBuffer(int bufferMaxSize, int stride, int type) : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
-        
-            glGenBuffers(1, &m_id);
-            glBindBuffer(m_type, m_id);
-            glBufferData(m_type, m_size, nullptr, GL_STATIC_DRAW);
-
-        }
+        BatchBuffer(int bufferMaxSize, int stride, int type);
 
         template <typename T>
         BufferDetails push_back(std::vector<T> data) {
@@ -51,22 +47,16 @@ namespace Rendering {
             auto offset = m_fill;
             m_fill += data.size() * sizeof(T);
         
-            //assert(m_fill <= m_size, "Checking buffer fill");
+            assertLog(m_fill <= m_size, "Checking buffer fill");
             
-            return {offset, static_cast<int>(data.size()) };
+            return { offset, static_cast<int>(data.size()) };
         }
 
-        GLuint id() {
-            return m_id;
-        }
+        GLuint id();
 
-        size_t stride() {
-            return m_stride;
-        }
+        size_t stride();
 
-        size_t count() {
-            return m_fill / m_stride;
-        }
+        size_t count();
     };
 
     class RenderBatch {
@@ -78,17 +68,12 @@ namespace Rendering {
         Component::ComponentId shader;
         std::shared_ptr<Rendering::BatchBuffer> arrayBuffer;
         std::shared_ptr<Rendering::BatchBuffer> elementBuffer;
-
         std::map<Component::ComponentId, BufferDetails[2]> details;
 
         RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
             std::shared_ptr<Rendering::BatchBuffer> elementBuffer);
 
-        void push_back(const Component::Mesh& mesh)
-        {
-            details[mesh.id()][0] = arrayBuffer->push_back(mesh.vertices);
-            details[mesh.id()][1] = elementBuffer->push_back(mesh.indices);
-        }
+        void push_back(const Component::Mesh& mesh);
 
         /**
          * Binds the VAO and sets up all resources needed to draw the geometry in the batch.
@@ -100,15 +85,9 @@ namespace Rendering {
          */
         void draw(Rendering::RenderingSystem &renderingSystem);
 
-        bool contains(Component::ComponentId id) const
-        {
-            return details.count(id) > 0;
-        }
+        bool contains(Component::ComponentId id) const;
 
-        void remove(Component::ComponentId id)
-        {
-            details.erase(id);
-        }
+        void remove(Component::ComponentId id);
 
         void assign_shader(Component::Shader shader);
     };
