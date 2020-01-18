@@ -3,6 +3,8 @@
 //
 
 #include "ComponentId.h"
+#include "Index.h"
+#include "ComponentBase.h"
 
 unsigned int Component::next_id = 0xFEED0000;
 
@@ -31,3 +33,7 @@ Component::ComponentId::ComponentId(bool) noexcept : id(Component::next_id++) {}
 Component::ComponentId::ComponentId() : id(0xFFFFFFFFu) {        }
 
 Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
+
+std::shared_ptr<Component::ComponentInterface> Component::ComponentId::get() {
+    return Index::entityData<Component::ComponentInterface>(*this);
+}

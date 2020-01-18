@@ -3,6 +3,9 @@
 //
 
 #include "RenderingSystem.h"
+#include "../../Engine.h"
+
+Component::ComponentEvent<int, int> Rendering::RenderingSystem::onWindowSizeChanged;
 
 void Rendering::RenderingSystem::update(Engine::frametime) {
 

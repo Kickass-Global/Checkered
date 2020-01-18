@@ -8,7 +8,11 @@
 #include <map>
 #include <set>
 #include <memory>
-#include "ComponentId.h"
+
+namespace Component {
+    struct ComponentId;
+    enum class ClassId : unsigned int;
+}
 
 namespace Component {
 
@@ -56,6 +60,5 @@ namespace Component {
     };
 
 }
-
 
 #endif //ENGINE_INDEX_H

@@ -3,6 +3,7 @@
 //
 
 #include "Index.h"
+#include "ComponentId.h"
 
 std::map<Component::ComponentId, std::set<Component::ComponentId>> Component::Index::entityComponents;
 std::map<Component::ClassId, std::set<Component::ComponentId>> Component::Index::entities;

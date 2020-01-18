@@ -11,6 +11,7 @@
 namespace Component {
 
     class GameObject : public ComponentBase<ClassId::GameObject> {
+
     };
 
 }
