@@ -8,8 +8,9 @@
 #include <string>
 #include <filesystem>
 #include <map>
-#include "../../Engine.h"
+#include "../../main.h"
 #include "../../SystemCalls.h"
+#include "../../Engine.h"
 
 namespace Debug {
 

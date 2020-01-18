@@ -9,6 +9,8 @@
 
 namespace Component {
 
+    class ComponentInterface;
+
     extern unsigned int next_id;
 
     struct ComponentId {
@@ -24,6 +26,13 @@ namespace Component {
         explicit ComponentId(bool) noexcept;
         bool operator < (const ComponentId& other) const;
 
+        std::shared_ptr<ComponentInterface> get();
+
+        template<typename T>
+        std::shared_ptr<T> get() {
+            return Index::entityData<T>(*this);
+        }
+
         friend std::ostream& operator<<(std::ostream& out, const Component::ComponentId& id);
     };
 
@@ -33,13 +42,13 @@ namespace Component {
         Mesh,
         GameObject,
         Dirty,
-        Null = 0xFFFFFFFF,
+        Event,
+        EventArgs,
+        EventHandler,
+        Null = 0xFFFFFFFF
     };
 
     std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
 }
-
-
-
 
 #endif //ENGINE_COMPONENTID_H

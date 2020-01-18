@@ -6,7 +6,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c  )
 
-set(SRC Engine.cpp Engine.h
+set(SRC main.cpp main.h
+        Engine.cpp  Engine.h
         Components/Index.cpp Components/Index.h
         Components/Dirty.cpp Components/Dirty.h
         Components/Mesh.cpp Components/Mesh.h
@@ -23,7 +24,14 @@ set(SRC Engine.cpp Engine.h
         Systems/Pipeline/MeshLoader.h
         Components/Shader.cpp Components/Shader.h
         Components/ComponentId.cpp Components/ComponentId.h
-        Components/Camera.cpp Components/Camera.h Systems/Rendering/Rendering.h)
+        Components/Camera.cpp Components/Camera.h
+        Systems/Rendering/Rendering.h
+        Components/Plane.cpp Components/Plane.h
+        Systems/Pipeline/EntityLoader.cpp Systems/Pipeline/EntityLoader.h
+        Components/Model.cpp Components/Model.h
+        Components/Vehicle.cpp Components/Vehicle.h
+        Components/EventHandler.cpp Components/EventHandler.h
+        Components/ComponentEvent.cpp Components/ComponentEvent.h)
 
 # Add source to this project's executable.
 add_executable (Engine

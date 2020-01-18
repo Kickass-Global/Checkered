@@ -9,17 +9,22 @@
 #include <algorithm>
 #include <string>
 #include <chrono>
+#include <functional>
 #include <GLFW/glfw3.h>
 #define _USE_MATH_DEFINES
 
 #include <math.h>
 
-#include "../../Engine.h"
+#include "../../main.h"
 #include "../../Components/ComponentId.h"
 #include "../../Components/Camera.h"
 #include "../../SystemCalls.h"
 #include "../../Components/Index.h"
 #include "../../Components/Dirty.h"
+#include "../../Components/ComponentEvent.h"
+#include "../../Components/EventHandler.h"
+#include "../../Engine.h"
+
 
 namespace Camera {
 
@@ -28,6 +33,24 @@ namespace Camera {
     class CameraSystem {
 
     public:
+
+        static Component::ComponentId id();
+
+        Component::ComponentId onKeyPressHandler;
+        Component::ComponentId onKeyDownHandler;
+        Component::ComponentId onKeyUpHandler;
+        Component::ComponentId onWindowSizeHandler;
+
+        CameraSystem() {
+
+            // create event handlers
+
+            onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
+            onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
+            onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
+            onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
+
+        }
 
         float x = 0;
         float y = 0;
@@ -95,7 +118,13 @@ namespace Camera {
 
         }
 
-        void onWindowSizeChanged(int width, int height) {
+        void onWindowSizeChanged(const Component::EventArgs<int,int>& args) {
+
+            Engine::log<module, Engine::Importance::low>(
+                    "onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
+
+            auto&& width = std::get<0>(args.values);
+            auto&& height = std::get<1>(args.values);
 
             for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
             {
@@ -107,15 +136,18 @@ namespace Camera {
             }
         }
 
-        void onKeyDown(int key) {
-            keys.emplace(key);
+        void onKeyDown(const Component::EventArgs<int>& args) {
+            Engine::log<module, Engine::Importance::low>("onKeyDown=", std::get<0>(args.values));
+            keys.emplace(std::get<int>(args.values));
         }
 
-        void onKeyUp(int key) {
-            keys.erase(key);
+        void onKeyUp(const Component::EventArgs<int>& args) {
+            Engine::log<module, Engine::Importance::low>("onKeyUp=", std::get<0>(args.values));
+            keys.erase(std::get<int>(args.values));
         }
 
-        void onKeyPress(int /*key*/) {
+        void onKeyPress(const Component::EventArgs<int>& args) {
+            Engine::log<module, Engine::Importance::low>("onKeyPress=", std::get<0>(args.values));
         }
 
     };

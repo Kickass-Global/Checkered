@@ -3,3 +3,5 @@
 //
 
 #include "CameraSystem.h"
+
+Component::ComponentId Camera::CameraSystem::id() { return Component::ComponentId(true, 0xCACA0002); }

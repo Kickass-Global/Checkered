@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../../Engine.h"
+#include "../../main.h"
 #include "../../SystemCalls.h"
 #include "../../Components/Shader.h"
 #include "../../Components/Camera.h"
@@ -23,6 +23,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "../../Components/Mesh.h"
 #include "Rendering.h"
+#include "../../Components/ComponentEvent.h"
+#include "../../Engine.h"
 
 namespace Rendering {
 
@@ -89,7 +91,7 @@ namespace Rendering {
 
     public:
 
-        inline static Engine::Event<int, int> onWindowSizeChanged;
+        static Component::ComponentEvent<int, int> onWindowSizeChanged;
 
         void bind_shader(Component::ComponentId id);
 
