@@ -8,12 +8,9 @@
 #include "Systems/Camera/CameraSystem.h"
 #include "Systems/Pipeline/MeshLoader.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "Components/GameObject.h"
 #include "Systems/Debug/LiveReloadSystem.h"
-#include "Components/ComponentBase.h"
-#include "Engine.h"
+
 
 int main() {
 
@@ -58,6 +55,7 @@ int main() {
     );
 
     auto box_object = Engine::createComponent<Component::GameObject>();
+    box_object->worldTransform = glm::translate(glm::vec3{ 0,0,-5 });
     box_object->attachComponent(box->id());
 
     // hook up a live-reload watcher on the box asset to reload it when changes are detected.
@@ -82,6 +80,8 @@ int main() {
 
     // send data to rendering system for drawing...
     renderingSystem.buffer(*box);
+
+    renderingSystem.updateInstanceData(box->id(), sizeof(glm::mat4), glm::value_ptr(box_object->worldTransform));
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();

@@ -7,6 +7,8 @@ project ("Engine")
 
 # Include sub-projects.
 add_subdirectory ("Engine")
+add_subdirectory ("Assets")
+
 
 
 
