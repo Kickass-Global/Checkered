@@ -8,10 +8,14 @@
 #include "ComponentId.h"
 #include "ComponentBase.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 namespace Component {
 
     class GameObject : public ComponentBase<ClassId::GameObject> {
-
+    public:
+        glm::mat4 worldTransform;
     };
 
 }

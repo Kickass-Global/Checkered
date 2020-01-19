@@ -4,6 +4,7 @@
 
 #include "RenderingBatch.h"
 #include "RenderingSystem.h"
+#include "../../Components/ComponentId.h"
 
 namespace Rendering {
 
@@ -13,7 +14,7 @@ namespace Rendering {
 
     void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
         for(auto [key, detail] : details) {
-            glDrawElementsBaseVertex(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0, detail[1].offset);
+            glDrawElementsInstancedBaseVertex(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0, 1, detail[1].offset);
         }
     }
 
@@ -24,14 +25,14 @@ namespace Rendering {
 
 
     RenderBatch::RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
-            std::shared_ptr<Rendering::BatchBuffer> elementBuffer) 
-        : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer) {
-        glGenVertexArrays(1, &vao);
+                             std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
+                             std::shared_ptr<Rendering::BatchBuffer> instanceBuffer)
+        : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer), instanceBuffer(instanceBuffer) {
 
+        glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
-
         glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
 
         glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
@@ -48,6 +49,25 @@ namespace Rendering {
         glVertexAttribFormat(2, 3, GL_FLOAT, false, 2 * sizeof(glm::vec3));
         glVertexAttribBinding(2, 0);
 
+        glBindVertexBuffer(1, instanceBuffer->id(), 0, instanceBuffer->stride());
+        glVertexBindingDivisor(1, 1);
+
+        // setup instance matrix attribute buffer
+
+        glEnableVertexAttribArray(4);
+        glEnableVertexAttribArray(5);
+        glEnableVertexAttribArray(6);
+        glEnableVertexAttribArray(7);
+
+        glVertexAttribFormat(4, 4, GL_FLOAT, false, 0);
+        glVertexAttribFormat(5, 4, GL_FLOAT, false, 1 * sizeof(glm::vec4));
+        glVertexAttribFormat(6, 4, GL_FLOAT, false, 2 * sizeof(glm::vec4));
+        glVertexAttribFormat(7, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4));
+
+        glVertexAttribBinding(4, 1);
+        glVertexAttribBinding(5, 1);
+        glVertexAttribBinding(6, 1);
+        glVertexAttribBinding(7, 1);
 
         glBindVertexArray(0);
     }
@@ -55,6 +75,7 @@ namespace Rendering {
     void RenderBatch::push_back(const Component::Mesh &mesh) {
         details[mesh.id()][0] = arrayBuffer->push_back(mesh.vertices);
         details[mesh.id()][1] = elementBuffer->push_back(mesh.indices);
+        details[mesh.id()][2] = instanceBuffer->push_back(std::vector<glm::mat4>{glm::mat4(1)});
     }
 
     bool RenderBatch::contains(Component::ComponentId id) const {
@@ -70,7 +91,7 @@ namespace Rendering {
 
         glGenBuffers(1, &m_id);
         glBindBuffer(m_type, m_id);
-        glBufferData(m_type, m_size, nullptr, GL_STATIC_DRAW);
+        glBufferData(m_type, m_size, nullptr, GL_DYNAMIC_DRAW);
 
     }
 

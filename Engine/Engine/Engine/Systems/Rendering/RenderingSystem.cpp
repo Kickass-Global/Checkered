@@ -20,7 +20,7 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
             auto program = shader_programs[batch->shader]->id();
             for(auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
             {
-                auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty().id());
+                auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
                 if(camera_is_dirty)
                 {
@@ -78,7 +78,13 @@ std::shared_ptr<Rendering::RenderBatch> Rendering::RenderingSystem::findSuitable
             GL_ELEMENT_ARRAY_BUFFER
     );
 
-    auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer);
+    auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
+            100000,
+            sizeof(glm::mat4),
+            GL_ARRAY_BUFFER
+    );
+
+    auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
     batch->shader = shader_programs.begin()->first;
 
     return push_back(batch);

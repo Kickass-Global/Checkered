@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 3.13)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/src/glad.c  )
+set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Include/glad/src/glad.c)
 
 set(SRC main.cpp main.h
         Engine.cpp  Engine.h
@@ -41,35 +41,14 @@ add_executable (Engine
 set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
 
 
-if(MSVC)
+#[[if(MSVC)
     target_compile_options(Engine PRIVATE /W4)
 else()
     target_compile_options(Engine PRIVATE -Wall -Wextra -pedantic)
-endif()
+endif()]]
 
 # GAME ASSETS
 # copy assets into build directory
-
-FILE(GLOB_RECURSE MESHES Assets/*.obj)
-
-foreach(file ${MESHES})
-    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${MESHES})
-    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
-endforeach()
-
-FILE(GLOB PROGRAMS Assets/Programs/*.shader)
-
-foreach(file ${PROGRAMS})
-    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${PROGRAMS})
-    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
-endforeach()
-
-FILE(GLOB SHADERS Assets/Shaders/*.vert Assets/Shaders/*.frag)
-
-foreach(SHADER ${SHADERS})
-    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${SHADER})
-    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
-endforeach()
 
 set(PHYSX_HOME PATH "")
 
@@ -77,24 +56,26 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glfw-3.3.1" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../Include/glfw-3.3.1" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
 
 target_link_libraries(Engine
         PUBLIC glfw
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/assimp-vc142-mtd.lib"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/zlibstaticd.lib"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/IrrXMLd.lib"
         PUBLIC ${OPENGL_gl_LIBRARY})
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/assimp-vc142-mtd.dll" assimp-vc142-mtd.dll COPYONLY)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/PhysxDevice64.dll" PhysxDevice64.dll COPYONLY)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/glut32.dll" glut32.dll COPYONLY)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../libs/PhysxDevice64.dll" PhysxDevice64.dll COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../libs/glut32.dll" glut32.dll COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../libs/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/pxshared/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/PhysX/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glminclude/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/assimp/include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Middleware/glad/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Include/PhysX/pxshared/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Include/PhysX/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Include/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Include/glminclude/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Include/assimp/include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../Include/glad/include")
 
 find_package(OpenGL REQUIRED)
 

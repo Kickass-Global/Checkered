@@ -89,6 +89,7 @@ namespace Rendering {
         std::vector<std::shared_ptr<Rendering::RenderBatch>> batches;
         std::map<Component::ComponentId, std::unique_ptr<Rendering::Program>> shader_programs;
 
+
     public:
 
         static Component::ComponentEvent<int, int> onWindowSizeChanged;
@@ -102,6 +103,15 @@ namespace Rendering {
         static void windowSizeHandler(GLFWwindow* /*window*/, int width, int height);
 
         GLFWwindow* getWindow();
+
+        void updateInstanceData(Component::ComponentId id, int size, float* data) {
+            auto it = std::find_if(batches.begin(), batches.end(),
+                         [id](auto batch) { return batch->contains(id); });
+
+            assertLog(it != batches.end(), "check for valid batch");
+
+            it->get()->update(id, 2, size, data);
+        }
 
         void buffer(const Component::Mesh& data );
 

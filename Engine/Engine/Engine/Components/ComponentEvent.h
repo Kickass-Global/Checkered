@@ -19,8 +19,12 @@
 
 namespace Component {
 
-    struct ComponentId;
+    struct ComponentId; //fwd decl.
 
+    /**
+     * Contains data from an event that will be sent to subscribers of that event.
+     * @tparam Args the data types to pass to subscribers
+     */
     template<typename... Args>
     class EventArgs : public ComponentBase<ClassId::EventArgs>
     {
@@ -29,26 +33,33 @@ namespace Component {
         std::tuple<Args...> values;
     };
 
+    /**
+     * Component events allow components to expose events; components can then subscribe to those events.
+     * This allows components to pass information between one another directly.
+     */
     template<typename... Args>
     class ComponentEvent : public ComponentBase<ClassId::Event>{
 
-        std::vector<Component::ComponentId> listeners;
+        std::vector<Component::ComponentId> subscribers;
 
     public:
 
+        /**
+         * Invokes the event args to all listeners
+         * @param args the event args data
+         */
         void operator()(Args ... args);
 
-        void operator+=(Component::ComponentId listener) {
-
-            listeners.push_back(listener);
-            Engine::EventSystem::registerHandler(listener);
-
-        }
+        /**
+         * Adds a new subscriber to this event
+         * @param subscriber the component to notify when this event occurs.
+         */
+        void operator+=(Component::ComponentId subscriber);
     };
 
     template<typename... Args>
     void ComponentEvent<Args...>::operator()(Args... args) {
-        for (Component::ComponentId listener : listeners) {
+        for (Component::ComponentId listener : subscribers) {
 
             auto eventArgs = std::make_shared<EventArgs<Args...>>(args...);
             Index::push_entity(eventArgs->classId(), eventArgs->id(), eventArgs);
@@ -56,7 +67,14 @@ namespace Component {
 
         }
     }
-}
 
+    template<typename... Args>
+    void ComponentEvent<Args...>::operator+=(Component::ComponentId subscriber) {
+
+        subscribers.push_back(subscriber);
+        Engine::EventSystem::registerHandler(subscriber);
+
+    }
+}
 
 #endif //ENGINE_COMPONENTEVENT_H
