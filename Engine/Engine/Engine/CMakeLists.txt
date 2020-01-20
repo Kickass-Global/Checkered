@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for Engine, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.13)
+cmake_minimum_required (VERSION 3.12)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 set(GLAD ${CMAKE_CURRENT_SOURCE_DIR}/../Include/glad/src/glad.c)

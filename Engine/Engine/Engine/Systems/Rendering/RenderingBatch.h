@@ -49,7 +49,7 @@ namespace Rendering {
             auto offset = m_fill;
             m_fill += data.size() * sizeof(T);
         
-            assertLog(m_fill <= m_size, "Checking buffer fill");
+			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
             
             return { offset, static_cast<int>(data.size()) };
         }
@@ -85,7 +85,6 @@ namespace Rendering {
         RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
                     std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
                     std::shared_ptr<Rendering::BatchBuffer> instanceBuffer);
-
 
         void push_back(const Component::Mesh& mesh);
 

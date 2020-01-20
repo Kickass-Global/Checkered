@@ -13,7 +13,7 @@
 
 namespace Component {
     namespace {
-        constexpr char module[] = "Component";
+        static char module[] = "Component";
     }
 }
 
