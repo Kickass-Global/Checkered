@@ -24,6 +24,7 @@
 #include "../../Components/ComponentEvent.h"
 #include "../../Components/EventHandler.h"
 #include "../../Engine.h"
+#include "../../Events.h"
 
 
 namespace Camera {

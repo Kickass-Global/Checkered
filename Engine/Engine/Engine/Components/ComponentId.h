@@ -6,6 +6,7 @@
 #define ENGINE_COMPONENTID_H
 
 #include <ostream>
+#include <memory>
 
 namespace Component {
 
@@ -26,15 +27,18 @@ namespace Component {
         explicit ComponentId(bool) noexcept;
         bool operator < (const ComponentId& other) const;
 
-        std::shared_ptr<ComponentInterface> get();
+        [[nodiscard]] std::shared_ptr<ComponentInterface> data() const;
 
         template<typename T>
-        std::shared_ptr<T> get() {
-            return Index::entityData<T>(*this);
-        }
+        [[nodiscard]] std::shared_ptr<T> data() const;
 
         friend std::ostream& operator<<(std::ostream& out, const Component::ComponentId& id);
     };
+
+    template<typename T>
+    std::shared_ptr<T> Component::ComponentId::data() const {
+        return Index::entityData<T>(*this);
+    }
 
     enum class ClassId : unsigned int {
         Camera = 0xBEEF0000,
@@ -42,9 +46,11 @@ namespace Component {
         Mesh,
         GameObject,
         Dirty,
+        Program,
         Event,
         EventArgs,
         EventHandler,
+        Billboard,
         Null = 0xFFFFFFFF
     };
 

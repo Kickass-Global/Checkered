@@ -1,0 +1,6 @@
+{
+  "Player": {
+    "Mesh": "Assets/Meshes/box.obj",
+    "Shader": "basic"
+  }
+}

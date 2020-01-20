@@ -5,6 +5,7 @@
 #include "ComponentId.h"
 #include "Index.h"
 #include "ComponentBase.h"
+#include "../Engine.h"
 
 unsigned int Component::next_id = 0xFEED0000;
 
@@ -25,7 +26,9 @@ bool Component::ComponentId::operator<(const Component::ComponentId &other) cons
 }
 
 std::ostream &Component::operator<<(std::ostream &out, const Component::ComponentId &id) {
-    return out << id.id;
+
+    if(Engine::hasName(id)) return out << Engine::names[id];
+    else return out << id.id;
 }
 
 Component::ComponentId::ComponentId(bool) noexcept : id(Component::next_id++) {}
@@ -34,6 +37,6 @@ Component::ComponentId::ComponentId() : id(0xFFFFFFFFu) {        }
 
 Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
 
-std::shared_ptr<Component::ComponentInterface> Component::ComponentId::get() {
+std::shared_ptr<Component::ComponentInterface> Component::ComponentId::data() const {
     return Index::entityData<Component::ComponentInterface>(*this);
 }

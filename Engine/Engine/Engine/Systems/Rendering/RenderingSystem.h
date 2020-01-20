@@ -23,7 +23,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "../../Components/Mesh.h"
 #include "Rendering.h"
-#include "../../Components/ComponentEvent.h"
+#include "../../Components/Component.h"
 #include "../../Engine.h"
 
 namespace Rendering {
@@ -43,13 +43,13 @@ namespace Rendering {
         ~Shader();
     };
 
-    class Program {
+    class Program : public Component::ComponentBase<Component::ClassId::Program> {
         GLuint m_id;
 
     public:
 
         template <typename... Ts>
-        explicit Program(std::vector<std::unique_ptr<Rendering::Shader>> shaders) {
+        explicit Program(std::vector<std::shared_ptr<Rendering::Shader>> shaders) {
 
             m_id = glCreateProgram();
 
@@ -75,7 +75,7 @@ namespace Rendering {
             for(auto&& shader : shaders) glDetachShader(m_id, shader->id());
         }
 
-        GLuint id();
+        GLuint programId();
 
         void bind();
 
@@ -87,24 +87,30 @@ namespace Rendering {
         GLFWwindow* window;
 
         std::vector<std::shared_ptr<Rendering::RenderBatch>> batches;
-        std::map<Component::ComponentId, std::unique_ptr<Rendering::Program>> shader_programs;
-
 
     public:
 
+        Component::ComponentId onBillboardModifiedHandler;
+
         static Component::ComponentEvent<int, int> onWindowSizeChanged;
-
-        void bind_shader(Component::ComponentId id);
-
-        void push_back(Component::ComponentId id, std::unique_ptr<Rendering::Program> program);
 
         void initialize();
 
         static void windowSizeHandler(GLFWwindow* /*window*/, int width, int height);
 
+        void onBillboardModified(const Component::EventArgs<Component::ComponentId>& args)
+        {
+            auto& billboard = std::get<0>(args.values);
+            Engine::log<module>("onBillboardModified=", billboard);
+            buffer(*billboard.data<Component::Mesh>());
+        }
+
         GLFWwindow* getWindow();
 
         void updateInstanceData(Component::ComponentId id, int size, float* data) {
+
+            Engine::log<module>("Updating instance data of component#", id);
+
             auto it = std::find_if(batches.begin(), batches.end(),
                          [id](auto batch) { return batch->contains(id); });
 

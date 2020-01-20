@@ -11,6 +11,7 @@
 #include "../../main.h"
 #include "../../SystemCalls.h"
 #include "../../Engine.h"
+#include "../../Events.h"
 
 namespace Debug {
 
@@ -47,7 +48,7 @@ namespace Debug {
 
                         modified[filename].last_modified_time = last_modified_time;
 
-                        Engine::log<module, Engine::Importance::medium>(
+                        Engine::log<module>("Asset was modified: ",
                                 filename, details.classId, details.componentId);
 
                         onAssetModified(filename, details.classId, details.componentId);

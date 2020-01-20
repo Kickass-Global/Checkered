@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include <memory>
+#include "ComponentId.h"
 
 namespace Component {
     struct ComponentId;

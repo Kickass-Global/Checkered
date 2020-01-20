@@ -10,6 +10,21 @@
 namespace Component {
 
     class Plane : public Component::Mesh {
+
+        Plane() {
+            vertices.emplace_back(aiVector3D{-0.5f, -0.5f, 0.0f},
+                                  aiVector3D{0, 0, 0},
+                                  aiVector3D{0, 0, 0});
+            vertices.emplace_back(aiVector3D{0.5f, -0.5f, 0.0f},
+                                  aiVector3D{0, 0, 0},
+                                  aiVector3D{1.0f, 0, 0});
+            vertices.emplace_back(aiVector3D{-0.5f, 0.5f, 0.0f},
+                                  aiVector3D{0, 0, 0},
+                                  aiVector3D{0, 1.0f, 0});
+            vertices.emplace_back(aiVector3D{0.5f, 0.5f, 0.0f},
+                                  aiVector3D{0, 0, 0},
+                                  aiVector3D{1.0f, 1.0f, 0});
+        }
         
     };
 

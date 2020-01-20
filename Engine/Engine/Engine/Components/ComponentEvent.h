@@ -10,12 +10,10 @@
 #include <vector>
 #include <tuple>
 
-#include "ComponentId.h"
-#include "ComponentBase.h"
-#include "Index.h"
-#include "EventHandler.h"
+#include "Component.h"
 
 #include "../Engine.h"
+#include "../Events.h"
 
 namespace Component {
 
@@ -59,17 +57,22 @@ namespace Component {
 
     template<typename... Args>
     void ComponentEvent<Args...>::operator()(Args... args) {
+
+        Engine::log<module>("ComponentEvent#", id(), " called.");
+
         for (Component::ComponentId listener : subscribers) {
 
             auto eventArgs = std::make_shared<EventArgs<Args...>>(args...);
             Index::push_entity(eventArgs->classId(), eventArgs->id(), eventArgs);
-            listener.get()->attachComponent(eventArgs->id());
+            listener.data()->attachComponent(eventArgs->id());
 
         }
     }
 
     template<typename... Args>
     void ComponentEvent<Args...>::operator+=(Component::ComponentId subscriber) {
+
+        Engine::log<module>("Adding subscriber#", subscriber, " to ComponentEvent#", id());
 
         subscribers.push_back(subscriber);
         Engine::EventSystem::registerHandler(subscriber);

@@ -3,7 +3,7 @@
 //
 
 #include "RenderingSystem.h"
-#include "../../Engine.h"
+#include "../../Events.h"
 
 Component::ComponentEvent<int, int> Rendering::RenderingSystem::onWindowSizeChanged;
 
@@ -17,15 +17,12 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
         // if batch should be drawn
         {
             // todo: figure out why this is out of sync...
-            auto program = shader_programs[batch->shader]->id();
-            for(auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
-            {
+            for(auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
-                if(camera_is_dirty)
-                {
+                if (camera_is_dirty) {
                     auto data = Component::Index::entityData<Component::Camera>(camera);
-                    auto view_matrix =  glm::toMat4(data->rotation);
+                    auto view_matrix = glm::toMat4(data->rotation);
                     auto world_matrix = glm::translate(data->position);
 
                     auto perspective_matrix = glm::perspective(
@@ -39,11 +36,14 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
 
                     glViewport(0, 0, data->viewport.width, data->viewport.height);
 
-                    glUseProgram(program);
-                    glUniformMatrix4fv(glGetUniformLocation(program, "M_View"),
+                    batch->shader.data<Program>()->bind();
+
+                    glUniformMatrix4fv(glGetUniformLocation(batch->shader.data<Program>()->programId(),
+                                                            "M_View"),
                                        1, false, glm::value_ptr(view_matrix));
 
-                    glUniformMatrix4fv(glGetUniformLocation(program, "M_Perspective"),
+                    glUniformMatrix4fv(glGetUniformLocation(batch->shader.data<Program>()->programId(),
+                                                            "M_Perspective"),
                                        1, false, glm::value_ptr(perspective_matrix));
 
                     Component::Index::removeComponent(camera, Component::Dirty::id());
@@ -85,7 +85,7 @@ std::shared_ptr<Rendering::RenderBatch> Rendering::RenderingSystem::findSuitable
     );
 
     auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-    batch->shader = shader_programs.begin()->first;
+    batch->shader = *Component::Index::entitiesOf(Component::ClassId::Program).begin();
 
     return push_back(batch);
 }
@@ -111,6 +111,8 @@ void Rendering::RenderingSystem::buffer(const Component::Mesh &data) {
 
     // find a batch that can hold the data, or make one
     auto batch = findSuitableBufferFor(std::make_shared<Component::Mesh>(data));
+
+    // todo: if the buffered data size matches that in the buffer we should actually replace it here...
     batch->push_back(data);
 }
 
@@ -137,17 +139,8 @@ void Rendering::RenderingSystem::initialize() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-}
-
-void Rendering::RenderingSystem::push_back(Component::ComponentId id, std::unique_ptr<Rendering::Program> program) {
-    shader_programs.emplace(id, std::move(program));
-}
-
-void Rendering::RenderingSystem::bind_shader(Component::ComponentId id) {
-    auto it = shader_programs.find(id);
-    assertLog(it != shader_programs.end(), "Binding shader");
-
-    it->second->bind();
+    onBillboardModifiedHandler = Engine::EventSystem::createHandler(
+            this, &RenderingSystem::onBillboardModified);
 }
 
 Rendering::Program::~Program() {
@@ -160,7 +153,7 @@ void Rendering::Program::bind() {
     glUseProgram(m_id);
 }
 
-GLuint Rendering::Program::id() {
+GLuint Rendering::Program::programId() {
     return m_id;
 }
 
