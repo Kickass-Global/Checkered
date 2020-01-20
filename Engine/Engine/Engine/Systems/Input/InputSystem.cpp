@@ -16,7 +16,7 @@ void Input::InputSystem::initialize(GLFWwindow *window) {
 void Input::InputSystem::keyHandler(GLFWwindow *, int key, int, int action, int) {
 
     if (action == GLFW_RELEASE) {
-        Engine::log<module, Engine::Importance::low>("onKeyPress: ", key);
+        Engine::log<module>("onKeyPress: ", key);
         onKeyPress(key);
         onKeyUp(key);
     }

@@ -29,7 +29,7 @@
 
 namespace Camera {
 
-    constexpr char module[] = "Camera";
+    static char module[] = "Camera";
 
     class CameraSystem {
 

@@ -14,7 +14,7 @@
 
 namespace Input {
 
-    constexpr char module[] = "Input";
+    static char module[] = "Input";
 
     class InputSystem {
 
