@@ -31,7 +31,12 @@ set(SRC main.cpp main.h
         Components/Model.cpp Components/Model.h
         Components/Vehicle.cpp Components/Vehicle.h
         Components/EventHandler.cpp Components/EventHandler.h
-        Components/ComponentEvent.cpp Components/ComponentEvent.h)
+        Components/ComponentEvent.cpp Components/ComponentEvent.h
+        Systems/Rendering/BillboardSystem.cpp Systems/Rendering/BillboardSystem.h
+        Components/Billboard.cpp Components/Billboard.h
+        Components/Component.h
+        Events.cpp Events.h
+        )
 
 # Add source to this project's executable.
 add_executable (Engine
@@ -39,7 +44,7 @@ add_executable (Engine
         ${SRC})
 
 set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
-
+set_property(TARGET Engine PROPERTY CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #[[if(MSVC)
     target_compile_options(Engine PRIVATE /W4)
@@ -60,9 +65,10 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../Include/glfw-3.3.1" "${CMAKE_CU
 
 target_link_libraries(Engine
         PUBLIC glfw
+        #[[PUBLIC c++fs]]
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/zlibstaticd.lib"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/IrrXMLd.lib"
+        #[[PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/zlibstaticd.lib"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/IrrXMLd.lib"]]
         PUBLIC ${OPENGL_gl_LIBRARY})
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)

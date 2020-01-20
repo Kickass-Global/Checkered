@@ -11,7 +11,6 @@
 #include "Components/GameObject.h"
 #include "Systems/Debug/LiveReloadSystem.h"
 
-
 int main() {
 
     using namespace Engine;
@@ -35,17 +34,10 @@ int main() {
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
 
-    // Component to reference the shader
-    Component::Shader shader;
-
     // simulate content pipeline loading
     Pipeline::ProgramLoader loader;
 
-    // load a simple shader program
-    renderingSystem.push_back(
-            shader.id(),
-            loader.load("Assets/Programs/basic.shader")
-    );
+    auto basicShaderComponent = Engine::createComponent(loader.load("Assets/Programs/basic.shader"));
 
     // simulate loading a complex game object
 
@@ -53,6 +45,8 @@ int main() {
     auto box = Engine::createComponent(
             meshLoader.load("Assets/Meshes/box.obj")
     );
+
+    box->shader = basicShaderComponent->id();
 
     auto box_object = Engine::createComponent<Component::GameObject>();
     box_object->worldTransform = glm::translate(glm::vec3{ 0,0,-5 });
@@ -85,6 +79,8 @@ int main() {
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
+
+
 
     // setup a game clock
     std::chrono::high_resolution_clock clock;

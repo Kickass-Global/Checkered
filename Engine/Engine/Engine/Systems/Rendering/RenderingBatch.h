@@ -40,7 +40,9 @@ namespace Rendering {
 
         template <typename T>
         BufferDetails push_back(std::vector<T> data) {
-            
+
+            Engine::log<module>("Pushing data into batch#", id());
+
             glBindBuffer(m_type, m_id);
             glBufferSubData(m_type, m_fill, sizeof(T) * data.size(), data.data());
 
@@ -54,6 +56,7 @@ namespace Rendering {
 
         void replace(int size, float* data, BufferDetails details)
         {
+            Engine::log<module>("Replacing data in batch#", id());
             glBindBuffer(m_type, m_id);
             glBufferSubData(m_type, details.offset, size, data);
         }
@@ -88,6 +91,7 @@ namespace Rendering {
 
         void update(const Component::ComponentId id, int buffer, int size, float* data)
         {
+            Engine::log<module>("Updating component#", id );
             switch (buffer) {
                 case 2:
                     instanceBuffer->replace(size, data, details.at(id)[buffer]);

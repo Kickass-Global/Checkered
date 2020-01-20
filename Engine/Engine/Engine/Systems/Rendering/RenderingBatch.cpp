@@ -19,7 +19,7 @@ namespace Rendering {
     }
 
     void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
-        renderingSystem.bind_shader(this->shader);
+        shader.data<Program>()->bind();
         glBindVertexArray(vao);
     }
 

@@ -5,13 +5,14 @@
 #ifndef ENGINE_ENGINE_H
 #define ENGINE_ENGINE_H
 
+#include <map>
+#include <memory>
 #include <iostream>
 #include <functional>
 #include <vector>
-
-#include "Components/Index.h"
 #include "Components/ComponentId.h"
-
+#include "Components/Index.h"
+#include "SystemCalls.h"
 
 namespace Component {
     template<typename... Args>
@@ -27,49 +28,21 @@ namespace Component {
 namespace Engine {
 
     typedef float frametime;
-    constexpr char module[] = "Engine";
 
-    template<typename... Args>
-    class Event {
-        std::vector<std::function<void(Args...)>> handlers;
-    public:
+    namespace {
+        constexpr char module[] = "Engine";
+        static std::map<Component::ComponentId, std::string> names;
+    }
 
-        void operator()(Args ... args) {
-            for (auto &&handler : handlers) {
-                if (handler) handler(std::forward<Args>(args)...);
-            }
-        }
+    static bool hasName(Component::ComponentId id)
+    {
+        return names.count(id) > 0;
+    }
 
-        void operator+=(std::function<void(Args...)> handler) {
-            handlers.push_back(handler);
-        }
-    };
-
-    /**
-     * Monitors registered components for EventArg data and passes it on to the corresponding event handler.
-     * Notes:
-     * A component must be registered with this system to receive events through ComponentEvent events.
-     */
-    class EventSystem {
-
-        static std::set<Component::ComponentId> registeredHandlers;
-
-    public:
-
-        static void update(frametime /*elapsed*/);
-
-        static void registerHandler(const Component::ComponentId &handler);
-
-        template<typename T, typename... Args>
-        static Component::ComponentId
-        createHandler(T *instance, void (T::*callback)(const Component::EventArgs<Args...> &)) {
-
-            std::shared_ptr<Component::EventHandler<Args...>> handler = Engine::createComponent<Component::EventHandler<Args...>>();
-            handler->callback = std::bind(callback, instance, std::placeholders::_1);
-            return handler->id();
-
-        }
-    };
+    static void name(Component::ComponentId id, std::string name)
+    {
+        names[id] = name;
+    }
 
     template<typename T>
     std::shared_ptr<T> createComponent() {
@@ -92,7 +65,6 @@ namespace Engine {
         return result;
 
     }
-
 }
 
 #endif //ENGINE_ENGINE_H

@@ -2,7 +2,9 @@
 // Created by root on 11/1/20.
 //
 
+#include "../../Components/Component.h"
 #include "InputSystem.h"
+
 Component::ComponentEvent<int> Input::InputSystem::onKeyPress;
 Component::ComponentEvent<int> Input::InputSystem::onKeyDown;
 Component::ComponentEvent<int> Input::InputSystem::onKeyUp;

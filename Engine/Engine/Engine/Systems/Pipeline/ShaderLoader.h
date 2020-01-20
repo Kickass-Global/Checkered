@@ -40,7 +40,7 @@ namespace Pipeline {
     class ProgramLoader {
     public:
 
-        std::unique_ptr<Rendering::Program> load(std::string filename) {
+        std::shared_ptr<Rendering::Program> load(std::string filename) {
 
         std::ifstream ifs(filename);
         assertLog(ifs.is_open(), "load program description file " + filename);
@@ -49,7 +49,7 @@ namespace Pipeline {
         ifs >> json;
 
         Pipeline::ShaderLoader loader;
-        std::vector<std::unique_ptr<Rendering::Shader>> shaders;
+        std::vector<std::shared_ptr<Rendering::Shader>> shaders;
 
         for(auto shader : json["shaders"]) {
             auto type_id = shader["shader"][0].get<int>();
@@ -61,7 +61,7 @@ namespace Pipeline {
             );
         }
 
-        return std::make_unique<Rendering::Program>(std::move(shaders));
+        return std::make_shared<Rendering::Program>(shaders);
     }
 };
 }
