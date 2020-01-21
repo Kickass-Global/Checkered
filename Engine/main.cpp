@@ -1,15 +1,7 @@
 ﻿// Engine.cpp : Defines the entry point for the application.
 //
 
-#include "Systems/Rendering/RenderingSystem.h"
-#include "Systems/Pipeline/ShaderLoader.h"
-#include "Systems/Rendering/RenderingBatch.h"
-#include "Systems/Input/InputSystem.h"
-#include "Systems/Camera/CameraSystem.h"
-#include "Systems/Pipeline/MeshLoader.h"
-
-#include "Components/GameObject.h"
-#include "Systems/Debug/LiveReloadSystem.h"
+#include "main.h"
 
 int main() {
 

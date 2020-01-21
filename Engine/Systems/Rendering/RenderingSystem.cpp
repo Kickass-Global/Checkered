@@ -3,9 +3,12 @@
 //
 
 #include "RenderingSystem.h"
-#include "../../Events.h"
 
-Component::ComponentEvent<int, int> Rendering::RenderingSystem::onWindowSizeChanged;
+#include "../../Components/Dirty.h"
+#include "../../Components/Camera.h"
+
+Component::ComponentEvent<int, int>
+        Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
 void Rendering::RenderingSystem::update(Engine::frametime) {
 
@@ -27,7 +30,7 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
                     auto perspective_matrix = glm::perspective(
                             45.0f,
                             static_cast<float>(data->viewport.width) /
-                            static_cast<float>(data->viewport.height),
+                            data->viewport.height,
                             0.1f,
                             100.0f
                     );

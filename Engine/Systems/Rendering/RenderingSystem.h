@@ -6,25 +6,14 @@
 #define ENGINE_RENDERINGSYSTEM_H
 
 #include "glad/glad.h"
+#include "../../Components/Component.h"
+#include "RenderingBatch.h"
+
 #include <GLFW/glfw3.h>
 #include <string>
 #include <vector>
 #include <map>
-#include "../../main.h"
-#include "../../SystemCalls.h"
-#include "../../Components/Shader.h"
-#include "../../Components/Camera.h"
-#include "RenderingBatch.h"
-#include "../../Components/Index.h"
-#include "../../Components/Dirty.h"
-#include "glm/glm.hpp"
-#include "glm/gtx/quaternion.hpp"
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "../../Components/Mesh.h"
-#include "Rendering.h"
-#include "../../Components/Component.h"
-#include "../../Engine.h"
+#include <memory>
 
 namespace Rendering {
 

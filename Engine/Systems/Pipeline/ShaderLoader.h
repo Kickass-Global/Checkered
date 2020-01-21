@@ -15,7 +15,7 @@
 
 namespace Pipeline {
 
-    constexpr char module[] = "Pipeline";
+    static char module[] = "Pipeline";
     constexpr auto assertLog = Engine::assertLog<module>;
 
     class ShaderLoader {
@@ -39,7 +39,6 @@ namespace Pipeline {
 
     class ProgramLoader {
     public:
-
         std::shared_ptr<Rendering::Program> load(std::string filename) {
 
         std::ifstream ifs(filename);

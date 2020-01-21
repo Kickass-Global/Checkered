@@ -15,7 +15,7 @@ set(SRC main.cpp main.h
         Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h
         Components/ComponentBase.h Components/ComponentBase.cpp
         SystemCalls.cpp SystemCalls.h
-        Systems/PhysicsSystem.cpp Systems/PhysicsSystem.h
+        Systems/Physics/PhysicsSystem.cpp Systems/Physics/PhysicsSystem.h
         Systems/Rendering/RenderingSystem.cpp Systems/Rendering/RenderingSystem.h
         Systems/Rendering/RenderingBatch.h Systems/Rendering/RenderingBatch.cpp
         Systems/Pipeline/ShaderLoader.cpp Systems/Pipeline/ShaderLoader.h
@@ -35,7 +35,7 @@ set(SRC main.cpp main.h
         Systems/Rendering/BillboardSystem.cpp Systems/Rendering/BillboardSystem.h
         Components/Billboard.cpp Components/Billboard.h
         Components/Component.h
-        Events.cpp Events.h
+        Systems/Events/Events.cpp Systems/Events/Events.h
         )
 
 # Add source to this project's executable.

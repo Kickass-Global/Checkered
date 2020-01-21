@@ -8,8 +8,8 @@
 #include <functional>
 #include <vector>
 
-#include "Engine.h"
-#include "Components/EventHandler.h"
+#include "../../Engine.h"
+#include "../../Components/EventHandler.h"
 
 namespace Engine {
 
