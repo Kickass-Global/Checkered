@@ -1,24 +1,24 @@
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
 
-FILE(GLOB_RECURSE Meshes *.obj)
+message(STATUS "Copying Assets")
 
-set(ENGINE_DIR ../Engine/Assets/)
-
+FILE(GLOB_RECURSE MESHES ${CMAKE_CURRENT_SOURCE_DIR}/Meshes *.obj)
 foreach(file ${MESHES})
-    FILE(RELATIVE_PATH ITEM_PATH_REL . ${MESHES})
-    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ENGINE_DIR}${ITEM_PATH_REL} COPYONLY)
+    message(STATUS "Copying " ${file})
+    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${MESHES})
+    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
 endforeach()
 
-FILE(GLOB Programs Programs/*.shader)
-
+FILE(GLOB_RECURSE PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/Programs *.shader)
 foreach(file ${PROGRAMS})
-    FILE(RELATIVE_PATH ITEM_PATH_REL . ${PROGRAMS})
-    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ENGINE_DIR}${ITEM_PATH_REL} COPYONLY)
+    message(STATUS "Copying " ${file})
+    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${PROGRAMS})
+    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
 endforeach()
 
-FILE(GLOB Shaders Shaders/*.vert Shaders/*.frag)
-
-foreach(SHADER ${SHADERS})
-    FILE(RELATIVE_PATH ITEM_PATH_REL . ${SHADER})
-    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ENGINE_DIR}${ITEM_PATH_REL} COPYONLY)
+FILE(GLOB_RECURSE SHADERS ${CMAKE_CURRENT_SOURCE_DIR}/Shaders *.vert *.frag)
+foreach (file ${SHADERS})
+    message(STATUS "Copying " ${file})
+    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${file})
+    configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
 endforeach()

@@ -125,7 +125,8 @@ namespace Rendering {
 
         ~RenderingSystem();
 
-        std::shared_ptr<Rendering::RenderBatch> findSuitableBufferFor(std::shared_ptr<Component::Mesh> data);
+        std::shared_ptr<Rendering::RenderBatch>
+        findSuitableBufferFor(const std::shared_ptr<Component::Mesh> &data);
 
         std::shared_ptr<Rendering::RenderBatch> push_back(
             std::shared_ptr<Rendering::RenderBatch> batch);
