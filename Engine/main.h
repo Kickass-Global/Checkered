@@ -1,0 +1,27 @@
+﻿// Engine.h : Include file for standard system include files,
+// or project specific include files.
+
+#pragma once
+
+#include <iostream>
+#include <functional>
+#include <vector>
+
+#include "Systems/Rendering/RenderingSystem.h"
+#include "Systems/Pipeline/ShaderLoader.h"
+#include "Systems/Rendering/RenderingBatch.h"
+#include "Systems/Input/InputSystem.h"
+#include "Systems/Camera/CameraSystem.h"
+#include "Systems/Pipeline/MeshLoader.h"
+
+#include "Components/GameObject.h"
+#include "Systems/Debug/LiveReloadSystem.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/quaternion.hpp"
+
+#include "Components/ComponentId.h"
+#include "Components/Index.h"
+#include "Components/ComponentEvent.h"
