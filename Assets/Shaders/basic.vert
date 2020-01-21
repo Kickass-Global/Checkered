@@ -25,7 +25,7 @@ void main() {
     vec3 reflection = reflect(light0_direction, n);
     vec3 viewer = normalize(vec3(inverse(M_View)[3]));
 
-    vColour = kA + kD * dot(light0_direction, n) + kS * pow(dot(reflection, viewer), 32);
+    vColour = kA + vNormal;// * dot(light0_direction, n) + kS * pow(dot(reflection, viewer), 32);
 
     gl_Position = M_Perspective * iInstanceMatrix * M_View * vec4(vPosition, 1);
 }

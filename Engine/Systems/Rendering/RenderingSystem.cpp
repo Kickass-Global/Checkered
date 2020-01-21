@@ -16,7 +16,6 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
 
         // if batch should be drawn
         {
-            // todo: figure out why this is out of sync...
             for(auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
@@ -27,7 +26,8 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
 
                     auto perspective_matrix = glm::perspective(
                             45.0f,
-                            static_cast<float>(data->viewport.width) / data->viewport.height,
+                            static_cast<float>(data->viewport.width) /
+                            static_cast<float>(data->viewport.height),
                             0.1f,
                             100.0f
                     );
@@ -64,7 +64,9 @@ Rendering::RenderingSystem::~RenderingSystem() {
     glfwDestroyWindow(window);
 }
 
-std::shared_ptr<Rendering::RenderBatch> Rendering::RenderingSystem::findSuitableBufferFor(std::shared_ptr<Component::Mesh> data) {
+std::shared_ptr<Rendering::RenderBatch>
+Rendering::RenderingSystem::findSuitableBufferFor(
+        const std::shared_ptr<Component::Mesh> &data) {
 
     auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
             100000,

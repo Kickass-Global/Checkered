@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for Engine, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 set(GLAD ../Include/glad/src/glad.c)
@@ -62,19 +62,20 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("../Include/glfw-3.3.1" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
+add_subdirectory("../Assets/" "${CMAKE_CURRENT_BINARY_DIR}/Assets")
 
 target_link_libraries(Engine
         PUBLIC glfw
         #[[PUBLIC c++fs]]
-        PUBLIC "../libs/x64/assimp-vc141-mtd.lib"
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
         #[[PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/zlibstaticd.lib"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/IrrXMLd.lib"]]
         PUBLIC ${OPENGL_gl_LIBRARY})
 
 configure_file("../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
-configure_file("../libs/PhysXDevice64.dll" PhysxDevice64.dll COPYONLY)
-configure_file("../libs/glut32.dll" glut32.dll COPYONLY)
-configure_file("../libs/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
+configure_file("../dlls/PhysXDevice64.dll" PhysxDevice64.dll COPYONLY)
+configure_file("../dlls/glut32.dll" glut32.dll COPYONLY)
+configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
 
 include_directories("../Include/PhysX/pxshared/include")
 include_directories("../Include/PhysX/include")
