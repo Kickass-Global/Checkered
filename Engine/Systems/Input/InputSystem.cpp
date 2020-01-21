@@ -5,9 +5,9 @@
 #include "../../Components/Component.h"
 #include "InputSystem.h"
 
-Component::ComponentEvent<int> Input::InputSystem::onKeyPress;
-Component::ComponentEvent<int> Input::InputSystem::onKeyDown;
-Component::ComponentEvent<int> Input::InputSystem::onKeyUp;
+Component::ComponentEvent<int> Input::InputSystem::onKeyPress("onKeyPress");
+Component::ComponentEvent<int> Input::InputSystem::onKeyDown("onKeyDown");
+Component::ComponentEvent<int> Input::InputSystem::onKeyUp("onKeyUp");
 
 void Input::InputSystem::initialize(GLFWwindow *window) {
     glfwSetKeyCallback(window, keyHandler);

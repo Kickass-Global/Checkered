@@ -13,7 +13,7 @@
 #include "Component.h"
 
 #include "../Engine.h"
-#include "../Events.h"
+#include "../Systems/Events/Events.h"
 
 namespace Component {
 
@@ -41,6 +41,8 @@ namespace Component {
         std::vector<Component::ComponentId> subscribers;
 
     public:
+
+        ComponentEvent(std::string name);
 
         /**
          * Invokes the event args to all listeners
@@ -77,6 +79,11 @@ namespace Component {
         subscribers.push_back(subscriber);
         Engine::EventSystem::registerHandler(subscriber);
 
+    }
+
+    template<typename... Args>
+    ComponentEvent<Args...>::ComponentEvent(std::string name) {
+        Engine::nameComponent(id(), name);
     }
 }
 

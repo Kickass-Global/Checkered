@@ -26,9 +26,8 @@ bool Component::ComponentId::operator<(const Component::ComponentId &other) cons
 }
 
 std::ostream &Component::operator<<(std::ostream &out, const Component::ComponentId &id) {
-
-    if(Engine::hasName(id)) return out << Engine::names[id];
-    else return out << id.id;
+    if (Engine::identifier[id] == "") return out << id.id;
+    else return out << Engine::identifier[id];
 }
 
 Component::ComponentId::ComponentId(bool) noexcept : id(Component::next_id++) {}

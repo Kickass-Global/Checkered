@@ -9,7 +9,13 @@
 #include <memory>
 #include <iostream>
 #include <functional>
+#include <utility>
 #include <vector>
+
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/transform.hpp"
+
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
 #include "SystemCalls.h"
@@ -31,30 +37,26 @@ namespace Engine {
 
     namespace {
         constexpr char module[] = "Engine";
-        static std::map<Component::ComponentId, std::string> names;
     }
 
-    static bool hasName(Component::ComponentId id)
-    {
-        return names.count(id) > 0;
-    }
+    extern std::map<Component::ComponentId, std::string> identifier;
 
-    static void name(Component::ComponentId id, std::string name)
-    {
-        names[id] = name;
-    }
+    void
+    nameComponent(const Component::ComponentId &componentId, std::string name);
 
     template<typename T>
-    std::shared_ptr<T> createComponent() {
+    std::shared_ptr<T> createComponent(std::string name = "") {
         auto component = std::make_shared<T>();
         Component::Index::push_entity(component->classId(), component->id(), component);
-
+        identifier[component->id()] = name;
         return component;
     }
 
     template<typename T>
-    std::shared_ptr<T> createComponent(std::shared_ptr<T> component) {
+    std::shared_ptr<T>
+    createComponent(std::shared_ptr<T> component, std::string name = "") {
         Component::Index::push_entity(component->classId(), component->id(), component);
+        identifier[component->id()] = name;
         return component;
     }
 

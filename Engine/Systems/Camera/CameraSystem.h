@@ -10,6 +10,7 @@
 #include <string>
 #include <chrono>
 #include <functional>
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #define _USE_MATH_DEFINES
 
@@ -24,7 +25,7 @@
 #include "../../Components/ComponentEvent.h"
 #include "../../Components/EventHandler.h"
 #include "../../Engine.h"
-#include "../../Events.h"
+#include "../Events/Events.h"
 
 
 namespace Camera {

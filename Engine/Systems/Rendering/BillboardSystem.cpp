@@ -3,3 +3,6 @@
 //
 
 #include "BillboardSystem.h"
+
+Component::ComponentEvent<Component::ComponentId>
+        Rendering::BillboardSystem::onBillboardChanged("onBillboardChanged");
