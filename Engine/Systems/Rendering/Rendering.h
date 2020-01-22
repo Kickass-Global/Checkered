@@ -10,7 +10,7 @@
 namespace Rendering {
 
     namespace {
-        static char module[] = "RenderingSystem";
+        char module[] = "RenderingSystem";
     }
 
 }

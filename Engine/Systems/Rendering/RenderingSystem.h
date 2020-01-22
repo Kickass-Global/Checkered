@@ -51,13 +51,14 @@ namespace Rendering {
             GLint successful_link;
             glGetProgramiv(m_id, GL_LINK_STATUS, &successful_link);
 
-            if (!successful_link) {
+            if (successful_link != GL_TRUE) {
                 GLint maxLength = 0;
                 glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
 
                 std::vector<GLchar> infoLog(maxLength);
                 glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
-                Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
+                Engine::log<module>(
+                        std::string(infoLog.begin(), infoLog.end()));
             }
 			Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
 

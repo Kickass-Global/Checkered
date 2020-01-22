@@ -1,0 +1,6 @@
+{
+  "entity": {
+    "mesh": "Assets/Meshes/box.obj",
+    "shader": "Assets/Programs/basic.json"
+  }
+}

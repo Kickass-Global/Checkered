@@ -50,13 +50,15 @@ namespace Pipeline {
         Pipeline::ShaderLoader loader;
         std::vector<std::shared_ptr<Rendering::Shader>> shaders;
 
-        for(auto shader : json["shaders"]) {
+        for (auto shader : json["entity"]["shaders"]) {
             auto type_id = shader["shader"][0].get<int>();
             auto shader_filename = shader["shader"][1].get<std::string>();
 
-            shaders.push_back(std::move( type_id == 0 ?
-                              loader.load<GL_VERTEX_SHADER>(shader_filename) :
-                              loader.load<GL_FRAGMENT_SHADER>(shader_filename))
+            shaders.push_back(std::move(type_id == 0 ?
+                                        loader.load<GL_VERTEX_SHADER>(
+                                                shader_filename) :
+                                        loader.load<GL_FRAGMENT_SHADER>(
+                                                shader_filename))
             );
         }
 

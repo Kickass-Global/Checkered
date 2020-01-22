@@ -10,6 +10,6 @@ uniform mat4 M_View = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 out vec3 fTexCoord;
 
 void main() {
-    fTexCoord = vTextCoord;
+    fTexCoord = vTexCoord;
     gl_Position = iInstanceMatrix * M_View * vec4(vPosition, 1);
 }
