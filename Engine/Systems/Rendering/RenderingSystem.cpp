@@ -131,7 +131,7 @@ void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow *, int width, int 
 
 void Rendering::RenderingSystem::initialize() {
 
-    assertLog(glfwInit(), "initialize GLFW");
+	Engine::assertLog<module>(glfwInit(), "initialize GLFW");
 
     window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
 
@@ -139,7 +139,7 @@ void Rendering::RenderingSystem::initialize() {
 
     glfwMakeContextCurrent(window);
 
-    assertLog(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
+	Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -195,7 +195,7 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
 
         Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
     }
-    assertLog(success != GL_FALSE, "shader creation");
+	Engine::assertLog<module>(success != GL_FALSE, "shader creation");
 }
 
 GLuint Rendering::Shader::id() const { return m_id; }

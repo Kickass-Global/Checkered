@@ -59,7 +59,7 @@ namespace Rendering {
                 glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
                 Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
             }
-            assertLog(successful_link != GL_FALSE, "Link shader program");
+			Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
 
             for(auto&& shader : shaders) glDetachShader(m_id, shader->id());
         }
@@ -103,7 +103,7 @@ namespace Rendering {
             auto it = std::find_if(batches.begin(), batches.end(),
                          [id](auto batch) { return batch->contains(id); });
 
-            assertLog(it != batches.end(), "check for valid batch");
+			Engine::assertLog<module>(it != batches.end(), "check for valid batch");
 
             it->get()->update(id, 2, size, data);
         }

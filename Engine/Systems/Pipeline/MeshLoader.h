@@ -27,10 +27,10 @@ namespace Pipeline {
             {
                 Engine::log<module, Engine::Importance::high>( importer.GetErrorString());
             }
-            assertLog(scene, "Loading resource " + filename);
+			Engine::assertLog<module>(scene, "Loading resource " + filename);
 
             auto&& data = scene->mMeshes[0];
-            assertLog(data, "Loading mesh data");
+			Engine::assertLog<module>(data, "Loading mesh data");
 
             Component::Mesh mesh;
 
@@ -48,7 +48,7 @@ namespace Pipeline {
             for (auto i = 0u; i < data->mNumFaces; ++i)
             {
                 auto&& face = data->mFaces[i];
-                assertLog(face.mNumIndices == 3, "Mesh face is triangulated");
+				Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
 
                 for (auto j = 0u; j < face.mNumIndices; ++j)
                 {
