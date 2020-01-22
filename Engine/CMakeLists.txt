@@ -46,11 +46,22 @@ add_executable (Engine
 set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
 set_property(TARGET Engine PROPERTY CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#[[if(MSVC)
-    target_compile_options(Engine PRIVATE /W4)
+macro(remove_flag_from_target _target _flag)
+    get_target_property(_target_cxx_flags ${_target} COMPILE_OPTIONS)
+    if(_target_cxx_flags)
+        list(REMOVE_ITEM _target_cxx_flags ${_flag})
+        set_target_properties(${_target} PROPERTIES COMPILE_OPTIONS "${_target_cxx_flags}")
+    endif()
+endmacro()
+
+
+if(MSVC)
+    remove_flag_from_target(Engine /W3)
+    target_compile_options(Engine PRIVATE /Wall)
 else()
     target_compile_options(Engine PRIVATE -Wall -Wextra -pedantic)
-endif()]]
+endif()
+
 
 # GAME ASSETS
 # copy assets into build directory
@@ -65,25 +76,24 @@ add_subdirectory("../Include/glfw-3.3.1" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
 add_subdirectory("../Assets/" "${CMAKE_CURRENT_BINARY_DIR}/Assets")
 
 target_link_libraries(Engine
-        PUBLIC glfw
+        PRIVATE glfw
         #[[PUBLIC c++fs]]
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
         #[[PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/zlibstaticd.lib"
         PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/IrrXMLd.lib"]]
-        PUBLIC ${OPENGL_gl_LIBRARY})
+        PRIVATE ${OPENGL_gl_LIBRARY})
 
 configure_file("../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
 configure_file("../dlls/PhysXDevice64.dll" PhysxDevice64.dll COPYONLY)
 configure_file("../dlls/glut32.dll" glut32.dll COPYONLY)
 configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
 
-include_directories("../Include/PhysX/pxshared/include")
-include_directories("../Include/PhysX/include")
-include_directories("../Include/include")
-include_directories("../Include/glminclude")
-include_directories("../Include/assimp/include")
-include_directories("../Include/glad/include")
-
 find_package(OpenGL REQUIRED)
 
-target_include_directories(Engine PUBLIC ${OPENGL_INCLUDE_DIR})
+target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
+        SYSTEM PRIVATE "../Include/PhysX/pxshared/include"
+        SYSTEM PRIVATE "../Include/PhysX/include"
+        SYSTEM PRIVATE "../Include/include"
+        SYSTEM PRIVATE "../Include/glminclude"
+        SYSTEM PRIVATE "../Include/assimp/include"
+        SYSTEM PRIVATE "../Include/glad/include")
