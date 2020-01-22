@@ -25,7 +25,7 @@ namespace Pipeline {
         std::unique_ptr<Rendering::Shader> load(std::string filename) {
 
             std::ifstream ifs(filename);
-            assertLog(ifs.is_open(), "load shader file " + filename);
+			Engine::assertLog<module>(ifs.is_open(), "load shader file " + filename);
 
             std::vector<std::string> lines;
             std::string line;
@@ -42,7 +42,7 @@ namespace Pipeline {
         std::shared_ptr<Rendering::Program> load(std::string filename) {
 
         std::ifstream ifs(filename);
-        assertLog(ifs.is_open(), "load program description file " + filename);
+		Engine::assertLog<module>(ifs.is_open(), "load program description file " + filename);
 
         nlohmann::json json;
         ifs >> json;

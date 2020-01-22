@@ -84,7 +84,7 @@ int main() {
 
         // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
         frametime elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 16.6666667f;
-        log<module, Importance::low>("Frametime: ", elapsed);
+        //Engine::log<module>("Frametime: ", elapsed);
 
         Engine::EventSystem::update(elapsed);
         liveReloadSystem.update(elapsed);

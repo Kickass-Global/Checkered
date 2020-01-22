@@ -45,7 +45,7 @@ namespace Engine {
 
     inline static Importance loggingLevel = medium;
 
-    template<char const *module, typename ... Ts>
+    template<char const * module, class ... Ts>
     void log(Ts...args)
     {
         if (loggingLevel >= medium)
@@ -56,7 +56,7 @@ namespace Engine {
         }
     }
     
-    template<char const* module, Importance importance, typename ... Ts>
+    template<char const* module, Importance importance, class ... Ts>
     void log(Ts...args)
     {
         if (importance >= loggingLevel) {

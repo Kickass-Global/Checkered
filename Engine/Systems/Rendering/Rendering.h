@@ -10,8 +10,7 @@
 namespace Rendering {
 
     namespace {
-        constexpr char module[] = "RenderingSystem";
-        constexpr auto assertLog = Engine::assertLog<module>;
+        static char module[] = "RenderingSystem";
     }
 
 }
