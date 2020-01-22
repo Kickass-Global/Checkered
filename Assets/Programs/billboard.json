@@ -1,0 +1,18 @@
+{
+  "entity": {
+    "shaders": [
+      {
+        "shader": [
+          0,
+          "Assets/Shaders/billboard.vert"
+        ]
+      },
+      {
+        "shader": [
+          1,
+          "Assets/Shaders/billboard.frag"
+        ]
+      }
+    ]
+  }
+}
