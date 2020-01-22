@@ -35,8 +35,8 @@ namespace Pipeline {
             json config;
             ifs >> config;
 
-            for (auto component : config["entity"]) {
-                Engine::log<module>(component);
+            for (auto [key, value] : config["entity"].items()) {
+                Engine::log<module>(key, " ", value);
             }
 
             return std::make_unique<T>();
