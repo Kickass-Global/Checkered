@@ -12,7 +12,13 @@ namespace Component {
 
     class Dirty {
     public:
-        static ComponentId id() { return {true, 0xAAAA0001};}
+        static ComponentId id() { return { true, 0xAAAA0001 }; }
+    };
+
+    class Visible
+    {
+    public:
+        static ComponentId id() { return { true, 0xAAAA0002 }; }
     };
 
 }

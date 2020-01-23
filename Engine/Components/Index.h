@@ -56,7 +56,9 @@ namespace Component {
 
         template<typename T>
         static std::shared_ptr<T> entityData(const Component::ComponentId &componentId) {
-            return std::static_pointer_cast<T>(meta[componentId]);
+            auto it = meta.find(componentId);
+            if (it == meta.end()) return nullptr;
+            else return std::static_pointer_cast<T>(it->second);
         }
     };
 

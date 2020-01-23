@@ -36,7 +36,7 @@ set(SRC main.cpp main.h
         Components/Billboard.cpp Components/Billboard.h
         Components/Component.h
         Systems/Events/Events.cpp Systems/Events/Events.h
-        )
+        Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h)
 
 # Add source to this project's executable.
 add_executable (Engine
@@ -57,7 +57,7 @@ endmacro()
 
 if(MSVC)
     remove_flag_from_target(Engine /W3)
-    target_compile_options(Engine PRIVATE /Wall)
+    target_compile_options(Engine PRIVATE /W3)
 else()
     target_compile_options(Engine PRIVATE -Wall -Wextra -pedantic)
 endif()

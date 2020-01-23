@@ -6,11 +6,39 @@
 
 #include "../../Components/Dirty.h"
 #include "../../Components/Camera.h"
+#include "../../Components/GameObject.h"
 
 Component::ComponentEvent<int, int>
         Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
 void Rendering::RenderingSystem::update(Engine::frametime) {
+
+    for (auto gameObject : Component::Index::entitiesOf(Component::ClassId::GameObject))
+    {
+        auto object_is_dirty = Component::Index::hasComponent(gameObject, Component::Dirty::id());
+        auto object_is_visible = Component::Index::hasComponent(gameObject, Component::Visible::id());
+
+        if (object_is_dirty && object_is_visible)
+        {
+            // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
+
+            auto components = Component::Index::componentsOf(gameObject);
+            for (auto component : components)
+            {
+
+                if (component.data() && component.data()->classId() == Component::ClassId::Mesh)
+                {
+                    auto data = component.data<Component::Mesh>();
+                    buffer(*data);
+                    updateInstanceData(component, sizeof(glm::mat4), glm::value_ptr(gameObject.data<Component::GameObject>()->worldTransform));
+                }
+
+            }
+
+            gameObject.data()->destroyComponent(Component::Dirty::id());
+            gameObject.data()->destroyComponent(Component::Visible::id());
+        }
+    }
 
     glClearColor(0, 0, 0.5f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
