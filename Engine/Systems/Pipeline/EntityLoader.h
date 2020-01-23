@@ -9,6 +9,8 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include "../../Components/ComponentBase.h"
+#include "MeshLoader.h"
+#include "Library.h"
 
 using json = nlohmann::json;
 
@@ -21,7 +23,7 @@ namespace Pipeline {
     class EntityLoader {
     public:
         template<typename T = Component::ComponentBase<Component::ClassId::GameObject>>
-        static std::unique_ptr<T> load(std::string filename) {
+        static std::shared_ptr<T> load(std::string filename) {
 
             // walk the description file and load each referenced entity; if
             // the entity has already been loaded we will simply link to the
@@ -35,11 +37,37 @@ namespace Pipeline {
             json config;
             ifs >> config;
 
-            for (auto [key, value] : config["entity"].items()) {
+            auto entity = Engine::createComponent<T>();
+
+            for (auto[key, value] : config["entity"].items()) {
                 Engine::log<module>(key, " ", value);
+
+                if (key == "mesh") {
+                    /* load meshes; */
+                    if (Library::contains(key)) {
+                        auto id = Library::at(key);
+                        Component::Index::addComponent(entity->id(), id);
+                    } else {
+                        MeshLoader loader;
+                        auto component = Engine::createComponent(loader.load(value), value);
+                        Library::emplace(key, component->id());
+                        Component::Index::addComponent(entity->id(), component->id());
+                    }
+                } else if (key == "shader") {
+                    /*load shaders*/
+                    if (Library::contains(key)) {
+                        auto id = Library::at(key);
+                        Component::Index::addComponent(entity->id(), id);
+                    } else {
+                        ProgramLoader loader;
+                        auto component = Engine::createComponent(loader.load(value), value);
+                        Library::emplace(key, component->id());
+                        Component::Index::addComponent(entity->id(), component->id());
+                    }
+                }
             }
 
-            return std::make_unique<T>();
+            return entity;
         }
     };
 
