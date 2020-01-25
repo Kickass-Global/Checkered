@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -57,24 +57,26 @@ are not supported, and links may not be kinematic.
 class PxArticulationLink : public PxRigidBody
 {
 public:
-	/**
-	\brief Deletes the articulation link.
-	
-	\note Only a leaf articulation link can be released
-	
-	Do not keep a reference to the deleted instance.
+    /**
+    \brief Deletes the articulation link.
 
-	@see PxArticulation::createLink()
-	*/
-	virtual		void						release() = 0;
+    \note Only a leaf articulation link can be released
 
-	/**
-	\brief get the articulation to which this articulation link belongs. This returns the base class. The application should
-	establish which articulation implementation this actually is and upcast to that type to access non-common functionality
+    Do not keep a reference to the deleted instance.
 
-	\return the articulation to which this link belongs
-	*/
-	virtual		PxArticulationBase&			getArticulation() const = 0;
+    @see PxArticulation::createLink()
+    */
+    virtual void release() = 0;
+
+
+    /**
+    \brief get the articulation to which this articulation link belongs. This returns the base class. The application should
+    establish which articulation implementation this actually is and upcast to that type to access non-common functionality
+
+    \return the articulation to which this link belongs
+    */
+    virtual PxArticulationBase &getArticulation() const = 0;
+
 
 	/**
 	\brief Get the joint which connects this link to its parent.
@@ -85,50 +87,61 @@ public:
 	*/
 	virtual		PxArticulationJointBase*	getInboundJoint() const = 0;
 
-	/**
-	\brief Get the degree of freedom of the joint which connects this link to its parent.
+    /**
+    \brief Get the degree of freedom of the joint which connects this link to its parent.
 
-	\return The degree of freeedom of the joint connecting the link to the parent. 0xffffffff for the root link.
+    \return The degree of freeedom of the joint connecting the link to the parent. 0xffffffff for the root link.
 
-	@see PxArticulationJoint
-	*/
-	virtual		PxU32						getInboundJointDof() const = 0;
+    @see PxArticulationJoint
+    */
+    virtual PxU32 getInboundJointDof() const = 0;
 
-	/**
-	\brief Get number of child links.
+    /**
+    \brief Get number of child links.
 
-	\return the number of child links
+    \return the number of child links
 
-	@see getChildren()
-	*/
-	virtual		PxU32						getNbChildren() const = 0;
+    @see getChildren()
+    */
+    virtual PxU32 getNbChildren() const = 0;
 
-	/**
-	\brief Get low-level link index 
 
-	\return low-level index
-	*/
-	virtual		PxU32						getLinkIndex() const = 0;
+    /**
+    \brief Get low-level link index
 
-	/**
-	\brief Retrieve all the child links.
+    \return low-level index
+    */
+    virtual PxU32 getLinkIndex() const = 0;
 
-	\param[out] userBuffer The buffer to receive articulation link pointers.
-	\param[in] bufferSize Size of provided user buffer.
-	\return Number of articulation links written to the buffer.
-	\param[in] startIndex Index of first child pointer to be retrieved
+    /**
+    \brief Retrieve all the child links.
 
-	@see getNbChildren()
-	*/
-	virtual		PxU32						getChildren(PxArticulationLink** userBuffer, PxU32 bufferSize, PxU32 startIndex=0) const = 0;
+    \param[out] userBuffer The buffer to receive articulation link pointers.
+    \param[in] bufferSize Size of provided user buffer.
+    \return Number of articulation links written to the buffer.
+    \param[in] startIndex Index of first child pointer to be retrieved
 
-	virtual		const char*					getConcreteTypeName()		const		{ return "PxArticulationLink";	}
+    @see getNbChildren()
+    */
+    virtual PxU32 getChildren(PxArticulationLink **userBuffer, PxU32 bufferSize,
+                              PxU32 startIndex = 0) const = 0;
+
+    virtual const char *
+    getConcreteTypeName() const { return "PxArticulationLink"; }
 
 protected:
-	PX_INLINE								PxArticulationLink(PxType concreteType, PxBaseFlags baseFlags) : PxRigidBody(concreteType, baseFlags) {}
-	PX_INLINE								PxArticulationLink(PxBaseFlags baseFlags) : PxRigidBody(baseFlags)	{}
-	virtual									~PxArticulationLink()	{}
-	virtual		bool						isKindOf(const char* name)	const		{ return !::strcmp("PxArticulationLink", name) || PxRigidBody::isKindOf(name);	}
+    PX_INLINE PxArticulationLink(PxType concreteType, PxBaseFlags baseFlags)
+            : PxRigidBody(concreteType, baseFlags) {}
+
+    PX_INLINE PxArticulationLink(PxBaseFlags baseFlags) : PxRigidBody(
+            baseFlags) {}
+
+    virtual                        ~PxArticulationLink() {}
+
+    virtual bool isKindOf(const char *name) const {
+        return !::strcmp("PxArticulationLink", name) ||
+               PxRigidBody::isKindOf(name);
+    }
 };
 
 #if !PX_DOXYGEN

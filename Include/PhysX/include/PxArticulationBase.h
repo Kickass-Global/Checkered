@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -41,7 +41,8 @@ namespace physx
 {
 #endif
 
-	class PxArticulationImpl;
+
+    class PxArticulationImpl;
 
 	/**
 	\brief a tree structure of bodies connected by joints that is treated as a unit by the dynamics solver
@@ -53,18 +54,22 @@ namespace physx
 
 	@see PxArticulationJoint PxArticulationLink PxPhysics.createArticulation
 	*/
-	class PxArticulationBase : public PxBase
-	{
-	public:
+    class PxArticulationBase : public PxBase {
+    public:
 
-		/**
-		\brief Retrieves the scene which this articulation belongs to.
+        enum Enum {
+            eReducedCoordinate = 0,
+            eMaximumCoordinate = 1
+        };
 
-		\return Owner Scene. NULL if not part of a scene.
+        /**
+        \brief Retrieves the scene which this articulation belongs to.
 
-		@see PxScene
-		*/
-		virtual		PxScene*		getScene()	const = 0;
+        \return Owner Scene. NULL if not part of a scene.
+
+        @see PxScene
+        */
+        virtual PxScene *getScene() const = 0;
 
 		/**
 		\brief Sets the solver iteration counts for the articulation.
@@ -223,94 +228,114 @@ namespace physx
 		*/
 		virtual		void				putToSleep() = 0;
 
-		/**
-		\brief adds a link to the articulation with default attribute values.
+        /**
+        \brief adds a link to the articulation with default attribute values.
 
-		\param[in] parent the parent link of the articulation. Should be NULL if (and only if) this is the root link
-		\param[in] pose the initial pose of the new link. Must be a valid transform
+        \param[in] parent the parent link of the articulation. Should be NULL if (and only if) this is the root link
+        \param[in] pose the initial pose of the new link. Must be a valid transform
 
-		\return the new link, or NULL if the link cannot be created because the articulation has reached
-		its maximum link count (currently 64).
+        \return the new link, or NULL if the link cannot be created because the articulation has reached
+        its maximum link count (currently 64).
 
-		@see PxArticulationLink
-		*/
-		virtual		PxArticulationLink*	createLink(PxArticulationLink* parent, const PxTransform& pose) = 0;
+        @see PxArticulationLink
+        */
 
-		/**
-		\brief returns the number of links in the articulation
-		*/
-		virtual		PxU32				getNbLinks() const = 0;
+        virtual PxArticulationLink *
+        createLink(PxArticulationLink *parent, const PxTransform &pose) = 0;
 
-		/**
-		\brief returns the set of links in the articulation
 
-		\param[in] userBuffer buffer into which to write an array of articulation link pointers
-		\param[in] bufferSize the size of the buffer. If this is not large enough to contain all the pointers to links,
-		only as many as will fit are written.
-		\param[in] startIndex Index of first link pointer to be retrieved
+        /**
+        \brief returns the number of links in the articulation
+        */
 
-		\return the number of links written into the buffer.
+        virtual PxU32 getNbLinks() const = 0;
 
-		@see ArticulationLink
-		*/
-		virtual		PxU32				getLinks(PxArticulationLink** userBuffer, PxU32 bufferSize, PxU32 startIndex = 0)	const = 0;
+        /**
+        \brief returns the set of links in the articulation
 
-		/**
-		\brief Sets a name string for the object that can be retrieved with getName().
+        \param[in] userBuffer buffer into which to write an array of articulation link pointers
+        \param[in] bufferSize the size of the buffer. If this is not large enough to contain all the pointers to links,
+        only as many as will fit are written.
+        \param[in] startIndex Index of first link pointer to be retrieved
 
-		This is for debugging and is not used by the SDK. The string is not copied by the SDK,
-		only the pointer is stored.
+        \return the number of links written into the buffer.
 
-		\param[in] name String to set the objects name to.
+        @see ArticulationLink
+        */
 
-		@see getName()
-		*/
-		virtual		void				setName(const char* name) = 0;
+        virtual PxU32
+        getLinks(PxArticulationLink **userBuffer, PxU32 bufferSize,
+                 PxU32 startIndex = 0) const = 0;
 
-		/**
-		\brief Retrieves the name string set with setName().
 
-		\return Name string associated with object.
+        /**
+        \brief Sets a name string for the object that can be retrieved with getName().
 
-		@see setName()
-		*/
-		virtual		const char*			getName()			const = 0;
+        This is for debugging and is not used by the SDK. The string is not copied by the SDK,
+        only the pointer is stored.
 
-		/**
-		\brief Retrieves the axis aligned bounding box enclosing the articulation.
+        \param[in] name String to set the objects name to.
 
-		\param[in] inflation  Scale factor for computed world bounds. Box extents are multiplied by this value.
+        @see getName()
+        */
+        virtual void setName(const char *name) = 0;
 
-		\return The articulation's bounding box.
+        /**
+        \brief Retrieves the name string set with setName().
 
-		@see PxBounds3
-		*/
-		virtual		PxBounds3			getWorldBounds(float inflation = 1.01f) const = 0;
+        \return Name string associated with object.
 
-		/**
-		\brief Retrieves the aggregate the articulation might be a part of.
+        @see setName()
+        */
+        virtual const char *getName() const = 0;
 
-		\return The aggregate the articulation is a part of, or NULL if the articulation does not belong to an aggregate.
+        /**
+        \brief Retrieves the axis aligned bounding box enclosing the articulation.
 
-		@see PxAggregate
-		*/
-		virtual		PxAggregate*		getAggregate() const = 0;
+        \param[in] inflation  Scale factor for computed world bounds. Box extents are multiplied by this value.
 
-		virtual		PxArticulationImpl*		getImpl() = 0;
-		virtual const PxArticulationImpl*	getImpl() const = 0;
+        \return The articulation's bounding box.
 
-		void*						userData;	//!< user can assign this to whatever, usually to create a 1:1 relationship with a user object.
+        @see PxBounds3
+        */
+        virtual PxBounds3 getWorldBounds(float inflation = 1.01f) const = 0;
 
-		virtual						~PxArticulationBase() {}
+        /**
+        \brief Retrieves the aggregate the articulation might be a part of.
 
-	protected:
-		PX_INLINE					PxArticulationBase(PxType concreteType, PxBaseFlags baseFlags) : PxBase(concreteType, baseFlags), userData(NULL) {}
-		PX_INLINE					PxArticulationBase(PxBaseFlags baseFlags) : PxBase(baseFlags) {}
-	
-	public:
-		virtual PxArticulationJointBase* createArticulationJoint(PxArticulationLink& parent, const PxTransform& parentFrame, PxArticulationLink& child, const PxTransform& childFrame) = 0;
-		virtual void					 releaseArticulationJoint(PxArticulationJointBase* joint) = 0;
-	};
+        \return The aggregate the articulation is a part of, or NULL if the articulation does not belong to an aggregate.
+
+        @see PxAggregate
+        */
+        virtual PxAggregate *getAggregate() const = 0;
+
+        virtual PxArticulationImpl *getImpl() = 0;
+
+        virtual const PxArticulationImpl *getImpl() const = 0;
+
+        virtual PxArticulationBase::Enum getType() const = 0;
+
+        void *userData;    //!< user can assign this to whatever, usually to create a 1:1 relationship with a user object.
+
+        virtual                        ~PxArticulationBase() {}
+
+    protected:
+        PX_INLINE PxArticulationBase(PxType concreteType, PxBaseFlags baseFlags)
+                : PxBase(concreteType, baseFlags) {}
+
+        PX_INLINE PxArticulationBase(PxBaseFlags baseFlags) : PxBase(
+                baseFlags) {}
+
+    public:
+        virtual PxArticulationJointBase *
+        createArticulationJoint(PxArticulationLink &parent,
+                                const PxTransform &parentFrame,
+                                PxArticulationLink &child,
+                                const PxTransform &childFrame) = 0;
+
+        virtual void
+        releaseArticulationJoint(PxArticulationJointBase *joint) = 0;
+    };
 
 #if !PX_DOXYGEN
 } // namespace physx

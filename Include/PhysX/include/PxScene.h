@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -617,14 +617,14 @@ class PxScene
 	*/
 	virtual PxCpuDispatcher* getCpuDispatcher() const = 0;
 
-	/**
-	\brief Return the CUDA context manager that was set in PxSceneDesc::cudaContextManager when creating the scene with PxPhysics::createScene
+    /**
+    \brief Return the gpu dispatcher that was set in PxSceneDesc::gpuDispatcher when creating the scene with PxPhysics::createScene
 
-	<b>Platform specific:</b> Applies to PC GPU only.
+    <b>Platform specific:</b> Applies to PC GPU only.
 
-	@see PxSceneDesc::cudaContextManager, PxPhysics::createScene
-	*/
-	virtual PxCudaContextManager* getCudaContextManager() const = 0;
+    @see PxSceneDesc::gpuDispatcher, PxPhysics::createScene
+    */
+    virtual PxGpuDispatcher *getGpuDispatcher() const = 0;
 
 	//@}
 	/************************************************************************************************/
@@ -769,23 +769,25 @@ class PxScene
 	*/
 	virtual	PxU32				getFilterShaderDataSize() const = 0;
 
-	/**
-	\brief Gets the custom collision filter shader in use for this scene.
+    /**
+    \brief Gets the custom collision filter shader in use for this scene.
 
-	\return Filter shader class that defines the collision pair filtering.
+    \return Filter shader class that defines the collision pair filtering.
 
-	@see PxSceneDesc.filterShader PxSimulationFilterShader
-	*/
-	virtual	PxSimulationFilterShader	getFilterShader() const = 0;
+    @see PxSceneDesc.filterShader PxSimulationFilterShader
+    */
+    virtual PxSimulationFilterShader
+    getFilterShader() const = 0;
 
-	/**
-	\brief Gets the custom collision filter callback in use for this scene.
+    /**
+    \brief Gets the custom collision filter callback in use for this scene.
 
-	\return Filter callback class that defines the collision pair filtering.
+    \return Filter callback class that defines the collision pair filtering.
 
-	@see PxSceneDesc.filterCallback PxSimulationFilterCallback
-	*/
-	virtual	PxSimulationFilterCallback*	getFilterCallback() const = 0;
+    @see PxSceneDesc.filterCallback PxSimulationFilterCallback
+    */
+    virtual PxSimulationFilterCallback *
+    getFilterCallback() const = 0;
 
 	/**
 	\brief Marks the object to reset interactions and re-run collision filters in the next simulation step.
@@ -833,24 +835,6 @@ class PxScene
 	@see PxSimulationFilterShader PxSimulationFilterCallback
 	*/
 	virtual void				resetFiltering(PxRigidActor& actor, PxShape*const* shapes, PxU32 shapeCount) = 0;
-
-	/**
-	\brief Gets the pair filtering mode for kinematic-kinematic pairs.
-
-	\return Filtering mode for kinematic-kinematic pairs.
-
-	@see PxPairFilteringMode PxSceneDesc
-	*/
-	virtual	PxPairFilteringMode::Enum	getKinematicKinematicFilteringMode()	const	= 0;
-
-	/**
-	\brief Gets the pair filtering mode for static-kinematic pairs.
-
-	\return Filtering mode for static-kinematic pairs.
-
-	@see PxPairFilteringMode PxSceneDesc
-	*/
-	virtual	PxPairFilteringMode::Enum	getStaticKinematicFilteringMode()		const	= 0;
 
 	//@}
 	/************************************************************************************************/
@@ -1192,20 +1176,21 @@ class PxScene
 	*/
 	virtual PxPruningStructureType::Enum getDynamicStructure() const = 0;
 
-	/**
-	\brief Flushes any changes to the scene query representation.
+    /**
+    \brief Flushes any changes in the simulation to the scene query representation.
 
-	This method updates the state of the scene query representation to match changes in the scene state.
+    This method updates the state of the scene query representation to match changes in the scene state.
 
-	By default, these changes are buffered until the next query is submitted. Calling this function will not change
-	the results from scene queries, but can be used to ensure that a query will not perform update work in the course of 
-	its execution.
-	
-	A thread performing updates will hold a write lock on the query structure, and thus stall other querying threads. In multithread
-	scenarios it can be useful to explicitly schedule the period where this lock may be held for a significant period, so that
-	subsequent queries issued from multiple threads will not block.
-	
-	*/
+    By default, these changes are buffered until the next query is submitted. Calling this function will not change
+    the results from scene queries, but can be used to ensure that a query will not perform update work in the course of
+    its execution.
+
+    A thread performing updates will hold a write lock on the query structure, and thus stall other querying threads. In multithread
+    scenarios it can be useful to explicitly schedule the period where this lock may be held for a significant period, so that
+    subsequent queries issued from multiple threads will not block.
+
+    Note that while queries will block during the execution of this method, other read operations on the scene will not.
+    */
 	virtual	void				flushQueryUpdates() = 0;
 
 	/**
@@ -1308,30 +1293,30 @@ class PxScene
 	\param[in] block When set to true will block until the condition is met, which is tree built task must finish running.
 	*/
 
-	virtual	bool				fetchQueries(bool block = false)	= 0;	
+	virtual	bool				fetchQueries(bool block = false)	= 0;
 
-	/**
-	\brief Performs a raycast against objects in the scene, returns results in a PxRaycastBuffer object
-	or via a custom user callback implementation inheriting from PxRaycastCallback.
+    /**
+    \brief Performs a raycast against objects in the scene, returns results in a PxRaycastBuffer object
+    or via a custom user callback implementation inheriting from PxRaycastCallback.
 
-	\note	Touching hits are not ordered.
-	\note	Shooting a ray from within an object leads to different results depending on the shape type. Please check the details in user guide article SceneQuery. User can ignore such objects by employing one of the provided filter mechanisms.
+    \note	Touching hits are not ordered.
+    \note	Shooting a ray from within an object leads to different results depending on the shape type. Please check the details in user guide article SceneQuery. User can ignore such objects by employing one of the provided filter mechanisms.
 
-	\param[in] origin		Origin of the ray.
-	\param[in] unitDir		Normalized direction of the ray.
-	\param[in] distance		Length of the ray. Has to be in the [0, inf) range.
-	\param[out] hitCall		Raycast hit buffer or callback object used to report raycast hits.
-	\param[in] hitFlags		Specifies which properties per hit should be computed and returned via the hit callback.
-	\param[in] filterData	Filtering data passed to the filter shader. See #PxQueryFilterData #PxBatchQueryPreFilterShader, #PxBatchQueryPostFilterShader
-	\param[in] filterCall	Custom filtering logic (optional). Only used if the corresponding #PxQueryFlag flags are set. If NULL, all hits are assumed to be blocking.
-	\param[in] cache		Cached hit shape (optional). Ray is tested against cached shape first. If no hit is found the ray gets queried against the scene.
-							Note: Filtering is not executed for a cached shape if supplied; instead, if a hit is found, it is assumed to be a blocking hit.
-							Note: Using past touching hits as cache will produce incorrect behavior since the cached hit will always be treated as blocking.
+    \param[in] origin		Origin of the ray.
+    \param[in] unitDir		Normalized direction of the ray.
+    \param[in] distance		Length of the ray. Has to be in the [0, inf) range.
+    \param[out] hitCall		Raycast hit buffer or callback object used to report raycast hits.
+    \param[in] hitFlags		Specifies which properties per hit should be computed and returned via the hit callback.
+    \param[in] filterData	Filtering data passed to the filer shader. See #PxQueryFilterData #PxBatchQueryPreFilterShader, #PxBatchQueryPostFilterShader
+    \param[in] filterCall	Custom filtering logic (optional). Only used if the corresponding #PxQueryFlag flags are set. If NULL, all hits are assumed to be blocking.
+    \param[in] cache		Cached hit shape (optional). Ray is tested against cached shape first. If no hit is found the ray gets queried against the scene.
+                            Note: Filtering is not executed for a cached shape if supplied; instead, if a hit is found, it is assumed to be a blocking hit.
+                            Note: Using past touching hits as cache will produce incorrect behavior since the cached hit will always be treated as blocking.
 
-	\return True if any touching or blocking hits were found or any hit was found in case PxQueryFlag::eANY_HIT was specified.
+    \return True if any touching or blocking hits were found or any hit was found in case PxQueryFlag::eANY_HIT was specified.
 
-	@see PxRaycastCallback PxRaycastBuffer PxQueryFilterData PxQueryFilterCallback PxQueryCache PxRaycastHit PxQueryFlag PxQueryFlag::eANY_HIT
-	*/
+    @see PxRaycastCallback PxRaycastBuffer PxQueryFilterData PxQueryFilterCallback PxQueryCache PxRaycastHit PxQueryFlag PxQueryFlag::eANY_HIT
+    */
 	virtual bool				raycast(
 									const PxVec3& origin, const PxVec3& unitDir, const PxReal distance,
 									PxRaycastCallback& hitCall, PxHitFlags hitFlags = PxHitFlags(PxHitFlag::eDEFAULT),
@@ -1616,24 +1601,6 @@ class PxScene
 	@see PxSceneDesc.solverBatchSize setSolverBatchSize()
 	*/
 	virtual PxU32						getSolverBatchSize() const = 0;
-
-	/**
-	\brief Sets the number of articulations required to spawn a separate rigid body solver thread.
-
-	\param[in] solverBatchSize Number of articulations required to spawn a separate rigid body solver thread.
-
-	@see PxSceneDesc.solverBatchSize getSolverArticulationBatchSize()
-	*/
-	virtual	void						setSolverArticulationBatchSize(PxU32 solverBatchSize) = 0;
-
-	/**
-	\brief Retrieves the number of articulations required to spawn a separate rigid body solver thread.
-
-	\return Current number of articulations required to spawn a separate rigid body solver thread.
-
-	@see PxSceneDesc.solverBatchSize setSolverArticulationBatchSize()
-	*/
-	virtual PxU32						getSolverArticulationBatchSize() const = 0;
 	
 
 	//@}

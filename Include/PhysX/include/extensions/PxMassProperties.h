@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -294,29 +294,32 @@ public:
 		PxVec3 combinedCoM(0.0f);
 		PxMat33 combinedInertiaT = PxMat33(PxZero);
 
-		for(PxU32 i = 0; i < count; i++)
-		{
-			PX_ASSERT(props[i].inertiaTensor.column0.isFinite() && props[i].inertiaTensor.column1.isFinite() && props[i].inertiaTensor.column2.isFinite());
-			PX_ASSERT(props[i].centerOfMass.isFinite());
-			PX_ASSERT(PxIsFinite(props[i].mass));
+		for(PxU32 i = 0; i < count; i++) {
+            PX_ASSERT(props[i].inertiaTensor.column0.isFinite() &&
+                      props[i].inertiaTensor.column1.isFinite() &&
+                      props[i].inertiaTensor.column2.isFinite());
+            PX_ASSERT(props[i].centerOfMass.isFinite());
+            PX_ASSERT(PxIsFinite(props[i].mass));
 
-			combinedMass += props[i].mass;
-			const PxVec3 comTm = transforms[i].transform(props[i].centerOfMass);
-			combinedCoM += comTm * props[i].mass;
-		}
+            combinedMass += props[i].mass;
+            const PxVec3 comTm = transforms[i].transform(props[i].centerOfMass);
+            combinedCoM += comTm * props[i].mass;
+        }
 
-		if(combinedMass > 0.f)
-			combinedCoM /= combinedMass;
+        combinedCoM /= combinedMass;
 
-		for(PxU32 i = 0; i < count; i++)
-		{
-			const PxVec3 comTm = transforms[i].transform(props[i].centerOfMass);
-			combinedInertiaT += translateInertia(rotateInertia(props[i].inertiaTensor, transforms[i].q), props[i].mass, combinedCoM - comTm);
-		}
+        for (PxU32 i = 0; i < count; i++) {
+            const PxVec3 comTm = transforms[i].transform(props[i].centerOfMass);
+            combinedInertiaT += translateInertia(
+                    rotateInertia(props[i].inertiaTensor, transforms[i].q),
+                    props[i].mass, combinedCoM - comTm);
+        }
 
-		PX_ASSERT(combinedInertiaT.column0.isFinite() && combinedInertiaT.column1.isFinite() && combinedInertiaT.column2.isFinite());
-		PX_ASSERT(combinedCoM.isFinite());
-		PX_ASSERT(PxIsFinite(combinedMass));
+        PX_ASSERT(combinedInertiaT.column0.isFinite() &&
+                  combinedInertiaT.column1.isFinite() &&
+                  combinedInertiaT.column2.isFinite());
+        PX_ASSERT(combinedCoM.isFinite());
+        PX_ASSERT(PxIsFinite(combinedMass));
 
 		return PxMassProperties(combinedMass, combinedInertiaT, combinedCoM);
 	}
