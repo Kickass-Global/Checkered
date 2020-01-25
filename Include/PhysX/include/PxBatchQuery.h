@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -123,29 +123,29 @@ class PX_DEPRECATED PxBatchQuery
 	*/
 	virtual	void							release() = 0;
 
-	/**
-	\brief Performs a raycast against objects in the scene, returns results in PxBatchQueryMemory::userRaycastResultBuffer
-	specified at PxBatchQuery creation time or via PxBatchQuery::setUserMemory call.
+    /**
+    \brief Performs a raycast against objects in the scene, returns results in PxBatchQueryMemory::userRaycastResultBuffer
+    specified at PxBatchQuery creation time or via PxBatchQuery::setUserMemory call.
 
-	\note	Touching hits are not ordered.
-	\note	Shooting a ray from within an object leads to different results depending on the shape type. Please check the details in article SceneQuery. User can ignore such objects by using one of the provided filter mechanisms.
+    \note	Touching hits are not ordered.
+    \note	Shooting a ray from within an object leads to different results depending on the shape type. Please check the details in article SceneQuery. User can ignore such objects by using one of the provided filter mechanisms.
 
-	\param[in] origin		Origin of the ray.
-	\param[in] unitDir		Normalized direction of the ray.
-	\param[in] distance		Length of the ray. Needs to be larger than 0.
-	\param[in] maxTouchHits	Maximum number of hits to record in the touch buffer for this query. Default=0 reports a single blocking hit. If maxTouchHits is set to 0 all hits are treated as blocking by default.
-	\param[in] hitFlags		Specifies which properties per hit should be computed and returned in hit array and blocking hit.
-	\param[in] filterData	Filtering data passed to the filter shader. See #PxQueryFilterData #PxBatchQueryPreFilterShader, #PxBatchQueryPostFilterShader
-	\param[in] userData		User can pass any value in this argument, usually to identify this particular query
-	\param[in] cache		Cached hit shape (optional). Query is tested against cached shape first. If no hit is found the ray gets queried against the scene.
-							Note: Filtering is not executed for a cached shape if supplied; instead, if a hit is found, it is assumed to be a blocking hit.
-							Note: Using past touching hits as cache will produce incorrect behavior since the cached hit will always be treated as blocking.
-	
-	\note This query call writes to a list associated with the query object and is NOT thread safe (for performance reasons there is no lock
-		and overlapping writes from different threads may result in undefined behavior).
+    \param[in] origin		Origin of the ray.
+    \param[in] unitDir		Normalized direction of the ray.
+    \param[in] distance		Length of the ray. Needs to be larger than 0.
+    \param[in] maxTouchHits	Maximum number of hits to record in the touch buffer for this query. Default=0 reports a single blocking hit. If maxTouchHits is set to 0 all hits are treated as blocking by default.
+    \param[in] hitFlags		Specifies which properties per hit should be computed and returned in hit array and blocking hit.
+    \param[in] filterData	Filtering data passed to the filer shader. See #PxQueryFilterData #PxBatchQueryPreFilterShader, #PxBatchQueryPostFilterShader
+    \param[in] userData		User can pass any value in this argument, usually to identify this particular query
+    \param[in] cache		Cached hit shape (optional). Query is tested against cached shape first. If no hit is found the ray gets queried against the scene.
+                            Note: Filtering is not executed for a cached shape if supplied; instead, if a hit is found, it is assumed to be a blocking hit.
+                            Note: Using past touching hits as cache will produce incorrect behavior since the cached hit will always be treated as blocking.
 
-	@see PxQueryFilterData PxBatchQueryPreFilterShader PxBatchQueryPostFilterShader PxRaycastHit PxScene::raycast
-	*/
+    \note This query call writes to a list associated with the query object and is NOT thread safe (for performance reasons there is no lock
+        and overlapping writes from different threads may result in undefined behavior).
+
+    @see PxQueryFilterData PxBatchQueryPreFilterShader PxBatchQueryPostFilterShader PxRaycastHit PxScene::raycast
+    */
 	virtual void raycast(
 		const PxVec3& origin, const PxVec3& unitDir, PxReal distance = PX_MAX_F32, PxU16 maxTouchHits = 0,
 		PxHitFlags hitFlags = PxHitFlag::eDEFAULT,

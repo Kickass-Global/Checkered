@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 
 #ifndef PX_GPU_H
 #define PX_GPU_H
@@ -35,6 +35,7 @@
 
 #include "cudamanager/PxCudaContextManager.h"
 #include "cudamanager/PxCudaMemoryManager.h"
+#include "cudamanager/PxGpuCopyDesc.h"
 #include "foundation/Px.h"
 #include "foundation/PxPreprocessor.h"
 #include "common/PxPhysXCommonConfig.h"
@@ -77,19 +78,17 @@ PX_C_EXPORT PX_PHYSX_CORE_API void PX_CALL_CONV PxSetPhysXGpuLoadHook(const PxGp
  * PhysX.  Returns -1 if no PhysX capable GPU is found or GPU PhysX has
  * been disabled.
  */
-PX_C_EXPORT PX_PHYSX_CORE_API int PX_CALL_CONV PxGetSuggestedCudaDeviceOrdinal(physx::PxErrorCallback& errc);
+PX_C_EXPORT PX_PHYSX_CORE_API int
+PX_CALL_CONV PxGetSuggestedCudaDeviceOrdinal(physx::PxErrorCallback &errc);
 
 /**
- * \brief Allocate a CUDA Context manager, complete with heaps.
+ * \brief Allocate a CUDA Context manager, complete with heaps and task dispatcher.
  * You only need one CUDA context manager per GPU device you intend to use for
  * CUDA tasks. 
- \param[in] foundation PhysXFoundation instance.
- \param[in] desc Cuda context manager desc.
- \param[in] profilerCallback PhysX profiler callback instance.
-
- @see PxGetProfilerCallback()
  */
-PX_C_EXPORT PX_PHYSX_CORE_API physx::PxCudaContextManager* PX_CALL_CONV PxCreateCudaContextManager(physx::PxFoundation& foundation, const physx::PxCudaContextManagerDesc& desc, physx::PxProfilerCallback* profilerCallback = NULL);
+PX_C_EXPORT PX_PHYSX_CORE_API physx::PxCudaContextManager *
+PX_CALL_CONV PxCreateCudaContextManager(physx::PxFoundation &foundation,
+                                        const physx::PxCudaContextManagerDesc &desc);
 
 #endif // PX_SUPPORT_GPU_PHYSX
 

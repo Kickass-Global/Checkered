@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -34,14 +34,15 @@
   @{
 */
 
+#include "characterkinematic/PxCharacter.h"
+
 #include "PxPhysXConfig.h"
 #include "foundation/PxFlags.h"
 #include "foundation/PxErrorCallback.h"
 #include "common/PxRenderBuffer.h"
 
 #if !PX_DOXYGEN
-namespace physx
-{
+namespace physx {
 #endif
 
 class PxPhysics;
@@ -81,17 +82,16 @@ PX_FLAGS_OPERATORS(PxControllerDebugRenderFlag::Enum, PxU32)
 
 @see PxController PxBoxController PxCapsuleController
 */
-class PxControllerManager
-{
-public:
-	/**
-	\brief Releases the controller manager.
+    class PX_PHYSX_CHARACTER_API PxControllerManager {
+    public:
+        /**
+        \brief Releases the controller manager.
 
-	\note This will release all associated controllers and obstacle contexts.
+        \note This will release all associated controllers and obstacle contexts.
 
-	\note This function is required to be called to release foundation usage.
+        \note This function is required to be called to release foundation usage.
 
-	*/
+        */
 	virtual void				release() = 0;
 
 	/**
@@ -277,23 +277,25 @@ protected:
 } // namespace physx
 #endif
 
-	/**
-	\brief Creates the controller manager.
+/**
+\brief Creates the controller manager.
 
-	\param[in] scene PhysX scene.
-	\param[in] lockingEnabled Enables/disables internal locking.
+\param[in] scene PhysX scene.
+\param[in] lockingEnabled Enables/disables internal locking.
 
-	The character controller is informed by #PxDeletionListener::onRelease() when actors or shapes are released, and updates its internal
-	caches accordingly. If character controller movement or a call to #PxControllerManager::shiftOrigin() may overlap with actor/shape releases,
-	internal data structures must be guarded against concurrent access.
+The character controller is informed by #PxDeletionListener::onRelease() when actors or shapes are released, and updates its internal
+caches accordingly. If character controller movement or a call to #PxControllerManager::shiftOrigin() may overlap with actor/shape releases,
+internal data structures must be guarded against concurrent access.
 
-	Locking guarantees thread safety in such scenarios.
+Locking guarantees thread safety in such scenarios.
 
-	\note locking may result in significant slowdown for release of actors or shapes.
+\note locking may result in significant slowdown for release of actors or shapes.
 
-	By default, locking is disabled.
-	*/
-PX_C_EXPORT physx::PxControllerManager* PX_CALL_CONV PxCreateControllerManager(physx::PxScene& scene, bool lockingEnabled = false);
+By default, locking is disabled.
+*/
+PX_C_EXPORT PX_PHYSX_CHARACTER_API physx::PxControllerManager *
+PX_CALL_CONV PxCreateControllerManager(physx::PxScene &scene,
+                                       bool lockingEnabled = false);
 
 /** @} */
 #endif //PX_PHYSICS_CCT_MANAGER

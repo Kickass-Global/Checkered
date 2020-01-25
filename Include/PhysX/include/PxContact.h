@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -157,18 +157,18 @@ struct PxModifiableContact : public PxExtendedContact
 	\brief Shape A's material index
 	*/
 	PxU16	materialIndex0;							//54
-	/**
-	\brief Shape B's material index
-	*/
-	PxU16	materialIndex1;							//56
-	/**
-	\brief static friction coefficient
-	*/
-	PxReal	staticFriction;							//60
-	/**
-	\brief dynamic friction coefficient
-	*/	
-	PxReal dynamicFriction;							//x64
+    /**
+    \brief Shape B's material index
+    */
+    PxU16 materialIndex1;                            //56
+    /**
+    \brief static friction coefficient
+    */
+    PxReal staticFriction;                            //60
+    /**
+    \brief dynamic friction coefficient
+    */
+    PxReal dynamicFriction;                            //64
 }
 PX_ALIGN_SUFFIX(16);
 

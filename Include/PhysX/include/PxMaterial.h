@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -59,38 +59,25 @@ struct PxMaterialFlag
 		*/
 		eDISABLE_FRICTION = 1 << 0,
 
-		/**
-		The difference between "normal" and "strong" friction is that the strong friction feature
-		remembers the "friction error" between simulation steps. The friction is a force trying to
-		hold objects in place (or slow them down) and this is handled in the solver. But since the
-		solver is only an approximation, the result of the friction calculation can include a small
-		"error" - e.g. a box resting on a slope should not move at all if the static friction is in
-		action, but could slowly glide down the slope because of a small friction error in each 
-		simulation step. The strong friction counter-acts this by remembering the small error and
-		taking it to account during the next simulation step.
+        /**
+        The difference between "normal" and "strong" friction is that the strong friction feature
+        remembers the "friction error" between simulation steps. The friction is a force trying to
+        hold objects in place (or slow them down) and this is handled in the solver. But since the
+        solver is only an approximation, the result of the friction calculation can include a small
+        "error" - e.g. a box resting on a slope should not move at all if the static friction is in
+        action, but could slowly glide down the slope because of a small friction error in each
+        simulation step. The strong friction counter-acts this by remembering the small error and
+        taking it to account during the next simulation step.
 
-		However, in some cases the strong friction could cause problems, and this is why it is
-		possible to disable the strong friction feature by setting this flag. One example is
-		raycast vehicles, that are sliding fast across the surface, but still need a precise
-		steering behavior. It may be a good idea to reenable the strong friction when objects
-		are coming to a rest, to prevent them from slowly creeping down inclines.
+        However, in some cases the strong friction could cause problems, and this is why it is
+        possible to disable the strong friction feature by setting this flag. One example is
+        raycast vehicles, that are sliding fast across the surface, but still need a precise
+        steering behavior. It may be a good idea to reenable the strong friction when objects
+        are coming to a rest, to prevent them from slowly creeping down inclines.
 
-		Note: This flag only has an effect if the PxMaterialFlag::eDISABLE_FRICTION bit is 0.
-		*/
-		eDISABLE_STRONG_FRICTION = 1 << 1,
-
-		/**
-		This flag only has an effect if PxFrictionType::ePATCH friction model is used.
-
-		When using the patch friction model, up to 2 friction anchors are generated per patch. As the number of friction anchors
-		can be smaller than the number of contacts, the normal force is accumulated over all contacts and used to compute friction
-		for all anchors. Where there are more than 2 anchors, this can produce frictional behavior that is too strong (approximately 2x as strong
-		as analytical models suggest). 
-
-		This flag causes the normal force to be distributed between the friction anchors such that the total amount of friction applied does not 
-		exceed the analyical results.
-		*/
-		eIMPROVED_PATCH_FRICTION = 1 << 2
+        Note: This flag only has an effect if the PxMaterialFlag::eDISABLE_FRICTION bit is 0.
+        */
+                eDISABLE_STRONG_FRICTION = 1 << 1
 	};
 };
 

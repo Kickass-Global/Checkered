@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 
 #ifndef PXTASK_PXTASKMANAGER_H
 #define PXTASK_PXTASKMANAGER_H
@@ -54,15 +54,17 @@ struct PxTaskType
 	/**
 	 * \brief Identifies the type of each heavyweight PxTask object
 	 */
-	enum Enum
-	{
-		TT_CPU,				//!< PxTask will be run on the CPU
-		TT_NOT_PRESENT,		//!< Return code when attempting to find a task that does not exist
-		TT_COMPLETED		//!< PxTask execution has been completed
-	};
+    enum Enum {
+        TT_CPU,                //!< PxTask will be run on the CPU
+        TT_GPU,                //!< PxTask will be run on the GPU
+        TT_NOT_PRESENT,        //!< Return code when attempting to find a task that does not exist
+        TT_COMPLETED        //!< PxTask execution has been completed
+    };
 };
 
-class PxCpuDispatcher;
+    class PxCpuDispatcher;
+
+    class PxGpuDispatcher;
 
 /** 
  \brief The PxTaskManager interface
@@ -73,38 +75,57 @@ class PxCpuDispatcher;
  per-scene which users can configure by passing dispatcher objects into the PxSceneDesc.
 
  @see CpuDispatcher
+ @see PxGpuDispatcher
  
 */
 class PxTaskManager
 {
 public:
 
-	/**
-	\brief Set the user-provided dispatcher object for CPU tasks
+    /**
+    \brief Set the user-provided dispatcher object for CPU tasks
 
-	\param[in] ref The dispatcher object.
+    \param[in] ref The dispatcher object.
 
-	@see CpuDispatcher
-	*/
-	virtual void     setCpuDispatcher(PxCpuDispatcher& ref) = 0;
+    @see CpuDispatcher
+    */
+    virtual void setCpuDispatcher(PxCpuDispatcher &ref) = 0;
 
-	/**
-	\brief Get the user-provided dispatcher object for CPU tasks
+    /**
+    \brief Set the user-provided dispatcher object for GPU tasks
 
-	\return The CPU dispatcher object.
+    \param[in] ref The dispatcher object.
 
-	@see CpuDispatcher
-	*/
-	virtual PxCpuDispatcher*			getCpuDispatcher() const = 0;
+    @see PxGpuDispatcher
+    */
+    virtual void setGpuDispatcher(PxGpuDispatcher &ref) = 0;
 
-	/**
-	\brief Reset any dependencies between Tasks
+    /**
+    \brief Get the user-provided dispatcher object for CPU tasks
 
-	\note Will be called at the start of every frame before tasks are submitted.
+    \return The CPU dispatcher object.
 
-	@see PxTask
-	*/
-	virtual void	resetDependencies() = 0;
+    @see CpuDispatcher
+    */
+    virtual PxCpuDispatcher *getCpuDispatcher() const = 0;
+
+    /**
+    \brief Get the user-provided dispatcher object for GPU tasks
+
+    \return The GPU dispatcher object.
+
+    @see PxGpuDispatcher
+    */
+    virtual PxGpuDispatcher *getGpuDispatcher() const = 0;
+
+    /**
+    \brief Reset any dependencies between Tasks
+
+    \note Will be called at the start of every frame before tasks are submitted.
+
+    @see PxTask
+    */
+    virtual void resetDependencies() = 0;
 	
 	/**
 	\brief Called by the owning scene to start the task graph.
@@ -115,9 +136,11 @@ public:
 	*/
 	virtual void	startSimulation() = 0;
 
-	/**
-	\brief Called by the owning scene at the end of a simulation step.
-	*/
+    /**
+    \brief Called by the owning scene at the end of a simulation step to synchronize the PxGpuDispatcher
+
+    @see PxGpuDispatcher
+    */
 	virtual void	stopSimulation() = 0;
 
 	/**
@@ -169,10 +192,12 @@ public:
 	*/
 	virtual void        release() = 0;
 
-	/**
-	\brief Construct a new PxTaskManager instance with the given [optional] dispatchers
-	*/
-	static PxTaskManager* createTaskManager(PxErrorCallback& errorCallback, PxCpuDispatcher* = 0);
+    /**
+    \brief Construct a new PxTaskManager instance with the given [optional] dispatchers
+    */
+    static PxTaskManager *
+    createTaskManager(PxErrorCallback &errorCallback, PxCpuDispatcher * = 0,
+                      PxGpuDispatcher * = 0);
 	
 protected:
 	virtual ~PxTaskManager() {}
@@ -184,16 +209,22 @@ protected:
 
 	virtual void addReference(PxTaskID taskID) = 0;
 	virtual void decrReference(PxTaskID taskID) = 0;
-	virtual int32_t getReference(PxTaskID taskID) const = 0;
 
-	virtual void decrReference(PxLightCpuTask&) = 0;
-	virtual void addReference(PxLightCpuTask&) = 0;
+    virtual int32_t getReference(PxTaskID taskID) const = 0;
 
-	/*! \endcond */
+    virtual void decrReference(PxLightCpuTask &) = 0;
 
-	friend class PxBaseTask;
-	friend class PxTask;
-	friend class PxLightCpuTask;
+    virtual void addReference(PxLightCpuTask &) = 0;
+
+    /*! \endcond */
+
+    friend class PxBaseTask;
+
+    friend class PxTask;
+
+    friend class PxLightCpuTask;
+
+    friend class PxGpuWorkerThread;
 };
 
 PX_POP_PACK

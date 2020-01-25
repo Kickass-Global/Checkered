@@ -6,6 +6,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 set(GLAD ../Include/glad/src/glad.c)
 
+file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
+
 set(SRC main.cpp main.h
         Engine.cpp Engine.h
         Components/Index.cpp Components/Index.h
@@ -36,7 +38,9 @@ set(SRC main.cpp main.h
         Components/Billboard.cpp Components/Billboard.h
         Components/Component.h
         Systems/Events/Events.cpp Systems/Events/Events.h
-        Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h)
+        Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h
+        ${PHYSX_SNIPPETS}
+        )
 
 # Add source to this project's executable.
 add_executable (Engine
@@ -79,20 +83,31 @@ target_link_libraries(Engine
         PRIVATE glfw
         #[[PUBLIC c++fs]]
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
-        #[[PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/zlibstaticd.lib"
-        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/IrrXMLd.lib"]]
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCommon_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCooking_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXExtensions_static_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXFoundation_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXPvdSDK_static_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXTask_static_64.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXVehicle_static_64.lib
         PRIVATE ${OPENGL_gl_LIBRARY})
 
 configure_file("../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
-configure_file("../dlls/PhysXDevice64.dll" PhysxDevice64.dll COPYONLY)
-configure_file("../dlls/glut32.dll" glut32.dll COPYONLY)
 configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
+configure_file("../dlls/PhysXCommon_64.dll" PhysXCommon_64.dll COPYONLY)
+configure_file("../dlls/PhysXCooking_64.dll" PhysXCooking_64.dll COPYONLY)
+configure_file("../dlls/PhysXDevice64.dll" PhysXDevice64.dll COPYONLY)
+configure_file("../dlls/PhysXFoundation_64.dll" PhysXFoundation_64.dll COPYONLY)
+configure_file("../dlls/glut32.dll" glut32.dll COPYONLY)
 
 find_package(OpenGL REQUIRED)
 
 target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
-        SYSTEM PRIVATE "../Include/PhysX/pxshared/include"
         SYSTEM PRIVATE "../Include/PhysX/include"
+        SYSTEM PRIVATE "../Include/PhysX/source/foundation/include"
+        SYSTEM PRIVATE "../Include/PxShared/include"
         SYSTEM PRIVATE "../Include/include"
         SYSTEM PRIVATE "../Include/glminclude"
         SYSTEM PRIVATE "../Include/assimp/include"

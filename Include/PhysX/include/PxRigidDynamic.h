@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
@@ -49,19 +49,19 @@ namespace physx
 */
 struct PxRigidDynamicLockFlag
 {
-	enum Enum
-	{
-		eLOCK_LINEAR_X = (1 << 0),
-		eLOCK_LINEAR_Y = (1 << 1),
-		eLOCK_LINEAR_Z = (1 << 2),
-		eLOCK_ANGULAR_X = (1 << 3),
-		eLOCK_ANGULAR_Y = (1 << 4),
-		eLOCK_ANGULAR_Z = (1 << 5)
-	};
+	enum Enum {
+        eLOCK_LINEAR_X = (1 << 0),
+        eLOCK_LINEAR_Y = (1 << 1),
+        eLOCK_LINEAR_Z = (1 << 2),
+        eLOCK_ANGULAR_X = (1 << 3),
+        eLOCK_ANGULAR_Y = (1 << 4),
+        eLOCK_ANGULAR_Z = (1 << 5)
+    };
 };
 
-typedef PxFlags<PxRigidDynamicLockFlag::Enum, PxU8> PxRigidDynamicLockFlags;
-PX_FLAGS_OPERATORS(PxRigidDynamicLockFlag::Enum, PxU8)
+    typedef PxFlags <PxRigidDynamicLockFlag::Enum, PxU16> PxRigidDynamicLockFlags;
+
+    PX_FLAGS_OPERATORS(PxRigidDynamicLockFlag::Enum, PxU16)
 
 /**
 \brief PxRigidDynamic represents a dynamic rigid simulation object in the physics SDK.

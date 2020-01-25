@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2019 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 
 
 #ifndef PXCUDACONTEXTMANAGER_PXCUDACONTEXTMANAGER_H
@@ -44,18 +44,18 @@ typedef struct CUctx_st *CUcontext;
 typedef struct CUgraphicsResource_st *CUgraphicsResource;
 typedef int CUdevice;
 
-namespace physx
-{ 
-	
+namespace physx {
+
+    class PxGpuDispatcher;
+
+
 /** \brief Possible graphic/CUDA interoperability modes for context */
-struct PxCudaInteropMode
-{
-    /**
-     * \brief Possible graphic/CUDA interoperability modes for context
-     */
-	enum Enum
-	{
-		NO_INTEROP = 0,
+    struct PxCudaInteropMode {
+        /**
+         * \brief Possible graphic/CUDA interoperability modes for context
+         */
+        enum Enum {
+            NO_INTEROP = 0,
 		D3D10_INTEROP,
 		D3D11_INTEROP,
 		OGL_INTEROP,
@@ -204,6 +204,12 @@ public:
  *
  * The PxCudaContextManager is based on the CUDA driver API and explictly does not
  * support the CUDA runtime API (aka, CUDART).
+ *
+ * To enable CUDA use by an APEX scene, a PxCudaContextManager must be created
+ * (supplying your own CUDA context, or allowing a new context to be allocated
+ * for you), the PxGpuDispatcher for that context is retrieved via the
+ * getGpuDispatcher() method, and this is assigned to the TaskManager that is
+ * given to the scene via its NxApexSceneDesc.
  */
 class PxCudaContextManager
 {
@@ -216,6 +222,12 @@ public:
      * it the same count.
      *
      * The context must be acquired before using most CUDA functions.
+     *
+     * It is not necessary to acquire the CUDA context inside GpuTask
+     * launch functions, because the PxGpuDispatcher will have already
+     * acquired the context for its worker thread.  However it is not
+     * harmfull to (re)acquire the context in code that is shared between
+     * GpuTasks and non-task functions.
      */
     virtual void acquireContext() = 0;
 
@@ -223,14 +235,15 @@ public:
      * \brief Release the CUDA context from the current thread
      *
      * The CUDA context should be released as soon as practically
-     * possible, to allow other CPU threads to work efficiently.
+     * possible, to allow other CPU threads (including the
+     * PxGpuDispatcher) to work efficiently.
      */
     virtual void releaseContext() = 0;
 
 	/**
 	* \brief Return the CUcontext
 	*/
-	virtual CUcontext getContext() = 0;
+    virtual CUcontext getContext() = 0;
 
     /**
      * \brief Return the PxCudaMemoryManager instance associated with this
@@ -238,14 +251,22 @@ public:
 	 * Note: This is currently not used by PxSceneFlag::eENABLE_GPU_DYNAMICS. Memory allocation properties are configured
 	 * for GPU rigid bodies using PxSceneDesc::gpuDynamicsConfig.
      */
-	virtual PxCudaMemoryManager *getMemoryManager() = 0;
+    virtual PxCudaMemoryManager *getMemoryManager() = 0;
+
+    /**
+     * \brief Return the PxGpuDispatcher instance associated with this
+     * CUDA context
+     */
+    virtual class physx::PxGpuDispatcher *getGpuDispatcher() = 0;
 
     /**
      * \brief Context manager has a valid CUDA context
      *
      * This method should be called after creating a PxCudaContextManager,
      * especially if the manager was responsible for allocating its own
-     * CUDA context (desc.ctx == NULL).
+     * CUDA context (desc.ctx == NULL).  If it returns false, there is
+     * no point in assigning this manager's PxGpuDispatcher to a
+     * TaskManager as it will be unable to execute GpuTasks.
      */
     virtual bool contextIsValid() const = 0;
 
@@ -344,13 +365,15 @@ public:
      * \brief Release the PxCudaContextManager
      *
      * When the manager instance is released, it also releases its
-     * PxCudaMemoryManager.  Before the memory manager is released, it 
-	 * frees all allocated memory pages.  If the PxCudaContextManager 
-	 * created the CUDA context it was responsible for, it also frees 
-	 * that context.
+     * PxGpuDispatcher instance and PxCudaMemoryManager.  Before the memory
+     * manager is released, it frees all allocated memory pages.  If the
+     * PxCudaContextManager created the CUDA context it was responsible
+     * for, it also frees that context.
      *
      * Do not release the PxCudaContextManager if there are any scenes
-     * using it.  Those scenes must be released first.
+     * using its PxGpuDispatcher.  Those scenes must be released first
+     * since there is no safe way to remove a PxGpuDispatcher from a
+     * TaskManager once the TaskManager has been given to a scene.
      *
      */
 	virtual void release() = 0;
