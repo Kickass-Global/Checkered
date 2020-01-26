@@ -96,6 +96,7 @@ target_link_libraries(Engine
 
 configure_file("../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
 configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
+configure_file("../dlls/PhysX_64.dll" PhysX_64.dll COPYONLY)
 configure_file("../dlls/PhysXCommon_64.dll" PhysXCommon_64.dll COPYONLY)
 configure_file("../dlls/PhysXCooking_64.dll" PhysXCooking_64.dll COPYONLY)
 configure_file("../dlls/PhysXDevice64.dll" PhysXDevice64.dll COPYONLY)
