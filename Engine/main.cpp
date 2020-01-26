@@ -68,9 +68,8 @@ int main() {
     auto camera = Engine::createComponent<Component::Camera>();
 
     // setup a game clock
-    std::chrono::high_resolution_clock clock;
 
-    auto start = clock.now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto end = start;
 
     while (running) {
@@ -87,6 +86,6 @@ int main() {
         renderingSystem.update(elapsed);
 
         start = end;
-        end = clock.now();
+        end = std::chrono::high_resolution_clock::now();
     }
 }
