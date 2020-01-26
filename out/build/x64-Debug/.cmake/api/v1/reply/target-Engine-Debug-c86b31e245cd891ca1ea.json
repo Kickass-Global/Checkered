@@ -1,0 +1,641 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "Engine/Engine.exe"
+		},
+		{
+			"path" : "Engine/Engine.pdb"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"target_link_libraries",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"Engine/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 46,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 82,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 108,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1   /W3"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 2,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Include/glfw-3.3.1/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/SYSTEM"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/PhysX/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/PhysX/source/foundation/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/PxShared/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/glminclude"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/assimp/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/glad/include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 2,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Include/glfw-3.3.1/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/SYSTEM"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/PhysX/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/PhysX/source/foundation/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/PxShared/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/glminclude"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/assimp/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/Engine/../Include/glad/include"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				1,
+				3,
+				5,
+				7,
+				9,
+				11,
+				13,
+				16,
+				17,
+				19,
+				21,
+				24,
+				25,
+				27,
+				29,
+				32,
+				34,
+				36,
+				39,
+				41,
+				43,
+				45,
+				47,
+				49,
+				51,
+				53,
+				56,
+				58
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "glfw::@91fdd3aedec7db8fe70c"
+		}
+	],
+	"id" : "Engine::@8f69bdd092c897d92c1e",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "glfw\\src\\glfw3.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\assimp-vc141-mtd.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysX_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXCharacterKinematic_static_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXCommon_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXCooking_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXExtensions_static_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXFoundation_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXPvdSDK_static_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXTask_static_64.lib ..\\..\\..\\..\\Engine\\..\\libs\\x64\\PhysXVehicle_static_64.lib opengl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "Engine",
+	"nameOnDisk" : "Engine.exe",
+	"paths" : 
+	{
+		"build" : "Engine",
+		"source" : "Engine"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				3,
+				5,
+				7,
+				9,
+				11,
+				13,
+				16,
+				17,
+				19,
+				21,
+				24,
+				25,
+				27,
+				29,
+				32,
+				34,
+				36,
+				39,
+				41,
+				43,
+				45,
+				47,
+				49,
+				51,
+				53,
+				56,
+				58
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				2,
+				4,
+				6,
+				8,
+				10,
+				12,
+				14,
+				15,
+				18,
+				20,
+				22,
+				23,
+				26,
+				28,
+				30,
+				31,
+				33,
+				35,
+				37,
+				38,
+				40,
+				42,
+				44,
+				46,
+				48,
+				50,
+				52,
+				54,
+				55,
+				57,
+				59
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "Include/glad/src/glad.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/main.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Engine.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Engine.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Index.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Index.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Dirty.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Dirty.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Mesh.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Mesh.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/GameObject.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/GameObject.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Debug/LiveReloadSystem.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Debug/LiveReloadSystem.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/ComponentBase.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/ComponentBase.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/SystemCalls.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/SystemCalls.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Physics/PhysicsSystem.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Physics/PhysicsSystem.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Rendering/RenderingSystem.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Rendering/RenderingSystem.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Rendering/RenderingBatch.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Rendering/RenderingBatch.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Pipeline/ShaderLoader.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Pipeline/ShaderLoader.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Camera/CameraSystem.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Camera/CameraSystem.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Input/InputSystem.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Input/InputSystem.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Pipeline/MeshLoader.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Shader.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Shader.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/ComponentId.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/ComponentId.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Camera.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Camera.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Rendering/Rendering.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Plane.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Plane.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Pipeline/EntityLoader.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Pipeline/EntityLoader.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Model.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Model.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Vehicle.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Vehicle.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/EventHandler.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/EventHandler.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/ComponentEvent.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/ComponentEvent.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Rendering/BillboardSystem.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Rendering/BillboardSystem.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Components/Billboard.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Billboard.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Components/Component.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Events/Events.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Events/Events.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Engine/Systems/Pipeline/Library.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Engine/Systems/Pipeline/Library.h",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "EXECUTABLE"
+}

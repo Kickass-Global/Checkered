@@ -3,34 +3,8 @@
 
 #include "main.h"
 #include "Systems/Pipeline/EntityLoader.h"
-#include <PxPhysicsAPI.h>
-
-
 
 int main() {
-
-
-	using namespace physx;
-
-	static PxDefaultErrorCallback gDefaultErrorCallback;
-	static PxDefaultAllocator gDefaultAllocatorCallback;
-
-	auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-		gDefaultErrorCallback);
-	if (!mFoundation)
-		assert(false, "PxCreateFoundation failed!");
-
-	bool recordMemoryAllocations = true;
-
-	auto mPvd = PxCreatePvd(*mFoundation);
-	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-	mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
-
-
-	auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
-		PxTolerancesScale(), recordMemoryAllocations, mPvd);
-	if (!mPhysics)
-		assert(false, "PxCreatePhysics failed!");
 
     using namespace Engine;
 
@@ -38,6 +12,16 @@ int main() {
 
     Rendering::RenderingSystem renderingSystem;
     renderingSystem.initialize();
+
+    Physics::PhysicsSystem physicsSystem;
+    physicsSystem.initialize();
+
+
+
+
+
+
+
 
     Debug::LiveReloadSystem liveReloadSystem;
 
@@ -52,7 +36,8 @@ int main() {
     Input::InputSystem::onKeyUp += cameraSystem.onKeyUpHandler;
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
-  
+
+    
     // simulate loading a complex game object
 
     auto box_object = Pipeline::EntityLoader::load<Component::GameObject>("Assets/Objects/box.json");
@@ -93,8 +78,9 @@ int main() {
     auto camera = Engine::createComponent<Component::Camera>();
 
     // setup a game clock
+    std::chrono::high_resolution_clock clock;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = clock.now();
     auto end = start;
 
     while (running) {
@@ -111,6 +97,6 @@ int main() {
         renderingSystem.update(elapsed);
 
         start = end;
-        end = std::chrono::high_resolution_clock::now();
+        end = clock.now();
     }
 }
