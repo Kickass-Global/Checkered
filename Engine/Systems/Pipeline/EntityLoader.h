@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <cctype>
 #include <nlohmann/json.hpp>
 
 #include "../../Components/ComponentId.h"
@@ -42,42 +43,60 @@ namespace Pipeline {
             json config;
             ifs >> config;
 
-            auto entity = Engine::createComponent<T>(filename);
+            auto name = config["entity"]["name"];
+            auto data = config["entity"]["data"];
+            auto entity = Engine::createComponent<T>(name);
 
-            for (auto[key, value] : config["entity"].items()) {
-                Engine::log<module>(key, " ", value);
+            // load components ...
 
-                if (key == "mesh") {
-                    /* load meshes; */
-                    if (Library::contains(value)) {
-                        auto id = Library::at(value);
-                        Component::Index::addComponent(entity->id(), id);
-                    } else {
-                        MeshLoader loader;
-                        auto component = Engine::createComponent(loader.load(value), value);
-                        Library::emplace(value, component->id());
-                        Component::Index::addComponent(entity->id(), component->id());
-                    }
-                } else if (key == "shader") {
-                    /*load shaders*/
-                    if (Library::contains(value)) {
-                        auto id = Library::at(value);
-                        Component::Index::addComponent(entity->id(), id);
-                    } else {
-                        ProgramLoader loader;
-                        auto component = Engine::createComponent(loader.load(value), value);
-                        Library::emplace(value, component->id());
-                        Component::Index::addComponent(entity->id(), component->id());
-                    }
-                }
-                else if (key == "quad")
-                {
-                    auto quad = Engine::createComponent<Component::Plane>(value);
-                    entity->id();
-                }
-            }
+            load_components(config, entity->id());
 
             return entity;
+        }
+
+        static void load_components(
+                const json &config, const Component::ComponentId &entity) {
+
+            for (auto[key, value] : config["entity"]["components"].items()) {
+                Engine::log<module>(key, " ", value);
+
+                auto classId = value["entity"]["class"];
+                auto data = value["entity"]["data"];
+                auto name = value["entity"]["name"];
+
+                Component::ComponentId componentId;
+
+                if (classId == "mesh") {
+                    /* load meshes; */
+                    if (Library::contains(data)) {
+                        componentId = Library::at(data);
+                        Component::Index::addComponent(entity, componentId);
+                    } else {
+                        MeshLoader loader;
+                        auto component = Engine::createComponent(
+                                loader.load(data), name);
+                        Library::emplace(data, component->id());
+                        Component::Index::addComponent(entity, component->id());
+                        load_components(value, component->id());
+                    }
+                } else if (classId == "program") {
+                    /*load shaders*/
+                    if (Library::contains(data)) {
+                        componentId = Library::at(data);
+                        Component::Index::addComponent(entity, componentId);
+                    } else {
+                        ProgramLoader loader;
+                        auto component = Engine::createComponent(
+                                loader.load(data), name);
+                        Library::emplace(data, component->id());
+                        Component::Index::addComponent(entity, component->id());
+                        load_components(value, component->id());
+                    }
+                } else if (classId == "quad") {
+                    auto quad = Engine::createComponent<Component::Plane>(data);
+                }
+
+            }
         }
     };
 

@@ -2,6 +2,7 @@
 // Created by root on 9/1/20.
 //
 
+#include <sstream>
 #include "RenderingSystem.h"
 
 #include "../../Components/Dirty.h"
@@ -11,16 +12,22 @@
 Component::ComponentEvent<int, int>
         Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
-void Rendering::RenderingSystem::update(Engine::frametime) {
+void Rendering::RenderingSystem::update(Engine::frametime time) {
+
+    std::stringstream ss;
+    ss << "frametime: " << time << "ms" << std::endl;
+    auto title = ss.str();
+    glfwSetWindowTitle(window, title.c_str());
 
     // Find and update any GameObjects with meshes that should be drawn...
-    for (auto&& gameObject : Component::Index::entitiesOf(Component::ClassId::GameObject))
-    {
-        auto object_is_dirty = Component::Index::hasComponent(gameObject, Component::Dirty::id());
-        auto object_is_visible = Component::Index::hasComponent(gameObject, Component::Visible::id());
+    for (auto &&gameObject : Component::Index::entitiesOf(
+            Component::ClassId::GameObject)) {
+        auto object_is_dirty = Component::Index::hasComponent(gameObject,
+                                                              Component::Dirty::id());
+        auto object_is_visible = Component::Index::hasComponent(gameObject,
+                                                                Component::Visible::id());
 
-        if (object_is_dirty && object_is_visible)
-        {
+        if (object_is_dirty && object_is_visible) {
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
             Engine::log<module>("Streaming in component#", gameObject);
 
@@ -122,6 +129,8 @@ Rendering::RenderingSystem::findSuitableBufferFor(
     );
 
     auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
+
+
     batch->shader = data->shader;
 
     return push_back(batch);

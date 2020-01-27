@@ -1,6 +1,25 @@
 {
   "entity": {
-    "mesh": "Assets/Meshes/box.obj",
-    "shader": "Assets/Programs/basic.json"
+    "name": "boxymcboxface",
+    "class": "gameobject",
+    "components": [
+      {
+        "entity": {
+          "name": "meshmcmeshface",
+          "class": "mesh",
+          "data": "Assets/Meshes/box.obj",
+          "components": [
+            {
+              "entity": {
+                "name": "shadermcshaderface",
+                "class": "program",
+                "data": "Assets/Programs/basic.json",
+                "components": []
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

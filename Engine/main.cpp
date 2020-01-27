@@ -52,14 +52,35 @@ int main() {
     Input::InputSystem::onKeyUp += cameraSystem.onKeyUpHandler;
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
-  
+
     // simulate loading a complex game object
 
-    auto box_object = Pipeline::EntityLoader::load<Component::GameObject>("Assets/Objects/box.json");
+    auto box_object = Pipeline::EntityLoader::load<Component::GameObject>(
+            "Assets/Objects/box.json");
     box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
     box_object->attachComponent(Component::Dirty::id());
     box_object->attachComponent(Component::Visible::id());
 
+    { // hack; todo: not this
+        auto components = Component::Index::componentsOf(box_object->id());
+
+        auto it = std::find_if(components.begin(), components.end(),
+                               [](auto component) {
+                                   return component.classId() ==
+                                          Component::ClassId::Mesh;
+                               });
+
+        auto components2 = Component::Index::componentsOf(*it);
+        auto it2 = std::find_if(components2.begin(), components2.end(),
+                                [](auto component) {
+                                    auto cid = component.classId();
+                                    return cid ==
+                                           Component::ClassId::Program;
+                                });
+
+        it->data<Component::Mesh>()->shader = *it2;
+
+    } // hack
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
@@ -74,7 +95,8 @@ int main() {
         // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
         frametime elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start).count() / 16.6666667f;
+                        end - start).count();
+
         //Engine::log<module>("Frametime: ", elapsed);
 
         Engine::EventSystem::update(elapsed);
