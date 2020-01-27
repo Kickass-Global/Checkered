@@ -12,9 +12,6 @@
 
 namespace Engine {
 
-    namespace {
-        extern char module[];
-    }
 
     struct Name {
         std::string value;

@@ -2,9 +2,11 @@
 // Created by root on 9/1/20.
 //
 
-#include "SystemCalls.h"
 #include <sstream>
 #include <algorithm>
+
+#include "SystemCalls.h"
+#include "Engine.h"
 
 std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
     const unsigned int width = 20;
