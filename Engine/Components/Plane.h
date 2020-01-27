@@ -10,7 +10,7 @@
 namespace Component {
 
     class Plane : public Component::Mesh {
-
+    public:
         Plane() {
             vertices.emplace_back(aiVector3D{-0.5f, -0.5f, 0.0f},
                                   aiVector3D{0, 0, 0},

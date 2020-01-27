@@ -8,11 +8,11 @@
 #include <map>
 #include <set>
 #include <memory>
-#include "ComponentId.h"
 
 namespace Component {
     struct ComponentId;
     enum class ClassId : unsigned int;
+    class CopmonentInterface;
 }
 
 namespace Component {
@@ -54,11 +54,13 @@ namespace Component {
 
         static void removeComponent(Component::ComponentId eid, Component::ComponentId cid);
 
-        template<typename T>
+        template<class T>
         static std::shared_ptr<T> entityData(const Component::ComponentId &componentId) {
             auto it = meta.find(componentId);
+
             if (it == meta.end()) return nullptr;
-            else return std::static_pointer_cast<T>(it->second);
+            
+            return std::static_pointer_cast<T>(it->second);
         }
     };
 

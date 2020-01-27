@@ -16,13 +16,13 @@ void Engine::EventSystem::update(Engine::frametime) {
         for (Component::ComponentId eventArgs : set) {
 
             // I want to take all the data and pass it to the callback of the handler
-            auto data = eventArgs.data<Component::EventArgs<>>();
-            handler.data<Component::EventHandler<>>()->callback(*data);
+            auto data = eventArgs.data<Component::EventArgs<void>>();
+            handler.data<Component::EventHandler<void>>()->callback(*data);
 
         }
         // remove eventArgs from handler
         for (auto &&id : set) {
-            handler.data()->destroyComponent(id);
+            handler.data()->removeComponent(id);
         }
     }
 }

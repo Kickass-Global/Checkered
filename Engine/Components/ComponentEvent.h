@@ -11,8 +11,6 @@
 #include <tuple>
 
 #include "Component.h"
-
-#include "../Engine.h"
 #include "../Systems/Events/Events.h"
 
 namespace Component {

@@ -13,7 +13,8 @@ Component::ComponentEvent<int, int>
 
 void Rendering::RenderingSystem::update(Engine::frametime) {
 
-    for (auto gameObject : Component::Index::entitiesOf(Component::ClassId::GameObject))
+    // Find and update any GameObjects with meshes that should be drawn...
+    for (auto&& gameObject : Component::Index::entitiesOf(Component::ClassId::GameObject))
     {
         auto object_is_dirty = Component::Index::hasComponent(gameObject, Component::Dirty::id());
         auto object_is_visible = Component::Index::hasComponent(gameObject, Component::Visible::id());
@@ -21,12 +22,14 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
         if (object_is_dirty && object_is_visible)
         {
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
+            Engine::log<module>("Streaming in component#", gameObject);
 
             auto components = Component::Index::componentsOf(gameObject);
-            for (auto component : components)
+
+            for (auto&& component : components)
             {
 
-                if (component.data() && component.data()->classId() == Component::ClassId::Mesh)
+                if (component.classId() == Component::ClassId::Mesh)
                 {
                     auto data = component.data<Component::Mesh>();
                     buffer(*data);
@@ -35,8 +38,8 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
 
             }
 
-            gameObject.data()->destroyComponent(Component::Dirty::id());
-            gameObject.data()->destroyComponent(Component::Visible::id());
+            gameObject.data()->removeComponent(Component::Dirty::id());
+            gameObject.data()->removeComponent(Component::Visible::id());
         }
     }
 
@@ -51,6 +54,7 @@ void Rendering::RenderingSystem::update(Engine::frametime) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
                 if (camera_is_dirty) {
+
                     auto data = Component::Index::entityData<Component::Camera>(camera);
                     auto view_matrix = glm::toMat4(data->rotation);
                     auto world_matrix = glm::translate(data->position);
@@ -118,7 +122,7 @@ Rendering::RenderingSystem::findSuitableBufferFor(
     );
 
     auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-    batch->shader = *Component::Index::entitiesOf(Component::ClassId::Program).begin();
+    batch->shader = data->shader;
 
     return push_back(batch);
 }
@@ -174,6 +178,18 @@ void Rendering::RenderingSystem::initialize() {
 
     onBillboardModifiedHandler = Engine::EventSystem::createHandler(
             this, &RenderingSystem::onBillboardModified);
+}
+
+void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, int size, float *data) {
+
+    Engine::log<module>("Updating instance data of component#", id);
+
+    auto it = std::find_if(batches.begin(), batches.end(),
+                           [id](auto batch) { return batch->contains(id); });
+
+    Engine::assertLog<module>(it != batches.end(), "check for valid batch");
+
+    it->get()->update(id, 2, size, data);
 }
 
 Rendering::Program::~Program() {

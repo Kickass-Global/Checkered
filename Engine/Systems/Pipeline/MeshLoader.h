@@ -47,6 +47,7 @@ namespace Pipeline {
 
             for (auto i = 0u; i < data->mNumFaces; ++i)
             {
+                int x = 000;
                 auto&& face = data->mFaces[i];
 				Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
 
