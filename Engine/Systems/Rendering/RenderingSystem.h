@@ -97,17 +97,7 @@ namespace Rendering {
 
         GLFWwindow* getWindow();
 
-        void updateInstanceData(Component::ComponentId id, int size, float* data) {
-
-            Engine::log<module>("Updating instance data of component#", id);
-
-            auto it = std::find_if(batches.begin(), batches.end(),
-                         [id](auto batch) { return batch->contains(id); });
-
-			Engine::assertLog<module>(it != batches.end(), "check for valid batch");
-
-            it->get()->update(id, 2, size, data);
-        }
+        void updateInstanceData(Component::ComponentId id, int size, float* data);
 
         void buffer(const Component::Mesh& data );
 

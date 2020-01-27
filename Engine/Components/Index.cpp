@@ -22,6 +22,7 @@ bool Component::Index::hasComponent(Component::ComponentId id, Component::Compon
 }
 
 void Component::Index::addComponent(Component::ComponentId eid, Component::ComponentId cid) {
+    //Engine::log<module>("Attaching component#", cid, " to #", eid);
     entityComponents[eid].emplace(cid);
 }
 

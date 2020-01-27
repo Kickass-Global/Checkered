@@ -18,7 +18,7 @@ int main() {
 	auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
 		gDefaultErrorCallback);
 	if (!mFoundation)
-		assert(false, "PxCreateFoundation failed!");
+        Engine::assertLog(false, "PxCreateFoundation failed!");
 
 	bool recordMemoryAllocations = true;
 
@@ -30,7 +30,7 @@ int main() {
 	auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
 		PxTolerancesScale(), recordMemoryAllocations, mPvd);
 	if (!mPhysics)
-		assert(false, "PxCreatePhysics failed!");
+		Engine::assertLog(false, "PxCreatePhysics failed!");
 
     using namespace Engine;
 
@@ -57,37 +57,9 @@ int main() {
 
     auto box_object = Pipeline::EntityLoader::load<Component::GameObject>("Assets/Objects/box.json");
     box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
-
-    
-    // hook up a live-reload watcher on the box asset to reload it when changes are detected.
-
-    //liveReloadSystem.onAssetModified += [&renderingSystem](
-    //        const std::string &filename,
-    //        const Component::ClassId &classId,
-    //        const Component::ComponentId &componentId
-    //) {
-    //    if (classId == Component::ClassId::Mesh) {
-    //        Pipeline::MeshLoader meshLoader;
-    //        auto meshComponent = Engine::replaceComponent(componentId,
-    //                                                      meshLoader.load(
-    //                                                              filename)
-    //        );
-
-    //        renderingSystem.buffer(*meshComponent);
-    //    }
-    //};
-
-    // We want to engine to automatically load & buffer game objects without neededing to manually define what needs to be done...
-    // probably want a separate system for this down the road...
-
     box_object->attachComponent(Component::Dirty::id());
     box_object->attachComponent(Component::Visible::id());
 
-    //renderingSystem.buffer();
-
-    //renderingSystem.updateInstanceData(box->id(), sizeof(glm::mat4),
-    //                                   glm::value_ptr(
-    //                                           box_object->worldTransform));
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();

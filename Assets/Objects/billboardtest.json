@@ -1,0 +1,18 @@
+{
+  "entity": {
+    "billboard": {
+      "name": "quadBoi",
+      "fields": [
+        {
+          "ComponentId": ""
+        },
+        {
+          "ComponentId": "Assets/Programs/billboard.json"
+        },
+        {
+          "plot": [ 0, 0, 10, 10 ]
+        }
+      ]
+    }
+  }
+}

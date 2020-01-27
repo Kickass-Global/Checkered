@@ -5,8 +5,8 @@
 #ifndef ENGINE_COMPONENTBASE_H
 #define ENGINE_COMPONENTBASE_H
 
-#include "ComponentId.h"
 #include "Index.h"
+#include "ComponentId.h"
 
 namespace Component {
 
@@ -14,9 +14,9 @@ namespace Component {
     public:
         [[nodiscard]] virtual Component::ComponentId id() const  = 0;
         [[nodiscard]] virtual Component::ClassId classId() const = 0;
+
         virtual void attachComponent(Component::ComponentId id) const = 0;
-        virtual void destroyComponent(Component::ComponentId id) const = 0;
-        virtual void clone(Component::ComponentId id) = 0;
+        virtual void removeComponent(Component::ComponentId id) const = 0;
     };
 
     template<ClassId E>
@@ -31,8 +31,8 @@ namespace Component {
         [[nodiscard]] Component::ComponentId id() const override;
         [[nodiscard]] Component::ClassId classId() const override;
         void attachComponent(Component::ComponentId id) const override;
-        void destroyComponent(Component::ComponentId id) const override;
-        void clone(Component::ComponentId id) override;
+        void removeComponent(Component::ComponentId id) const override;
+
         ComponentBase() : m_id(true) {}
     };
 
@@ -45,17 +45,13 @@ namespace Component {
     }
 
     template<Component::ClassId E>
-    void ComponentBase<E>::destroyComponent(Component::ComponentId id) const {
+    void ComponentBase<E>::removeComponent(Component::ComponentId id) const {
         Component::Index::removeComponent(m_id, id);
     }
 
     template<Component::ClassId E>
     Component::ComponentId ComponentBase<E>::id() const { return m_id; }
 
-    template<Component::ClassId E>
-    void ComponentBase<E>::clone(Component::ComponentId id) {
-        m_id = id;
-    }
 }
 
 #endif //ENGINE_COMPONENTBASE_H

@@ -18,3 +18,7 @@ std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
 
     return out << std::setw(width) << buff.str();
 }
+
+void Engine::assertLog(bool test, std::string msg) {
+    assertLog<module>(test, msg);
+}
