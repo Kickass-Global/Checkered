@@ -18,7 +18,6 @@
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
-#include "SystemCalls.h"
 
 namespace Component {
     template<typename... Args>
@@ -36,7 +35,7 @@ namespace Engine {
     typedef float frametime;
 
     namespace {
-        char module[] = "Engine";
+        const char module[] = "Engine";
     }
 
     extern std::map<Component::ComponentId, std::string> identifier;
