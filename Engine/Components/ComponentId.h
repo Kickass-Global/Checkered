@@ -36,6 +36,8 @@ namespace Component {
 
         unsigned int id;
 
+        static Component::Index index;
+
         ComponentId();
         ComponentId(const ComponentId& other);
         ComponentId(bool, unsigned int) noexcept;

@@ -15,91 +15,44 @@
 #include "../../Components/ComponentBase.h"
 #include "../../Components/Plane.h"
 #include "MeshLoader.h"
+#include "pipeline.hpp"
 #include "Library.h"
 
 using json = nlohmann::json;
 
 namespace Pipeline {
 
-    /**
-     * input: entity description file -> output: game-entity
-     */
+    template<typename T = Component::ComponentBase<Component::ClassId::GameObject>>
+    std::shared_ptr<T> load(std::string filename) {
+        static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
-    class EntityLoader {
-    public:
-        template<typename T = Component::ComponentBase<Component::ClassId::GameObject>>
-        static std::shared_ptr<T> load(std::string filename) {
-            static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
+        // walk the description file and load each referenced entity; if
+        // the entity has already been loaded we will simply link to the
+        // same one (unless its not sharable).
 
-            // walk the description file and load each referenced entity; if
-            // the entity has already been loaded we will simply link to the
-            // same one (unless its not sharable).
+        std::ifstream ifs(filename);
+        Engine::assertLog<module>(ifs.is_open(),
+                                  "load entity description file " +
+                                  filename);
 
-            std::ifstream ifs(filename);
-            Engine::assertLog<module>(ifs.is_open(),
-                                      "load entity description file " +
-                                      filename);
+        json config;
+        ifs >> config;
 
-            json config;
-            ifs >> config;
+        auto name = config["entity"]["name"];
+        auto data = config["entity"]["data"];
+        auto entity = Engine::createComponent<T>(name);
 
-            auto name = config["entity"]["name"];
-            auto data = config["entity"]["data"];
-            auto entity = Engine::createComponent<T>(name);
+        // load components ...
 
-            // load components ...
+        load_meta_data(config, entity);
+        load_components(config, entity->id());
 
-            load_components(config, entity->id());
+        return entity;
+    }
 
-            return entity;
-        }
-
-        static void load_components(
-                const json &config, const Component::ComponentId &entity) {
-
-            for (auto[key, value] : config["entity"]["components"].items()) {
-                Engine::log<module>(key, " ", value);
-
-                auto classId = value["entity"]["class"];
-                auto data = value["entity"]["data"];
-                auto name = value["entity"]["name"];
-
-                Component::ComponentId componentId;
-
-                if (classId == "mesh") {
-                    /* load meshes; */
-                    if (Library::contains(data)) {
-                        componentId = Library::at(data);
-                        Component::Index::addComponent(entity, componentId);
-                    } else {
-                        MeshLoader loader;
-                        auto component = Engine::createComponent(
-                                loader.load(data), name);
-                        Library::emplace(data, component->id());
-                        Component::Index::addComponent(entity, component->id());
-                        load_components(value, component->id());
-                    }
-                } else if (classId == "program") {
-                    /*load shaders*/
-                    if (Library::contains(data)) {
-                        componentId = Library::at(data);
-                        Component::Index::addComponent(entity, componentId);
-                    } else {
-                        ProgramLoader loader;
-                        auto component = Engine::createComponent(
-                                loader.load(data), name);
-                        Library::emplace(data, component->id());
-                        Component::Index::addComponent(entity, component->id());
-                        load_components(value, component->id());
-                    }
-                } else if (classId == "quad") {
-                    auto quad = Engine::createComponent<Component::Plane>(data);
-                }
-
-            }
-        }
-    };
-
+    template<class T>
+    void load_meta_data(const json &config, std::shared_ptr<T> data);
+    void load_components(const json &config, Component::ComponentId entity);
 }
 
 

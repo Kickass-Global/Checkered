@@ -65,61 +65,64 @@ int main() {
 
     // simulate loading a complex game object
 
-    auto box_object = Pipeline::EntityLoader::load<Component::GameObject>(
+    Component::Index;
+
+    auto box_object = Pipeline::load<Component::GameObject>(
             "Assets/Objects/box.json");
+
     box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
     box_object->attachComponent(Component::Dirty::id());
     box_object->attachComponent(Component::Visible::id());
 
-    { // hack; todo: not this
-        auto components = Component::Index::componentsOf(box_object->id());
+//    { // hack; todo: not this
+//        auto components = Component::Index::componentsOf(box_object->id());
+//
+//        auto it = std::find_if(components.begin(), components.end(),
+//                               [](auto component) {
+//                                   return component.classId() ==
+//                                          Component::ClassId::Mesh;
+//                               });
+//
+//        auto components2 = Component::Index::componentsOf(*it);
+//        auto it2 = std::find_if(components2.begin(), components2.end(),
+//                                [](auto component) {
+//                                    auto cid = component.classId();
+//                                    return cid ==
+//                                           Component::ClassId::Program;
+//                                });
+//
+//        it->data<Component::Mesh>()->shader = *it2;
+//
+//    } // hack
 
-        auto it = std::find_if(components.begin(), components.end(),
-                               [](auto component) {
-                                   return component.classId() ==
-                                          Component::ClassId::Mesh;
-                               });
+//    auto damage_object
+//            = Engine::createComponent<Component::GameObject>("object");
+//
+//    auto damage_model
+//            = Engine::createComponent<Component::Model>("model");
+//
+//    auto box_mesh = Pipeline::MeshLoader::load(
+//            "Assets/Meshes/box.obj");
+//
+//    damage_model->parts.push_back(Component::Model::Part{});
+//    damage_model->parts[0].variations.push_back(
+//            Component::Model::Variation{0, box_mesh->id()}
+//    );
 
-        auto components2 = Component::Index::componentsOf(*it);
-        auto it2 = std::find_if(components2.begin(), components2.end(),
-                                [](auto component) {
-                                    auto cid = component.classId();
-                                    return cid ==
-                                           Component::ClassId::Program;
-                                });
-
-        it->data<Component::Mesh>()->shader = *it2;
-
-    } // hack
-
-    auto damage_object
-            = Engine::createComponent<Component::GameObject>("object");
-
-    auto damage_model
-            = Engine::createComponent<Component::Model>("model");
-
-    auto box_mesh = Pipeline::MeshLoader::load(
-            "Assets/Meshes/box.obj");
-
-    damage_model->parts.push_back(Component::Model::Part{});
-    damage_model->parts[0].variations.push_back(
-            Component::Model::Variation{0, box_mesh->id()}
-    );
-
-    std::function<void(const Component::EventArgs<int> &)> onKeyPress
-            = [damage_model](auto &args) {
-
-                auto key = std::get<0>(args.values);
-                Engine::log(key, " was pressed");
-                if (key == GLFW_KEY_D) {
-                    auto damage = Engine::createComponent<Component::Damage>();
-                    damage->damage_amount = 1;
-                    damage_model->attachComponent(damage->id());
-                }
-
-            };
-    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
-    Input::InputSystem::onKeyPress += debugHandler;
+//    std::function<void(const Component::EventArgs<int> &)> onKeyPress
+//            = [damage_model](auto &args) {
+//
+//                auto key = std::get<0>(args.values);
+//                Engine::log(key, " was pressed");
+//                if (key == GLFW_KEY_D) {
+//                    auto damage = Engine::createComponent<Component::Damage>();
+//                    damage->damage_amount = 1;
+//                    damage_model->attachComponent(damage->id());
+//                }
+//
+//            };
+//    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
+//    Input::InputSystem::onKeyPress += debugHandler;
 
 
     // make a default camera
@@ -132,7 +135,6 @@ int main() {
 
     while (running) {
 
-        // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
         deltaTime elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                         end - start).count();
