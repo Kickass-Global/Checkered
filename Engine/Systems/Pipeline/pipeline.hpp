@@ -5,7 +5,11 @@
 #ifndef ENGINE_PIPELINE_HPP
 #define ENGINE_PIPELINE_HPP
 
+#include "../../Components/ComponentId.h"
+
 namespace Pipeline {
+
+    Component::ClassId parse(const std::string& value);
 
 }
 

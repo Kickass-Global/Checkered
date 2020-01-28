@@ -1,23 +1,21 @@
 {
   "entity": {
     "name": "boxymcboxface",
-    "class": "gameobject",
+    "class-id": "gameobject",
+    "meta": [],
     "components": [
       {
         "entity": {
           "name": "meshmcmeshface",
-          "class": "mesh",
-          "data": "Assets/Meshes/box.obj",
-          "components": [
+          "class-id": "mesh",
+          "meta": [
             {
-              "entity": {
-                "name": "shadermcshaderface",
-                "class": "program",
-                "data": "Assets/Programs/basic.json",
-                "components": []
-              }
+              "offset": 0,
+              "component-id": {"class-id": "program", "data": "Assets/Programs/basic.json"}
             }
-          ]
+          ],
+          "data": "Assets/Meshes/box.obj",
+          "components": []
         }
       }
     ]

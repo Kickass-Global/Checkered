@@ -24,6 +24,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             Component::ClassId::GameObject)) {
         auto object_is_dirty = Component::Index::hasComponent(gameObject,
                                                               Component::Dirty::id());
+
         auto object_is_visible = Component::Index::hasComponent(gameObject,
                                                                 Component::Visible::id());
 
