@@ -19,9 +19,11 @@ namespace Input {
         char module[] = "Input";
     }
 
-    class InputSystem {
+    class InputSystem : public Engine::SystemInterface {
 
-        static void keyHandler(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/);
+        static void
+        keyHandler(GLFWwindow * /*window*/, int key, int /*scancode*/,
+                   int action, int /*mods*/);
 
     public:
 
@@ -29,7 +31,9 @@ namespace Input {
         static Component::ComponentEvent<int> onKeyDown;
         static Component::ComponentEvent<int> onKeyUp;
 
-        static void initialize(GLFWwindow* window);
+        void initialize(GLFWwindow *window);
+
+        void update(Engine::deltaTime /*elapsed*/);
 
     };
 

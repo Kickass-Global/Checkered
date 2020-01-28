@@ -34,7 +34,7 @@ namespace Camera {
         char module[] = "Camera";
     }
 
-    class CameraSystem {
+    class CameraSystem : public Engine::SystemInterface {
 
     public:
 
@@ -60,22 +60,20 @@ namespace Camera {
         float y = 0;
         float u = 0;
 
-        float sensitivity = 50.0f;
+        float sensitivity = 100.0f;
         float increment = static_cast<float>(M_PI) / 180.0f;
 
         std::set<int> keys;
 
-        void update(Engine::frametime elapsed) {
-            for (auto&& key : keys)
-            {
+        void update(Engine::deltaTime elapsed) override {
+            for (auto &&key : keys) {
                 if (!keys.count(key)) continue;
 
-                switch (key)
-                {
-                case GLFW_KEY_RIGHT:
-                    x += increment;
-                    break;
-                case GLFW_KEY_DOWN:
+                switch (key) {
+                    case GLFW_KEY_RIGHT:
+                        x += increment;
+                        break;
+                    case GLFW_KEY_DOWN:
                     y -= increment;
                     break;
                 case GLFW_KEY_LEFT:

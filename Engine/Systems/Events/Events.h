@@ -34,17 +34,17 @@ namespace Engine {
  * Notes:
  * A component must be registered with this system to receive events through ComponentEvent events.
  */
-    class EventSystem {
+class EventSystem : public Engine::SystemInterface {
 
-        static std::set<Component::ComponentId> registeredHandlers;
+    static std::set<Component::ComponentId> registeredHandlers;
 
-    public:
+public:
 
-        static void update(Engine::frametime /*elapsed*/);
+    void update(Engine::deltaTime /*elapsed*/) override;
 
-        static void registerHandler(const Component::ComponentId &handler);
+    static void registerHandler(const Component::ComponentId &handler);
 
-        template<typename T, typename... Args>
+    template<typename T, typename... Args>
         static Component::ComponentId createHandler(
                 T *instance, void (T::*callback)(const Component::EventArgs<Args...> &)) {
 
