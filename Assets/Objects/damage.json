@@ -1,0 +1,15 @@
+{
+  "entity": {
+    "name": "boxymcboxface",
+    "class": "gameobject",
+    "components": [
+      {
+        "entity": {
+          "name": "meshmcmeshface",
+          "class": "model",
+          "components": []
+        }
+      }
+    ]
+  }
+}
