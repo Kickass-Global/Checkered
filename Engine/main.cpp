@@ -9,8 +9,7 @@
 
 int main() {
 
-
-	using namespace physx;
+    using namespace physx;
 
 	static PxDefaultErrorCallback gDefaultErrorCallback;
 	static PxDefaultAllocator gDefaultAllocatorCallback;
@@ -27,31 +26,39 @@ int main() {
 	mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 
-	auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
-		PxTolerancesScale(), recordMemoryAllocations, mPvd);
-	if (!mPhysics)
-		Engine::assertLog(false, "PxCreatePhysics failed!");
+    auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
+                                    PxTolerancesScale(),
+                                    recordMemoryAllocations, mPvd);
+    if (!mPhysics)
+        Engine::assertLog(false, "PxCreatePhysics failed!");
 
     using namespace Engine;
 
     auto running = true;
 
-    Rendering::RenderingSystem renderingSystem;
-    renderingSystem.initialize();
 
-    Debug::LiveReloadSystem liveReloadSystem;
+    auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
+    Engine::addSystem(renderingSystem);
+
+    auto liveReloadSystem = std::make_shared<Debug::LiveReloadSystem>();
+    Engine::addSystem(liveReloadSystem);
+
+    auto inputSystem = std::make_shared<Input::InputSystem>();
+    Engine::addSystem(inputSystem);
 
     // hookup inputs from current window
-    Input::InputSystem::initialize(renderingSystem.getWindow());
+    inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
-    Camera::CameraSystem cameraSystem;
+    auto cameraSystem = std::make_shared<Camera::CameraSystem>();
+    Engine::addSystem(cameraSystem);
+    Engine::addSystem(std::make_shared<Engine::EventSystem>());
 
-    Input::InputSystem::onKeyPress += cameraSystem.onKeyPressHandler;
-    Input::InputSystem::onKeyDown += cameraSystem.onKeyDownHandler;
-    Input::InputSystem::onKeyUp += cameraSystem.onKeyUpHandler;
+    Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
 
-    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
+    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 
     // simulate loading a complex game object
 
@@ -93,16 +100,14 @@ int main() {
     while (running) {
 
         // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
-        frametime elapsed =
+        deltaTime elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                         end - start).count();
 
-        //Engine::log<module>("Frametime: ", elapsed);
 
-        Engine::EventSystem::update(elapsed);
-        liveReloadSystem.update(elapsed);
-        cameraSystem.update(elapsed);
-        renderingSystem.update(elapsed);
+        for (const auto &system : Engine::systems()) {
+            system->update(elapsed);
+        }
 
         start = end;
         end = std::chrono::high_resolution_clock::now();

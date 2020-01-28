@@ -12,7 +12,7 @@
 Component::ComponentEvent<int, int>
         Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
-void Rendering::RenderingSystem::update(Engine::frametime time) {
+void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
     std::stringstream ss;
     ss << "frametime: " << time << "ms" << std::endl;
