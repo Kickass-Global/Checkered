@@ -23,24 +23,24 @@ namespace Component {
  * other effects.
  */
     class Model : public Component::ComponentBase<Component::ClassId::Model> {
+
+
     public:
-
-        int current_damage;
-        int max_damage;
-
-    private:
         struct Variation {
-            std::string name;
             int damage_threshold;
             Component::ComponentId mesh;
         };
 
         struct Part {
-            std::string name;
-            std::vector<Variation> variations;
+            std::vector<Variation> variations = {};
+            int active_variation;
         };
 
+        int current_damage;
+        int max_damage;
         std::vector<Part> parts;
+
+
     };
 }
 

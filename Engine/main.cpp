@@ -1,10 +1,12 @@
 ﻿// Engine.cpp : Defines the entry point for the application.
 //
 
+#include <functional>
+
 #include "main.h"
 #include "Systems/Pipeline/EntityLoader.h"
+#include "Systems/Damage/damagesystem.hpp"
 #include <PxPhysicsAPI.h>
-
 
 
 int main() {
@@ -53,6 +55,7 @@ int main() {
     auto cameraSystem = std::make_shared<Camera::CameraSystem>();
     Engine::addSystem(cameraSystem);
     Engine::addSystem(std::make_shared<Engine::EventSystem>());
+    Engine::addSystem(std::make_shared<Engine::DamageSystem>());
 
     Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
     Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
@@ -88,6 +91,36 @@ int main() {
         it->data<Component::Mesh>()->shader = *it2;
 
     } // hack
+
+    auto damage_object
+            = Engine::createComponent<Component::GameObject>("object");
+
+    auto damage_model
+            = Engine::createComponent<Component::Model>("model");
+
+    auto box_mesh = Pipeline::MeshLoader::load(
+            "Assets/Meshes/box.obj");
+
+    damage_model->parts.push_back(Component::Model::Part{});
+    damage_model->parts[0].variations.push_back(
+            Component::Model::Variation{0, box_mesh->id()}
+    );
+
+    std::function<void(const Component::EventArgs<int> &)> onKeyPress
+            = [damage_model](auto &args) {
+
+                auto key = std::get<0>(args.values);
+                Engine::log(key, " was pressed");
+                if (key == GLFW_KEY_D) {
+                    auto damage = Engine::createComponent<Component::Damage>();
+                    damage->damage_amount = 1;
+                    damage_model->attachComponent(damage->id());
+                }
+
+            };
+    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
+    Input::InputSystem::onKeyPress += debugHandler;
+
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();

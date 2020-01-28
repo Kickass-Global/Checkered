@@ -34,26 +34,39 @@ namespace Engine {
  * Notes:
  * A component must be registered with this system to receive events through ComponentEvent events.
  */
-class EventSystem : public Engine::SystemInterface {
+    class EventSystem : public Engine::SystemInterface {
 
-    static std::set<Component::ComponentId> registeredHandlers;
+        static std::set<Component::ComponentId> registeredHandlers;
 
-public:
+    public:
 
-    void update(Engine::deltaTime /*elapsed*/) override;
+        void update(Engine::deltaTime /*elapsed*/) override;
 
-    static void registerHandler(const Component::ComponentId &handler);
+        static void registerHandler(const Component::ComponentId &handler);
 
-    template<typename T, typename... Args>
+        template<typename T, typename... Args>
         static Component::ComponentId createHandler(
-                T *instance, void (T::*callback)(const Component::EventArgs<Args...> &)) {
+                T *instance,
+                void (T::*callback)(const Component::EventArgs<Args...> &)) {
 
             std::shared_ptr<Component::EventHandler<Args...>> handler = Engine::createComponent<Component::EventHandler<Args...>>();
-            handler->callback = std::bind(callback, instance, std::placeholders::_1);
+            handler->callback = std::bind(callback, instance,
+                                          std::placeholders::_1);
+            return handler->id();
+
+        }
+
+
+        template<typename... Args>
+        static Component::ComponentId createHandler(
+                std::function<void(const Component::EventArgs<Args...> &)>
+                callback) {
+
+            std::shared_ptr<Component::EventHandler<Args...>> handler = Engine::createComponent<Component::EventHandler<Args...>>();
+            handler->callback = callback;
             return handler->id();
 
         }
     };
-
 }
 #endif //ENGINE_EVENTS_H
