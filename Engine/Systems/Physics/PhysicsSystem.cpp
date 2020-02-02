@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <vector>
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
 
@@ -21,6 +22,7 @@ const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.6f;
 
 
+
 PxFoundation* cFoundation = NULL;
 PxPhysics* cPhysics = NULL;
 PxPvd* cPVD = NULL;
@@ -30,10 +32,20 @@ PxScene* cScene = NULL;
 PxCpuDispatcher* cDispatcher = NULL;
 PxMaterial* cMaterial = NULL;
 PxRigidStatic* cGroundPlane = NULL;
+PxVehicleDrive4W* cVehicle4w = NULL;
+VehicleSceneQueryData* cVehicleSceneQueryData = NULL;
+PxBatchQuery* cBatchQuery = NULL;
 
 
 
-VehicleDesc initVehicleDesc() {
+
+static PxDefaultAllocator cDefaultAllocator;
+static PxDefaultErrorCallback cErrorCallback;
+
+extern VehicleDesc initVehicleDesc();
+
+
+VehicleDesc initVehicleDescription() {
     //Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
     //The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
     //Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
@@ -97,6 +109,8 @@ void Physics::PhysicsSystem::initialize() {
 	createGround();
 
 	initVehicleSupport();
+    
+    createDrivableVehicle();    
 
 	std::cout << "Physics System Successfully Initalized" << std::endl;
 
@@ -104,10 +118,9 @@ void Physics::PhysicsSystem::initialize() {
 
 
 void Physics::PhysicsSystem::createFoundation() {
-	static PxDefaultAllocator gDefaultAllocator;
-	static PxDefaultErrorCallback gErrorCallback;
+	
 
-	cFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocator, gErrorCallback);
+	cFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, cDefaultAllocator, cErrorCallback);
 	if (!cFoundation)
 		assert(false, "PxCreateFoundation failed");
 
@@ -165,6 +178,9 @@ void Physics::PhysicsSystem::createGround() {
 
 void Physics::PhysicsSystem::initVehicleSupport() {
 
+    cVehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, 1, WheelSceneQueryPreFilterBlocking, NULL, cDefaultAllocator);
+    cBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *cVehicleSceneQueryData, cScene);
+
 	PxInitVehicleSDK(*cPhysics);
 	PxVehicleSetBasisVectors(PxVec3(0, 1, 0), PxVec3(0, 0, 1));
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
@@ -172,5 +188,38 @@ void Physics::PhysicsSystem::initVehicleSupport() {
 
 void Physics::PhysicsSystem::createDrivableVehicle() {
 
-    VehicleDesc vehicleDesc = initVehicleDesc();
+    VehicleDesc vehicleDesc = initVehicleDescription();
+    
+
+    cVehicle4w = createVehicle4W(vehicleDesc, cPhysics, cCooking);
+    PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0), PxQuat(PxIdentity));
+    cVehicle4w->getRigidDynamicActor()->setGlobalPose(startTransform);
+
+    cScene->addActor(*cVehicle4w->getRigidDynamicActor());
+
+    cVehicle4w->setToRestState();
+    cVehicle4w->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+    cVehicle4w->mDriveDynData.setUseAutoGears(true);
+
+
+
+
+}
+
+//CHANGE WHEN YOU HAVE MORE VEHICLES
+void Physics::PhysicsSystem::stepPhysics(Engine::frametime timestep){
+    
+    //update control inputs
+
+
+    //raycasts
+    PxVehicleWheels* vehicles[1] = { cVehicle4w };
+    PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+    const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
+    PxVehicleSuspensionRaycasts(cBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+    //vehicle update
+    const PxVec3 grav = cScene->getGravity();
+    PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+    PxVehicleWheelQueryResult vehicleQueryResult[1] = { {wheelQueryResults,cVehicle4w->mWheelsSimData.getNbWheels()} };
 }
