@@ -12,9 +12,10 @@
 
 namespace Engine {
 
+
     struct Name {
         std::string value;
-        explicit Name(std::string&& name) : value(name) {}
+        explicit Name(const char * module) : value(module) {}
     };
 
     std::ostream& operator<<(std::ostream& out, Name name);
@@ -25,16 +26,18 @@ namespace Engine {
      * @param test the condition to test.
      * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
      */
-    template<char const *module>
+    template<char const *m>
     void assertLog(bool test, std::string msg) {
 
         auto result = test ? "SUCCEEDED" : "FAILED";
 
         if(!test) {
-            std::cerr << Name(module) << msg << " " << result << std::endl;
+            std::cerr << Name(m) << msg << " " << result << std::endl;
             exit(-1);
         }
     }
+
+    void assertLog(bool test, std::string msg);
 
 
     enum Importance {
@@ -45,22 +48,22 @@ namespace Engine {
 
     inline static Importance loggingLevel = medium;
 
-    template<char const * module, class ... Ts>
+    template<char const * m, class ... Ts>
     void log(Ts...args)
     {
         if (loggingLevel >= medium)
         {
-            std::cout << Name(module);
+            std::cout << Name(m);
             (std::cout << ... << args);
             std::cout << std::endl;
         }
     }
     
-    template<char const* module, Importance importance, class ... Ts>
+    template<char const* m, Importance importance, class ... Ts>
     void log(Ts...args)
     {
         if (importance >= loggingLevel) {
-            std::cout << Name(module);
+            std::cout << Name(m);
             (std::cout << ... << args);
             std::cout << std::endl;
         }

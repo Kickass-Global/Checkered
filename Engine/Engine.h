@@ -18,7 +18,6 @@
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
-#include "SystemCalls.h"
 
 namespace Component {
     template<typename... Args>
@@ -36,7 +35,7 @@ namespace Engine {
     typedef float frametime;
 
     namespace {
-        constexpr char module[] = "Engine";
+        const char module[] = "Engine";
     }
 
     extern std::map<Component::ComponentId, std::string> identifier;
@@ -46,6 +45,7 @@ namespace Engine {
 
     template<typename T>
     std::shared_ptr<T> createComponent(std::string name = "") {
+        static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
         auto component = std::make_shared<T>();
         Component::Index::push_entity(component->classId(), component->id(), component);
         identifier[component->id()] = name;
@@ -53,8 +53,8 @@ namespace Engine {
     }
 
     template<typename T>
-    std::shared_ptr<T>
-    createComponent(std::shared_ptr<T> component, std::string name = "") {
+    std::shared_ptr<T> createComponent(std::shared_ptr<T> component, std::string name = "") {
+        static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
         Component::Index::push_entity(component->classId(), component->id(), component);
         identifier[component->id()] = name;
         return component;

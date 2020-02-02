@@ -39,8 +39,8 @@ set(SRC main.cpp main.h
         Components/Component.h
         Systems/Events/Events.cpp Systems/Events/Events.h
         Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h
-       # ${PHYSX_SNIPPETS}
-        )
+        ${PHYSX_SNIPPETS}
+        Systems/Pipeline/pipeline.cpp Systems/Pipeline/pipeline.hpp)
 
 # Add source to this project's executable.
 add_executable (Engine

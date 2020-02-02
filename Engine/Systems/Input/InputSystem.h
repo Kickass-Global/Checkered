@@ -15,7 +15,9 @@
 
 namespace Input {
 
-    static char module[] = "Input";
+    namespace {
+        char module[] = "Input";
+    }
 
     class InputSystem {
 

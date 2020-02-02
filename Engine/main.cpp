@@ -40,39 +40,32 @@ int main() {
     
     // simulate loading a complex game object
 
-    auto box_object = Pipeline::EntityLoader::load<Component::GameObject>("Assets/Objects/box.json");
+    auto box_object = Pipeline::EntityLoader::load<Component::GameObject>(
+            "Assets/Objects/box.json");
     box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
-
-    
-    // hook up a live-reload watcher on the box asset to reload it when changes are detected.
-
-    //liveReloadSystem.onAssetModified += [&renderingSystem](
-    //        const std::string &filename,
-    //        const Component::ClassId &classId,
-    //        const Component::ComponentId &componentId
-    //) {
-    //    if (classId == Component::ClassId::Mesh) {
-    //        Pipeline::MeshLoader meshLoader;
-    //        auto meshComponent = Engine::replaceComponent(componentId,
-    //                                                      meshLoader.load(
-    //                                                              filename)
-    //        );
-
-    //        renderingSystem.buffer(*meshComponent);
-    //    }
-    //};
-
-    // We want to engine to automatically load & buffer game objects without neededing to manually define what needs to be done...
-    // probably want a separate system for this down the road...
-
     box_object->attachComponent(Component::Dirty::id());
     box_object->attachComponent(Component::Visible::id());
 
-    //renderingSystem.buffer();
+    { // hack; todo: not this
+        auto components = Component::Index::componentsOf(box_object->id());
 
-    //renderingSystem.updateInstanceData(box->id(), sizeof(glm::mat4),
-    //                                   glm::value_ptr(
-    //                                           box_object->worldTransform));
+        auto it = std::find_if(components.begin(), components.end(),
+                               [](auto component) {
+                                   return component.classId() ==
+                                          Component::ClassId::Mesh;
+                               });
+
+        auto components2 = Component::Index::componentsOf(*it);
+        auto it2 = std::find_if(components2.begin(), components2.end(),
+                                [](auto component) {
+                                    auto cid = component.classId();
+                                    return cid ==
+                                           Component::ClassId::Program;
+                                });
+
+        it->data<Component::Mesh>()->shader = *it2;
+
+    } // hack
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
@@ -88,7 +81,8 @@ int main() {
         // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
         frametime elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start).count() / 16.6666667f;
+                        end - start).count();
+
         //Engine::log<module>("Frametime: ", elapsed);
 
         Engine::EventSystem::update(elapsed);

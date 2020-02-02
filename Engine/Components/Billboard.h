@@ -9,9 +9,10 @@
 
 namespace Component {
 
-    class Billboard : ComponentBase<ClassId::Billboard> {
+    class Billboard : public ComponentBase<ClassId::Billboard> {
     public:
         ComponentId bitmap;
+        ComponentId shader;
         struct Rectangle {
             int x;
             int y;

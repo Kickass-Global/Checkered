@@ -13,7 +13,7 @@
 
 namespace Component {
     namespace {
-        static char module[] = "Component";
+        char module[] = "Component";
     }
 }
 

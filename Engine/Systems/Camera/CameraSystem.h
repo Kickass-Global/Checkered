@@ -30,7 +30,9 @@
 
 namespace Camera {
 
-    static char module[] = "Camera";
+    namespace {
+        char module[] = "Camera";
+    }
 
     class CameraSystem {
 
