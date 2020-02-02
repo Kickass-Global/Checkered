@@ -12,8 +12,10 @@
 #include "cooking/PxCooking.h"
 #include "snippetvehiclecommon/SnippetVehicleFilterShader.h"
 #include "snippetvehiclecommon/SnippetVehicleCreate.h"
-#include ""
-
+#include "vehicle/PxVehicleDrive4W.h"
+#include "snippetvehiclecommon/SnippetVehicleSceneQuery.h"
+#include "vehicle/PxVehicleUpdate.h"
+#include "../Engine.h"
 using namespace physx;
 
 namespace Physics {
@@ -39,7 +41,7 @@ namespace Physics {
 		void createGround();
 		void initVehicleSupport();
 		void createDrivableVehicle();
-
+		void stepPhysics(Engine::frametime);
 	};
 
 
