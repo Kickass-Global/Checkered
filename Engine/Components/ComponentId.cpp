@@ -2,6 +2,8 @@
 // Created by root on 11/1/20.
 //
 
+#include <string>
+
 #include "ComponentId.h"
 #include "Index.h"
 #include "ComponentBase.h"
@@ -26,7 +28,7 @@ bool Component::ComponentId::operator<(const Component::ComponentId &other) cons
 }
 
 std::ostream &Component::operator<<(std::ostream &out, const Component::ComponentId &id) {
-    if (Engine::identifier[id] == "") return out << id.id;
+    if (Engine::identifier[id].empty()) return out << id.id;
     else return out << Engine::identifier[id];
 }
 
@@ -35,6 +37,15 @@ Component::ComponentId::ComponentId(bool) noexcept : id(Component::next_id++) {}
 Component::ComponentId::ComponentId() : id(0xFFFFFFFFu) {        }
 
 Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
+
+/**
+ * Returns the ClassId associated with this component in the Engine; returns ClassId::None if no data is linked with
+ * this component.
+ */
+Component::ClassId Component::ComponentId::classId() const {
+    auto meta = data();
+    return meta ? meta->classId() : Component::ClassId::None;
+}
 
 std::shared_ptr<Component::ComponentInterface> Component::ComponentId::data() const {
     return Index::entityData<Component::ComponentInterface>(*this);

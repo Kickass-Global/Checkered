@@ -15,7 +15,9 @@
 
 namespace Debug {
 
-    inline static char module[] = "Debug";
+    namespace {
+        char module[] = "Debug";
+    }
 
 
 /**

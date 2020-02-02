@@ -15,7 +15,9 @@
 
 namespace Pipeline {
 
-    static char module[] = "Pipeline";
+    namespace {
+        char module[] = "Pipeline";
+    }
     constexpr auto assertLog = Engine::assertLog<module>;
 
     class ShaderLoader {

@@ -2,9 +2,11 @@
 // Created by root on 9/1/20.
 //
 
-#include "SystemCalls.h"
 #include <sstream>
 #include <algorithm>
+
+#include "SystemCalls.h"
+#include "Engine.h"
 
 std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
     const unsigned int width = 20;
@@ -17,4 +19,8 @@ std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
     buff << "] ";
 
     return out << std::setw(width) << buff.str();
+}
+
+void Engine::assertLog(bool test, std::string msg) {
+    assertLog<module>(test, msg);
 }
