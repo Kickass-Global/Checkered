@@ -9,6 +9,10 @@
 #include "extensions/PxDefaultAllocator.h"
 #include "extensions/PxDefaultErrorCallback.h"
 #include "pvd/PxPvd.h"
+#include "cooking/PxCooking.h"
+#include "snippetvehiclecommon/SnippetVehicleFilterShader.h"
+#include "snippetvehiclecommon/SnippetVehicleCreate.h"
+#include ""
 
 using namespace physx;
 
@@ -17,6 +21,8 @@ namespace Physics {
 
 	class PhysicsSystem {
 
+
+		
 		
 
 
@@ -28,6 +34,11 @@ namespace Physics {
 		void createFoundation();
 		void createPhysicsObject();
 		void createPVD();
+		void createCooking();
+		void createScene();
+		void createGround();
+		void initVehicleSupport();
+		void createDrivableVehicle();
 
 	};
 
