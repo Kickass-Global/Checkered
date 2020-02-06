@@ -2,7 +2,10 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-.vs/
-cmake-build-debug/
-out/
-.idea/
+/.vs
+/Engine/Engine/.vs
+/Engine/Engine/out/build/x64-Debug
+/Engine/.idea
+/Engine/Engine/cmake-build-debug
+/Engine/Engine/Engine/cmake-build-debug
+/Engine/Engine/out

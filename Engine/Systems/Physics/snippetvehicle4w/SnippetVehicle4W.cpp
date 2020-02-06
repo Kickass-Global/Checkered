@@ -165,6 +165,7 @@ PxU32 gVehicleOrderProgress = 0;
 bool gVehicleOrderComplete = false;
 bool gMimicKeyInputs = false;
 
+
 VehicleDesc initVehicleDesc() {
     //Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
     //The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
@@ -211,6 +212,8 @@ VehicleDesc initVehicleDesc() {
 
     return vehicleDesc;
 }
+
+
 
 void startAccelerateForwardsMode() {
     if (gMimicKeyInputs) {
