@@ -16,6 +16,10 @@
 #include "snippetvehiclecommon/SnippetVehicleSceneQuery.h"
 #include "vehicle/PxVehicleUpdate.h"
 #include "../Engine.h"
+#include "vehicle/PxVehicleUtil.h"
+
+
+
 using namespace physx;
 
 namespace Physics {
