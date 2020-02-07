@@ -93,12 +93,12 @@ namespace Camera {
 
             float x_rotation = x / sensitivity * elapsed;
             float y_rotation = y / sensitivity * elapsed;
-//            float zoom = u / sensitivity * elapsed;
+            float zoom = u / sensitivity * elapsed;
             
 
             for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
             {
-                //if (x_rotation == 0.0 && y_rotation == 0.0) continue;
+                if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
 
                 auto data = Component::Index::entityData<Component::Camera>(camera);
 

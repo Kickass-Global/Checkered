@@ -24,7 +24,6 @@ namespace Component {
  */
     class Model : public Component::ComponentBase<Component::ClassId::Model> {
 
-
     public:
         struct Variation {
             int damage_threshold;
@@ -39,8 +38,6 @@ namespace Component {
         int current_damage;
         int max_damage;
         std::vector<Part> parts;
-
-
     };
 }
 

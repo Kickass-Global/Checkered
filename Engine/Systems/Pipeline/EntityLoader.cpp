@@ -38,7 +38,7 @@ void Pipeline::load_components(const json &config, Component::ComponentId entity
         auto classId = parse(value["entity"]["class-id"]);
         auto data = value["entity"]["data"];
         auto componentId = Library::getAsset(data, classId);
-        entity.attachComponent(componentId);
+        entity.attachExistingComponent(componentId);
         switch (classId) {
             case Component::ClassId::Mesh:
                 load_meta_data<Component::Mesh>(value, componentId.data<Component::Mesh>());

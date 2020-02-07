@@ -45,8 +45,7 @@ Component::ClassId Component::ComponentId::classId() const {
     return meta ? meta->classId() : Component::ClassId::None;
 }
 
-void
-Component::ComponentId::attachComponent(Component::ComponentId componentId) {
+void Component::ComponentId::attachExistingComponent(Component::ComponentId componentId) const {
     Component::Index::addComponent(*this, componentId);
 }
 
@@ -55,8 +54,7 @@ Component::ComponentId::destroyComponent(Component::ComponentId componentId) {
     Component::Index::removeComponent(*this, componentId);
 }
 
-std::set<Component::ComponentId>
-Component::ComponentId::childComponentsOfClass(Component::ClassId classId) {
+std::set<Component::ComponentId> Component::ComponentId::childComponentsOfClass(Component::ClassId classId) const {
     return Index::componentsOf(*this, classId);
 }
 

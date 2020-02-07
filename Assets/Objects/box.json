@@ -1,12 +1,12 @@
 {
   "entity": {
-    "name": "boxymcboxface",
+    "name": "box-object",
     "class-id": "gameobject",
     "meta": [],
     "components": [
       {
         "entity": {
-          "name": "meshmcmeshface",
+          "name": "box-mesh",
           "class-id": "mesh",
           "meta": [
             {

@@ -23,6 +23,7 @@ namespace Component {
         GameObject,
         Dirty,
         Damage,
+        Transform,
         Program,
         Event,
         EventArgs,
@@ -58,12 +59,12 @@ namespace Component {
         friend std::ostream &
         operator<<(std::ostream &out, const Component::ComponentId &id);
 
-        void attachComponent(Component::ComponentId componentId);
+        void attachExistingComponent(Component::ComponentId componentId) const;
 
         void destroyComponent(Component::ComponentId componentId);
 
         std::set<Component::ComponentId> childComponentsOfClass
-                (Component::ClassId classId);
+                (Component::ClassId classId) const;
 
     };
 
