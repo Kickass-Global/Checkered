@@ -13,24 +13,26 @@ int main() {
 
     using namespace physx;
 
-	static PxDefaultErrorCallback gDefaultErrorCallback;
-	static PxDefaultAllocator gDefaultAllocatorCallback;
+    static PxDefaultErrorCallback gDefaultErrorCallback;
+    static PxDefaultAllocator gDefaultAllocatorCallback;
 
-	auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-		gDefaultErrorCallback);
-	if (!mFoundation)
+    auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
+                                          gDefaultErrorCallback
+    );
+    if (!mFoundation)
         Engine::assertLog(false, "PxCreateFoundation failed!");
 
-	bool recordMemoryAllocations = true;
+    bool recordMemoryAllocations = true;
 
-	auto mPvd = PxCreatePvd(*mFoundation);
-	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-	mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+    auto mPvd = PxCreatePvd(*mFoundation);
+    PxPvdTransport *transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+    mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 
     auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
                                     PxTolerancesScale(),
-                                    recordMemoryAllocations, mPvd);
+                                    recordMemoryAllocations, mPvd
+    );
     if (!mPhysics)
         Engine::assertLog(false, "PxCreatePhysics failed!");
 
@@ -39,6 +41,7 @@ int main() {
     auto running = true;
 
 
+    Engine::addSystem(std::make_shared<Engine::DamageSystem>());
     auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
     Engine::addSystem(renderingSystem);
 
@@ -55,7 +58,6 @@ int main() {
     auto cameraSystem = std::make_shared<Camera::CameraSystem>();
     Engine::addSystem(cameraSystem);
     Engine::addSystem(std::make_shared<Engine::EventSystem>());
-    Engine::addSystem(std::make_shared<Engine::DamageSystem>());
 
     Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
     Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
@@ -67,62 +69,71 @@ int main() {
 
     Component::Index;
 
-    auto box_object = Pipeline::load<Component::GameObject>(
-            "Assets/Objects/box.json");
+//    auto box_object = Pipeline::load<Component::GameObject>(
+//            "Assets/Objects/box.json");
+//
+//    box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
+//    box_object->attachComponent(Component::Dirty::id());
+//    box_object->attachComponent(Component::Visible::id());
 
-    box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
-    box_object->attachComponent(Component::Dirty::id());
-    box_object->attachComponent(Component::Visible::id());
 
-//    { // hack; todo: not this
-//        auto components = Component::Index::componentsOf(box_object->id());
-//
-//        auto it = std::find_if(components.begin(), components.end(),
-//                               [](auto component) {
-//                                   return component.classId() ==
-//                                          Component::ClassId::Mesh;
-//                               });
-//
-//        auto components2 = Component::Index::componentsOf(*it);
-//        auto it2 = std::find_if(components2.begin(), components2.end(),
-//                                [](auto component) {
-//                                    auto cid = component.classId();
-//                                    return cid ==
-//                                           Component::ClassId::Program;
-//                                });
-//
-//        it->data<Component::Mesh>()->shader = *it2;
-//
-//    } // hack
+    auto damage_object = Engine::createComponent<Component::GameObject>("object");
 
-//    auto damage_object
-//            = Engine::createComponent<Component::GameObject>("object");
-//
-//    auto damage_model
-//            = Engine::createComponent<Component::Model>("model");
-//
-//    auto box_mesh = Pipeline::MeshLoader::load(
-//            "Assets/Meshes/box.obj");
-//
-//    damage_model->parts.push_back(Component::Model::Part{});
-//    damage_model->parts[0].variations.push_back(
-//            Component::Model::Variation{0, box_mesh->id()}
-//    );
+    auto damage_model = Engine::createComponent<Component::Model>("model");
 
-//    std::function<void(const Component::EventArgs<int> &)> onKeyPress
-//            = [damage_model](auto &args) {
-//
-//                auto key = std::get<0>(args.values);
-//                Engine::log(key, " was pressed");
-//                if (key == GLFW_KEY_D) {
-//                    auto damage = Engine::createComponent<Component::Damage>();
-//                    damage->damage_amount = 1;
-//                    damage_model->attachComponent(damage->id());
-//                }
-//
-//            };
-//    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
-//    Input::InputSystem::onKeyPress += debugHandler;
+    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_0.obj", Component::ClassId::Mesh);
+    auto sphere_1_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_1.obj", Component::ClassId::Mesh);
+    auto sphere_2_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_2.obj", Component::ClassId::Mesh);
+    auto sphere_3_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_3.obj", Component::ClassId::Mesh);
+
+    sphere_0_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    sphere_1_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    sphere_2_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    sphere_3_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+
+    damage_model->parts.push_back(Component::Model::Part{});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{2, sphere_0_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{5, sphere_1_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{8, sphere_2_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{300000, sphere_3_mesh});
+    damage_model->id().attachExistingComponent(Component::Dirty::id());
+
+    damage_object->id().attachExistingComponent(sphere_0_mesh);
+    damage_object->id().attachExistingComponent(damage_model->id());
+    damage_object->id().attachExistingComponent(Component::Dirty::id());
+    damage_object->id().attachExistingComponent(Component::Visible::id());
+
+    std::function<void(const Component::EventArgs<int> &)> onKeyPress
+            = [damage_model](auto &args) {
+
+                auto key = std::get<0>(args.values);
+                Engine::log(key, " was pressed");
+                if (key == GLFW_KEY_D) {
+                    auto damage = Engine::createComponent<Component::Damage>();
+                    damage->damage_amount = 1;
+                    damage_model->id().attachExistingComponent(damage->id());
+                }
+                if (key == GLFW_KEY_F) {
+                    auto damage = Engine::createComponent<Component::Damage>();
+                    damage->damage_amount = -1;
+                    damage_model->id().attachExistingComponent(damage->id());
+                }
+            };
+
+    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
+    Input::InputSystem::onKeyPress += debugHandler;
 
 
     // make a default camera
@@ -137,8 +148,8 @@ int main() {
 
         deltaTime elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start).count();
-
+                        end - start
+                ).count();
 
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);
