@@ -36,6 +36,8 @@ PxVehicleDrive4W* cVehicle4w = NULL;
 VehicleSceneQueryData* cVehicleSceneQueryData = NULL;
 PxBatchQuery* cBatchQuery = NULL;
 
+bool cIsVehicleInAir = true;
+
 
 
 
@@ -222,4 +224,13 @@ void Physics::PhysicsSystem::stepPhysics(Engine::frametime timestep){
     const PxVec3 grav = cScene->getGravity();
     PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
     PxVehicleWheelQueryResult vehicleQueryResult[1] = { {wheelQueryResults,cVehicle4w->mWheelsSimData.getNbWheels()} };
+
+    //workout if vehicle is in air
+    cIsVehicleInAir = cVehicle4w->getRigidDynamicActor()->isSleeping ? false : PxVehicleIsInAir(vehicleQueryResult[0]);
+
+    cScene->simulate(timestep);
+    cScene->fetchResults(true);
+
+
 }
+
