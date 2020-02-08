@@ -10,6 +10,8 @@ namespace {
     std::vector<std::shared_ptr<Engine::SystemInterface>> registeredSystems;
 }
 
+const char Engine::module[] = "Engine";
+
 void Engine::nameComponent(const Component::ComponentId &componentId,
                            std::string name) {
     identifier[componentId] = std::move(name);

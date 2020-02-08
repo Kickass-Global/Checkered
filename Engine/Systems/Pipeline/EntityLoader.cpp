@@ -3,7 +3,7 @@
 //
 
 #include "EntityLoader.h"
-#include "../../Components/GameObject.h"
+#include "../../Components/SceneComponent.h"
 
 template<>
 void Pipeline::load_meta_data<Component::Mesh>(const json &config, std::shared_ptr<Component::Mesh> data) {
@@ -21,7 +21,8 @@ void Pipeline::load_meta_data<Component::Mesh>(const json &config, std::shared_p
 }
 
 template<>
-void Pipeline::load_meta_data<Component::GameObject>(const json &config, std::shared_ptr<Component::GameObject> data) {
+void Pipeline::load_meta_data<Component::SceneComponent>(const json &config,
+                                                         std::shared_ptr<Component::SceneComponent> data) {
     for (auto[key, value] : config["entity"]["meta"].items()) {
         auto offset = value["offset"].get<int>();
         auto is_component_reference = value.contains("component-id");

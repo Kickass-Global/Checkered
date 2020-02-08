@@ -20,6 +20,7 @@
 #include "../../Components/ComponentId.h"
 #include "../../Components/Camera.h"
 #include "../../SystemCalls.h"
+#include "../../Systems/systeminterface.hpp"
 #include "../../Components/Index.h"
 #include "../../Components/Dirty.h"
 #include "../../Components/ComponentEvent.h"

@@ -7,6 +7,7 @@
 
 #include "glad/glad.h"
 #include "../../Components/Component.h"
+#include "../../Systems/systeminterface.hpp"
 #include "RenderingBatch.h"
 
 #include <GLFW/glfw3.h>

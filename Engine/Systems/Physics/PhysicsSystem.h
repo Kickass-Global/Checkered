@@ -45,4 +45,8 @@ namespace Physics {
     };
 }
 
+namespace physx {
+    std::ostream &operator<<(std::ostream &out, const PxTransform &transform);
+}
+
 #endif //ENGINE_PHYSICSSYSTEM_H

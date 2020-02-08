@@ -60,6 +60,10 @@ std::set<Component::ComponentId> Component::ComponentId::childComponentsOfClass(
     return Index::componentsOf(*this, classId);
 }
 
+bool Component::ComponentId::hasChildComponent(const Component::ComponentId &componentId) const {
+    return Index::hasComponent(*this, componentId);
+}
+
 std::shared_ptr<Component::ComponentInterface>
 Component::ComponentId::data() const {
     return Index::entityData<Component::ComponentInterface>(*this);

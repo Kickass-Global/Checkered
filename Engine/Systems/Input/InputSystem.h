@@ -10,6 +10,7 @@
 #include "../../main.h"
 #include "../../SystemCalls.h"
 #include "../../Components/ComponentEvent.h"
+#include "../../Systems/systeminterface.hpp"
 #include <memory>
 #include <functional>
 

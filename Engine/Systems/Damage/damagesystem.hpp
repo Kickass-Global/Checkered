@@ -15,6 +15,7 @@
 #include "../../Components/EventHandler.h"
 #include "../Events/Events.h"
 #include "../../Components/ComponentEvent.h"
+#include "../../Systems/systeminterface.hpp"
 #include "../systeminterface.hpp"
 #include "../../Components/Dirty.h"
 

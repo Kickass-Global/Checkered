@@ -16,7 +16,7 @@
 #include "Systems/Physics/PhysicsSystem.h"
 
 
-#include "Components/GameObject.h"
+#include "Components/SceneComponent.h"
 #include "Systems/Debug/LiveReloadSystem.h"
 
 #include "glm/glm.hpp"
