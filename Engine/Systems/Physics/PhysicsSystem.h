@@ -15,40 +15,34 @@
 #include "vehicle/PxVehicleDrive4W.h"
 #include "snippetvehiclecommon/SnippetVehicleSceneQuery.h"
 #include "vehicle/PxVehicleUpdate.h"
-#include "../Engine.h"
+#include "../../Engine.h"
 #include "vehicle/PxVehicleUtil.h"
-
+#include "../systeminterface.hpp"
 
 
 using namespace physx;
 
+
 namespace Physics {
+    const char module[] = "Physics";
 
+    class PhysicsSystem : public Engine::SystemInterface {
 
-	class PhysicsSystem {
+    public:
+        void initialize() override;
+        void update(Engine::deltaTime /*elapsed*/) override;
 
-
-		
-		
-
-
-
-	public:
-		void initialize();
-
-	private:
-		void createFoundation();
-		void createPhysicsObject();
-		void createPVD();
-		void createCooking();
-		void createScene();
-		void createGround();
-		void initVehicleSupport();
-		void createDrivableVehicle();
-		void stepPhysics(Engine::frametime);
-	};
-
-
+    private:
+        void createFoundation();
+        void createPhysicsObject();
+        void createPVD();
+        void createCooking();
+        void createScene();
+        void createGround();
+        void initVehicleSupport();
+        void createDrivableVehicle();
+        void stepPhysics(Engine::deltaTime);
+    };
 }
 
 #endif //ENGINE_PHYSICSSYSTEM_H

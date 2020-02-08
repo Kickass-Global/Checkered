@@ -10,6 +10,7 @@
 std::map<Component::ComponentId, std::set<Component::ComponentId>> Component::Index::entityComponents;
 std::map<Component::ClassId, std::set<Component::ComponentId>> Component::Index::entities;
 std::map<Component::ComponentId, std::shared_ptr<void>> Component::Index::meta;
+std::map<Component::ComponentId, Component::ComponentId> parents;
 
 const std::set<Component::ComponentId> &
 Component::Index::entitiesOf(Component::ClassId cid) {
@@ -43,10 +44,17 @@ bool Component::Index::hasComponent(Component::ComponentId id,
 
 void Component::Index::addComponent(Component::ComponentId eid,
                                     Component::ComponentId cid) {
-    //Engine::log<module>("Attaching component#", cid, " to #", eid);
     entityComponents[eid].emplace(cid);
+    parents[cid] = eid; // todo assert that only one parent exists...
 }
 
-void Component::Index::removeComponent(Component::ComponentId eid, Component::ComponentId cid) {
+Component::ComponentId
+Component::Index::parentOf(Component::ComponentId componentId) {
+    return parents[componentId];
+}
+
+void Component::Index::removeComponent(Component::ComponentId eid,
+                                       Component::ComponentId cid) {
     entityComponents[eid].erase(cid);
+    parents.erase(cid);
 }

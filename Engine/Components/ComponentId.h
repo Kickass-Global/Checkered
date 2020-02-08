@@ -63,7 +63,9 @@ namespace Component {
 
         void destroyComponent(Component::ComponentId componentId);
 
-        std::set<Component::ComponentId> childComponentsOfClass
+        ComponentId parent() { return Component::Index::parentOf(*this); }
+
+        [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
                 (Component::ClassId classId) const;
 
     };

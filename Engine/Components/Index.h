@@ -48,7 +48,7 @@ namespace Component {
         static const std::set<Component::ComponentId> &
         entitiesOf(Component::ClassId cid);
 
-        static std::set<Component::ComponentId> Component::Index::componentsOf
+        static std::set<Component::ComponentId> componentsOf
                 (Component::ComponentId id, Component::ClassId classId);
 
         static const std::set<Component::ComponentId> &
@@ -60,11 +60,15 @@ namespace Component {
         static void
         addComponent(Component::ComponentId eid, Component::ComponentId cid);
 
+        static Component::ComponentId parentOf(Component::ComponentId
+                                               componentId);
+
         static void
         removeComponent(Component::ComponentId eid, Component::ComponentId cid);
 
         template<class T>
-        static std::shared_ptr<T> entityData(const Component::ComponentId &componentId) {
+        static std::shared_ptr<T>
+        entityData(const Component::ComponentId &componentId) {
             auto it = meta.find(componentId);
 
             if (it == meta.end()) return nullptr;
