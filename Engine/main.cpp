@@ -1,4 +1,4 @@
-﻿// Engine.cpp : Defines the entry point for the application.
+// Engine.cpp : Defines the entry point for the application.
 //
 
 #include <functional>
@@ -22,8 +22,6 @@ int main() {
     if (!mFoundation)
         Engine::assertLog(false, "PxCreateFoundation failed!");
 
-    //okay
-
     bool recordMemoryAllocations = true;
 
     auto mPvd = PxCreatePvd(*mFoundation);
@@ -42,6 +40,11 @@ int main() {
 
     auto running = true;
 
+    Rendering::RenderingSystem renderingSystem;
+    renderingSystem.initialize();
+
+    Physics::PhysicsSystem physicsSystem;
+    physicsSystem.initialize();
 
     Engine::addSystem(std::make_shared<Engine::DamageSystem>());
     auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
@@ -67,6 +70,7 @@ int main() {
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 
+    
     // simulate loading a complex game object
 
     Component::Index;
@@ -142,8 +146,9 @@ int main() {
     auto camera = Engine::createComponent<Component::Camera>();
 
     // setup a game clock
+    std::chrono::high_resolution_clock clock;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = clock.now();
     auto end = start;
 
     while (running) {
@@ -158,6 +163,6 @@ int main() {
         }
 
         start = end;
-        end = std::chrono::high_resolution_clock::now();
+        end = clock.now();
     }
 }

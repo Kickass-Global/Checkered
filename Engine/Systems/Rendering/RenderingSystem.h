@@ -72,9 +72,9 @@ namespace Rendering {
         ~Program();
     };
 
-    class RenderingSystem {
+    class RenderingSystem : public Engine::SystemInterface {
 
-        GLFWwindow* window;
+        GLFWwindow *window;
 
         std::vector<std::shared_ptr<Rendering::RenderBatch>> batches;
 
@@ -84,7 +84,7 @@ namespace Rendering {
 
         static Component::ComponentEvent<int, int> onWindowSizeChanged;
 
-        void initialize();
+        void initialize() override;
 
         static void windowSizeHandler(GLFWwindow* /*window*/, int width, int height);
 
@@ -101,7 +101,7 @@ namespace Rendering {
 
         void buffer(const Component::Mesh& data );
 
-        void update(Engine::frametime /*elapsedTime*/);
+        void update(Engine::deltaTime /*elapsedTime*/) override;
 
         ~RenderingSystem();
 

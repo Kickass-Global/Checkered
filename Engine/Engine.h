@@ -18,6 +18,9 @@
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
+#include "SystemCalls.h"
+#include "Systems/systeminterface.hpp"
+
 
 namespace Component {
     template<typename... Args>
@@ -32,11 +35,15 @@ namespace Component {
 
 namespace Engine {
 
-    typedef float frametime;
+    typedef float deltaTime;
 
     namespace {
         const char module[] = "Engine";
     }
+
+    const std::vector<std::shared_ptr<Engine::SystemInterface>> &systems();
+
+    void addSystem(const std::shared_ptr<Engine::SystemInterface> &system);
 
     extern std::map<Component::ComponentId, std::string> identifier;
 
