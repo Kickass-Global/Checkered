@@ -5,7 +5,7 @@ message(STATUS "Copying Assets")
 FILE(GLOB_RECURSE MESHES ${CMAKE_CURRENT_SOURCE_DIR}/Meshes *.obj)
 foreach(file ${MESHES})
     message(STATUS "Copying " ${file})
-    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${MESHES})
+    FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${file})
     configure_file(${ITEM_PATH_REL} ${CMAKE_CURRENT_BINARY_DIR}/${ITEM_PATH_REL} COPYONLY)
 endforeach()
 

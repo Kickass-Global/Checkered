@@ -23,17 +23,17 @@ namespace Debug {
 /**
  * This system will handle watching assets on disk and reloading them while the game is already running
  */
-    class LiveReloadSystem {
+class LiveReloadSystem : public Engine::SystemInterface {
 
-        struct AssetDetails {
-            std::filesystem::file_time_type last_modified_time;
-            Component::ClassId classId;
-            Component::ComponentId componentId;
-        };
+    struct AssetDetails {
+        std::filesystem::file_time_type last_modified_time;
+        Component::ClassId classId;
+        Component::ComponentId componentId;
+    };
 
-        std::map<std::string, AssetDetails> modified;
+    std::map<std::string, AssetDetails> modified;
 
-    public:
+public:
 
         Engine::Event<std::string, Component::ClassId, Component::ComponentId> onAssetModified;
 
@@ -41,17 +41,19 @@ namespace Debug {
             modified[filename] = {std::filesystem::last_write_time(filename), classId, componentId};
         }
 
-        void update(Engine::frametime /*elapsed*/) {
+    void update(Engine::deltaTime /*elapsed*/) {
 
-            for (const auto&[filename, details] : modified) {
-                try {
-                    auto last_modified_time = std::filesystem::last_write_time(filename);
-                    if (last_modified_time != details.last_modified_time) {
+        for (const auto&[filename, details] : modified) {
+            try {
+                auto last_modified_time = std::filesystem::last_write_time(
+                        filename);
+                if (last_modified_time != details.last_modified_time) {
 
-                        modified[filename].last_modified_time = last_modified_time;
+                    modified[filename].last_modified_time = last_modified_time;
 
-                        Engine::log<module>("Asset was modified: ",
-                                filename, details.classId, details.componentId);
+                    Engine::log<module>("Asset was modified: ",
+                                        filename, details.classId,
+                                        details.componentId);
 
                         onAssetModified(filename, details.classId, details.componentId);
 
