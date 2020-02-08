@@ -1,96 +1,163 @@
 ﻿// Engine.cpp : Defines the entry point for the application.
 //
 
+#include <functional>
+
 #include "main.h"
 #include "Systems/Pipeline/EntityLoader.h"
+#include "Systems/Damage/damagesystem.hpp"
+#include <PxPhysicsAPI.h>
+
 
 int main() {
+
+    using namespace physx;
+
+    static PxDefaultErrorCallback gDefaultErrorCallback;
+    static PxDefaultAllocator gDefaultAllocatorCallback;
+
+    auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
+                                          gDefaultErrorCallback
+    );
+    if (!mFoundation)
+        Engine::assertLog(false, "PxCreateFoundation failed!");
+
+    //okay
+
+    bool recordMemoryAllocations = true;
+
+    auto mPvd = PxCreatePvd(*mFoundation);
+    PxPvdTransport *transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+    mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+
+
+    auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
+                                    PxTolerancesScale(),
+                                    recordMemoryAllocations, mPvd
+    );
+    if (!mPhysics)
+        Engine::assertLog(false, "PxCreatePhysics failed!");
 
     using namespace Engine;
 
     auto running = true;
 
-    Rendering::RenderingSystem renderingSystem;
-    renderingSystem.initialize();
 
-    Physics::PhysicsSystem physicsSystem;
-    physicsSystem.initialize();
+    Engine::addSystem(std::make_shared<Engine::DamageSystem>());
+    auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
+    Engine::addSystem(renderingSystem);
 
+    auto liveReloadSystem = std::make_shared<Debug::LiveReloadSystem>();
+    Engine::addSystem(liveReloadSystem);
 
-
-
-
-
-
-
-    Debug::LiveReloadSystem liveReloadSystem;
+    auto inputSystem = std::make_shared<Input::InputSystem>();
+    Engine::addSystem(inputSystem);
 
     // hookup inputs from current window
-    Input::InputSystem::initialize(renderingSystem.getWindow());
+    inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
-    Camera::CameraSystem cameraSystem;
+    auto cameraSystem = std::make_shared<Camera::CameraSystem>();
+    Engine::addSystem(cameraSystem);
+    Engine::addSystem(std::make_shared<Engine::EventSystem>());
 
-    Input::InputSystem::onKeyPress += cameraSystem.onKeyPressHandler;
-    Input::InputSystem::onKeyDown += cameraSystem.onKeyDownHandler;
-    Input::InputSystem::onKeyUp += cameraSystem.onKeyUpHandler;
+    Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
 
-    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
+    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 
-    
     // simulate loading a complex game object
 
-    auto box_object = Pipeline::EntityLoader::load<Component::GameObject>(
-            "Assets/Objects/box.json");
-    box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
-    box_object->attachComponent(Component::Dirty::id());
-    box_object->attachComponent(Component::Visible::id());
+    Component::Index;
 
-    { // hack; todo: not this
-        auto components = Component::Index::componentsOf(box_object->id());
+//    auto box_object = Pipeline::load<Component::GameObject>(
+//            "Assets/Objects/box.json");
+//
+//    box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
+//    box_object->attachComponent(Component::Dirty::id());
+//    box_object->attachComponent(Component::Visible::id());
 
-        auto it = std::find_if(components.begin(), components.end(),
-                               [](auto component) {
-                                   return component.classId() ==
-                                          Component::ClassId::Mesh;
-                               });
 
-        auto components2 = Component::Index::componentsOf(*it);
-        auto it2 = std::find_if(components2.begin(), components2.end(),
-                                [](auto component) {
-                                    auto cid = component.classId();
-                                    return cid ==
-                                           Component::ClassId::Program;
-                                });
+    auto damage_object = Engine::createComponent<Component::GameObject>("object");
 
-        it->data<Component::Mesh>()->shader = *it2;
+    auto damage_model = Engine::createComponent<Component::Model>("model");
 
-    } // hack
+    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_0.obj", Component::ClassId::Mesh);
+    auto sphere_1_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_1.obj", Component::ClassId::Mesh);
+    auto sphere_2_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_2.obj", Component::ClassId::Mesh);
+    auto sphere_3_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_3.obj", Component::ClassId::Mesh);
+
+    sphere_0_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    sphere_1_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    sphere_2_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    sphere_3_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+
+    damage_model->parts.push_back(Component::Model::Part{});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{2, sphere_0_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{5, sphere_1_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{8, sphere_2_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{300000, sphere_3_mesh});
+    damage_model->id().attachExistingComponent(Component::Dirty::id());
+
+    damage_object->id().attachExistingComponent(sphere_0_mesh);
+    damage_object->id().attachExistingComponent(damage_model->id());
+    damage_object->id().attachExistingComponent(Component::Dirty::id());
+    damage_object->id().attachExistingComponent(Component::Visible::id());
+
+    std::function<void(const Component::EventArgs<int> &)> onKeyPress
+            = [damage_model](auto &args) {
+
+                auto key = std::get<0>(args.values);
+                Engine::log(key, " was pressed");
+                if (key == GLFW_KEY_D) {
+                    auto damage = Engine::createComponent<Component::Damage>();
+                    damage->damage_amount = 1;
+                    damage_model->id().attachExistingComponent(damage->id());
+                }
+                if (key == GLFW_KEY_F) {
+                    auto damage = Engine::createComponent<Component::Damage>();
+                    damage->damage_amount = -1;
+                    damage_model->id().attachExistingComponent(damage->id());
+                }
+            };
+
+    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
+    Input::InputSystem::onKeyPress += debugHandler;
+
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
 
     // setup a game clock
-    std::chrono::high_resolution_clock clock;
 
-    auto start = clock.now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto end = start;
 
     while (running) {
 
-        // frametime is a measure of how 'on-time' a frame is... <1 early, >1 late.
-        frametime elapsed =
+        deltaTime elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start).count();
+                        end - start
+                ).count();
 
-        //Engine::log<module>("Frametime: ", elapsed);
-
-        Engine::EventSystem::update(elapsed);
-        liveReloadSystem.update(elapsed);
-        cameraSystem.update(elapsed);
-        renderingSystem.update(elapsed);
+        for (const auto &system : Engine::systems()) {
+            system->update(elapsed);
+        }
 
         start = end;
-        end = clock.now();
+        end = std::chrono::high_resolution_clock::now();
     }
 }
