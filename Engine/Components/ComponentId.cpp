@@ -47,6 +47,20 @@ Component::ClassId Component::ComponentId::classId() const {
     return meta ? meta->classId() : Component::ClassId::None;
 }
 
-std::shared_ptr<Component::ComponentInterface> Component::ComponentId::data() const {
+void Component::ComponentId::attachExistingComponent(Component::ComponentId componentId) const {
+    Component::Index::addComponent(*this, componentId);
+}
+
+void
+Component::ComponentId::destroyComponent(Component::ComponentId componentId) {
+    Component::Index::removeComponent(*this, componentId);
+}
+
+std::set<Component::ComponentId> Component::ComponentId::childComponentsOfClass(Component::ClassId classId) const {
+    return Index::componentsOf(*this, classId);
+}
+
+std::shared_ptr<Component::ComponentInterface>
+Component::ComponentId::data() const {
     return Index::entityData<Component::ComponentInterface>(*this);
 }

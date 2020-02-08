@@ -12,7 +12,7 @@
 Component::ComponentEvent<int, int>
         Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
-void Rendering::RenderingSystem::update(Engine::frametime time) {
+void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
     std::stringstream ss;
     ss << "frametime: " << time << "ms" << std::endl;
@@ -20,34 +20,57 @@ void Rendering::RenderingSystem::update(Engine::frametime time) {
     glfwSetWindowTitle(window, title.c_str());
 
     // Find and update any GameObjects with meshes that should be drawn...
-    for (auto &&gameObject : Component::Index::entitiesOf(
-            Component::ClassId::GameObject)) {
-        auto object_is_dirty = Component::Index::hasComponent(gameObject,
-                                                              Component::Dirty::id());
-        auto object_is_visible = Component::Index::hasComponent(gameObject,
-                                                                Component::Visible::id());
+    for (const Component::ComponentId& mesh : Component::Index::entitiesOf(Component::ClassId::Mesh)) {
 
-        if (object_is_dirty && object_is_visible) {
+        auto is_dirty = Component::Index::hasComponent(
+                mesh,
+                Component::Dirty::id());
+
+        auto is_visible = Component::Index::hasComponent(
+                mesh,
+                Component::Visible::id());
+
+        if (!is_visible) {
+            auto match = std::find_if(
+                    batches.begin(), batches.end(), [id = mesh](const auto &batch) {
+                        return batch->contains(id);
+                    }
+            );
+
+            if (match != batches.end()) {
+                // mark/remove buffered data so its not used
+                (*match)->remove(mesh);
+            }
+        }
+
+        auto transforms = mesh.childComponentsOfClass(Component::ClassId::Transform);
+
+        if (is_visible && is_dirty) {
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
-            Engine::log<module>("Streaming in component#", gameObject);
+            Engine::log<module>("Streaming in component#", mesh);
 
-            auto components = Component::Index::componentsOf(gameObject);
+            auto classid = mesh.classId();
+            auto data = mesh.data<Component::Mesh>();
 
-            for (auto&& component : components)
-            {
+            for (auto &&transform : transforms) {
 
-                if (component.classId() == Component::ClassId::Mesh)
-                {
-                    auto data = component.data<Component::Mesh>();
+                if (classid == Component::ClassId::Mesh) {
                     buffer(*data);
-                    updateInstanceData(component, sizeof(glm::mat4), glm::value_ptr(gameObject.data<Component::GameObject>()->worldTransform));
+                    Engine::log<module>("Adding instance transform#", transform);
+                    updateInstanceData(
+                            mesh,
+                            sizeof(glm::mat4),
+                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix));
                 }
-
             }
 
-            gameObject.data()->removeComponent(Component::Dirty::id());
-            gameObject.data()->removeComponent(Component::Visible::id());
+            mesh.data()->removeComponent(Component::Dirty::id());
+
         }
+        for (auto &transform : transforms) {
+            mesh.data()->removeComponent(transform);
+        }
+        mesh.data()->removeComponent(Component::Visible::id());
     }
 
     glClearColor(0, 0, 0.5f, 1);
@@ -55,9 +78,9 @@ void Rendering::RenderingSystem::update(Engine::frametime time) {
 
     for (auto &&batch : batches) {
 
-        // if batch should be drawn
+        if(!batch->details.empty())
         {
-            for(auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
+            for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
                 if (camera_is_dirty) {
@@ -80,13 +103,19 @@ void Rendering::RenderingSystem::update(Engine::frametime time) {
 
                     batch->shader.data<Program>()->bind();
 
-                    glUniformMatrix4fv(glGetUniformLocation(batch->shader.data<Program>()->programId(),
-                                                            "M_View"),
-                                       1, false, glm::value_ptr(view_matrix));
+                    glUniformMatrix4fv(
+                            glGetUniformLocation(
+                                    batch->shader.data<Program>()->programId(),
+                                    "M_View"
+                            ),
+                            1, false, glm::value_ptr(view_matrix));
 
-                    glUniformMatrix4fv(glGetUniformLocation(batch->shader.data<Program>()->programId(),
-                                                            "M_Perspective"),
-                                       1, false, glm::value_ptr(perspective_matrix));
+                    glUniformMatrix4fv(
+                            glGetUniformLocation(
+                                    batch->shader.data<Program>()->programId(),
+                                    "M_Perspective"
+                            ),
+                            1, false, glm::value_ptr(perspective_matrix));
 
                     Component::Index::removeComponent(camera, Component::Dirty::id());
                 }
@@ -108,7 +137,8 @@ Rendering::RenderingSystem::~RenderingSystem() {
 
 std::shared_ptr<Rendering::RenderBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
-        const std::shared_ptr<Component::Mesh> &data) {
+        const std::shared_ptr<Component::Mesh> &data
+) {
 
     auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
             100000,
@@ -137,7 +167,8 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 }
 
 std::shared_ptr<Rendering::RenderBatch> Rendering::RenderingSystem::push_back(
-    std::shared_ptr<Rendering::RenderBatch> batch) {
+        std::shared_ptr<Rendering::RenderBatch> batch
+) {
     batches.push_back(batch);
     return batches.back();
 }
@@ -146,9 +177,11 @@ void Rendering::RenderingSystem::buffer(const Component::Mesh &data) {
 
     // if the data is already buffered we want to update the existing buffer data
     auto id = data.id();
-    auto match = std::find_if(batches.begin(), batches.end(), [id](const auto &batch) {
-        return batch->contains(id);
-    });
+    auto match = std::find_if(
+            batches.begin(), batches.end(), [id](const auto &batch) {
+                return batch->contains(id);
+            }
+    );
 
     if (match != batches.end()) {
         // mark/remove buffered data so its not used
@@ -172,7 +205,7 @@ void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow *, int width, int 
 
 void Rendering::RenderingSystem::initialize() {
 
-	Engine::assertLog<module>(glfwInit(), "initialize GLFW");
+    Engine::assertLog<module>(glfwInit(), "initialize GLFW");
 
     window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
 
@@ -180,21 +213,24 @@ void Rendering::RenderingSystem::initialize() {
 
     glfwMakeContextCurrent(window);
 
-	Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
+    Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     onBillboardModifiedHandler = Engine::EventSystem::createHandler(
-            this, &RenderingSystem::onBillboardModified);
+            this, &RenderingSystem::onBillboardModified
+    );
 }
 
 void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, int size, float *data) {
 
     Engine::log<module>("Updating instance data of component#", id);
 
-    auto it = std::find_if(batches.begin(), batches.end(),
-                           [id](auto batch) { return batch->contains(id); });
+    auto it = std::find_if(
+            batches.begin(), batches.end(),
+            [id](auto batch) { return batch->contains(id); }
+    );
 
     Engine::assertLog<module>(it != batches.end(), "check for valid batch");
 
@@ -239,7 +275,7 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
     GLint success;
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &success);
 
-    if(!success) {
+    if (!success) {
         GLint maxLength = 0;
         glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
 
@@ -248,7 +284,7 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
 
         Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
     }
-	Engine::assertLog<module>(success != GL_FALSE, "shader creation");
+    Engine::assertLog<module>(success != GL_FALSE, "shader creation");
 }
 
 GLuint Rendering::Shader::id() const { return m_id; }

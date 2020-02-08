@@ -41,7 +41,7 @@ namespace Pipeline {
 
     class ProgramLoader {
     public:
-        std::shared_ptr<Rendering::Program> load(std::string filename) {
+        static std::shared_ptr<Rendering::Program> load(std::string filename) {
 
         std::ifstream ifs(filename);
 		Engine::assertLog<module>(ifs.is_open(), "load program description file " + filename);
