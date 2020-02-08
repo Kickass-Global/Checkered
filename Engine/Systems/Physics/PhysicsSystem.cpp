@@ -2,19 +2,13 @@
 // Created by root on 9/1/20.
 //
 
-#include <assert.h>
 #include <iostream>
-#include <vector>
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
-
-
-
-
+#include "../../SystemCalls.h"
 
 using namespace physx;
 using namespace snippetvehicle;
-
 
 const float GRAVITY = -9.81;
 const float STATIC_FRICTION = 0.5F;
@@ -38,14 +32,10 @@ PxBatchQuery* cBatchQuery = NULL;
 
 bool cIsVehicleInAir = true;
 
-
-
-
 static PxDefaultAllocator cDefaultAllocator;
 static PxDefaultErrorCallback cErrorCallback;
 
 extern VehicleDesc initVehicleDesc();
-
 
 VehicleDesc initVehicleDescription() {
     //Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
@@ -124,7 +114,7 @@ void Physics::PhysicsSystem::createFoundation() {
 
 	cFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, cDefaultAllocator, cErrorCallback);
 	if (!cFoundation)
-		assert(false, "PxCreateFoundation failed");
+        Engine::assertLog<module>(false, "PxCreateFoundation failed");
 
 }
 
@@ -140,7 +130,7 @@ void Physics::PhysicsSystem::createPhysicsObject() {
 
 	cPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *cFoundation, PxTolerancesScale(), true, cPVD);
 	if (!cPhysics)
-		assert(false, "PxCreatePhysics Failed");
+        Engine::assertLog<module>(false, "PxCreatePhysics Failed");
 
 }
 
@@ -209,16 +199,18 @@ void Physics::PhysicsSystem::createDrivableVehicle() {
 }
 
 //CHANGE WHEN YOU HAVE MORE VEHICLES
-void Physics::PhysicsSystem::stepPhysics(Engine::frametime timestep){
-    
+void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
+
     //update control inputs
 
 
     //raycasts
-    PxVehicleWheels* vehicles[1] = { cVehicle4w };
-    PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+    PxVehicleWheels *vehicles[1] = {cVehicle4w};
+    PxRaycastQueryResult *raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(
+            0);
     const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
-    PxVehicleSuspensionRaycasts(cBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+    PxVehicleSuspensionRaycasts(cBatchQuery, 1, vehicles, raycastResultsSize,
+                                raycastResults);
 
     //vehicle update
     const PxVec3 grav = cScene->getGravity();
@@ -226,11 +218,16 @@ void Physics::PhysicsSystem::stepPhysics(Engine::frametime timestep){
     PxVehicleWheelQueryResult vehicleQueryResult[1] = { {wheelQueryResults,cVehicle4w->mWheelsSimData.getNbWheels()} };
 
     //workout if vehicle is in air
-    cIsVehicleInAir = cVehicle4w->getRigidDynamicActor()->isSleeping ? false : PxVehicleIsInAir(vehicleQueryResult[0]);
+    cIsVehicleInAir = cVehicle4w->getRigidDynamicActor()->isSleeping() ? false
+                                                                       : PxVehicleIsInAir(
+                    vehicleQueryResult[0]);
 
     cScene->simulate(timestep);
     cScene->fetchResults(true);
+}
 
-
+void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
+    // do nothing
+    stepPhysics(deltaTime);
 }
 

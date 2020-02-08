@@ -8,7 +8,9 @@
 
 #include <numeric>
 #include <algorithm>
+
 #include "../../Engine.h"
+#include "../../SystemCalls.h"
 #include "../../Components/damage.hpp"
 #include "../../Components/EventHandler.h"
 #include "../Events/Events.h"
@@ -17,16 +19,6 @@
 #include "../../Components/Dirty.h"
 
 namespace Engine {
-
-
-class ModelSystem : public Engine::SystemInterface {
-
-    void update(Engine::deltaTime elapsed) override {
-        // if the model has changed variations...
-
-    }
-
-};
 
 class DamageSystem : public Engine::SystemInterface {
 
@@ -46,7 +38,7 @@ class DamageSystem : public Engine::SystemInterface {
 
             if(Component::Index::hasComponent(model, Component::Dirty::id()))
             {
-                Engine::log<module>("Updating dirty model#", model);
+                Engine::log("Updating dirty model#", model);
 
                 for (auto &&part : meta->parts) {
 
@@ -65,7 +57,7 @@ class DamageSystem : public Engine::SystemInterface {
 
             if (!damages.empty()) {
 
-                Engine::log<module>("Processing damage on model#", model);
+                Engine::log("Processing damage on model#", model);
                 int total_damage = 0;
                 for (auto &damage : damages) {
 
@@ -77,7 +69,7 @@ class DamageSystem : public Engine::SystemInterface {
                 }
                 meta->current_damage += total_damage;
                 auto current_damage = meta->current_damage;
-                Engine::log<module>(
+                Engine::log(
                         "Total damage is now = ",
                         meta->current_damage
                 );
@@ -108,7 +100,8 @@ class DamageSystem : public Engine::SystemInterface {
                     auto variation_changed = part.active_variation != previous;
 
                     if (variation_changed) {
-                        Engine::log<module>("Updating variation#", part.active_variation);
+                        Engine::log("Updating variation#",
+                                    part.active_variation);
                         mesh.attachExistingComponent(Component::Dirty::id());
                     }
 

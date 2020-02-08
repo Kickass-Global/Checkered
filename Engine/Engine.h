@@ -18,7 +18,6 @@
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
-#include "SystemCalls.h"
 #include "Systems/systeminterface.hpp"
 
 
@@ -47,14 +46,16 @@ namespace Engine {
 
     extern std::map<Component::ComponentId, std::string> identifier;
 
-    void
-    nameComponent(const Component::ComponentId &componentId, std::string name);
+
+    void nameComponent(
+            const Component::ComponentId &componentId, std::string name);
 
     template<typename T>
     std::shared_ptr<T> createComponent(std::string name = "") {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
         auto component = std::make_shared<T>();
-        Component::Index::push_entity(component->classId(), component->id(), component);
+        Component::Index::push_entity(component->classId(), component->id(),
+                                      component);
         identifier[component->id()] = name;
         return component;
     }
@@ -72,7 +73,6 @@ namespace Engine {
         Component::Index::replace_component_data(id, component);
         auto result = Component::Index::entityData<T>(id);
         return result;
-
     }
 }
 

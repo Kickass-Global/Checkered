@@ -8,43 +8,15 @@
 #include "Systems/Damage/damagesystem.hpp"
 #include <PxPhysicsAPI.h>
 
+#include "glm/gtx/transform.hpp"
 
 int main() {
-
-    using namespace physx;
-
-    static PxDefaultErrorCallback gDefaultErrorCallback;
-    static PxDefaultAllocator gDefaultAllocatorCallback;
-
-    auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-                                          gDefaultErrorCallback
-    );
-    if (!mFoundation)
-        Engine::assertLog(false, "PxCreateFoundation failed!");
-
-    bool recordMemoryAllocations = true;
-
-    auto mPvd = PxCreatePvd(*mFoundation);
-    PxPvdTransport *transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-    mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
-
-
-    auto mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
-                                    PxTolerancesScale(),
-                                    recordMemoryAllocations, mPvd
-    );
-    if (!mPhysics)
-        Engine::assertLog(false, "PxCreatePhysics failed!");
 
     using namespace Engine;
 
     auto running = true;
 
-    Rendering::RenderingSystem renderingSystem;
-    renderingSystem.initialize();
-
-    Physics::PhysicsSystem physicsSystem;
-    physicsSystem.initialize();
+    Engine::addSystem(std::make_shared<Physics::PhysicsSystem>());
 
     Engine::addSystem(std::make_shared<Engine::DamageSystem>());
     auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
@@ -70,20 +42,9 @@ int main() {
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 
-    
-    // simulate loading a complex game object
-
-    Component::Index;
-
-//    auto box_object = Pipeline::load<Component::GameObject>(
-//            "Assets/Objects/box.json");
-//
-//    box_object->worldTransform = glm::translate(glm::vec3{0, 0, -5});
-//    box_object->attachComponent(Component::Dirty::id());
-//    box_object->attachComponent(Component::Visible::id());
-
-
     auto damage_object = Engine::createComponent<Component::GameObject>("object");
+    damage_object->worldTransform = glm::translate(
+            glm::vec3(0.0f, 0.0f, 100.0f));
 
     auto damage_model = Engine::createComponent<Component::Model>("model");
 
@@ -144,11 +105,11 @@ int main() {
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
+    camera->id().attachExistingComponent(Component::Dirty::id());
 
     // setup a game clock
-    std::chrono::high_resolution_clock clock;
 
-    auto start = clock.now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto end = start;
 
     while (running) {
@@ -163,6 +124,6 @@ int main() {
         }
 
         start = end;
-        end = clock.now();
+        end = std::chrono::high_resolution_clock::now();
     }
 }

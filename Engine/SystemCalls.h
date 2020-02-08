@@ -10,15 +10,16 @@
 #include <iomanip>
 #include <utility>
 
-namespace Engine {
+#include "Engine.h"
 
+namespace Engine {
 
     struct Name {
         std::string value;
-        explicit Name(const char * module) : value(module) {}
+        explicit Name(const char *module) : value(module) {}
     };
 
-    std::ostream& operator<<(std::ostream& out, Name name);
+    std::ostream &operator<<(std::ostream &out, Name name);
 
     /**
      * Asserts that given condition is successful and logs given message.
