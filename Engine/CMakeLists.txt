@@ -13,7 +13,7 @@ set(SRC main.cpp main.h
         Components/Index.cpp Components/Index.h
         Components/Dirty.cpp Components/Dirty.h
         Components/Mesh.cpp Components/Mesh.h
-        Components/GameObject.cpp Components/GameObject.h
+        Components/SceneComponent.cpp Components/SceneComponent.h
         Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h
         Components/ComponentBase.h Components/ComponentBase.cpp
         SystemCalls.cpp SystemCalls.h
@@ -40,7 +40,7 @@ set(SRC main.cpp main.h
         Systems/Events/Events.cpp Systems/Events/Events.h
         Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h
         ${PHYSX_SNIPPETS}
-        Systems/Pipeline/pipeline.cpp Systems/Pipeline/pipeline.hpp Systems/Damage/damagesystem.cpp Systems/Damage/damagesystem.hpp Components/damage.cpp Components/damage.hpp Systems/systeminterface.hpp)
+        Systems/Pipeline/pipeline.cpp Systems/Pipeline/pipeline.hpp Systems/Damage/damagesystem.cpp Systems/Damage/damagesystem.hpp Components/damage.cpp Components/damage.hpp Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp Systems/Component/scenecomponentsystem.hpp)
 
 # Add source to this project's executable.
 add_executable (Engine

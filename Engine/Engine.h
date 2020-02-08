@@ -18,7 +18,6 @@
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
-#include "Systems/systeminterface.hpp"
 
 
 namespace Component {
@@ -34,18 +33,17 @@ namespace Component {
 
 namespace Engine {
 
+    class SystemInterface;
+
     typedef float deltaTime;
 
-    namespace {
-        const char module[] = "Engine";
-    }
+    extern const char module[];
 
     const std::vector<std::shared_ptr<Engine::SystemInterface>> &systems();
 
     void addSystem(const std::shared_ptr<Engine::SystemInterface> &system);
 
     extern std::map<Component::ComponentId, std::string> identifier;
-
 
     void nameComponent(
             const Component::ComponentId &componentId, std::string name);
@@ -54,8 +52,7 @@ namespace Engine {
     std::shared_ptr<T> createComponent(std::string name = "") {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
         auto component = std::make_shared<T>();
-        Component::Index::push_entity(component->classId(), component->id(),
-                                      component);
+        Component::Index::push_entity(component->classId(), component->id(), component);
         identifier[component->id()] = name;
         return component;
     }

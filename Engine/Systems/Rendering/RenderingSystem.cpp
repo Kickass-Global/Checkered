@@ -7,7 +7,7 @@
 
 #include "../../Components/Dirty.h"
 #include "../../Components/Camera.h"
-#include "../../Components/GameObject.h"
+#include "../../Components/SceneComponent.h"
 
 Component::ComponentEvent<int, int>
         Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");

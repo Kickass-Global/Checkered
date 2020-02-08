@@ -9,6 +9,8 @@
 #include <PxPhysicsAPI.h>
 
 #include "glm/gtx/transform.hpp"
+#include "Systems/Component/scenecomponentsystem.hpp"
+#include "Systems/systeminterface.hpp"
 
 int main() {
 
@@ -17,6 +19,7 @@ int main() {
     auto running = true;
 
     Engine::addSystem(std::make_shared<Physics::PhysicsSystem>());
+    Engine::addSystem(std::make_shared<Component::SceneComponentSystem>());
 
     Engine::addSystem(std::make_shared<Engine::DamageSystem>());
     auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
@@ -42,9 +45,9 @@ int main() {
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 
-    auto damage_object = Engine::createComponent<Component::GameObject>("object");
-    damage_object->worldTransform = glm::translate(
-            glm::vec3(0.0f, 0.0f, 100.0f));
+    auto damage_object = Engine::createComponent<Component::SceneComponent>("player");
+    damage_object->m_localTransform = glm::translate(
+            glm::vec3(0.0f, 0.0f, 10.0f));
 
     auto damage_model = Engine::createComponent<Component::Model>("model");
 
@@ -125,5 +128,6 @@ int main() {
 
         start = end;
         end = std::chrono::high_resolution_clock::now();
+
     }
 }
