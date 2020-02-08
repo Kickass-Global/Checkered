@@ -23,13 +23,11 @@ Component::ComponentId Pipeline::Library::getAsset(const std::string &name, Comp
             case Component::ClassId::Program: {
                 auto program = Pipeline::ProgramLoader::load(name);
                 emplace(name, program->id());
-                Engine::createComponent(program, name);
                 return program->id();
             }
             case Component::ClassId::Mesh: {
                 auto component = Pipeline::MeshLoader::load(name);
                 emplace(name, component->id());
-                Engine::createComponent(component, name);
                 return component->id();
             }
         }

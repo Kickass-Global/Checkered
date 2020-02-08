@@ -33,12 +33,17 @@ class DamageSystem : public Engine::SystemInterface {
                 Component::ClassId::Model
         );
 
-        for (auto model : models) {
+        for (const auto &model : models) {
 
             auto &&meta = model.data<Component::Model>();
 
-            if(Component::Index::hasComponent(model, Component::Dirty::id()))
-            {
+            const bool is_dirty = model.hasChildComponent(Component::Dirty::id());
+
+            const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
+            auto has_transform = !transform.empty();
+            Engine::assertLog(has_transform, "Checking model has a world transform");
+
+            if (is_dirty) {
                 Engine::log("Updating dirty model#", model);
 
                 for (auto &&part : meta->parts) {
@@ -47,11 +52,12 @@ class DamageSystem : public Engine::SystemInterface {
 
                     mesh.attachExistingComponent(Component::Visible::id());
                     mesh.attachExistingComponent(Component::Dirty::id());
-                    mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+                    mesh.attachExistingComponent(*transform.begin());
 
                 }
                 model.destroyComponent(Component::Dirty::id());
             }
+
             // check to see if this model has received any damage...
             auto damages = model.childComponentsOfClass
                     (Component::ClassId::Damage);
@@ -96,7 +102,7 @@ class DamageSystem : public Engine::SystemInterface {
                     auto&& mesh = part.variations[part.active_variation].mesh;
 
                     mesh.attachExistingComponent(Component::Visible::id());
-                    mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+                    mesh.attachExistingComponent(*transform.begin());
 
                     auto variation_changed = part.active_variation != previous;
 

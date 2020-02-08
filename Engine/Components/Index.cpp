@@ -6,10 +6,11 @@
 #include <iterator>
 #include "Index.h"
 #include "ComponentId.h"
+#include "ComponentBase.h"
 
 std::map<Component::ComponentId, std::set<Component::ComponentId>> Component::Index::entityComponents;
 std::map<Component::ClassId, std::set<Component::ComponentId>> Component::Index::entities;
-std::map<Component::ComponentId, std::shared_ptr<void>> Component::Index::meta;
+std::map<Component::ComponentId, std::unique_ptr<Component::ComponentInterface>> Component::Index::meta;
 std::map<Component::ComponentId, Component::ComponentId> parents;
 
 const std::set<Component::ComponentId> &

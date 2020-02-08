@@ -5,7 +5,6 @@
 #ifndef ENGINE_SYSTEMINTERFACE_HPP
 #define ENGINE_SYSTEMINTERFACE_HPP
 
-#include "../SystemCalls.h"
 
 namespace Engine {
 
@@ -16,7 +15,6 @@ namespace Engine {
         virtual void update(Engine::deltaTime /*elapsed*/) = 0;
 
         virtual void initialize() {
-            Engine::log<module>("Initializing system");
         }
     };
 

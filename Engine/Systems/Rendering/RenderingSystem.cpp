@@ -49,12 +49,12 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
             Engine::log<module>("Streaming in component#", mesh);
 
-            auto classid = mesh.classId();
+            auto classId = mesh.classId();
             auto data = mesh.data<Component::Mesh>();
 
             for (auto &&transform : transforms) {
 
-                if (classid == Component::ClassId::Mesh) {
+                if (classId == Component::ClassId::Mesh) {
                     buffer(*data);
                     Engine::log<module>("Adding instance transform#", transform);
                     updateInstanceData(
@@ -64,13 +64,13 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                 }
             }
 
-            mesh.data()->removeComponent(Component::Dirty::id());
+            mesh.destroyComponent(Component::Dirty::id());
 
         }
         for (auto &transform : transforms) {
-            mesh.data()->removeComponent(transform);
+            mesh.destroyComponent(transform);
         }
-        mesh.data()->removeComponent(Component::Visible::id());
+        mesh.destroyComponent(Component::Visible::id());
     }
 
     glClearColor(0, 0, 0.5f, 1);

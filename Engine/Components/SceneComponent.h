@@ -20,7 +20,7 @@ namespace Component {
      * A scene component has a transformation related with it; scene components can contain other scene components
      * to form a hierarchy of transformations which are relative to one another.
      */
-    class SceneComponent : public ComponentBase<ClassId::GameObject> {
+    class SceneComponent : public ComponentBase<ClassId::SceneComponent> {
     public:
         SceneComponent *m_parent;
         std::vector<SceneComponent *> m_children;
@@ -48,6 +48,7 @@ namespace Component {
                 stack.pop();
                 transform *= parent->m_localTransform;
             }
+            transform *= m_localTransform;
 
             return transform;
         }

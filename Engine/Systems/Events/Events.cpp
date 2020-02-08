@@ -23,7 +23,7 @@ void Engine::EventSystem::update(Engine::deltaTime) {
         }
         // remove eventArgs from handler
         for (auto &&id : set) {
-            handler.data()->removeComponent(id);
+            handler.destroyComponent(id);
         }
     }
 }
