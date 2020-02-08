@@ -6,7 +6,7 @@
 #include "../../Components/SceneComponent.h"
 
 template<>
-void Pipeline::load_meta_data<Component::Mesh>(const json &config, std::shared_ptr<Component::Mesh> data) {
+void Pipeline::load_meta_data<Component::Mesh>(const json &config, Component::Mesh &data) {
     for (auto[key, value] : config["entity"]["meta"].items()) {
         auto offset = value["offset"].get<int>();
         auto is_component_reference = value.contains("component-id");
@@ -15,14 +15,14 @@ void Pipeline::load_meta_data<Component::Mesh>(const json &config, std::shared_p
             auto dataName = value["component-id"]["data"];
 
             auto componentId = Library::getAsset(dataName, parse(classId));
-            data->shader = componentId;
+            data.shader = componentId;
         }
     }
 }
 
 template<>
 void Pipeline::load_meta_data<Component::SceneComponent>(const json &config,
-                                                         std::shared_ptr<Component::SceneComponent> data) {
+                                                         Component::SceneComponent &data) {
     for (auto[key, value] : config["entity"]["meta"].items()) {
         auto offset = value["offset"].get<int>();
         auto is_component_reference = value.contains("component-id");
@@ -42,7 +42,7 @@ void Pipeline::load_components(const json &config, Component::ComponentId entity
         entity.attachExistingComponent(componentId);
         switch (classId) {
             case Component::ClassId::Mesh:
-                load_meta_data<Component::Mesh>(value, componentId.data<Component::Mesh>());
+                load_meta_data<Component::Mesh>(value, *componentId.data<Component::Mesh>());
                 break;
         }
     }

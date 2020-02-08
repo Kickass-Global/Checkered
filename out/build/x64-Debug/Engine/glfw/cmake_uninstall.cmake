@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/build/x64-Debug/Engine/glfw/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: \"D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/build/x64-Debug/Engine/glfw/install_manifest.txt\"")
-endif()
+if (NOT EXISTS "C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/glfw/install_manifest.txt")
+    message(FATAL_ERROR "Cannot find install manifest: \"C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/glfw/install_manifest.txt\"")
+endif ()
 
-file(READ "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/build/x64-Debug/Engine/glfw/install_manifest.txt" files)
+file(READ "C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/glfw/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

@@ -1,8 +1,8 @@
-# Install script for directory: D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f
+# Install script for directory: C:/Users/seed/Documents/GitHub/Checkered
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/install/x64-Debug")
+    set(CMAKE_INSTALL_PREFIX "C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/build/x64-Debug/Engine/cmake_install.cmake")
+  include("C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/cmake_install.cmake")
 
 endif()
 
@@ -45,6 +45,6 @@ else()
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
-       "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/build/x64-Debug/${CMAKE_INSTALL_MANIFEST}"
-     "${CMAKE_INSTALL_MANIFEST_CONTENT}")
+        "${CMAKE_INSTALL_MANIFEST_FILES}")
+file(WRITE "C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/${CMAKE_INSTALL_MANIFEST}"
+        "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -18,6 +18,7 @@
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
+#include "Systems/systeminterface.hpp"
 
 
 namespace Component {
@@ -33,15 +34,20 @@ namespace Component {
 
 namespace Engine {
 
-    class SystemInterface;
+    extern std::vector<std::unique_ptr<Engine::SystemInterface>> registeredSystems;
 
     typedef float deltaTime;
 
     extern const char module[];
 
-    const std::vector<std::shared_ptr<Engine::SystemInterface>> &systems();
+    const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
 
-    void addSystem(const std::shared_ptr<Engine::SystemInterface> &system);
+    template<typename T>
+    T &addSystem() {
+        registeredSystems.push_back(std::make_unique<T>());
+        registeredSystems.back()->initialize();
+        return dynamic_cast<T &>(*registeredSystems.back());
+    }
 
     extern std::map<Component::ComponentId, std::string> identifier;
 
@@ -49,20 +55,24 @@ namespace Engine {
             const Component::ComponentId &componentId, std::string name);
 
     template<typename T>
-    std::shared_ptr<T> createComponent(std::string name = "") {
+    T *addComponent(std::unique_ptr<T> data) {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
-        auto component = std::make_shared<T>();
-        Component::Index::push_entity(component->classId(), component->id(), component);
-        identifier[component->id()] = name;
-        return component;
+
+        auto id = data->id();
+        Component::Index::push_entity(data->classId(), data->id(), std::move(data));
+
+        return id.data<T>();
     }
 
-    template<typename T>
-    std::shared_ptr<T> createComponent(std::shared_ptr<T> component, std::string name = "") {
+    template<typename T, typename... Args>
+    T *createComponent(Args... args) {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
-        Component::Index::push_entity(component->classId(), component->id(), component);
-        identifier[component->id()] = name;
-        return component;
+
+        auto component = std::make_unique<T>(args...);
+        auto id = component->id();
+        Component::Index::push_entity(component->classId(), component->id(), std::move(component));
+
+        return id.data<T>();
     }
 
     template<typename T>

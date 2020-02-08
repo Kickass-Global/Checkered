@@ -50,7 +50,7 @@ namespace Engine {
                 T *instance,
                 void (T::*callback)(const Component::EventArgs<Args...> &)) {
 
-            std::shared_ptr<Component::EventHandler<Args...>> handler = Engine::createComponent<Component::EventHandler<Args...>>();
+            auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
             handler->callback = std::bind(callback, instance,
                                           std::placeholders::_1);
             return handler->id();
@@ -63,7 +63,7 @@ namespace Engine {
                 std::function<void(const Component::EventArgs<Args...> &)>
                 callback) {
 
-            std::shared_ptr<Component::EventHandler<Args...>> handler = Engine::createComponent<Component::EventHandler<Args...>>();
+            auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
             handler->callback = callback;
             return handler->id();
 

@@ -43,7 +43,7 @@ Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
  * this component.
  */
 Component::ClassId Component::ComponentId::classId() const {
-    auto meta = data();
+    auto meta = interface();
     return meta ? meta->classId() : Component::ClassId::None;
 }
 
@@ -52,7 +52,7 @@ void Component::ComponentId::attachExistingComponent(Component::ComponentId comp
 }
 
 void
-Component::ComponentId::destroyComponent(Component::ComponentId componentId) {
+Component::ComponentId::destroyComponent(Component::ComponentId componentId) const {
     Component::Index::removeComponent(*this, componentId);
 }
 
@@ -64,7 +64,7 @@ bool Component::ComponentId::hasChildComponent(const Component::ComponentId &com
     return Index::hasComponent(*this, componentId);
 }
 
-std::shared_ptr<Component::ComponentInterface>
-Component::ComponentId::data() const {
+Component::ComponentInterface *
+Component::ComponentId::interface() const {
     return Index::entityData<Component::ComponentInterface>(*this);
 }

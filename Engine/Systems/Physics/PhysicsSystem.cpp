@@ -3,9 +3,12 @@
 //
 
 #include <iostream>
+#include <GLFW/glfw3.h>
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
 #include "../../SystemCalls.h"
+#include "../Events/Events.h"
+#include "../../Components/physicshandler.hpp"
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -32,6 +35,8 @@ bool cIsVehicleInAir = true;
 
 static PxDefaultAllocator cDefaultAllocator;
 static PxDefaultErrorCallback cErrorCallback;
+
+std::map<physx::PxActor *, Component::ComponentId> trackedComponents;
 
 extern VehicleDesc initVehicleDesc();
 
@@ -85,6 +90,10 @@ VehicleDesc initVehicleDescription() {
 
 void Physics::PhysicsSystem::initialize() {
 
+    onKeyPressHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyPress);
+    onKeyDownHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyDown);
+    onKeyUpHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyUp);
+
     createFoundation();
     createPVD();
     createPhysicsObject();
@@ -93,6 +102,7 @@ void Physics::PhysicsSystem::initialize() {
     createGround();
     initVehicleSupport();
     createDrivableVehicle();
+
     std::cout << "Physics System Successfully Initalized" << std::endl;
 
 }
@@ -205,6 +215,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
     cScene->simulate(timestep);
     cScene->fetchResults(true);
+
+    auto t = cVehicle4w->getRigidDynamicActor()->getGlobalPose();
+    trackedComponents[cVehicle4w->getRigidDynamicActor()]
+            .attachExistingComponent(
+                    Engine::createComponent<Component::PhysicsPacket>(glm::vec3(t.p.x, t.p.y, t.p.z))->id());
 //    auto t = cVehicle4w->getRigidDynamicActor()->getGlobalPose();
 //    Engine::log(t);
 }
@@ -218,4 +233,21 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 std::ostream &physx::operator<<(std::ostream &out, const physx::PxTransform &transform) {
     out << transform.p.x << ", " << transform.p.y << ", " << transform.p.z;
     return out;
+}
+
+void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int> &args) {
+    Engine::log<module, Engine::Importance::low>("onKeyDown=", std::get<0>(args.values));
+}
+
+void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int> &args) {
+    Engine::log<module, Engine::Importance::low>("onKeyUp=", std::get<0>(args.values));
+}
+
+void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
+
+    auto key = std::get<0>(args.values);
+
+    if (key == GLFW_KEY_W) {
+        Engine::log(key, " acceleration");
+    }
 }
