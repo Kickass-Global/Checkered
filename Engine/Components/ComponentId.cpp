@@ -2,6 +2,8 @@
 // Created by root on 11/1/20.
 //
 
+#include <string>
+
 #include "ComponentId.h"
 #include "Index.h"
 #include "ComponentBase.h"

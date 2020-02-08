@@ -13,6 +13,8 @@
 #include "Systems/Input/InputSystem.h"
 #include "Systems/Camera/CameraSystem.h"
 #include "Systems/Pipeline/MeshLoader.h"
+#include "Systems/Physics/PhysicsSystem.h"
+
 
 #include "Components/GameObject.h"
 #include "Systems/Debug/LiveReloadSystem.h"
@@ -21,6 +23,8 @@
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/quaternion.hpp"
+
+
 
 #include "Components/ComponentId.h"
 #include "Components/Index.h"
