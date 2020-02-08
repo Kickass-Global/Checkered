@@ -21,6 +21,7 @@
 #include "SystemCalls.h"
 #include "Systems/systeminterface.hpp"
 
+
 namespace Component {
     template<typename... Args>
     class ComponentEvent;
@@ -37,7 +38,7 @@ namespace Engine {
     typedef float deltaTime;
 
     namespace {
-        char module[] = "Engine";
+        const char module[] = "Engine";
     }
 
     const std::vector<std::shared_ptr<Engine::SystemInterface>> &systems();
