@@ -6,13 +6,14 @@
 
 std::set<Component::ComponentId> Engine::EventSystem::registeredHandlers;
 
-void Engine::EventSystem::update(Engine::frametime) {
+void Engine::EventSystem::update(Engine::deltaTime) {
 
     // todo: combine EventArgs between updates so that handlers don't get showered with events. #optimization
 
     for (Component::ComponentId handler : registeredHandlers) {
 
-        std::set<Component::ComponentId> set = Component::Index::componentsOf(handler);
+        std::set<Component::ComponentId> set = Component::Index::componentsOf(
+                handler);
         for (Component::ComponentId eventArgs : set) {
 
             // I want to take all the data and pass it to the callback of the handler

@@ -1,0 +1,43 @@
+{
+  "entity": {
+    "name": "damagable-box-object",
+    "class-id": "gameobject",
+    "meta": [],
+    "components": [
+      {
+        "entity": {
+          "name": "box-model",
+          "class-id": "model",
+          "meta": [
+            {
+              "offset": 0,
+              "component-id": {
+                "class-id": "program",
+                "data": "Assets/Programs/basic.json"
+              }
+            }
+          ],
+          "data": "Assets/Meshes/box.obj",
+          "components": []
+        }
+      },
+      {
+        "entity": {
+          "name": "box-mesh",
+          "class-id": "mesh",
+          "meta": [
+            {
+              "offset": 0,
+              "component-id": {
+                "class-id": "program",
+                "data": "Assets/Programs/basic.json"
+              }
+            }
+          ],
+          "data": "Assets/Meshes/box.obj",
+          "components": []
+        }
+      }
+    ]
+  }
+}

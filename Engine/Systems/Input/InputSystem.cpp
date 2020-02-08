@@ -20,9 +20,10 @@ void Input::InputSystem::keyHandler(GLFWwindow *, int key, int, int action, int)
         onKeyPress(key);
         onKeyUp(key);
     }
-    if (action == GLFW_PRESS)
-    {
+    if (action == GLFW_PRESS) {
         Engine::log<module, Engine::Importance::low>("onKeyDown: ", key);
         onKeyDown(key);
     }
 }
+
+void Input::InputSystem::update(Engine::deltaTime) {}

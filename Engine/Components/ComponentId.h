@@ -7,6 +7,7 @@
 
 #include <ostream>
 #include <memory>
+#include "Index.h"
 
 namespace Component {
 
@@ -18,8 +19,11 @@ namespace Component {
         Camera = 0xBEEF0000,
         Shader,
         Mesh,
+        Model,
         GameObject,
         Dirty,
+        Damage,
+        Transform,
         Program,
         Event,
         EventArgs,
@@ -28,9 +32,12 @@ namespace Component {
         None = 0xFFFFFFFF
     };
 
+
     struct ComponentId {
 
         unsigned int id;
+
+        static Component::Index index;
 
         ComponentId();
         ComponentId(const ComponentId& other);
@@ -40,7 +47,7 @@ namespace Component {
 
         explicit ComponentId(bool) noexcept;
 
-        bool operator < (const ComponentId& other) const;
+        bool operator<(const ComponentId &other) const;
 
         [[nodiscard]] std::shared_ptr<ComponentInterface> data() const;
 
@@ -49,7 +56,16 @@ namespace Component {
         template<typename T>
         [[nodiscard]] std::shared_ptr<T> data() const;
 
-        friend std::ostream& operator<<(std::ostream& out, const Component::ComponentId& id);
+        friend std::ostream &
+        operator<<(std::ostream &out, const Component::ComponentId &id);
+
+        void attachExistingComponent(Component::ComponentId componentId) const;
+
+        void destroyComponent(Component::ComponentId componentId);
+
+        std::set<Component::ComponentId> childComponentsOfClass
+                (Component::ClassId classId) const;
+
     };
 
     template<typename T>

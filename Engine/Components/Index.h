@@ -37,22 +37,31 @@ namespace Component {
         }
 
         template<typename T>
-        static void replace_component_data(Component::ComponentId id, std::shared_ptr<T> &data) {
-            
+        static void replace_component_data(Component::ComponentId id,
+                                           std::shared_ptr<T> &data) {
+
             data->clone(id);
             meta[id] = data;
 
         }
 
-        static const std::set<Component::ComponentId> &entitiesOf(Component::ClassId cid);
+        static const std::set<Component::ComponentId> &
+        entitiesOf(Component::ClassId cid);
 
-        static const std::set<Component::ComponentId> &componentsOf(Component::ComponentId id);
+        static std::set<Component::ComponentId> Component::Index::componentsOf
+                (Component::ComponentId id, Component::ClassId classId);
 
-        static bool hasComponent(Component::ComponentId id, Component::ComponentId componentId);
+        static const std::set<Component::ComponentId> &
+        componentsOf(Component::ComponentId id);
 
-        static void addComponent(Component::ComponentId eid, Component::ComponentId cid);
+        static bool hasComponent(Component::ComponentId id,
+                                 Component::ComponentId componentId);
 
-        static void removeComponent(Component::ComponentId eid, Component::ComponentId cid);
+        static void
+        addComponent(Component::ComponentId eid, Component::ComponentId cid);
+
+        static void
+        removeComponent(Component::ComponentId eid, Component::ComponentId cid);
 
         template<class T>
         static std::shared_ptr<T> entityData(const Component::ComponentId &componentId) {
