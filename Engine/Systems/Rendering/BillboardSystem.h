@@ -9,6 +9,7 @@
 #include "Component.h"
 #include "Dirty.h"
 #include "Rendering.h"
+#include "Engine.h"
 
 namespace Rendering {
 

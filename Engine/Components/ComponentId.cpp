@@ -7,7 +7,7 @@
 #include "ComponentId.h"
 #include "Index.h"
 #include "ComponentBase.h"
-#include "../Engine.h"
+#include "Engine.h"
 
 unsigned int Component::next_id = 0xFEED0000;
 

@@ -8,6 +8,7 @@
 #include "../../Components/Dirty.h"
 #include "../../Components/Camera.h"
 #include "../../Components/SceneComponent.h"
+#include "Engine.h"
 
 Component::ComponentEvent<int, int>
         Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
@@ -243,7 +244,7 @@ Rendering::Program::~Program() {
 }
 
 void Rendering::Program::bind() {
-    Engine::log<module, Engine::Importance::low>("Binding program ", m_id);
+    Engine::log<module, Engine::low>("Binding program ", m_id);
     glUseProgram(m_id);
 }
 
