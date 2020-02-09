@@ -21,6 +21,8 @@ namespace Component {
         Mesh,
         Model,
         GameObject,
+        SceneComponent,
+        PhysicsPacket,
         Dirty,
         Damage,
         Transform,
@@ -37,8 +39,6 @@ namespace Component {
 
         unsigned int id;
 
-        static Component::Index index;
-
         ComponentId();
         ComponentId(const ComponentId& other);
         ComponentId(bool, unsigned int) noexcept;
@@ -49,29 +49,26 @@ namespace Component {
 
         bool operator<(const ComponentId &other) const;
 
-        [[nodiscard]] std::shared_ptr<ComponentInterface> data() const;
-
+        [[nodiscard]] ComponentInterface *interface() const;
         [[nodiscard]] Component::ClassId classId() const;
-
         template<typename T>
-        [[nodiscard]] std::shared_ptr<T> data() const;
+        [[nodiscard]] T *data() const;
 
         friend std::ostream &
         operator<<(std::ostream &out, const Component::ComponentId &id);
-
         void attachExistingComponent(Component::ComponentId componentId) const;
-
-        void destroyComponent(Component::ComponentId componentId);
+        void destroyComponent(Component::ComponentId componentId) const;
+        void destroyComponentsOfType(Component::ClassId classId) const;
 
         ComponentId parent() { return Component::Index::parentOf(*this); }
-
         [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
                 (Component::ClassId classId) const;
+        [[nodiscard]] bool hasChildComponent(const Component::ComponentId &componentId) const;
 
     };
 
     template<typename T>
-    std::shared_ptr<T> Component::ComponentId::data() const {
+    T *Component::ComponentId::data() const {
         return Index::entityData<T>(*this);
     }
 

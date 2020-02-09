@@ -13,7 +13,7 @@
 
 namespace Component {
     namespace {
-        char module[] = "Component";
+        const char module[] = "Component";
     }
 }
 

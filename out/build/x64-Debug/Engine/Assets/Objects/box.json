@@ -1,6 +1,26 @@
 {
   "entity": {
-    "mesh": "Assets/Meshes/box.obj",
-    "shader": "Assets/Programs/basic.json"
+    "name": "box-object",
+    "class-id": "gameobject",
+    "meta": [],
+    "components": [
+      {
+        "entity": {
+          "name": "box-mesh",
+          "class-id": "mesh",
+          "meta": [
+            {
+              "offset": 0,
+              "component-id": {
+                "class-id": "program",
+                "data": "Assets/Programs/basic.json"
+              }
+            }
+          ],
+          "data": "Assets/Meshes/box.obj",
+          "components": []
+        }
+      }
+    ]
   }
 }

@@ -8,11 +8,13 @@
 #include <map>
 #include <set>
 #include <memory>
+#include <any>
 
 namespace Component {
     struct ComponentId;
     enum class ClassId : unsigned int;
-    class CopmonentInterface;
+
+    class ComponentInterface;
 }
 
 namespace Component {
@@ -23,14 +25,14 @@ namespace Component {
 
         static std::map<Component::ComponentId, std::set<Component::ComponentId>> entityComponents;
         static std::map<Component::ClassId, std::set<Component::ComponentId>> entities;
-        static std::map<Component::ComponentId, std::shared_ptr<void>> meta;
+        static std::map<Component::ComponentId, std::unique_ptr<Component::ComponentInterface>> meta;
 
     public:
 
         template<typename T>
-        static void push_entity(Component::ClassId cid, Component::ComponentId id, std::shared_ptr<T> &data) {
+        static void push_entity(Component::ClassId cid, Component::ComponentId id, std::unique_ptr<T> &data) {
 
-            meta[id] = data;
+            meta.emplace(id, std::move(data));
             entities[cid].emplace(id);
             entityComponents[id] = {};
 
@@ -38,7 +40,7 @@ namespace Component {
 
         template<typename T>
         static void replace_component_data(Component::ComponentId id,
-                                           std::shared_ptr<T> &data) {
+                                           std::unique_ptr<T> &data) {
 
             data->clone(id);
             meta[id] = data;
@@ -67,13 +69,11 @@ namespace Component {
         removeComponent(Component::ComponentId eid, Component::ComponentId cid);
 
         template<class T>
-        static std::shared_ptr<T>
-        entityData(const Component::ComponentId &componentId) {
+        static T *entityData(const Component::ComponentId &componentId) {
             auto it = meta.find(componentId);
 
-            if (it == meta.end()) return nullptr;
-            
-            return std::static_pointer_cast<T>(it->second);
+            auto result = it == meta.end() ? nullptr : (T *) it->second.get();
+            return result;
         }
     };
 

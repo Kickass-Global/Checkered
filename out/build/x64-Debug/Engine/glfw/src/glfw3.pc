@@ -1,7 +1,7 @@
-prefix=D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/install/x64-Debug
+prefix=C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug
 exec_prefix=${prefix}
-includedir=D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/install/x64-Debug/include
-libdir=D:/Downloads/Checkered-fb95f6775088bfb0eb94d80a722e5209e296e96f/out/install/x64-Debug/lib
+includedir=C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug/include
+libdir=C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug/lib
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input

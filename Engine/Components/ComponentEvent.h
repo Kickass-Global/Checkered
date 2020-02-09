@@ -62,9 +62,10 @@ namespace Component {
 
         for (Component::ComponentId listener : subscribers) {
 
-            auto eventArgs = std::make_shared<EventArgs<Args...>>(args...);
-            Index::push_entity(eventArgs->classId(), eventArgs->id(), eventArgs);
-            listener.data()->attachComponent(eventArgs->id());
+            auto eventArgs = std::make_unique<EventArgs<Args...>>(args...);
+            auto id = eventArgs->id();
+            Index::push_entity(eventArgs->classId(), eventArgs->id(), std::move(eventArgs));
+            listener.attachExistingComponent(id);
 
         }
     }
