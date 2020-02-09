@@ -15,7 +15,8 @@ namespace Pipeline {
     class MeshLoader {
     public:
 
-        static std::shared_ptr<Component::Mesh> load(std::string filename) {
+        static Component::Mesh *load(std::string filename) {
+
             if (Library::contains(filename)) {
                 Engine::log<module>("Using resource from library ", filename);
                 return Library::at(filename).data<Component::Mesh>();
@@ -67,7 +68,7 @@ namespace Pipeline {
             }
 
             Library::emplace(filename, mesh.id());
-            return std::make_shared<Component::Mesh>(mesh);
+            return Engine::addComponent(std::make_unique<Component::Mesh>(mesh));
         }
 	};
 

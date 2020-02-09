@@ -9,6 +9,8 @@
 #include <PxPhysicsAPI.h>
 
 #include "glm/gtx/transform.hpp"
+#include "Systems/Component/scenecomponentsystem.hpp"
+#include "Systems/systeminterface.hpp"
 
 int main() {
 
@@ -16,37 +18,35 @@ int main() {
 
     auto running = true;
 
-    Engine::addSystem(std::make_shared<Physics::PhysicsSystem>());
-
-    Engine::addSystem(std::make_shared<Engine::DamageSystem>());
-    auto renderingSystem = std::make_shared<Rendering::RenderingSystem>();
-    Engine::addSystem(renderingSystem);
-
-    auto liveReloadSystem = std::make_shared<Debug::LiveReloadSystem>();
-    Engine::addSystem(liveReloadSystem);
-
-    auto inputSystem = std::make_shared<Input::InputSystem>();
-    Engine::addSystem(inputSystem);
+    auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
+    Engine::addSystem<Component::SceneComponentSystem>();
+    Engine::addSystem<Engine::DamageSystem>();
+    auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
+    auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
+    auto inputSystem = Engine::addSystem<Input::InputSystem>();
 
     // hookup inputs from current window
-    inputSystem->initialize(renderingSystem->getWindow());
+    inputSystem.initialize(renderingSystem.getWindow());
 
     // hookup key press event with camera system
-    auto cameraSystem = std::make_shared<Camera::CameraSystem>();
-    Engine::addSystem(cameraSystem);
-    Engine::addSystem(std::make_shared<Engine::EventSystem>());
+    auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
+    Engine::addSystem<Engine::EventSystem>();
 
-    Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
-    Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
-    Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
+    Input::InputSystem::onKeyPress += cameraSystem.onKeyPressHandler;
+    Input::InputSystem::onKeyDown += cameraSystem.onKeyDownHandler;
+    Input::InputSystem::onKeyUp += cameraSystem.onKeyUpHandler;
 
-    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
+    Input::InputSystem::onKeyPress += physicsSystem.onKeyPressHandler;
+    Input::InputSystem::onKeyDown += physicsSystem.onKeyDownHandler;
+    Input::InputSystem::onKeyUp += physicsSystem.onKeyUpHandler;
 
-    auto damage_object = Engine::createComponent<Component::GameObject>("object");
-    damage_object->worldTransform = glm::translate(
-            glm::vec3(0.0f, 0.0f, 100.0f));
+    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
 
-    auto damage_model = Engine::createComponent<Component::Model>("model");
+    auto damage_object = Engine::createComponent<Component::SceneComponent>();
+    damage_object->m_localTransform = glm::translate(
+            glm::vec3(0.0f, 0.0f, -10.0f));
+
+    auto damage_model = Engine::createComponent<Component::Model>();
 
     auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_0.obj", Component::ClassId::Mesh);
     auto sphere_1_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_1.obj", Component::ClassId::Mesh);
@@ -77,10 +77,11 @@ int main() {
     damage_model->parts[0].variations.push_back(Component::Model::Variation{300000, sphere_3_mesh});
     damage_model->id().attachExistingComponent(Component::Dirty::id());
 
-    damage_object->id().attachExistingComponent(sphere_0_mesh);
     damage_object->id().attachExistingComponent(damage_model->id());
     damage_object->id().attachExistingComponent(Component::Dirty::id());
     damage_object->id().attachExistingComponent(Component::Visible::id());
+
+    physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
 
     std::function<void(const Component::EventArgs<int> &)> onKeyPress
             = [damage_model](auto &args) {
@@ -101,7 +102,6 @@ int main() {
 
     auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
     Input::InputSystem::onKeyPress += debugHandler;
-
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
@@ -125,5 +125,6 @@ int main() {
 
         start = end;
         end = std::chrono::high_resolution_clock::now();
+
     }
 }

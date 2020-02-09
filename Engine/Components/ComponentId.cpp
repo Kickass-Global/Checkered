@@ -12,7 +12,7 @@
 unsigned int Component::next_id = 0xFEED0000;
 
 std::ostream &Component::operator<<(std::ostream &out, const Component::ClassId &id) {
-    return out << (int)id;
+    return out << (int) id;
 }
 
 Component::ComponentId::ComponentId(const Component::ComponentId &other) {
@@ -34,7 +34,7 @@ std::ostream &Component::operator<<(std::ostream &out, const Component::Componen
 
 Component::ComponentId::ComponentId(bool) noexcept : id(Component::next_id++) {}
 
-Component::ComponentId::ComponentId() : id(0xFFFFFFFFu) {        }
+Component::ComponentId::ComponentId() : id(0xFFFFFFFFu) {}
 
 Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
 
@@ -43,7 +43,7 @@ Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
  * this component.
  */
 Component::ClassId Component::ComponentId::classId() const {
-    auto meta = data();
+    auto meta = interface();
     return meta ? meta->classId() : Component::ClassId::None;
 }
 
@@ -52,7 +52,7 @@ void Component::ComponentId::attachExistingComponent(Component::ComponentId comp
 }
 
 void
-Component::ComponentId::destroyComponent(Component::ComponentId componentId) {
+Component::ComponentId::destroyComponent(Component::ComponentId componentId) const {
     Component::Index::removeComponent(*this, componentId);
 }
 
@@ -60,7 +60,15 @@ std::set<Component::ComponentId> Component::ComponentId::childComponentsOfClass(
     return Index::componentsOf(*this, classId);
 }
 
-std::shared_ptr<Component::ComponentInterface>
-Component::ComponentId::data() const {
+bool Component::ComponentId::hasChildComponent(const Component::ComponentId &componentId) const {
+    return Index::hasComponent(*this, componentId);
+}
+
+Component::ComponentInterface *
+Component::ComponentId::interface() const {
     return Index::entityData<Component::ComponentInterface>(*this);
+}
+void Component::ComponentId::destroyComponentsOfType(Component::ClassId classId) const {
+    auto components = Index::componentsOf(*this, classId);
+    for (const auto &component : components) { destroyComponent(component); }
 }

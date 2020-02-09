@@ -18,6 +18,7 @@
 #include "../../Engine.h"
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
+#include "../../Components/ComponentEvent.h"
 
 
 using namespace physx;
@@ -32,6 +33,13 @@ namespace Physics {
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
 
+        Component::ComponentId onKeyPressHandler;
+        Component::ComponentId onKeyDownHandler;
+        Component::ComponentId onKeyUpHandler;
+
+        physx::PxActor *getVehicleActor();
+
+        void link(Component::ComponentId sceneComponent, physx::PxActor *actor);
     private:
         void createFoundation();
         void createPhysicsObject();
@@ -42,7 +50,16 @@ namespace Physics {
         void initVehicleSupport();
         void createDrivableVehicle();
         void stepPhysics(Engine::deltaTime);
+
+        void onKeyDown(const Component::EventArgs<int> &args);
+        void onKeyUp(const Component::EventArgs<int> &args);
+        void onKeyPress(const Component::EventArgs<int> &args);
     };
+
+}
+
+namespace physx {
+    std::ostream &operator<<(std::ostream &out, const PxTransform &transform);
 }
 
 #endif //ENGINE_PHYSICSSYSTEM_H

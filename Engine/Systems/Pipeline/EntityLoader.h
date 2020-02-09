@@ -51,7 +51,7 @@ namespace Pipeline {
     }
 
     template<class T>
-    void load_meta_data(const json &config, std::shared_ptr<T> data);
+    void load_meta_data(const json &config, T &data);
     void load_components(const json &config, Component::ComponentId entity);
 }
 

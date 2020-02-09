@@ -12,7 +12,8 @@
 
 namespace Component {
 
-class WorldTransform : public Component::ComponentBase<Component::ClassId::Transform> {
+
+    class WorldTransform : public Component::ComponentBase<Component::ClassId::Transform> {
 public:
     glm::mat4 world_matrix{1};
 };
