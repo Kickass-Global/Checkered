@@ -77,9 +77,11 @@ namespace Engine {
 
     template<typename T>
     std::shared_ptr<T> replaceComponent(Component::ComponentId id, std::shared_ptr<T> component) {
+
         Component::Index::replace_component_data(id, component);
         auto result = Component::Index::entityData<T>(id);
         return result;
+
     }
 }
 

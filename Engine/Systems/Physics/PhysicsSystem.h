@@ -37,6 +37,9 @@ namespace Physics {
         Component::ComponentId onKeyDownHandler;
         Component::ComponentId onKeyUpHandler;
 
+        physx::PxActor *getVehicleActor();
+
+        void link(Component::ComponentId sceneComponent, physx::PxActor *actor);
     private:
         void createFoundation();
         void createPhysicsObject();
@@ -47,8 +50,6 @@ namespace Physics {
         void initVehicleSupport();
         void createDrivableVehicle();
         void stepPhysics(Engine::deltaTime);
-
-        void link(Component::ComponentId sceneComponent) {}
 
         void onKeyDown(const Component::EventArgs<int> &args);
         void onKeyUp(const Component::EventArgs<int> &args);

@@ -10,6 +10,7 @@
 #include "../../Components/Dirty.h"
 #include "../../Components/SceneComponent.h"
 #include "../../Components/Component.h"
+#include "../../Components/physicshandler.hpp"
 
 void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
@@ -23,18 +24,22 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
         auto physicsUpdates = sceneComponent.childComponentsOfClass(Component::ClassId::PhysicsPacket);
         auto has_physics_update = !physicsUpdates.empty();
 
+        auto meta = sceneComponent.data<Component::SceneComponent>();
+
         if (has_physics_update) {
 
-            Engine::log("Performing physics update #", sceneComponent);
+            //Engine::log("Performing physics update #", sceneComponent);
             // todo something here.
-
+            auto translation = physicsUpdates.begin()->data<Component::PhysicsPacket>()->position;
+            meta->m_localTransform = glm::translate(translation);
         }
+
+        for (const auto &update : physicsUpdates) sceneComponent.destroyComponent(update);
 
         if (is_dirty) {
 
             Engine::log("Updating scene component worldTransform #", sceneComponent);
 
-            auto meta = sceneComponent.data<Component::SceneComponent>();
             auto transform = meta->getWorldTransform();
 
             auto meshes = sceneComponent.childComponentsOfClass(Component::ClassId::Mesh);
@@ -46,6 +51,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
                 auto worldTransform = Engine::createComponent<Component::WorldTransform>();
                 worldTransform->world_matrix = transform;
                 mesh.attachExistingComponent(worldTransform->id());
+                mesh.attachExistingComponent(Component::Dirty::id());
 
             }
 
@@ -57,7 +63,9 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
                 auto worldTransform = Engine::createComponent<Component::WorldTransform>();
                 worldTransform->world_matrix = transform;
+                model.destroyComponentsOfType(Component::ClassId::Transform);
                 model.attachExistingComponent(worldTransform->id());
+                model.attachExistingComponent(Component::Dirty::id());
 
             }
         }

@@ -81,6 +81,8 @@ int main() {
     damage_object->id().attachExistingComponent(Component::Dirty::id());
     damage_object->id().attachExistingComponent(Component::Visible::id());
 
+    physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
+
     std::function<void(const Component::EventArgs<int> &)> onKeyPress
             = [damage_model](auto &args) {
 
