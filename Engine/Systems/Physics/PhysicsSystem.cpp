@@ -9,6 +9,8 @@
 #include "../../SystemCalls.h"
 #include "../Events/Events.h"
 #include "../../Components/physicshandler.hpp"
+#include "snippetvehiclecommon/SnippetVehicleTireFriction.h"
+#include "../../Components/Dirty.h"
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -17,6 +19,60 @@ const float GRAVITY = -9.81;
 const float STATIC_FRICTION = 0.5F;
 const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.6f;
+
+PxVehicleDrivableSurfaceToTireFrictionPairs *cFrictionPairs = NULL;
+
+PxF32 cSteerVsForwardSpeedData[2 * 8] =
+        {
+                0.0f, 0.75f,
+                5.0f, 0.75f,
+                30.0f, 0.125f,
+                120.0f, 0.1f,
+                PX_MAX_F32, PX_MAX_F32,
+                PX_MAX_F32, PX_MAX_F32,
+                PX_MAX_F32, PX_MAX_F32,
+                PX_MAX_F32, PX_MAX_F32
+        };
+PxFixedSizeLookupTable<8> cSteerVsForwardSpeedTable(cSteerVsForwardSpeedData,
+                                                    4);
+
+PxVehicleKeySmoothingData cKeySmoothingData =
+        {
+                {
+                        6.0f,    //rise rate eANALOG_INPUT_ACCEL
+                        6.0f,    //rise rate eANALOG_INPUT_BRAKE
+                        6.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+                        2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+                        2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+                },
+                {
+                        10.0f,    //fall rate eANALOG_INPUT_ACCEL
+                        10.0f,    //fall rate eANALOG_INPUT_BRAKE
+                        10.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
+                        5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+                        5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+                }
+        };
+
+PxVehiclePadSmoothingData cPadSmoothingData =
+        {
+                {
+                        6.0f,    //rise rate eANALOG_INPUT_ACCEL
+                        6.0f,    //rise rate eANALOG_INPUT_BRAKE
+                        6.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+                        2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+                        2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+                },
+                {
+                        10.0f,    //fall rate eANALOG_INPUT_ACCEL
+                        10.0f,    //fall rate eANALOG_INPUT_BRAKE
+                        10.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
+                        5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+                        5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+                }
+        };
+
+PxVehicleDrive4WRawInputData cVehicleInputData;
 
 PxFoundation *cFoundation = NULL;
 PxPhysics *cPhysics = NULL;
@@ -164,12 +220,16 @@ void Physics::PhysicsSystem::createGround() {
 void Physics::PhysicsSystem::initVehicleSupport() {
 
     cVehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, 1,
-                                                             WheelSceneQueryPreFilterBlocking, NULL, cDefaultAllocator);
+                                                             WheelSceneQueryPreFilterBlocking, nullptr,
+                                                             cDefaultAllocator);
     cBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *cVehicleSceneQueryData, cScene);
 
     PxInitVehicleSDK(*cPhysics);
     PxVehicleSetBasisVectors(PxVec3(0, 1, 0), PxVec3(0, 0, 1));
     PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
+
+    cFrictionPairs = createFrictionPairs(cMaterial);
+
 }
 
 void Physics::PhysicsSystem::createDrivableVehicle() {
@@ -178,7 +238,7 @@ void Physics::PhysicsSystem::createDrivableVehicle() {
 
 
     cVehicle4w = createVehicle4W(vehicleDesc, cPhysics, cCooking);
-    PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 1.0f), 0),
+    PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
                                PxQuat(PxIdentity));
     cVehicle4w->getRigidDynamicActor()->setGlobalPose(startTransform);
 
@@ -193,7 +253,9 @@ void Physics::PhysicsSystem::createDrivableVehicle() {
 //CHANGE WHEN YOU HAVE MORE VEHICLES
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
-    //todo update control inputs
+    PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
+            cKeySmoothingData, cSteerVsForwardSpeedTable, cVehicleInputData,
+            timestep, cIsVehicleInAir, *cVehicle4w);
 
     //raycasts
     PxVehicleWheels *vehicles[1] = {cVehicle4w};
@@ -206,22 +268,27 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     //vehicle update
     const PxVec3 grav = cScene->getGravity();
     PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-    PxVehicleWheelQueryResult vehicleQueryResult[1] = {{wheelQueryResults, cVehicle4w->mWheelsSimData.getNbWheels()}};
+    PxVehicleWheelQueryResult vehicleQueryResults[1] = {{wheelQueryResults, cVehicle4w->mWheelsSimData.getNbWheels()}};
+
+    PxVehicleUpdates(0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, 1, vehicles, vehicleQueryResults);
 
     //workout if vehicle is in air
-    cIsVehicleInAir = cVehicle4w->getRigidDynamicActor()->isSleeping() ? false
-                                                                       : PxVehicleIsInAir(
-                    vehicleQueryResult[0]);
+    cIsVehicleInAir = cVehicle4w->getRigidDynamicActor()->isSleeping()
+                      ? false
+                      : PxVehicleIsInAir(vehicleQueryResults[0]);
 
-    cScene->simulate(timestep);
+
+    cScene->simulate(0.0001 + timestep / 1000.0f);
     cScene->fetchResults(true);
 
     auto t = cVehicle4w->getRigidDynamicActor()->getGlobalPose();
     trackedComponents[cVehicle4w->getRigidDynamicActor()]
             .attachExistingComponent(
                     Engine::createComponent<Component::PhysicsPacket>(glm::vec3(t.p.x, t.p.y, t.p.z))->id());
-//    auto t = cVehicle4w->getRigidDynamicActor()->getGlobalPose();
-//    Engine::log(t);
+    trackedComponents[cVehicle4w->getRigidDynamicActor()]
+            .attachExistingComponent(Component::Dirty::id());
+
+    Engine::log(t);
 }
 
 
@@ -249,5 +316,12 @@ void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
 
     if (key == GLFW_KEY_W) {
         Engine::log(key, " acceleration");
+        cVehicleInputData.setDigitalAccel(true);
     }
+}
+void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxActor *actor) {
+    trackedComponents.emplace(actor, sceneComponent);
+}
+physx::PxActor *Physics::PhysicsSystem::getVehicleActor() {
+    return cVehicle4w->getRigidDynamicActor();
 }

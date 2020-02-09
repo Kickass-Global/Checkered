@@ -58,6 +58,8 @@ namespace Component {
         operator<<(std::ostream &out, const Component::ComponentId &id);
         void attachExistingComponent(Component::ComponentId componentId) const;
         void destroyComponent(Component::ComponentId componentId) const;
+        void destroyComponentsOfType(Component::ClassId classId) const;
+
         ComponentId parent() { return Component::Index::parentOf(*this); }
         [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
                 (Component::ClassId classId) const;
