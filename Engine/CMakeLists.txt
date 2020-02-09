@@ -40,10 +40,17 @@ set(SRC main.cpp main.h
         Systems/Events/Events.cpp Systems/Events/Events.h
         Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h
         ${PHYSX_SNIPPETS}
-        Systems/Pipeline/pipeline.cpp Systems/Pipeline/pipeline.hpp Systems/Damage/damagesystem.cpp Systems/Damage/damagesystem.hpp Components/damage.cpp Components/damage.hpp Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp Systems/Component/scenecomponentsystem.hpp Components/physicshandler.cpp Components/physicshandler.hpp)
+        Systems/Pipeline/pipeline.cpp
+        Systems/Pipeline/pipeline.hpp
+        Systems/Damage/damagesystem.cpp
+        Systems/Damage/damagesystem.hpp
+        Components/damage.cpp Components/damage.hpp
+        Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp
+        Systems/Component/scenecomponentsystem.hpp Components/physicshandler.cpp
+        Components/physicshandler.hpp)
 
 # Add source to this project's executable.
-add_executable (Engine
+add_executable(Engine
         ${GLAD}
         ${SRC})
 
@@ -52,19 +59,19 @@ set_property(TARGET Engine PROPERTY CMAKE_CXX_STANDARD_REQUIRED ON)
 
 macro(remove_flag_from_target _target _flag)
     get_target_property(_target_cxx_flags ${_target} COMPILE_OPTIONS)
-    if(_target_cxx_flags)
+    if (_target_cxx_flags)
         list(REMOVE_ITEM _target_cxx_flags ${_flag})
         set_target_properties(${_target} PROPERTIES COMPILE_OPTIONS "${_target_cxx_flags}")
-    endif()
+    endif ()
 endmacro()
 
 
-if(MSVC)
+if (MSVC)
     remove_flag_from_target(Engine /W3)
     target_compile_options(Engine PRIVATE /W3)
-else()
+else ()
     target_compile_options(Engine PRIVATE -Wall -Wextra -pedantic)
-endif()
+endif ()
 
 
 # GAME ASSETS
@@ -106,6 +113,8 @@ configure_file("../dlls/glut32.dll" glut32.dll COPYONLY)
 find_package(OpenGL REQUIRED)
 
 target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
+        PRIVATE "Components"
+        PRIVATE "Systems"
         SYSTEM PRIVATE "../Include/PhysX/include"
         SYSTEM PRIVATE "../Include/PhysX/source/foundation/include"
         SYSTEM PRIVATE "../Include/PxShared/include"
