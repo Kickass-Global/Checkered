@@ -4,13 +4,14 @@
 
 #include <iostream>
 #include <GLFW/glfw3.h>
+
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
-#include "../../SystemCalls.h"
-#include "../Events/Events.h"
-#include "../../Components/physicshandler.hpp"
+#include "Events/Events.h"
+#include "physicshandler.hpp"
 #include "snippetvehiclecommon/SnippetVehicleTireFriction.h"
-#include "../../Components/Dirty.h"
+#include "Dirty.h"
+#include "Engine.h"
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -303,11 +304,11 @@ std::ostream &physx::operator<<(std::ostream &out, const physx::PxTransform &tra
 }
 
 void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::Importance::low>("onKeyDown=", std::get<0>(args.values));
+    Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
 }
 
 void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::Importance::low>("onKeyUp=", std::get<0>(args.values));
+    Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
 }
 
 void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {

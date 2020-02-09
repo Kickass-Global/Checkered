@@ -9,14 +9,13 @@ set(GLAD ../Include/glad/src/glad.c)
 file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
 
 set(SRC main.cpp main.h
-        Engine.cpp Engine.h
+        Systems/Engine.cpp Systems/Engine.h
         Components/Index.cpp Components/Index.h
         Components/Dirty.cpp Components/Dirty.h
         Components/Mesh.cpp Components/Mesh.h
         Components/SceneComponent.cpp Components/SceneComponent.h
         Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h
         Components/ComponentBase.h Components/ComponentBase.cpp
-        SystemCalls.cpp SystemCalls.h
         Systems/Physics/PhysicsSystem.cpp Systems/Physics/PhysicsSystem.h
         Systems/Rendering/RenderingSystem.cpp Systems/Rendering/RenderingSystem.h
         Systems/Rendering/RenderingBatch.h Systems/Rendering/RenderingBatch.cpp

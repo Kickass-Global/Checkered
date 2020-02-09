@@ -11,6 +11,7 @@
 #include "glm/gtx/transform.hpp"
 #include "Systems/Component/scenecomponentsystem.hpp"
 #include "Systems/systeminterface.hpp"
+#include "Engine.h"
 
 int main() {
 
@@ -109,22 +110,23 @@ int main() {
 
     // setup a game clock
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto end = start;
+    using namespace std::chrono;
+
+    typedef duration<float> fmilli; // define this to get float values;
+    auto start = high_resolution_clock::now();
+    auto end = start + milliseconds(1); // do this so physx doesn't complain
 
     while (running) {
 
-        deltaTime elapsed =
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start
-                ).count();
+        fmilli delta = end - start;
+        deltaTime elapsed = duration_cast<milliseconds>(delta).count();
 
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);
         }
 
         start = end;
-        end = std::chrono::high_resolution_clock::now();
+        end = high_resolution_clock::now();
 
     }
 }

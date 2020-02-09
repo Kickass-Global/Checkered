@@ -19,13 +19,12 @@
 #include "../../main.h"
 #include "../../Components/ComponentId.h"
 #include "../../Components/Camera.h"
-#include "../../SystemCalls.h"
 #include "../../Systems/systeminterface.hpp"
 #include "../../Components/Index.h"
 #include "../../Components/Dirty.h"
 #include "../../Components/ComponentEvent.h"
 #include "../../Components/EventHandler.h"
-#include "../../Engine.h"
+#include "Engine.h"
 #include "../Events/Events.h"
 
 
@@ -112,7 +111,7 @@ namespace Camera {
 
                 //if camera view matrix has changed mark it as dirty
                 Component::Index::addComponent(camera, Component::Dirty::id());
-                Engine::log<module, Engine::Importance::low>("Marking Camera ", camera, " dirty");
+                Engine::log<module, Engine::low>("Marking Camera ", camera, " dirty");
                 
                 x = 0;
                 y = 0;
@@ -123,7 +122,7 @@ namespace Camera {
 
         void onWindowSizeChanged(const Component::EventArgs<int,int>& args) {
 
-            Engine::log<module, Engine::Importance::low>(
+            Engine::log<module, Engine::low>(
                     "onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
 
             auto&& width = std::get<0>(args.values);
@@ -140,17 +139,17 @@ namespace Camera {
         }
 
         void onKeyDown(const Component::EventArgs<int>& args) {
-            Engine::log<module, Engine::Importance::low>("onKeyDown=", std::get<0>(args.values));
+            Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
             keys.emplace(std::get<int>(args.values));
         }
 
         void onKeyUp(const Component::EventArgs<int>& args) {
-            Engine::log<module, Engine::Importance::low>("onKeyUp=", std::get<0>(args.values));
+            Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
             keys.erase(std::get<int>(args.values));
         }
 
         void onKeyPress(const Component::EventArgs<int>& args) {
-            Engine::log<module, Engine::Importance::low>("onKeyPress=", std::get<0>(args.values));
+            Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
         }
 
     };

@@ -17,6 +17,7 @@
 #include "MeshLoader.h"
 #include "pipeline.hpp"
 #include "Library.h"
+#include "Engine.h"
 
 using json = nlohmann::json;
 

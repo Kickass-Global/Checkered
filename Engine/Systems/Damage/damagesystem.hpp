@@ -9,8 +9,7 @@
 #include <numeric>
 #include <algorithm>
 
-#include "../../Engine.h"
-#include "../../SystemCalls.h"
+#include "Engine.h"
 #include "../../Components/damage.hpp"
 #include "../../Components/EventHandler.h"
 #include "../Events/Events.h"
@@ -41,7 +40,7 @@ class DamageSystem : public Engine::SystemInterface {
 
             const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
             auto has_transform = !transform.empty();
-            Engine::assertLog(has_transform, "Checking model has a world transform");
+            assertLog(has_transform, "Checking model has a world transform");
 
             if (is_dirty) {
                 Engine::log("Updating dirty model#", model);
@@ -97,7 +96,7 @@ class DamageSystem : public Engine::SystemInterface {
 
                 if (it != part.variations.end()) {
                     auto previous = part.active_variation;
-                    part.active_variation = it - part.variations.begin();
+                    part.active_variation = static_cast<int>(it - part.variations.begin());
 
                     auto&& mesh = part.variations[part.active_variation].mesh;
 

@@ -5,8 +5,6 @@
 #ifndef ENGINE_RENDERING_H
 #define ENGINE_RENDERING_H
 
-#include "SystemCalls.h"
-
 namespace Rendering {
 
     namespace {

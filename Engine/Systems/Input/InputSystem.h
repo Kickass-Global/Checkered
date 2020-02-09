@@ -8,7 +8,6 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "../../main.h"
-#include "../../SystemCalls.h"
 #include "../../Components/ComponentEvent.h"
 #include "../../Systems/systeminterface.hpp"
 #include <memory>

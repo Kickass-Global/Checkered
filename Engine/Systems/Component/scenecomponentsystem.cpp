@@ -6,11 +6,11 @@
 #include <set>
 
 #include "scenecomponentsystem.hpp"
-#include "../../SystemCalls.h"
 #include "../../Components/Dirty.h"
 #include "../../Components/SceneComponent.h"
 #include "../../Components/Component.h"
 #include "../../Components/physicshandler.hpp"
+#include "Engine.h"
 
 void Component::SceneComponentSystem::update(Engine::deltaTime) {
 

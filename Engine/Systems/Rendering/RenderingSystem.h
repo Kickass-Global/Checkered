@@ -9,6 +9,7 @@
 #include "../../Components/Component.h"
 #include "../../Systems/systeminterface.hpp"
 #include "RenderingBatch.h"
+#include "Engine.h"
 
 #include <GLFW/glfw3.h>
 #include <string>
@@ -61,7 +62,7 @@ namespace Rendering {
                 Engine::log<module>(
                         std::string(infoLog.begin(), infoLog.end()));
             }
-			Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
+            Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
 
             for(auto&& shader : shaders) glDetachShader(m_id, shader->id());
         }
