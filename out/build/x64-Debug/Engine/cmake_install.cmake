@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-    set(CMAKE_INSTALL_PREFIX "C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug")
+  set(CMAKE_INSTALL_PREFIX "C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -32,10 +32,10 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+if (NOT CMAKE_INSTALL_LOCAL_ONLY)
     # Include the install script for each subdirectory.
     include("C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/glfw/cmake_install.cmake")
     include("C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/Assets/cmake_install.cmake")
 
-endif()
+endif ()
 

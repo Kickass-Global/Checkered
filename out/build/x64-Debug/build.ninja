@@ -98,7 +98,7 @@ build cmake_object_order_depends_target_Engine: phony || cmake_object_order_depe
 
 build Engine\CMakeFiles\Engine.dir\__\Include\glad\src\glad.c.obj: C_COMPILER__Engine ..\..\..\Include\glad\src\glad.c || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1   /W3
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\__\Include\glad\src
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -106,7 +106,7 @@ build Engine\CMakeFiles\Engine.dir\__\Include\glad\src\glad.c.obj: C_COMPILER__E
 
 build Engine\CMakeFiles\Engine.dir\main.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\main.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -114,7 +114,7 @@ build Engine\CMakeFiles\Engine.dir\main.cpp.obj: CXX_COMPILER__Engine ..\..\..\E
 
 build Engine\CMakeFiles\Engine.dir\Engine.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Engine.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -122,7 +122,7 @@ build Engine\CMakeFiles\Engine.dir\Engine.cpp.obj: CXX_COMPILER__Engine ..\..\..
 
 build Engine\CMakeFiles\Engine.dir\Components\Index.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Index.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -130,7 +130,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Index.cpp.obj: CXX_COMPILER__Engin
 
 build Engine\CMakeFiles\Engine.dir\Components\Dirty.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Dirty.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -138,7 +138,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Dirty.cpp.obj: CXX_COMPILER__Engin
 
 build Engine\CMakeFiles\Engine.dir\Components\Mesh.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Mesh.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -146,7 +146,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Mesh.cpp.obj: CXX_COMPILER__Engine
 
 build Engine\CMakeFiles\Engine.dir\Components\SceneComponent.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\SceneComponent.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -154,7 +154,7 @@ build Engine\CMakeFiles\Engine.dir\Components\SceneComponent.cpp.obj: CXX_COMPIL
 
 build Engine\CMakeFiles\Engine.dir\Systems\Debug\LiveReloadSystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Debug\LiveReloadSystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Debug
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -162,7 +162,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Debug\LiveReloadSystem.cpp.obj: CXX_C
 
 build Engine\CMakeFiles\Engine.dir\Components\ComponentBase.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\ComponentBase.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -170,7 +170,7 @@ build Engine\CMakeFiles\Engine.dir\Components\ComponentBase.cpp.obj: CXX_COMPILE
 
 build Engine\CMakeFiles\Engine.dir\SystemCalls.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\SystemCalls.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -178,7 +178,7 @@ build Engine\CMakeFiles\Engine.dir\SystemCalls.cpp.obj: CXX_COMPILER__Engine ..\
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\PhysicsSystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\PhysicsSystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -186,7 +186,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\PhysicsSystem.cpp.obj: CXX_CO
 
 build Engine\CMakeFiles\Engine.dir\Systems\Rendering\RenderingSystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Rendering\RenderingSystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Rendering
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -194,7 +194,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Rendering\RenderingSystem.cpp.obj: CX
 
 build Engine\CMakeFiles\Engine.dir\Systems\Rendering\RenderingBatch.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Rendering\RenderingBatch.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Rendering
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -202,7 +202,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Rendering\RenderingBatch.cpp.obj: CXX
 
 build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\ShaderLoader.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Pipeline\ShaderLoader.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Pipeline
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -210,7 +210,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\ShaderLoader.cpp.obj: CXX_CO
 
 build Engine\CMakeFiles\Engine.dir\Systems\Camera\CameraSystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Camera\CameraSystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Camera
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -218,7 +218,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Camera\CameraSystem.cpp.obj: CXX_COMP
 
 build Engine\CMakeFiles\Engine.dir\Systems\Input\InputSystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Input\InputSystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Input
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -226,7 +226,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Input\InputSystem.cpp.obj: CXX_COMPIL
 
 build Engine\CMakeFiles\Engine.dir\Components\Shader.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Shader.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -234,7 +234,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Shader.cpp.obj: CXX_COMPILER__Engi
 
 build Engine\CMakeFiles\Engine.dir\Components\ComponentId.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\ComponentId.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -242,7 +242,7 @@ build Engine\CMakeFiles\Engine.dir\Components\ComponentId.cpp.obj: CXX_COMPILER_
 
 build Engine\CMakeFiles\Engine.dir\Components\Camera.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Camera.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -250,7 +250,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Camera.cpp.obj: CXX_COMPILER__Engi
 
 build Engine\CMakeFiles\Engine.dir\Components\Plane.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Plane.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -258,7 +258,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Plane.cpp.obj: CXX_COMPILER__Engin
 
 build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\EntityLoader.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Pipeline\EntityLoader.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Pipeline
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -266,7 +266,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\EntityLoader.cpp.obj: CXX_CO
 
 build Engine\CMakeFiles\Engine.dir\Components\Model.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Model.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -274,7 +274,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Model.cpp.obj: CXX_COMPILER__Engin
 
 build Engine\CMakeFiles\Engine.dir\Components\Vehicle.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Vehicle.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -282,7 +282,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Vehicle.cpp.obj: CXX_COMPILER__Eng
 
 build Engine\CMakeFiles\Engine.dir\Components\EventHandler.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\EventHandler.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -290,7 +290,7 @@ build Engine\CMakeFiles\Engine.dir\Components\EventHandler.cpp.obj: CXX_COMPILER
 
 build Engine\CMakeFiles\Engine.dir\Components\ComponentEvent.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\ComponentEvent.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -298,7 +298,7 @@ build Engine\CMakeFiles\Engine.dir\Components\ComponentEvent.cpp.obj: CXX_COMPIL
 
 build Engine\CMakeFiles\Engine.dir\Systems\Rendering\BillboardSystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Rendering\BillboardSystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Rendering
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -306,7 +306,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Rendering\BillboardSystem.cpp.obj: CX
 
 build Engine\CMakeFiles\Engine.dir\Components\Billboard.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\Billboard.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -314,7 +314,7 @@ build Engine\CMakeFiles\Engine.dir\Components\Billboard.cpp.obj: CXX_COMPILER__E
 
 build Engine\CMakeFiles\Engine.dir\Systems\Events\Events.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Events\Events.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Events
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -322,7 +322,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Events\Events.cpp.obj: CXX_COMPILER__
 
 build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\Library.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Pipeline\Library.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Pipeline
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -330,7 +330,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\Library.cpp.obj: CXX_COMPILE
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetutils\SnippetUtils.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetutils\SnippetUtils.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetutils
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -338,7 +338,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetutils\SnippetUtils.cpp
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehicle4w\SnippetVehicle4W.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehicle4w\SnippetVehicle4W.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehicle4w
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -346,7 +346,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehicle4w\SnippetVehic
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehicle4w\SnippetVehicle4WRender.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehicle4w\SnippetVehicle4WRender.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehicle4w
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -354,7 +354,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehicle4w\SnippetVehic
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicle4WCreate.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicle4WCreate.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -362,7 +362,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicleCreate.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicleCreate.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -370,7 +370,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicleFilterShader.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicleFilterShader.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -378,7 +378,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicleNoDriveCreate.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicleNoDriveCreate.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -386,7 +386,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicleSceneQuery.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicleSceneQuery.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -394,7 +394,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicleTankCreate.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicleTankCreate.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -402,7 +402,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetVehicleTireFriction.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetvehiclecommon\SnippetVehicleTireFriction.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -410,7 +410,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetvehiclecommon\SnippetV
 
 build Engine\CMakeFiles\Engine.dir\Components\damage.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\damage.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -418,7 +418,7 @@ build Engine\CMakeFiles\Engine.dir\Components\damage.cpp.obj: CXX_COMPILER__Engi
 
 build Engine\CMakeFiles\Engine.dir\Components\physicshandler.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Components\physicshandler.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Components
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -426,7 +426,7 @@ build Engine\CMakeFiles\Engine.dir\Components\physicshandler.cpp.obj: CXX_COMPIL
 
 build Engine\CMakeFiles\Engine.dir\Systems\Component\scenecomponentsystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Component\scenecomponentsystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Component
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -434,7 +434,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Component\scenecomponentsystem.cpp.ob
 
 build Engine\CMakeFiles\Engine.dir\Systems\Damage\damagesystem.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Damage\damagesystem.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Damage
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -442,7 +442,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Damage\damagesystem.cpp.obj: CXX_COMP
 
 build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetcommon\ClassicMain.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Physics\snippetcommon\ClassicMain.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetcommon
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
@@ -450,7 +450,7 @@ build Engine\CMakeFiles\Engine.dir\Systems\Physics\snippetcommon\ClassicMain.cpp
 
 build Engine\CMakeFiles\Engine.dir\Systems\Pipeline\pipeline.cpp.obj: CXX_COMPILER__Engine ..\..\..\Engine\Systems\Pipeline\pipeline.cpp || cmake_object_order_depends_target_Engine
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1   /W3 -std:c++17
-  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
+  INCLUDES = -I..\..\..\Include\glfw-3.3.1\include -I..\..\..\Engine\Components -I..\..\..\Engine\Systems -I..\..\..\Engine\SYSTEM -I..\..\..\Engine\..\Include\PhysX\include -I..\..\..\Engine\..\Include\PhysX\source\foundation\include -I..\..\..\Engine\..\Include\PxShared\include -I..\..\..\Engine\..\Include\include -I..\..\..\Engine\..\Include\glminclude -I..\..\..\Engine\..\Include\assimp\include -I..\..\..\Engine\..\Include\glad\include
   OBJECT_DIR = Engine\CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\Engine.dir\Systems\Pipeline
   TARGET_COMPILE_PDB = Engine\CMakeFiles\Engine.dir\
