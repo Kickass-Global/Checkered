@@ -82,20 +82,11 @@ namespace Rendering {
 
     public:
 
-        Component::ComponentId onBillboardModifiedHandler;
-
         static Component::ComponentEvent<int, int> onWindowSizeChanged;
 
         void initialize() override;
 
         static void windowSizeHandler(GLFWwindow* /*window*/, int width, int height);
-
-        void onBillboardModified(const Component::EventArgs<Component::ComponentId>& args)
-        {
-            auto& billboard = std::get<0>(args.values);
-            Engine::log<module>("onBillboardModified=", billboard);
-            buffer(*billboard.data<Component::Mesh>());
-        }
 
         GLFWwindow* getWindow();
 

@@ -12,6 +12,10 @@
 #include "../../Components/physicshandler.hpp"
 #include "Engine.h"
 
+namespace {
+    const char module[] = "ComponentSystem";
+}
+
 void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
     // Go through every SceneComponent in the scene and update its transformation matrix, then update each component
@@ -38,7 +42,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
         if (is_dirty) {
 
-            Engine::log("Updating scene component worldTransform #", sceneComponent);
+            Engine::log<module>("Updating scene component worldTransform #", sceneComponent);
 
             auto transform = meta->getWorldTransform();
 
@@ -46,12 +50,11 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
             for (const auto &mesh : meshes) {
 
-                Engine::log("Updating attached component world transform #", mesh);
+                Engine::log<module>("Updating attached component world transform #", mesh);
 
                 auto worldTransform = Engine::createComponent<Component::WorldTransform>();
                 worldTransform->world_matrix = transform;
                 mesh.attachExistingComponent(worldTransform->id());
-                mesh.attachExistingComponent(Component::Dirty::id());
 
             }
 
@@ -65,7 +68,6 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
                 worldTransform->world_matrix = transform;
                 model.destroyComponentsOfType(Component::ClassId::Transform);
                 model.attachExistingComponent(worldTransform->id());
-                model.attachExistingComponent(Component::Dirty::id());
 
             }
         }

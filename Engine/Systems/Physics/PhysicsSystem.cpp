@@ -21,6 +21,10 @@ const float STATIC_FRICTION = 0.5F;
 const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.6f;
 
+namespace {
+    const char module[] = "Physics";
+}
+
 PxVehicleDrivableSurfaceToTireFrictionPairs *cFrictionPairs = NULL;
 
 PxF32 cSteerVsForwardSpeedData[2 * 8] =

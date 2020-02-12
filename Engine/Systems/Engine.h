@@ -43,7 +43,9 @@ namespace Engine {
 
     typedef float deltaTime;
 
-    extern const char module[];
+    namespace {
+        const char module[] = "Engine";
+    }
 
     /**
      * Returns collection of systems currently running in the engine.
@@ -114,7 +116,7 @@ namespace Engine {
 
     struct Name {
         std::string value;
-        explicit Name(const char *module) : value(module) {}
+        explicit Name(const char *module_name) : value(module_name) {}
     };
 
     std::ostream &operator<<(std::ostream &out, Name name);
@@ -125,7 +127,7 @@ namespace Engine {
      * @param test the condition to test.
      * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
      */
-    template<char const *m>
+    template<char const *m = module>
     void assertLog(bool test, std::string msg) {
 
         auto result = test ? "SUCCEEDED" : "FAILED";
@@ -135,8 +137,6 @@ namespace Engine {
             exit(-1);
         }
     }
-
-    void assertLog(bool test, std::string msg);
 
     enum Importance {
         low,
@@ -148,11 +148,13 @@ namespace Engine {
 
     template<char const *m = module, Importance importance = medium, class ... Ts>
     void log(Ts...args) {
-        if (importance >= loggingLevel) {
-            std::cout << Name(m);
-            (std::cout << ... << args);
-            std::cout << std::endl;
-        }
+#if _DEBUG
+//        if (importance >= loggingLevel) {
+//            std::cout << Name(m);
+//            (std::cout << ... << args);
+//            std::cout << std::endl;
+//        }
+#endif
     }
 
 }
