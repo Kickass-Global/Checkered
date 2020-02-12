@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/seed/Documents/GitHub/Checkered/Include/glfw-3.3.1/src
+# Install script for directory: C:/Users/root/source/repos/Checkered/Include/glfw-3.3.1/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Users/seed/Documents/GitHub/Checkered/out/install/x64-Debug")
+  set(CMAKE_INSTALL_PREFIX "C:/Users/root/Source/Repos/Checkered/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,6 +33,6 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/Engine/glfw/src/glfw3.lib")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/root/source/repos/Checkered/out/build/x64-Debug/Engine/glfw/src/glfw3.lib")
 endif()
 

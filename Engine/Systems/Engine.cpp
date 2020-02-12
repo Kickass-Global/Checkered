@@ -8,7 +8,7 @@
 #include "EventHandler.h"
 #include "Events/Events.h"
 
-const char Engine::module[] = "Engine";
+//const char Engine::module[] = "Engine";
 
 std::vector<std::unique_ptr<Engine::SystemInterface>> Engine::registeredSystems;
 
@@ -33,9 +33,7 @@ std::ostream &operator<<(std::ostream &out, Engine::Name name) {
 
     return out << std::setw(width) << buff.str();
 }
-void assertLog(bool test, std::string msg) {
-    Engine::assertLog<Engine::module>(test, msg);
-}
+
 std::map<Component::ComponentId, std::string> Engine::identifier;
 
 std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
@@ -49,8 +47,4 @@ std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
     buff << "] ";
 
     return out << std::setw(width) << buff.str();
-}
-
-void Engine::assertLog(bool test, std::string msg) {
-    assertLog<module>(test, msg);
 }

@@ -10,8 +10,11 @@
 #include "../../Components/SceneComponent.h"
 #include "Engine.h"
 
-Component::ComponentEvent<int, int>
-        Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
+Component::ComponentEvent<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
+
+namespace {
+    const char module[] = "RenderingSystem";
+}
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
@@ -21,7 +24,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glfwSetWindowTitle(window, title.c_str());
 
     // Find and update any GameObjects with meshes that should be drawn...
-    for (const Component::ComponentId& mesh : Component::Index::entitiesOf(Component::ClassId::Mesh)) {
+    for (const Component::ComponentId &mesh : Component::Index::entitiesOf(Component::ClassId::Mesh)) {
 
         auto is_dirty = Component::Index::hasComponent(
                 mesh,
@@ -45,10 +48,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         }
 
         auto transforms = mesh.childComponentsOfClass(Component::ClassId::Transform);
+        auto is_instanced = !transforms.empty();
 
         if (is_visible && is_dirty) {
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
-            Engine::log<module>("Streaming in component#", mesh);
+            Engine::log("Streaming in component#", mesh);
 
             auto classId = mesh.classId();
             auto data = mesh.data<Component::Mesh>();
@@ -57,7 +61,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
                 if (classId == Component::ClassId::Mesh) {
                     buffer(*data);
-                    Engine::log<module>("Adding instance transform#", transform);
+                    Engine::log("Adding instance transform#", transform);
                     updateInstanceData(
                             mesh,
                             sizeof(glm::mat4),
@@ -67,6 +71,19 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
             mesh.destroyComponent(Component::Dirty::id());
 
+        }
+        if(is_instanced)
+        {
+            auto classId = mesh.classId();
+            for (auto &&transform : transforms) {
+                if (classId == Component::ClassId::Mesh) {
+                    Engine::log("Adding instance transform#", transform);
+                    updateInstanceData(
+                            mesh,
+                            sizeof(glm::mat4),
+                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix));
+                }
+            }
         }
         for (auto &transform : transforms) {
             mesh.destroyComponent(transform);
@@ -79,8 +96,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
     for (auto &&batch : batches) {
 
-        if(!batch->details.empty())
-        {
+        if (!batch->details.empty()) {
             for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
@@ -219,9 +235,6 @@ void Rendering::RenderingSystem::initialize() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    onBillboardModifiedHandler = Engine::EventSystem::createHandler(
-            this, &RenderingSystem::onBillboardModified
-    );
 }
 
 void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, int size, float *data) {

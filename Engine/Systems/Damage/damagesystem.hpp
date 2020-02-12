@@ -20,6 +20,7 @@
 
 namespace Engine {
 
+
 class DamageSystem : public Engine::SystemInterface {
 
     void initialize() override {
@@ -37,6 +38,7 @@ class DamageSystem : public Engine::SystemInterface {
             auto &&meta = model.data<Component::Model>();
 
             const bool is_dirty = model.hasChildComponent(Component::Dirty::id());
+            model.destroyComponent(Component::Dirty::id());
 
             const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
             auto has_transform = !transform.empty();
@@ -98,7 +100,7 @@ class DamageSystem : public Engine::SystemInterface {
                     auto previous = part.active_variation;
                     part.active_variation = static_cast<int>(it - part.variations.begin());
 
-                    auto&& mesh = part.variations[part.active_variation].mesh;
+                    auto &&mesh = part.variations[part.active_variation].mesh;
 
                     mesh.attachExistingComponent(Component::Visible::id());
                     mesh.attachExistingComponent(*transform.begin());
@@ -106,8 +108,10 @@ class DamageSystem : public Engine::SystemInterface {
                     auto variation_changed = part.active_variation != previous;
 
                     if (variation_changed) {
-                        Engine::log("Updating variation#",
-                                    part.active_variation);
+                        Engine::log(
+                                "Updating variation#",
+                                part.active_variation
+                        );
                         mesh.attachExistingComponent(Component::Dirty::id());
                     }
 

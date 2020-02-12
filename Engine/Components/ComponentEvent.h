@@ -2,6 +2,7 @@
 // Created by root on 17/1/20.
 //
 
+#pragma once
 #ifndef ENGINE_COMPONENTEVENT_H
 #define ENGINE_COMPONENTEVENT_H
 
@@ -11,7 +12,7 @@
 #include <tuple>
 
 #include "Component.h"
-#include "../Systems/Events/Events.h"
+#include "Events/Events.h"
 
 namespace Component {
 
@@ -55,6 +56,11 @@ namespace Component {
         void operator+=(Component::ComponentId subscriber);
     };
 
+    /**
+     * Invokes the event, passing the arguments to all subscribers.
+     * @tparam Args The types of the arguments to pass to subscribers
+     * @param args The arguments to pass to subscribers
+     */
     template<typename... Args>
     void ComponentEvent<Args...>::operator()(Args... args) {
 
@@ -64,12 +70,17 @@ namespace Component {
 
             auto eventArgs = std::make_unique<EventArgs<Args...>>(args...);
             auto id = eventArgs->id();
-            Index::push_entity(eventArgs->classId(), eventArgs->id(), std::move(eventArgs));
-            listener.attachExistingComponent(id);
+            auto classId = eventArgs->classId();
 
+            Index::push_entity(classId, id, std::move(eventArgs));
+            listener.attachExistingComponent(id);
         }
     }
 
+    /**
+     * Adds a new subscriber to this event.
+     * @param subscriber the subscribing component.
+     */
     template<typename... Args>
     void ComponentEvent<Args...>::operator+=(Component::ComponentId subscriber) {
 
@@ -80,6 +91,10 @@ namespace Component {
 
     }
 
+    /**
+     * Creates a new component event.
+     * @param name the name of the component event.
+     */
     template<typename... Args>
     ComponentEvent<Args...>::ComponentEvent(std::string name) {
         Engine::nameComponent(id(), name);

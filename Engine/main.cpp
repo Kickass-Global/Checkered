@@ -15,6 +15,7 @@
 
 int main() {
 
+    // region initialize engine systems
     using namespace Engine;
 
     auto running = true;
@@ -42,6 +43,9 @@ int main() {
     Input::InputSystem::onKeyUp += physicsSystem.onKeyUpHandler;
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
+    //endregion
+
+    //region setup damage model for player vehicle
 
     auto damage_object = Engine::createComponent<Component::SceneComponent>();
     damage_object->m_localTransform = glm::translate(
@@ -84,6 +88,9 @@ int main() {
 
     physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
 
+    //endregion
+
+    // region setup keyPress callback for debugging purposes
     std::function<void(const Component::EventArgs<int> &)> onKeyPress
             = [damage_model](auto &args) {
 
@@ -104,29 +111,33 @@ int main() {
     auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
     Input::InputSystem::onKeyPress += debugHandler;
 
+    // endregion
+
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
     camera->id().attachExistingComponent(Component::Dirty::id());
 
-    // setup a game clock
-
+    // region initialize game-clocks
     using namespace std::chrono;
-
     typedef duration<float> fmilli; // define this to get float values;
     auto start = high_resolution_clock::now();
     auto end = start + milliseconds(1); // do this so physx doesn't complain
+    // endregion
 
     while (running) {
 
+        // region before update
         fmilli delta = end - start;
         deltaTime elapsed = duration_cast<milliseconds>(delta).count();
+        // endregion
 
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);
         }
 
+        // region after update
         start = end;
         end = high_resolution_clock::now();
-
+        //endregion
     }
 }
