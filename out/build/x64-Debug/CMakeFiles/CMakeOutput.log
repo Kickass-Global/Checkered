@@ -1,4 +1,4 @@
-The system is: Windows - 10.0.18362 - AMD64
+The system is: Windows - 10.0.17763 - AMD64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.24.28314/bin/HostX86/x64/cl.exe 
 Build flags: 
@@ -21,7 +21,7 @@ Compilation of the C compiler identification source "CMakeCCompilerId.c" produce
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.obj"
 
-The C compiler identification is MSVC, found in "C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/CMakeFiles/3.15.19101501-MSVC_2/CompilerIdC/CMakeCCompilerId.exe"
+The C compiler identification is MSVC, found in "D:/GameProject/out/build/x64-Debug/CMakeFiles/3.15.19101501-MSVC_2/CompilerIdC/CMakeCCompilerId.exe"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.24.28314/bin/HostX86/x64/cl.exe 
@@ -45,37 +45,37 @@ Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" p
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.obj"
 
-The CXX compiler identification is MSVC, found in "C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/CMakeFiles/3.15.19101501-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.exe"
+The CXX compiler identification is MSVC, found in "D:/GameProject/out/build/x64-Debug/CMakeFiles/3.15.19101501-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.exe"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: D:/GameProject/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_c26be && [1/2] Building C object CMakeFiles\cmTC_c26be.dir\testCCompiler.c.obj
-[2/2] Linking C executable cmTC_c26be.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_4996f && [1/2] Building C object CMakeFiles\cmTC_4996f.dir\testCCompiler.c.obj
+[2/2] Linking C executable cmTC_4996f.exe
 
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: D:/GameProject/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_43283 && [1/2] Building C object CMakeFiles\cmTC_43283.dir\CMakeCCompilerABI.c.obj
-[2/2] Linking C executable cmTC_43283.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_c7a54 && [1/2] Building C object CMakeFiles\cmTC_c7a54.dir\CMakeCCompilerABI.c.obj
+[2/2] Linking C executable cmTC_c7a54.exe
 
 
 
 Determining if the CXX compiler works passed with the following output:
-Change Dir: C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: D:/GameProject/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_6c33f && [1/2] Building CXX object CMakeFiles\cmTC_6c33f.dir\testCXXCompiler.cxx.obj
-[2/2] Linking CXX executable cmTC_6c33f.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_8eef5 && [1/2] Building CXX object CMakeFiles\cmTC_8eef5.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_8eef5.exe
 
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: C:/Users/seed/Documents/GitHub/Checkered/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: D:/GameProject/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_2abe5 && [1/2] Building CXX object CMakeFiles\cmTC_2abe5.dir\CMakeCXXCompilerABI.cpp.obj
-[2/2] Linking CXX executable cmTC_2abe5.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_608cd && [1/2] Building CXX object CMakeFiles\cmTC_608cd.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_608cd.exe
 
 
 
