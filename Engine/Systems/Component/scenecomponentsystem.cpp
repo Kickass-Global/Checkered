@@ -34,8 +34,9 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
             //Engine::log("Performing physics update #", sceneComponent);
             // todo something here.
-            auto translation = physicsUpdates.begin()->data<Component::PhysicsPacket>()->position;
-            meta->m_localTransform = glm::translate(translation);
+            auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
+            auto translation = physx_data->position;
+            meta->m_localTransform = glm::translate(translation) * glm::mat4_cast(physx_data->rotation);
         }
 
         for (const auto &update : physicsUpdates) sceneComponent.destroyComponent(update);
