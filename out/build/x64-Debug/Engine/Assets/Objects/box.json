@@ -11,10 +11,7 @@
           "meta": [
             {
               "offset": 0,
-              "component-id": {
-                "class-id": "program",
-                "data": "Assets/Programs/basic.json"
-              }
+              "component-id": {"class-id": "program", "data": "Assets/Programs/basic.json"}
             }
           ],
           "data": "Assets/Meshes/box.obj",
