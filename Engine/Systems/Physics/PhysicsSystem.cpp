@@ -26,6 +26,7 @@ namespace {
 	const char module[] = "Physics";
 }
 
+std::vector<PxVehicleDrive4W*> vehicles;
 
 PxVehicleDrivableSurfaceToTireFrictionPairs* cFrictionPairs = NULL;
 
@@ -245,7 +246,9 @@ void Physics::PhysicsSystem::createDrivableVehicle() {
 
 	VehicleDesc vehicleDesc = initVehicleDescription();
 
-	cVehicle4w = createVehicle4W(vehicleDesc, cPhysics, cCooking);
+	vehicles.push_back(createVehicle4W(vehicleDesc, cPhysics, cCooking));
+	cVehicle4w = vehicles.back();
+
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
 		PxQuat(PxIdentity));
     cVehicle4w->getRigidDynamicActor()->setGlobalPose(startTransform);
@@ -263,11 +266,14 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
     PxVehicleDrive4W *pxVehicle;
     VehicleDesc vehicleDesc = initVehicleDescription();
 
-    pxVehicle = createVehicle4W(vehicleDesc, cPhysics, cCooking);
+
+	vehicles.push_back(createVehicle4W(vehicleDesc, cPhysics, cCooking));
+	pxVehicle = vehicles.back();
+
     PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
                                PxQuat(PxIdentity));
 
-    pxVehicle->getRigidDynamicActor()->setGlobalPose(worldTransform * startTransform);
+    pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
 
     cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
@@ -281,35 +287,43 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 //CHANGE WHEN YOU HAVE MORE VEHICLES
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
-    PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
-            cKeySmoothingData, cSteerVsForwardSpeedTable, cVehicleInputData,
-            timestep, cIsVehicleInAir, *cVehicle4w);
 
-    //raycasts
-    PxVehicleWheels *vehicles[1] = {cVehicle4w};
-	PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(
-		0);
-	const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
-	PxVehicleSuspensionRaycasts(cBatchQuery, 1, vehicles, raycastResultsSize,
-		raycastResults);
+	for (auto& vehicle : Component::Index::entitiesOf(Component::ClassId::Vehicle))
+	{
+		auto meta = vehicle.data<Component::Vehicle>();
 
-	//vehicle update
-	const PxVec3 grav = cScene->getGravity();
-	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, cVehicle4w->mWheelsSimData.getNbWheels()} };
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
+			cKeySmoothingData, cSteerVsForwardSpeedTable, cVehicleInputData,
+			timestep, cIsVehicleInAir, *meta->pxVehicle);
 
-	PxVehicleUpdates(0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, 1, vehicles, vehicleQueryResults);
+		// todo replace all the following structs with the ones in the meta...
 
-	//workout if vehicle is in air
-	cIsVehicleInAir = cVehicle4w->getRigidDynamicActor()->isSleeping()
-		? false
-		: PxVehicleIsInAir(vehicleQueryResults[0]);
+		//raycasts
+		PxVehicleWheels *vehicles[1] = { meta->pxVehicle };
+		PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(
+			0);
+		const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
+		PxVehicleSuspensionRaycasts(cBatchQuery, 1, vehicles, raycastResultsSize,
+			raycastResults);
 
+		//vehicle update
+		const PxVec3 grav = cScene->getGravity();
+		PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+		PxVehicleWheelQueryResult vehicleQueryResults[1] = { {wheelQueryResults, meta->pxVehicle->mWheelsSimData.getNbWheels()} };
+
+		PxVehicleUpdates(0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, 1, vehicles, vehicleQueryResults);
+
+		//workout if vehicle is in air
+		cIsVehicleInAir = meta->pxVehicle->getRigidDynamicActor()->isSleeping()
+			? false
+			: PxVehicleIsInAir(vehicleQueryResults[0]);
+
+
+	}
+	// send the objects transform into the engine ...
 
 	cScene->simulate(0.0001 + timestep / 1000.0f);
 	cScene->fetchResults(true);
-
-	// send the objects transform into the engine ...
 
 	for(auto& [actor, component]: trackedComponents)
 	{
@@ -364,7 +378,7 @@ void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
 
 void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args) {
     auto vehicleComponent = std::get<0>(args.values);
-    auto pxVehicle = createDrivableVehicle(PxTransform());
+    auto pxVehicle = createDrivableVehicle(PxTransform(0,-1,5));
 
     vehicleComponent.data<Component::Vehicle>()->pxVehicle = pxVehicle;
 

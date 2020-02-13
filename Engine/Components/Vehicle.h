@@ -16,11 +16,11 @@ namespace Component {
 
     class Vehicle : public Component::ComponentBase<Component::ClassId::Vehicle> {
     public:
-        ComponentId model;
-        ComponentId input;
+		ComponentId model{};
+		ComponentId input{};
 
-        physx::PxVehicleDrive4W *pxVehicle;
-        physx::PxVehicleDrivableSurfaceToTireFrictionPairs *pxFrictionPairs;
+		physx::PxVehicleDrive4W *pxVehicle = nullptr;
+		physx::PxVehicleDrivableSurfaceToTireFrictionPairs *pxFrictionPairs = nullptr;
         physx::PxReal pxSteerVsForwardSpeedData[16];
         physx::PxFixedSizeLookupTable<8> pxSteerVsForwardSpeedTable;
         physx::PxVehicleKeySmoothingData pxKeySmoothingData;

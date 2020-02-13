@@ -103,6 +103,7 @@ class DamageSystem : public Engine::SystemInterface {
                     auto &&mesh = part.variations[part.active_variation].mesh;
 
                     mesh.attachExistingComponent(Component::Visible::id());
+
 					if(has_transform)
 						mesh.attachExistingComponent(*transform.begin());
 
