@@ -308,21 +308,64 @@ std::ostream &physx::operator<<(std::ostream &out, const physx::PxTransform &tra
 }
 
 void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
-}
-
-void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
-}
-
-void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
-
+    Engine::log<module, Engine::Importance::low>("onKeyDown=", std::get<0>(args.values));
+    
     auto key = std::get<0>(args.values);
+
+    //cVehicle4w->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 
     if (key == GLFW_KEY_W) {
         Engine::log(key, " acceleration");
         cVehicleInputData.setDigitalAccel(true);
     }
+
+    
+
+    if (key == GLFW_KEY_S) {
+        Engine::log(key, "brake");
+        cVehicleInputData.setDigitalBrake(true);
+
+    }
+
+    /*
+    if (key == GLFW_KEY_S && cVehicle4w->computeForwardSpeed() <= 0.0f  ) {
+        Engine::log(key, "reverse");
+
+        cVehicle4w->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+
+        cVehicleInputData.setDigitalAccel(true);
+    }*/
+
+    if (key == GLFW_KEY_A) {
+        Engine::log(key, "steer left");
+        //cVehicleInputData.setDigitalAccel(true);
+        cVehicleInputData.setDigitalSteerRight(true);
+    }
+
+    if (key == GLFW_KEY_D) {
+        Engine::log(key, "steer right");
+       // cVehicleInputData.setDigitalAccel(true);
+        cVehicleInputData.setDigitalSteerLeft(true);
+
+    }
+
+}
+
+void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int> &args) {
+    Engine::log<module, Engine::Importance::low>("onKeyUp=", std::get<0>(args.values));
+
+    cVehicleInputData.setDigitalAccel(false);
+    cVehicleInputData.setDigitalBrake(false);
+    cVehicleInputData.setDigitalSteerLeft(false);
+    cVehicleInputData.setDigitalSteerRight(false);
+    cVehicleInputData.setDigitalHandbrake(false);
+
+    
+}
+
+void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
+
+    
 }
 void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxActor *actor) {
     trackedComponents.emplace(actor, sceneComponent);
