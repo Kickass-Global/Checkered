@@ -2,11 +2,14 @@
 // Created by root on 11/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_COMPONENTID_H
 #define ENGINE_COMPONENTID_H
 
 #include <ostream>
 #include <memory>
+
 #include "Index.h"
 
 namespace Component {
@@ -25,6 +28,7 @@ namespace Component {
         PhysicsPacket,
         Dirty,
         Damage,
+        Vehicle,
         Transform,
         Program,
         Event,
@@ -37,7 +41,7 @@ namespace Component {
 
     struct ComponentId {
 
-        static const int nullid = 0xffffffffu;
+        static const int Null = 0xffffffffu;
 
         unsigned int id;
 
@@ -52,23 +56,27 @@ namespace Component {
         bool operator<(const ComponentId &other) const;
 
         operator bool() const noexcept {
-            return id != nullid;
+            return id != Null;
         }
 
         [[nodiscard]] ComponentInterface *base() const;
         [[nodiscard]] Component::ClassId classId() const;
+
         template<typename T>
         [[nodiscard]] T *data() const;
 
         friend std::ostream &
         operator<<(std::ostream &out, const Component::ComponentId &id);
+
         void attachExistingComponent(Component::ComponentId componentId) const;
         void destroyComponent(Component::ComponentId componentId) const;
         void destroyComponentsOfType(Component::ClassId classId) const;
 
         ComponentId parent() { return Component::Index::parentOf(*this); }
+
         [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
                 (Component::ClassId classId) const;
+
         [[nodiscard]] bool hasChildComponent(const Component::ComponentId &componentId) const;
 
     };

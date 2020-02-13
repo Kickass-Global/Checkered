@@ -2,6 +2,8 @@
 // Created by root on 11/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_CAMERA_H
 #define ENGINE_CAMERA_H
 

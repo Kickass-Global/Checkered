@@ -51,7 +51,7 @@ set(SRC main.cpp main.h
         Systems/soundSystem/sound.h
         Systems/hornSystem/hornSystem.cpp
         Systems/hornSystem/hornSystem.h
-        )
+        Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine

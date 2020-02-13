@@ -1,6 +1,7 @@
 //
 // Created by root on 9/1/20.
 //
+#pragma once
 
 #ifndef ENGINE_PHYSICSSYSTEM_H
 #define ENGINE_PHYSICSSYSTEM_H
@@ -33,6 +34,7 @@ namespace Physics {
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
 
+        Component::ComponentId onVehicleCreatedHandler;
         Component::ComponentId onKeyPressHandler;
         Component::ComponentId onKeyDownHandler;
         Component::ComponentId onKeyUpHandler;
@@ -54,6 +56,8 @@ namespace Physics {
         void onKeyDown(const Component::EventArgs<int> &args);
         void onKeyUp(const Component::EventArgs<int> &args);
         void onKeyPress(const Component::EventArgs<int> &args);
+        PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+        void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
     };
 
 }

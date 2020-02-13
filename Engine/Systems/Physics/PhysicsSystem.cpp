@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <GLFW/glfw3.h>
+#include <Vehicle.h>
 
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
@@ -28,18 +29,17 @@ namespace {
 PxVehicleDrivableSurfaceToTireFrictionPairs* cFrictionPairs = NULL;
 
 PxF32 cSteerVsForwardSpeedData[2 * 8] =
-{
-		0.0f, 0.75f,
-		5.0f, 0.75f,
-		30.0f, 0.125f,
-		120.0f, 0.1f,
-		PX_MAX_F32, PX_MAX_F32,
-		PX_MAX_F32, PX_MAX_F32,
-		PX_MAX_F32, PX_MAX_F32,
-		PX_MAX_F32, PX_MAX_F32
-};
-PxFixedSizeLookupTable<8> cSteerVsForwardSpeedTable(cSteerVsForwardSpeedData,
-	4);
+        {
+                0.0f, 0.75f,
+                5.0f, 0.75f,
+                30.0f, 0.125f,
+                120.0f, 0.1f,
+                PX_MAX_F32, PX_MAX_F32,
+                PX_MAX_F32, PX_MAX_F32,
+                PX_MAX_F32, PX_MAX_F32,
+                PX_MAX_F32, PX_MAX_F32
+        };
+PxFixedSizeLookupTable<8> cSteerVsForwardSpeedTable(cSteerVsForwardSpeedData, 4);
 
 PxVehicleKeySmoothingData cKeySmoothingData =
 {
@@ -155,7 +155,8 @@ void Physics::PhysicsSystem::initialize() {
 
 	onKeyPressHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyPress);
 	onKeyDownHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyDown);
-	onKeyUpHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyUp);
+    onKeyUpHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyUp);
+    onVehicleCreatedHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onVehicleCreated);
 
 	createFoundation();
 	createPVD();
@@ -243,29 +244,48 @@ void Physics::PhysicsSystem::createDrivableVehicle() {
 
 	VehicleDesc vehicleDesc = initVehicleDescription();
 
-
 	cVehicle4w = createVehicle4W(vehicleDesc, cPhysics, cCooking);
 	PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
 		PxQuat(PxIdentity));
-	cVehicle4w->getRigidDynamicActor()->setGlobalPose(startTransform);
+    cVehicle4w->getRigidDynamicActor()->setGlobalPose(startTransform);
 
-	cScene->addActor(*cVehicle4w->getRigidDynamicActor());
+    cScene->addActor(*cVehicle4w->getRigidDynamicActor());
 
-	cVehicle4w->setToRestState();
-	cVehicle4w->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-	cVehicle4w->mDriveDynData.setUseAutoGears(true);
+    cVehicle4w->setToRestState();
+    cVehicle4w->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+    cVehicle4w->mDriveDynData.setUseAutoGears(true);
 
+}
+
+PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform) {
+
+    PxVehicleDrive4W *pxVehicle;
+    VehicleDesc vehicleDesc = initVehicleDescription();
+
+    pxVehicle = createVehicle4W(vehicleDesc, cPhysics, cCooking);
+    PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
+                               PxQuat(PxIdentity));
+
+    pxVehicle->getRigidDynamicActor()->setGlobalPose(worldTransform * startTransform);
+
+    cScene->addActor(*pxVehicle->getRigidDynamicActor());
+
+    pxVehicle->setToRestState();
+    pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+    pxVehicle->mDriveDynData.setUseAutoGears(true);
+
+    return pxVehicle;
 }
 
 //CHANGE WHEN YOU HAVE MORE VEHICLES
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
-	PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
-		cKeySmoothingData, cSteerVsForwardSpeedTable, cVehicleInputData,
-		timestep, cIsVehicleInAir, *cVehicle4w);
+    PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
+            cKeySmoothingData, cSteerVsForwardSpeedTable, cVehicleInputData,
+            timestep, cIsVehicleInAir, *cVehicle4w);
 
-	//raycasts
-	PxVehicleWheels* vehicles[1] = { cVehicle4w };
+    //raycasts
+    PxVehicleWheels *vehicles[1] = {cVehicle4w};
 	PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(
 		0);
 	const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
@@ -304,12 +324,13 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 
-	cVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
-	cVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
-	cVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
-	cVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
+    // using our key states to set input data directly...
+    cVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
+    cVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
+    cVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
+    cVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
 
-	stepPhysics(deltaTime);
+    stepPhysics(deltaTime);
 }
 
 std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& transform) {
@@ -320,28 +341,34 @@ std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& tra
 void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int>& args) {
 
 	auto key = std::get<0>(args.values);
+
 	Engine::log<module, Engine::low>("onKeyDown=", key);
 
-
 	keys.emplace(key);
-
 }
 
 void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int>& args) {
 
-	auto key = std::get<0>(args.values);
-	Engine::log<module, Engine::low>("onKeyUp=", key);
+    auto key = std::get<0>(args.values);
 
-	keys.erase(key);
+    Engine::log<module, Engine::low>("onKeyUp=", key);
 
+    keys.erase(key);
 }
 
-void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int>& args) { /* do nothing */ }
+void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) { /* do nothing */ }
 
-void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxActor* actor) {
-	trackedComponents.emplace(actor, sceneComponent);
+void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args) {
+    auto vehicleComponent = std::get<0>(args.values);
+    auto pxVehicle = createDrivableVehicle(PxTransform());
+
+    vehicleComponent.data<Component::Vehicle>()->pxVehicle = pxVehicle;
 }
 
-physx::PxActor* Physics::PhysicsSystem::getVehicleActor() {
-	return cVehicle4w->getRigidDynamicActor();
+void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxActor *actor) {
+    trackedComponents.emplace(actor, sceneComponent);
+}
+
+physx::PxActor *Physics::PhysicsSystem::getVehicleActor() {
+    return cVehicle4w->getRigidDynamicActor();
 }
