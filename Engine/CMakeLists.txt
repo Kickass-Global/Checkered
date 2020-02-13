@@ -46,7 +46,12 @@ set(SRC main.cpp main.h
         Components/damage.cpp Components/damage.hpp
         Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp
         Systems/Component/scenecomponentsystem.hpp Components/physicshandler.cpp
-        Components/physicshandler.hpp)
+        Components/physicshandler.hpp
+        Systems/soundSystem/sound.cpp
+        Systems/soundSystem/sound.h
+        Systems/hornSystem/hornSystem.cpp
+        Systems/hornSystem/hornSystem.h
+        )
 
 # Add source to this project's executable.
 add_executable(Engine

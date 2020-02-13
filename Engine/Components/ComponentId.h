@@ -55,7 +55,7 @@ namespace Component {
             return id != nullid;
         }
 
-        [[nodiscard]] ComponentInterface *interface() const;
+        [[nodiscard]] ComponentInterface *base() const;
         [[nodiscard]] Component::ClassId classId() const;
         template<typename T>
         [[nodiscard]] T *data() const;
