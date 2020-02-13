@@ -65,7 +65,8 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                     updateInstanceData(
                             mesh,
                             sizeof(glm::mat4),
-                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix));
+                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix), 
+						sizeof(glm::mat4));
                 }
             }
 
@@ -75,15 +76,20 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         if(is_instanced)
         {
             auto classId = mesh.classId();
+			std::vector<glm::mat4> transform_data;
+
             for (auto &&transform : transforms) {
                 if (classId == Component::ClassId::Mesh) {
                     Engine::log("Adding instance transform#", transform);
-                    updateInstanceData(
-                            mesh,
-                            sizeof(glm::mat4),
-                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix));
+					transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);   
                 }
             }
+			updateInstanceData(
+				mesh,
+				sizeof(glm::mat4) * transform_data.size(),
+				(float*)transform_data.data(), 
+				sizeof(glm::mat4)
+			);
         }
         for (auto &transform : transforms) {
             mesh.destroyComponent(transform);
@@ -238,7 +244,7 @@ void Rendering::RenderingSystem::initialize() {
 
 }
 
-void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, int size, float *data) {
+void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, int size, float *data, int stride) {
 
     Engine::log<module>("Updating instance data of component#", id);
 
@@ -249,7 +255,7 @@ void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, i
 
     Engine::assertLog<module>(it != batches.end(), "check for valid batch");
 
-    it->get()->update(id, 2, size, data);
+    it->get()->update(id, 2, size, data, stride);
 }
 
 Rendering::Program::~Program() {

@@ -101,6 +101,7 @@ int main() {
 
     ai_vehicle->model = ai_damage_model->id();
 
+
     // endregion
 
     // make a default camera
