@@ -7,6 +7,8 @@
 #include "Systems/Pipeline/EntityLoader.h"
 #include "Systems/Damage/damagesystem.hpp"
 #include <PxPhysicsAPI.h>
+#include <Vehicle/vehiclesystem.hpp>
+#include <Vehicle.h>
 
 #include "glm/gtx/transform.hpp"
 #include "Systems/Component/scenecomponentsystem.hpp"
@@ -21,9 +23,13 @@ int main() {
     auto running = true;
 
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
+    auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
+
+    vehicleSystem.onVehicleCreated += physicsSystem.onVehicleCreatedHandler;
+
     Engine::addSystem<Component::SceneComponentSystem>();
     Engine::addSystem<Engine::DamageSystem>();
-	auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
+    auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
     auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
     auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
@@ -48,7 +54,6 @@ int main() {
 
     // setup plane for ground
 
-
     auto ground_object = Engine::createComponent<Component::SceneComponent>();
     auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
     quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
@@ -62,7 +67,7 @@ int main() {
     ground_object->id().attachExistingComponent(Component::Dirty::id());
     ground_object->id().attachExistingComponent(Component::Visible::id());
 
-    //region setup damage model for player vehicle
+    // region setup damage model for player vehicle
 
     auto damage_object = Engine::createComponent<Component::SceneComponent>();
     damage_object->m_localTransform = glm::translate(
@@ -87,28 +92,7 @@ int main() {
 
     physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
 
-    //endregion
-
-    // region setup keyPress callback for debugging purposes
-    std::function<void(const Component::EventArgs<int> &)> onKeyPress
-            = [damage_model](auto &args) {
-
-                auto key = std::get<0>(args.values);
-                Engine::log(key, " was pressed");
-                if (key == GLFW_KEY_D) {
-                    auto damage = Engine::createComponent<Component::Damage>();
-                    damage->damage_amount = 1;
-                    damage_model->id().attachExistingComponent(damage->id());
-                }
-                if (key == GLFW_KEY_F) {
-                    auto damage = Engine::createComponent<Component::Damage>();
-                    damage->damage_amount = -1;
-                    damage_model->id().attachExistingComponent(damage->id());
-                }
-            };
-
-    auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
-    Input::InputSystem::onKeyPress += debugHandler;
+    auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
 
     // endregion
 
@@ -128,7 +112,7 @@ int main() {
 
         // region before update
         fmilli delta = end - start;
-        deltaTime elapsed = duration_cast<milliseconds>(delta).count();
+        deltaTime elapsed = static_cast<deltaTime>(duration_cast<milliseconds>(delta).count());
         // endregion
 
         quad_mesh.attachExistingComponent(Component::Visible::id()); 

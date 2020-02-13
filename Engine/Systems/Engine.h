@@ -2,6 +2,8 @@
 // Created by root on 18/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_ENGINE_H
 #define ENGINE_ENGINE_H
 
@@ -19,9 +21,11 @@
 #include "glm/gtx/transform.hpp"
 
 #include "ComponentId.h"
+#include "Dirty.h"
 #include "Index.h"
 #include "systeminterface.hpp"
 
+#undef assert
 
 namespace Component {
     template<typename... Args>
@@ -111,6 +115,8 @@ namespace Engine {
 
         Component::Index::push_entity<T>(classId, id, std::move(component));
 
+        id.attachExistingComponent(Component::Dirty::id());
+
         return id.data<T>();
     }
 
@@ -122,7 +128,7 @@ namespace Engine {
     std::ostream &operator<<(std::ostream &out, Name name);
 
     /**
-     * Asserts that given condition is successful and logs given message.
+     * Asserts that given condition is successful and logs the given message.
      * @tparam module name to tag log messages with.
      * @param test the condition to test.
      * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
@@ -130,12 +136,23 @@ namespace Engine {
     template<char const *m = module>
     void assertLog(bool test, std::string msg) {
 
-        auto result = test ? "SUCCEEDED" : "FAILED";
-
         if (!test) {
-            std::cerr << Name(m) << msg << " " << result << std::endl;
+            std::cerr << Name(m) << msg << " [FAILURE]" << std::endl;
             exit(-1);
         }
+
+    }
+
+    template<char const *m = module, class ... Ts>
+    void assertLog(bool test, Ts...args) {
+
+        if (!test) {
+            std::cout << Name(m);
+            (std::cout << ... << args);
+            std::cout << "[FAILURE]" << std::endl;
+            exit(-1);
+        }
+
     }
 
     enum Importance {

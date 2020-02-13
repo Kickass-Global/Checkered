@@ -12,8 +12,7 @@ void Engine::EventSystem::update(Engine::deltaTime) {
 
     for (Component::ComponentId handler : registeredHandlers) {
 
-        std::set<Component::ComponentId> set = Component::Index::componentsOf(
-                handler);
+        std::set<Component::ComponentId> set = handler.childComponentsOfClass(Component::ClassId::EventArgs);
         for (Component::ComponentId eventArgs : set) {
 
             // I want to take all the data and pass it to the callback of the handler
