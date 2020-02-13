@@ -23,6 +23,7 @@ int main() {
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     Engine::addSystem<Component::SceneComponentSystem>();
     Engine::addSystem<Engine::DamageSystem>();
+	auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
     auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
     auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
@@ -31,7 +32,7 @@ int main() {
     inputSystem.initialize(renderingSystem.getWindow());
 
     // hookup key press event with camera system
-    auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
+
     Engine::addSystem<Engine::EventSystem>();
 
     Input::InputSystem::onKeyPress += cameraSystem.onKeyPressHandler;
@@ -116,6 +117,7 @@ int main() {
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
     camera->id().attachExistingComponent(Component::Dirty::id());
+	camera->attachComponent(damage_object->id());
 
     // region initialize game-clocks
     using namespace std::chrono;

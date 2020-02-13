@@ -25,6 +25,7 @@ namespace Component {
 
         glm::vec3 position;
         glm::quat rotation;
+		glm::mat4 view;
 
         Camera();
     };

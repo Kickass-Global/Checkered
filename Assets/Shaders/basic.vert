@@ -27,5 +27,5 @@ void main() {
 
     vColour = kA + vNormal;// * dot(light0_direction, n) + kS * pow(dot(reflection, viewer), 32);
 
-    gl_Position = M_Perspective * iInstanceMatrix * M_View * vec4(vPosition, 1);
+    gl_Position = M_Perspective * M_View * iInstanceMatrix * vec4(vPosition, 1);
 }

@@ -103,7 +103,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                 if (camera_is_dirty) {
 
                     auto data = Component::Index::entityData<Component::Camera>(camera);
-                    auto view_matrix = glm::toMat4(data->rotation);
+					auto view_matrix = data->view;
                     auto world_matrix = glm::translate(data->position);
 
                     auto perspective_matrix = glm::perspective(
@@ -114,7 +114,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                             100.0f
                     );
 
-                    view_matrix = world_matrix * view_matrix;
+                    //view_matrix = world_matrix * view_matrix;
 
                     glViewport(0, 0, data->viewport.width, data->viewport.height);
 

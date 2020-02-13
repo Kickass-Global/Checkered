@@ -144,17 +144,15 @@ namespace Engine {
         high
     };
 
-    inline static Importance loggingLevel = medium;
+    static Importance loggingLevel = medium;
 
     template<char const *m = module, Importance importance = medium, class ... Ts>
     void log(Ts...args) {
-#if _DEBUG
-//        if (importance >= loggingLevel) {
-//            std::cout << Name(m);
-//            (std::cout << ... << args);
-//            std::cout << std::endl;
-//        }
-#endif
+        //if (importance >= loggingLevel) {
+        //    std::cout << Name(m);
+        //    (std::cout << ... << args);
+        //    std::cout << std::endl;
+        //}
     }
 
 }
