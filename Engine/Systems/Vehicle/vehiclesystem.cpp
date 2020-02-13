@@ -5,8 +5,8 @@
 #include <Events/Events.h>
 #include <ComponentEvent.h>
 #include <Dirty.h>
+#include <Vehicle.h>
 #include "vehiclesystem.hpp"
-
 
 void Engine::vehicleSystem::initialize() {
     SystemInterface::initialize();
@@ -17,5 +17,7 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
         if (vehicle.hasChildComponent(Component::Dirty::id())) {
             onVehicleCreated(vehicle);
         }
+        if (vehicle.data<Component::Vehicle>()->model)
+            vehicle.data<Component::Vehicle>()->model.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
     }
 }

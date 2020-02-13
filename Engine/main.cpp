@@ -93,6 +93,13 @@ int main() {
     physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
 
     auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
+    auto ai_damage_model = Engine::createComponent<Component::Model>();
+
+    ai_damage_model->parts.push_back(Component::Model::Part{});
+    ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, sphere_0_mesh});
+    ai_damage_model->id().attachExistingComponent(Component::Dirty::id());
+
+    ai_vehicle->model = ai_damage_model->id();
 
     // endregion
 
@@ -115,9 +122,11 @@ int main() {
         deltaTime elapsed = static_cast<deltaTime>(duration_cast<milliseconds>(delta).count());
         // endregion
 
-        quad_mesh.attachExistingComponent(Component::Visible::id()); 
+        // todo remove these hacks...
+        quad_mesh.attachExistingComponent(Component::Visible::id());
         quad_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
 
+        ai_vehicle->id().attachExistingComponent(Component::Visible::id());
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);
         }
