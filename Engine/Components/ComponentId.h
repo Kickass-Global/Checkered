@@ -37,6 +37,8 @@ namespace Component {
 
     struct ComponentId {
 
+        static const int nullid = 0xffffffffu;
+
         unsigned int id;
 
         ComponentId();
@@ -48,6 +50,10 @@ namespace Component {
         explicit ComponentId(bool) noexcept;
 
         bool operator<(const ComponentId &other) const;
+
+        operator bool() const noexcept {
+            return id != nullid;
+        }
 
         [[nodiscard]] ComponentInterface *interface() const;
         [[nodiscard]] Component::ClassId classId() const;

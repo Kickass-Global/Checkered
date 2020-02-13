@@ -158,19 +158,19 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 ) {
 
     auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-            100000,
+            10000000,
             sizeof(data->vertices[0]),
             GL_ARRAY_BUFFER
     );
 
     auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-            100000,
+            10000000,
             sizeof(data->indices[0]),
             GL_ELEMENT_ARRAY_BUFFER
     );
 
     auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-            100000,
+            10000000,
             sizeof(glm::mat4),
             GL_ARRAY_BUFFER
     );
@@ -234,6 +234,7 @@ void Rendering::RenderingSystem::initialize() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glDisable(GL_CULL_FACE);
 
 }
 
