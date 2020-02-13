@@ -17,7 +17,6 @@
 
 #include <math.h>
 
-#include "../../main.h"
 #include "ComponentId.h"
 #include "Camera.h"
 #include "systeminterface.hpp"
@@ -103,9 +102,8 @@ namespace Camera {
 
                 auto data = Component::Index::entityData<Component::Camera>(camera);
 
-                auto delta = glm::quat(glm::vec3(
-                    glm::degrees(x_rotation),
-                    glm::degrees(y_rotation), 0));
+                auto delta = glm::quat(glm::vec3(0,
+                    glm::degrees(x_rotation), 0));
 
                 data->rotation *= delta;
                 data->position.z += u;
@@ -116,21 +114,24 @@ namespace Camera {
 
 				// check if the camera is attached to a component, get that components 
 				// transform and update the camera to lookat that object.
-				auto sceneComponents = camera.childComponentsOfClass(Component::ClassId::SceneComponent);
-				auto is_attached = !sceneComponents.empty();
 
-				if (is_attached)
+
+				if (data->target)
 				{
-					auto component = *sceneComponents.begin();
+                    const auto &component = data->target;
 
 					Engine::log<module>("Updating camera to look at #", component);
+
+                    auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset,1);
 					
 					auto component_transform = component.data<Component::SceneComponent>()->getWorldTransform();
-					data->position = component_transform[3] + component_transform[2] * 5.0f + glm::vec4{0, 2, 0, 0};
-					glm::vec3 eye = data->position;
+                    data->position = component_transform[3] + offset;
+					
+                    glm::vec3 eye = data->position;
 					glm::vec3 target = component_transform[3];
 					glm::vec3 up = { 0,1,0 };
-					data->view = glm::lookAt(eye, target, up);
+
+                    data->view = glm::lookAt(eye, target, up);
 				}
 
 				// reset deltas

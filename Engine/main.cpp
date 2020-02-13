@@ -46,41 +46,39 @@ int main() {
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
     //endregion
 
+    // setup plane for ground
+
+
+    auto ground_object = Engine::createComponent<Component::SceneComponent>();
+    auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
+    quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+        "Assets/Programs/basic.json",
+        Component::ClassId::Program
+    );
+    quad_mesh.attachExistingComponent(Component::Dirty::id());
+    Engine::nameComponent(quad_mesh, "quad-boi");
+
+    ground_object->attachComponent(quad_mesh);
+    ground_object->id().attachExistingComponent(Component::Dirty::id());
+    ground_object->id().attachExistingComponent(Component::Visible::id());
+
     //region setup damage model for player vehicle
 
     auto damage_object = Engine::createComponent<Component::SceneComponent>();
     damage_object->m_localTransform = glm::translate(
-            glm::vec3(0.0f, 0.0f, -10.0f));
+            glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto damage_model = Engine::createComponent<Component::Model>();
 
-    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_0.obj", Component::ClassId::Mesh);
-    auto sphere_1_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_1.obj", Component::ClassId::Mesh);
-    auto sphere_2_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_2.obj", Component::ClassId::Mesh);
-    auto sphere_3_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_3.obj", Component::ClassId::Mesh);
+    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
 
     sphere_0_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
             "Assets/Programs/basic.json",
             Component::ClassId::Program
     );
-    sphere_1_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
-    );
-    sphere_2_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
-    );
-    sphere_3_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
-    );
 
     damage_model->parts.push_back(Component::Model::Part{});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{2, sphere_0_mesh});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{5, sphere_1_mesh});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{8, sphere_2_mesh});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{300000, sphere_3_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, sphere_0_mesh});
     damage_model->id().attachExistingComponent(Component::Dirty::id());
 
     damage_object->id().attachExistingComponent(damage_model->id());
@@ -117,7 +115,7 @@ int main() {
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
     camera->id().attachExistingComponent(Component::Dirty::id());
-	camera->attachComponent(damage_object->id());
+    camera->target = damage_object->id();
 
     // region initialize game-clocks
     using namespace std::chrono;
@@ -132,6 +130,9 @@ int main() {
         fmilli delta = end - start;
         deltaTime elapsed = duration_cast<milliseconds>(delta).count();
         // endregion
+
+        quad_mesh.attachExistingComponent(Component::Visible::id()); 
+        quad_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
 
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);

@@ -148,11 +148,11 @@ namespace Engine {
 
     template<char const *m = module, Importance importance = medium, class ... Ts>
     void log(Ts...args) {
-        //if (importance >= loggingLevel) {
-        //    std::cout << Name(m);
-        //    (std::cout << ... << args);
-        //    std::cout << std::endl;
-        //}
+        if (importance >= loggingLevel) {
+            std::cout << Name(m);
+            (std::cout << ... << args);
+            std::cout << std::endl;
+        }
     }
 
 }

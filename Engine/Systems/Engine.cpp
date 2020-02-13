@@ -14,7 +14,7 @@ std::vector<std::unique_ptr<Engine::SystemInterface>> Engine::registeredSystems;
 
 void Engine::nameComponent(const Component::ComponentId &componentId,
                            std::string name) {
-    identifier[componentId] = std::move(name);
+    identifier[componentId] = name;
 }
 
 const std::vector<std::unique_ptr<Engine::SystemInterface>> &Engine::systems() {
