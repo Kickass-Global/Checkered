@@ -12,21 +12,22 @@
 #include <functional>
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+
 #define _USE_MATH_DEFINES
 
 #include <math.h>
 
 #include "../../main.h"
-#include "../../Components/ComponentId.h"
-#include "../../Components/Camera.h"
-#include "../../Systems/systeminterface.hpp"
-#include "../../Components/Index.h"
-#include "../../Components/Dirty.h"
-#include "../../Components/ComponentEvent.h"
-#include "../../Components/EventHandler.h"
+#include "ComponentId.h"
+#include "Camera.h"
+#include "systeminterface.hpp"
+#include "Index.h"
+#include "Dirty.h"
+#include "ComponentEvent.h"
+#include "EventHandler.h"
 #include "Engine.h"
-#include "../Events/Events.h"
-
+#include "Events/Events.h"
+#include "SceneComponent.h"
 
 namespace Camera {
 
@@ -45,16 +46,16 @@ namespace Camera {
         Component::ComponentId onKeyUpHandler;
         Component::ComponentId onWindowSizeHandler;
 
-        CameraSystem() {
+		CameraSystem() {
 
-            // create event handlers
+			// create event handlers
 
-            onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
-            onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
-            onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
-            onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
+			onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
+			onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
+			onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
+			onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
 
-        }
+		}
 
         float x = 0;
         float y = 0;
@@ -98,7 +99,7 @@ namespace Camera {
 
             for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
             {
-                if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
+                //if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
 
                 auto data = Component::Index::entityData<Component::Camera>(camera);
 
@@ -112,7 +113,27 @@ namespace Camera {
                 //if camera view matrix has changed mark it as dirty
                 Component::Index::addComponent(camera, Component::Dirty::id());
                 Engine::log<module, Engine::low>("Marking Camera ", camera, " dirty");
-                
+
+				// check if the camera is attached to a component, get that components 
+				// transform and update the camera to lookat that object.
+				auto sceneComponents = camera.childComponentsOfClass(Component::ClassId::SceneComponent);
+				auto is_attached = !sceneComponents.empty();
+
+				if (is_attached)
+				{
+					auto component = *sceneComponents.begin();
+
+					Engine::log<module>("Updating camera to look at #", component);
+					
+					auto component_transform = component.data<Component::SceneComponent>()->getWorldTransform();
+					data->position = component_transform[3] + component_transform[2] * 5.0f + glm::vec4{0, 2, 0, 0};
+					glm::vec3 eye = data->position;
+					glm::vec3 target = component_transform[3];
+					glm::vec3 up = { 0,1,0 };
+					data->view = glm::lookAt(eye, target, up);
+				}
+
+				// reset deltas
                 x = 0;
                 y = 0;
                 u = 0;
