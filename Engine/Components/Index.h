@@ -30,7 +30,8 @@ namespace Component {
     public:
 
         template<typename T>
-        static void push_entity(Component::ClassId cid, Component::ComponentId id, std::unique_ptr<T> &data) {
+        static void push_entity(Component::ClassId cid, Component::ComponentId id, std::unique_ptr<T> data) {
+            static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
             meta.emplace(id, std::move(data));
             entities[cid].emplace(id);

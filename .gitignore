@@ -1,8 +1,8 @@
 
 .vs/
-cmake-build-debug/
-out/
-.idea/
-enc_temp_folder/
-cmake-build*/
+cmake-build-debug/**
+out/**
+.idea/**
+enc_temp_folder/**
+cmake-build*/**
 

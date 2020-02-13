@@ -6,11 +6,15 @@
 #include <set>
 
 #include "scenecomponentsystem.hpp"
-#include "../../SystemCalls.h"
 #include "../../Components/Dirty.h"
 #include "../../Components/SceneComponent.h"
 #include "../../Components/Component.h"
 #include "../../Components/physicshandler.hpp"
+#include "Engine.h"
+
+namespace {
+    const char module[] = "ComponentSystem";
+}
 
 void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
@@ -30,15 +34,16 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
             //Engine::log("Performing physics update #", sceneComponent);
             // todo something here.
-            auto translation = physicsUpdates.begin()->data<Component::PhysicsPacket>()->position;
-            meta->m_localTransform = glm::translate(translation);
+            auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
+            auto translation = physx_data->position;
+            meta->m_localTransform = glm::translate(translation) * glm::mat4_cast(physx_data->rotation);
         }
 
         for (const auto &update : physicsUpdates) sceneComponent.destroyComponent(update);
 
         if (is_dirty) {
 
-            Engine::log("Updating scene component worldTransform #", sceneComponent);
+            Engine::log<module>("Updating scene component worldTransform #", sceneComponent);
 
             auto transform = meta->getWorldTransform();
 
@@ -46,12 +51,11 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
             for (const auto &mesh : meshes) {
 
-                Engine::log("Updating attached component world transform #", mesh);
+                Engine::log<module>("Updating attached component world transform #", mesh);
 
                 auto worldTransform = Engine::createComponent<Component::WorldTransform>();
                 worldTransform->world_matrix = transform;
                 mesh.attachExistingComponent(worldTransform->id());
-                mesh.attachExistingComponent(Component::Dirty::id());
 
             }
 
@@ -65,7 +69,6 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
                 worldTransform->world_matrix = transform;
                 model.destroyComponentsOfType(Component::ClassId::Transform);
                 model.attachExistingComponent(worldTransform->id());
-                model.attachExistingComponent(Component::Dirty::id());
 
             }
         }

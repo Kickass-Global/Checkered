@@ -8,9 +8,13 @@
 #include "../../Components/Dirty.h"
 #include "../../Components/Camera.h"
 #include "../../Components/SceneComponent.h"
+#include "Engine.h"
 
-Component::ComponentEvent<int, int>
-        Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
+Component::ComponentEvent<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
+
+namespace {
+    const char module[] = "RenderingSystem";
+}
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
@@ -20,7 +24,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glfwSetWindowTitle(window, title.c_str());
 
     // Find and update any GameObjects with meshes that should be drawn...
-    for (const Component::ComponentId& mesh : Component::Index::entitiesOf(Component::ClassId::Mesh)) {
+    for (const Component::ComponentId &mesh : Component::Index::entitiesOf(Component::ClassId::Mesh)) {
 
         auto is_dirty = Component::Index::hasComponent(
                 mesh,
@@ -44,10 +48,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         }
 
         auto transforms = mesh.childComponentsOfClass(Component::ClassId::Transform);
+        auto is_instanced = !transforms.empty();
 
         if (is_visible && is_dirty) {
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
-            Engine::log<module>("Streaming in component#", mesh);
+            Engine::log("Streaming in component#", mesh);
 
             auto classId = mesh.classId();
             auto data = mesh.data<Component::Mesh>();
@@ -56,7 +61,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
                 if (classId == Component::ClassId::Mesh) {
                     buffer(*data);
-                    Engine::log<module>("Adding instance transform#", transform);
+                    Engine::log("Adding instance transform#", transform);
                     updateInstanceData(
                             mesh,
                             sizeof(glm::mat4),
@@ -66,6 +71,19 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
             mesh.destroyComponent(Component::Dirty::id());
 
+        }
+        if(is_instanced)
+        {
+            auto classId = mesh.classId();
+            for (auto &&transform : transforms) {
+                if (classId == Component::ClassId::Mesh) {
+                    Engine::log("Adding instance transform#", transform);
+                    updateInstanceData(
+                            mesh,
+                            sizeof(glm::mat4),
+                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix));
+                }
+            }
         }
         for (auto &transform : transforms) {
             mesh.destroyComponent(transform);
@@ -78,15 +96,14 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
     for (auto &&batch : batches) {
 
-        if(!batch->details.empty())
-        {
+        if (!batch->details.empty()) {
             for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
                 if (camera_is_dirty) {
 
                     auto data = Component::Index::entityData<Component::Camera>(camera);
-                    auto view_matrix = glm::toMat4(data->rotation);
+					auto view_matrix = data->view;
                     auto world_matrix = glm::translate(data->position);
 
                     auto perspective_matrix = glm::perspective(
@@ -97,7 +114,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                             100.0f
                     );
 
-                    view_matrix = world_matrix * view_matrix;
+                    //view_matrix = world_matrix * view_matrix;
 
                     glViewport(0, 0, data->viewport.width, data->viewport.height);
 
@@ -141,19 +158,19 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 ) {
 
     auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-            100000,
+            10000000,
             sizeof(data->vertices[0]),
             GL_ARRAY_BUFFER
     );
 
     auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-            100000,
+            10000000,
             sizeof(data->indices[0]),
             GL_ELEMENT_ARRAY_BUFFER
     );
 
     auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-            100000,
+            10000000,
             sizeof(glm::mat4),
             GL_ARRAY_BUFFER
     );
@@ -217,10 +234,8 @@ void Rendering::RenderingSystem::initialize() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glDisable(GL_CULL_FACE);
 
-    onBillboardModifiedHandler = Engine::EventSystem::createHandler(
-            this, &RenderingSystem::onBillboardModified
-    );
 }
 
 void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, int size, float *data) {
@@ -243,7 +258,7 @@ Rendering::Program::~Program() {
 }
 
 void Rendering::Program::bind() {
-    Engine::log<module, Engine::Importance::low>("Binding program ", m_id);
+    Engine::log<module, Engine::low>("Binding program ", m_id);
     glUseProgram(m_id);
 }
 

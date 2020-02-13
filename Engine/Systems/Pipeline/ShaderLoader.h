@@ -8,17 +8,16 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include "../../SystemCalls.h"
 #include "../Rendering/RenderingSystem.h"
 
 #include "nlohmann/json.hpp"
+#include "Engine.h"
 
 namespace Pipeline {
 
     namespace {
         char module[] = "Pipeline";
     }
-    constexpr auto assertLog = Engine::assertLog<module>;
 
     class ShaderLoader {
     public:
@@ -27,7 +26,7 @@ namespace Pipeline {
         std::unique_ptr<Rendering::Shader> load(std::string filename) {
 
             std::ifstream ifs(filename);
-			Engine::assertLog<module>(ifs.is_open(), "load shader file " + filename);
+            Engine::assertLog<module>(ifs.is_open(), "load shader file " + filename);
 
             std::vector<std::string> lines;
             std::string line;

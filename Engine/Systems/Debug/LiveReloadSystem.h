@@ -9,8 +9,7 @@
 #include <filesystem>
 #include <map>
 #include "../../main.h"
-#include "../../SystemCalls.h"
-#include "../../Engine.h"
+#include "Engine.h"
 #include "../Events/Events.h"
 
 namespace Debug {
