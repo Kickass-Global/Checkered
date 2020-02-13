@@ -7,6 +7,7 @@
 #include <Dirty.h>
 #include <Vehicle.h>
 #include "vehiclesystem.hpp"
+#include <physicshandler.hpp>
 
 void Engine::vehicleSystem::initialize() {
     SystemInterface::initialize();
@@ -17,7 +18,20 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
         if (vehicle.hasChildComponent(Component::Dirty::id())) {
             onVehicleCreated(vehicle);
         }
-        if (vehicle.data<Component::Vehicle>()->model)
-            vehicle.data<Component::Vehicle>()->model.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+
+		auto is_dirty = vehicle.hasChildComponent(Component::Dirty::id());
+		auto physicsUpdates = vehicle.childComponentsOfClass(Component::ClassId::PhysicsPacket);
+		auto has_physics_update = !physicsUpdates.empty();
+
+		auto meta = vehicle.data<Component::Vehicle>();
+
+		if (has_physics_update) {
+
+			auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
+			auto T =  glm::translate(physx_data->position) * glm::mat4_cast(physx_data->rotation);
+
+			if (vehicle.data<Component::Vehicle>()->model)
+				vehicle.data<Component::Vehicle>()->model.attachExistingComponent(Engine::createComponent<Component::WorldTransform>(T)->id());
+		}
     }
 }

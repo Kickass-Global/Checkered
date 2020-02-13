@@ -138,6 +138,7 @@ template<char const *m = module, class ... Ts>
 void assertLog(bool test, Ts...args) {
 
     if (!test) {
+
         std::cout << Name(m);
         (std::cout << ... << args);
         std::cout << " [FAILURE]" << std::endl;
@@ -152,7 +153,7 @@ enum Importance {
     high
 };
 
-static Importance loggingLevel = high;
+static Importance loggingLevel = medium;
 
 template<char const *m = module, Importance importance = medium, class ... Ts>
 void log(Ts...args) {

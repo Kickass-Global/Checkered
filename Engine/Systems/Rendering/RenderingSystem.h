@@ -90,7 +90,7 @@ namespace Rendering {
 
         GLFWwindow* getWindow();
 
-        void updateInstanceData(Component::ComponentId id, int size, float* data);
+        void updateInstanceData(Component::ComponentId id, int size, float* data, int stride);
 
         void buffer(const Component::Mesh& data );
 

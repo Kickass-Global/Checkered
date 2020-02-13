@@ -39,9 +39,9 @@ namespace Physics {
         Component::ComponentId onKeyDownHandler;
         Component::ComponentId onKeyUpHandler;
 
-        physx::PxActor *getVehicleActor();
+        physx::PxRigidDynamic *getVehicleActor();
 
-        void link(Component::ComponentId sceneComponent, physx::PxActor *actor);
+        void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
     private:
         void createFoundation();
         void createPhysicsObject();

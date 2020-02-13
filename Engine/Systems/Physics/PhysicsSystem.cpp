@@ -26,6 +26,7 @@ namespace {
 	const char module[] = "Physics";
 }
 
+
 PxVehicleDrivableSurfaceToTireFrictionPairs* cFrictionPairs = NULL;
 
 PxF32 cSteerVsForwardSpeedData[2 * 8] =
@@ -99,7 +100,7 @@ bool cIsVehicleInAir = true;
 static PxDefaultAllocator cDefaultAllocator;
 static PxDefaultErrorCallback cErrorCallback;
 
-std::map<physx::PxActor*, Component::ComponentId> trackedComponents;
+std::map<physx::PxRigidDynamic*, Component::ComponentId> trackedComponents;
 
 extern VehicleDesc initVehicleDesc();
 
@@ -310,15 +311,18 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 	// send the objects transform into the engine ...
 
-	auto t = cVehicle4w->getRigidDynamicActor()->getGlobalPose();
-	trackedComponents[cVehicle4w->getRigidDynamicActor()]
-		.attachExistingComponent(
-			Engine::createComponent<Component::PhysicsPacket>(
-				glm::vec3(t.p.x, t.p.y, t.p.z),
-				glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id());
+	for(auto& [actor, component]: trackedComponents)
+	{
+		auto t = actor->getGlobalPose();
+		component.attachExistingComponent(
+				Engine::createComponent<Component::PhysicsPacket>(
+					glm::vec3(t.p.x, t.p.y, t.p.z),
+					glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id());
 
-	trackedComponents[cVehicle4w->getRigidDynamicActor()]
-		.attachExistingComponent(Component::Dirty::id());
+		component.attachExistingComponent(Component::Dirty::id());
+	}
+
+
 }
 
 
@@ -363,12 +367,16 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
     auto pxVehicle = createDrivableVehicle(PxTransform());
 
     vehicleComponent.data<Component::Vehicle>()->pxVehicle = pxVehicle;
+
+	link(vehicleComponent, pxVehicle->getRigidDynamicActor());
+
+	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 }
 
-void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxActor *actor) {
+void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor) {
     trackedComponents.emplace(actor, sceneComponent);
 }
 
-physx::PxActor *Physics::PhysicsSystem::getVehicleActor() {
+physx::PxRigidDynamic *Physics::PhysicsSystem::getVehicleActor() {
     return cVehicle4w->getRigidDynamicActor();
 }
