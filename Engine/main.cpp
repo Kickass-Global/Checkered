@@ -25,7 +25,7 @@ int main() {
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
 
-    vehicleSystem.onVehicleCreated += physicsSystem.onVehicleCreatedHandler;
+    vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
     Engine::addSystem<Component::SceneComponentSystem>();
     Engine::addSystem<Engine::DamageSystem>();
@@ -35,21 +35,21 @@ int main() {
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
 
     // hookup inputs from current window
-    inputSystem.initialize(renderingSystem.getWindow());
+    inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
 
     Engine::addSystem<Engine::EventSystem>();
 
-    Input::InputSystem::onKeyPress += cameraSystem.onKeyPressHandler;
-    Input::InputSystem::onKeyDown += cameraSystem.onKeyDownHandler;
-    Input::InputSystem::onKeyUp += cameraSystem.onKeyUpHandler;
+    Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
 
-    Input::InputSystem::onKeyPress += physicsSystem.onKeyPressHandler;
-    Input::InputSystem::onKeyDown += physicsSystem.onKeyDownHandler;
-    Input::InputSystem::onKeyUp += physicsSystem.onKeyUpHandler;
+    Input::InputSystem::onKeyPress += physicsSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
+    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
     //endregion
 
     // setup plane for ground
@@ -90,7 +90,7 @@ int main() {
     damage_object->id().attachExistingComponent(Component::Dirty::id());
     damage_object->id().attachExistingComponent(Component::Visible::id());
 
-    physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
+    physicsSystem->link(damage_object->id(), physicsSystem->getVehicleActor());
 
     auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
     auto ai_damage_model = Engine::createComponent<Component::Model>();

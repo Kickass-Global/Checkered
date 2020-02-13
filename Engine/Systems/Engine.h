@@ -62,10 +62,10 @@ const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
  * @return returns a reference to the new system.
  */
 template<typename T>
-T &addSystem() {
+T *addSystem() {
     registeredSystems.push_back(std::make_unique<T>());
     registeredSystems.back()->initialize();
-    return dynamic_cast<T &>(*registeredSystems.back());
+	return static_cast<T*>(registeredSystems.back().get());
 }
 
 /**

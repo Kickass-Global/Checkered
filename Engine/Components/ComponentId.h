@@ -41,7 +41,7 @@ namespace Component {
 
     struct ComponentId {
 
-        static const int Null = 0xffffffffu;
+        static const unsigned int Null = 0xffffffffu;
 
         unsigned int id;
 
