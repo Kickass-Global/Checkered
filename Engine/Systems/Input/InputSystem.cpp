@@ -4,6 +4,7 @@
 
 #include "../../Components/Component.h"
 #include "InputSystem.h"
+#include "Engine.h"
 
 Component::ComponentEvent<int> Input::InputSystem::onKeyPress("onKeyPress");
 Component::ComponentEvent<int> Input::InputSystem::onKeyDown("onKeyDown");
@@ -21,7 +22,7 @@ void Input::InputSystem::keyHandler(GLFWwindow *, int key, int, int action, int)
         onKeyUp(key);
     }
     if (action == GLFW_PRESS) {
-        Engine::log<module, Engine::Importance::low>("onKeyDown: ", key);
+        Engine::log<module, Engine::low>("onKeyDown: ", key);
         onKeyDown(key);
     }
 }

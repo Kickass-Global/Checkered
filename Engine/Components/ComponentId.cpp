@@ -7,7 +7,7 @@
 #include "ComponentId.h"
 #include "Index.h"
 #include "ComponentBase.h"
-#include "../Engine.h"
+#include "Engine.h"
 
 unsigned int Component::next_id = 0xFEED0000;
 
@@ -43,7 +43,7 @@ Component::ComponentId::ComponentId(bool, unsigned int id) noexcept: id(id) {}
  * this component.
  */
 Component::ClassId Component::ComponentId::classId() const {
-    auto meta = interface();
+    auto meta = base();
     return meta ? meta->classId() : Component::ClassId::None;
 }
 
@@ -65,7 +65,7 @@ bool Component::ComponentId::hasChildComponent(const Component::ComponentId &com
 }
 
 Component::ComponentInterface *
-Component::ComponentId::interface() const {
+Component::ComponentId::base() const {
     return Index::entityData<Component::ComponentInterface>(*this);
 }
 void Component::ComponentId::destroyComponentsOfType(Component::ClassId classId) const {

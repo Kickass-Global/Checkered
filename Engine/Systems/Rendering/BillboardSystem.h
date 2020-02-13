@@ -6,9 +6,10 @@
 #define ENGINE_BILLBOARDSYSTEM_H
 
 #include <vector>
-#include "../../Components/Component.h"
-#include "../../Components/Dirty.h"
+#include "Component.h"
+#include "Dirty.h"
 #include "Rendering.h"
+#include "Engine.h"
 
 namespace Rendering {
 

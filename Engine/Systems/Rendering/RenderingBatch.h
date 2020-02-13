@@ -14,6 +14,7 @@
 #include "Rendering.h"
 
 #include "glad/glad.h"
+#include "Engine.h"
 #include <GLFW/glfw3.h>
 
 namespace Rendering {
@@ -48,10 +49,10 @@ namespace Rendering {
 
             auto offset = m_fill;
             m_fill += data.size() * sizeof(T);
-        
-			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
-            
-            return { offset, static_cast<int>(data.size()) };
+
+            Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+
+            return {offset, static_cast<int>(data.size())};
         }
 
         void replace(int size, float* data, BufferDetails details)

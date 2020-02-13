@@ -11,9 +11,11 @@
 #include "glm/gtx/transform.hpp"
 #include "Systems/Component/scenecomponentsystem.hpp"
 #include "Systems/systeminterface.hpp"
+#include "Engine.h"
 
 int main() {
 
+    // region initialize engine systems
     using namespace Engine;
 
     auto running = true;
@@ -21,6 +23,7 @@ int main() {
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     Engine::addSystem<Component::SceneComponentSystem>();
     Engine::addSystem<Engine::DamageSystem>();
+	auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
     auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
     auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
@@ -29,7 +32,7 @@ int main() {
     inputSystem.initialize(renderingSystem.getWindow());
 
     // hookup key press event with camera system
-    auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
+
     Engine::addSystem<Engine::EventSystem>();
 
     Input::InputSystem::onKeyPress += cameraSystem.onKeyPressHandler;
@@ -41,40 +44,41 @@ int main() {
     Input::InputSystem::onKeyUp += physicsSystem.onKeyUpHandler;
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
+    //endregion
+
+    // setup plane for ground
+
+
+    auto ground_object = Engine::createComponent<Component::SceneComponent>();
+    auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
+    quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+        "Assets/Programs/basic.json",
+        Component::ClassId::Program
+    );
+    quad_mesh.attachExistingComponent(Component::Dirty::id());
+    Engine::nameComponent(quad_mesh, "quad-boi");
+
+    ground_object->attachComponent(quad_mesh);
+    ground_object->id().attachExistingComponent(Component::Dirty::id());
+    ground_object->id().attachExistingComponent(Component::Visible::id());
+
+    //region setup damage model for player vehicle
 
     auto damage_object = Engine::createComponent<Component::SceneComponent>();
     damage_object->m_localTransform = glm::translate(
-            glm::vec3(0.0f, 0.0f, -10.0f));
+            glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto damage_model = Engine::createComponent<Component::Model>();
 
-    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_0.obj", Component::ClassId::Mesh);
-    auto sphere_1_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_1.obj", Component::ClassId::Mesh);
-    auto sphere_2_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_2.obj", Component::ClassId::Mesh);
-    auto sphere_3_mesh = Pipeline::Library::getAsset("Assets/Meshes/sphere_3.obj", Component::ClassId::Mesh);
+    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
 
     sphere_0_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
             "Assets/Programs/basic.json",
             Component::ClassId::Program
     );
-    sphere_1_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
-    );
-    sphere_2_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
-    );
-    sphere_3_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
-    );
 
     damage_model->parts.push_back(Component::Model::Part{});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{2, sphere_0_mesh});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{5, sphere_1_mesh});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{8, sphere_2_mesh});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{300000, sphere_3_mesh});
+    damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, sphere_0_mesh});
     damage_model->id().attachExistingComponent(Component::Dirty::id());
 
     damage_object->id().attachExistingComponent(damage_model->id());
@@ -83,6 +87,9 @@ int main() {
 
     physicsSystem.link(damage_object->id(), physicsSystem.getVehicleActor());
 
+    //endregion
+
+    // region setup keyPress callback for debugging purposes
     std::function<void(const Component::EventArgs<int> &)> onKeyPress
             = [damage_model](auto &args) {
 
@@ -103,28 +110,37 @@ int main() {
     auto debugHandler = Engine::EventSystem::createHandler(onKeyPress);
     Input::InputSystem::onKeyPress += debugHandler;
 
+    // endregion
+
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
     camera->id().attachExistingComponent(Component::Dirty::id());
+    camera->target = damage_object->id();
 
-    // setup a game clock
-
-    auto start = std::chrono::high_resolution_clock::now();
-    auto end = start;
+    // region initialize game-clocks
+    using namespace std::chrono;
+    typedef duration<float> fmilli; // define this to get float values;
+    auto start = high_resolution_clock::now();
+    auto end = start + milliseconds(1); // do this so physx doesn't complain
+    // endregion
 
     while (running) {
 
-        deltaTime elapsed =
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                        end - start
-                ).count();
+        // region before update
+        fmilli delta = end - start;
+        deltaTime elapsed = duration_cast<milliseconds>(delta).count();
+        // endregion
+
+        quad_mesh.attachExistingComponent(Component::Visible::id()); 
+        quad_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
 
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);
         }
 
+        // region after update
         start = end;
-        end = std::chrono::high_resolution_clock::now();
-
+        end = high_resolution_clock::now();
+        //endregion
     }
 }
