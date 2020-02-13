@@ -6,6 +6,7 @@
 #define ENGINE_PHYSICSHANDLER_HPP
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "ComponentBase.h"
 
 namespace Component {
@@ -13,7 +14,8 @@ namespace Component {
 
     public:
         glm::vec3 position;
-        explicit PhysicsPacket(glm::vec3 pos) : position(pos) {}
+        glm::quat rotation;
+        explicit PhysicsPacket(glm::vec3 pos, glm::quat rotation) : position(pos), rotation(rotation) {}
 
     };
 }
