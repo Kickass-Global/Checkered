@@ -37,8 +37,9 @@ int main() {
     auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
 
-    // hookup inputs from current window
-    inputSystem->initialize(renderingSystem->getWindow());
+	auto hornSystem = Engine::addSystem<Horn::hornSystem>();
+	// hookup inputs from current window
+	inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
     Engine::addSystem<Engine::EventSystem>();
@@ -51,8 +52,12 @@ int main() {
     Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
     Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
-    //endregion
+	Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
+	Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
+	Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+
+	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
+	//endregion
 
     // setup the ground mesh
 
