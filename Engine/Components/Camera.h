@@ -27,7 +27,7 @@ namespace Component {
 
         glm::vec3 position;
         glm::quat rotation;
-		glm::mat4 view;
+		glm::mat4 view{1};
         Component::ComponentId target;
         glm::vec3 offset = { 0,2,-5 };
 
