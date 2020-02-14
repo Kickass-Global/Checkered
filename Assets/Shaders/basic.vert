@@ -13,26 +13,26 @@ uniform vec3 kA = vec3(0.2, 0.2, 0.2);
 uniform vec3 kD = vec3(0.6, 0.6, 0.6);
 uniform vec3 kS = vec3(0.6, 0.6, 0.6);
 
-uniform vec3 light0 = vec3(100.0, 100.0, 1.0);
+uniform vec4 light0 = vec4(100.0, 100.0, 100.0, 1.0);
 
-out vec3 debug;
-out vec3 vColour;
-out vec3 fTexCoord;
-out vec3 fPosition;
+out vec3 fColour;
+out vec3 fNormal;
+out vec3 fViewer;
+out vec3 fLightDirection;
+out vec3 fLightReflection;
 
 void main() {
 
+    vec4 v = iInstanceMatrix * vec4(vPosition,1.0);
 
-    vec3 n = normalize(vNormal);
-    vec3 light0_direction = normalize( light0 - vPosition );
-    vec3 reflection = reflect(light0_direction, n);
-    vec3 viewer = normalize(vec3(inverse(M_View)[3]));
+    fNormal = normalize( mat3(iInstanceMatrix) * vNormal);
+    fLightDirection = normalize( light0.xyz - v.xyz );
+    fLightReflection = reflect(fLightDirection, fNormal);
+    fViewer = normalize(vec3(inverse(M_View)[3]));
+    fColour = vec3(1,0,0);
 
-    vColour = kA + kD * dot(light0_direction, n);//+ kS * pow(dot(reflection, viewer), 32);
+    gl_Position = M_Perspective * M_View * iInstanceMatrix * vec4(vPosition,1.0);
 
-    gl_Position = M_Perspective * M_View * iInstanceMatrix * vec4(vPosition, 1);
-    fPosition = (iInstanceMatrix * vec4(vPosition, 1)).xyz;
-    fTexCoord = vTexCoord;
 }
 
 
