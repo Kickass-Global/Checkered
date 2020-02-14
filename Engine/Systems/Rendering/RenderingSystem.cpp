@@ -118,7 +118,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                             static_cast<float>(data->viewport.width) /
                             data->viewport.height,
                             0.1f,
-                            100.0f
+                            1000.0f
                     );
 
                     //view_matrix = world_matrix * view_matrix;
