@@ -22,6 +22,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
     // attached to the SceneComponent with the new world transform.
 
     auto sceneComponents = Component::Index::entitiesOf(Component::ClassId::SceneComponent);
+
     for (const auto &sceneComponent : sceneComponents) {
 
         auto is_dirty = sceneComponent.hasChildComponent(Component::Dirty::id());
@@ -32,8 +33,6 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
         if (has_physics_update) {
 
-            //Engine::log("Performing physics update #", sceneComponent);
-            // todo something here.
             auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
             auto translation = physx_data->position;
             meta->m_localTransform = glm::translate(translation) * glm::mat4_cast(physx_data->rotation);

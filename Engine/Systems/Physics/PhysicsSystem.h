@@ -1,6 +1,7 @@
 //
 // Created by root on 9/1/20.
 //
+#pragma once
 
 #ifndef ENGINE_PHYSICSSYSTEM_H
 #define ENGINE_PHYSICSSYSTEM_H
@@ -19,6 +20,7 @@
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
 #include "../../Components/ComponentEvent.h"
+#include <Vehicle.h>
 
 
 using namespace physx;
@@ -33,13 +35,17 @@ namespace Physics {
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
 
+
+        Component::Vehicle *playerVehicle;
+
+        Component::ComponentId onVehicleCreatedHandler;
         Component::ComponentId onKeyPressHandler;
         Component::ComponentId onKeyDownHandler;
         Component::ComponentId onKeyUpHandler;
 
-        physx::PxActor *getVehicleActor();
+        physx::PxRigidDynamic *getVehicleActor();
 
-        void link(Component::ComponentId sceneComponent, physx::PxActor *actor);
+        void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
     private:
         void createFoundation();
         void createPhysicsObject();
@@ -48,12 +54,14 @@ namespace Physics {
         void createScene();
         void createGround();
         void initVehicleSupport();
-        void createDrivableVehicle();
+        void createDrivablePlayerVehicle();
         void stepPhysics(Engine::deltaTime);
 
         void onKeyDown(const Component::EventArgs<int> &args);
         void onKeyUp(const Component::EventArgs<int> &args);
         void onKeyPress(const Component::EventArgs<int> &args);
+        PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+        void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
     };
 
 }
