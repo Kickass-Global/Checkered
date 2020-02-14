@@ -20,38 +20,37 @@
 
 int main() {
 
-	// region initialize engine systems
-	using namespace Engine;
+    // region initialize engine systems
+    using namespace Engine;
 
-	auto running = true;
+    auto running = true;
 
-	auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
-	auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
+    auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
+    auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
 
-	vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
+    vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
-	Engine::addSystem<Component::SceneComponentSystem>();
-	Engine::addSystem<Engine::DamageSystem>();
-	auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
-	auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
-	auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
-	auto inputSystem = Engine::addSystem<Input::InputSystem>();
+    Engine::addSystem<Component::SceneComponentSystem>();
+    Engine::addSystem<Engine::DamageSystem>();
+    auto cameraSystem = Engine::addSystem<Camera::CameraSystem>();
+    auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
+    auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
+    auto inputSystem = Engine::addSystem<Input::InputSystem>();
 
 	auto hornSystem = Engine::addSystem<Horn::hornSystem>();
 	// hookup inputs from current window
 	inputSystem->initialize(renderingSystem->getWindow());
 
-	// hookup key press event with camera system
+    // hookup key press event with camera system
+    Engine::addSystem<Engine::EventSystem>();
 
-	Engine::addSystem<Engine::EventSystem>();
+    Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
 
-	Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
-	Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
-	Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
-
-	Input::InputSystem::onKeyPress += physicsSystem->onKeyPressHandler;
-	Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
-	Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
+    Input::InputSystem::onKeyPress += physicsSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
 	Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
 	Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
@@ -60,152 +59,159 @@ int main() {
 	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 	//endregion
 
-	// setup plane for ground
+    // setup the ground mesh
 
-	auto ground_object = Engine::createComponent<Component::SceneComponent>();
-	auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
-	quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-		"Assets/Programs/checker.json",
-		Component::ClassId::Program
-	);
-	quad_mesh.attachExistingComponent(Component::Dirty::id());
-	Engine::nameComponent(quad_mesh, "quad-boi");
+    auto ground_object = Engine::createComponent<Component::SceneComponent>();
+    auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
+    quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/checker.json",
+            Component::ClassId::Program
+    );
+    quad_mesh.attachExistingComponent(Component::Dirty::id());
+    Engine::nameComponent(quad_mesh, "quad-boi");
 
-	ground_object->attachComponent(quad_mesh);
-	ground_object->id().attachExistingComponent(Component::Dirty::id());
-	ground_object->id().attachExistingComponent(Component::Visible::id());
+    ground_object->attachComponent(quad_mesh);
+    ground_object->id().attachExistingComponent(Component::Dirty::id());
+    ground_object->id().attachExistingComponent(Component::Visible::id());
 
-	// region setup damage model for player vehicle
+    // setup the mesh used for the cars...
 
-	auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
-	car_mesh.attachExistingComponent(Component::Dirty::id());
-	car_mesh.attachExistingComponent(Component::Visible::id());
-	car_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
-	car_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-		"Assets/Programs/basic.json",
-		Component::ClassId::Program
-	);
+    auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
+    car_mesh.attachExistingComponent(Component::Dirty::id());
+    car_mesh.attachExistingComponent(Component::Visible::id());
+    car_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+    car_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/basic.json",
+            Component::ClassId::Program
+    );
+    Engine::nameComponent(car_mesh, "car-gal");
 
-	Engine::nameComponent(car_mesh, "car-gal");
+    // setup the vehicle for the player...
 
-	auto player_vehicle = Engine::createComponent<Component::Vehicle>();
-	auto player_damage_model = Engine::createComponent<Component::Model>();
+    auto player_vehicle = Engine::createComponent<Component::Vehicle>();
+    auto player_damage_model = Engine::createComponent<Component::Model>();
 
-	player_damage_model->parts.push_back(Component::Model::Part{});
-	player_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, car_mesh });
+    player_damage_model->parts.push_back(Component::Model::Part{});
+    player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh});
 
-	player_vehicle->model = player_damage_model->id();
-	player_vehicle->world_transform = glm::translate(glm::vec3(0.0f, 0.0f, -40.0f));
-	physicsSystem->playerVehicle = player_vehicle;
+    player_vehicle->model = player_damage_model->id();
+    player_vehicle->world_transform = glm::translate(glm::vec3(0.0f, 0.0f, -40.0f));
+    physicsSystem->playerVehicle = player_vehicle;
 
-	auto make_ai = [car_mesh](glm::mat4 world_transform = glm::mat4{ 1 }) {
+    // ai factory method...
+    auto make_ai = [car_mesh](glm::mat4 world_transform = glm::mat4{1}) {
 
-		auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
-		auto ai_damage_model = Engine::createComponent<Component::Model>();
+        auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
+        auto ai_damage_model = Engine::createComponent<Component::Model>();
 
-		ai_damage_model->parts.push_back(Component::Model::Part{});
-		ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, car_mesh });
+        ai_damage_model->parts.push_back(Component::Model::Part{});
+        ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh});
 
-		ai_vehicle->model = ai_damage_model->id();
-		ai_vehicle->world_transform = world_transform;
+        ai_vehicle->model = ai_damage_model->id();
+        ai_vehicle->world_transform = world_transform;
 
-		return ai_vehicle;
+        return ai_vehicle;
 
-	};
+    };
 
-	// ai brains
+    // setup ai "brain"
 
-	std::function<void(const Component::EventArgs<Component::ComponentId>&)> cb = [player_vehicle](const Component::EventArgs<Component::ComponentId>& args) {
-		auto meta = std::get<0>(args.values).data<Component::Vehicle>();
+    std::function<void(const Component::EventArgs<Component::ComponentId> &)> ai_tick_callback = [player_vehicle](
+            const Component::EventArgs<Component::ComponentId> &args) {
+        auto meta = std::get<0>(args.values).data<Component::Vehicle>();
 
-		auto player_location = glm::normalize(player_vehicle->world_transform[3]);
-		auto ai_direction = glm::normalize(meta->world_transform[2]);
-		auto ai_location = glm::normalize(meta->world_transform[3]);
+        auto player_location = glm::normalize(player_vehicle->world_transform[3]); // translation vector of mat4
+        auto ai_direction = glm::normalize(meta->world_transform[2]); // 'z' column vector of mat4 (i.e. forward)
+        auto ai_location = glm::normalize(meta->world_transform[3]); // translation vector of mat4
 
-		auto perpdot = [](auto v1, auto v2)
-		{
-			return v1.z * v2.x - v1.x * v2.z;
-		};
+        // check if the player is to the left or right of the ai.
+        auto perpdot = [](auto v1, auto v2) {
+            return v1.z * v2.x - v1.x * v2.z;
+        };
 
-		auto heading = [p = glm::normalize(glm::vec3(player_location - ai_location)), b = glm::vec3(ai_direction)]() {
+        // check if the player is in front or behind the ai.
+        auto heading = [p = glm::normalize(glm::vec3(player_location - ai_location)), b = glm::vec3(ai_direction)]() {
+            return glm::dot(p, b);
+        };
 
-			return glm::dot(p, b);
-		};
+        meta->pxVehicleInputData.setDigitalSteerLeft(false);
+        meta->pxVehicleInputData.setDigitalSteerRight(false);
 
+        auto player_direction = perpdot(player_location - ai_location, ai_direction);
 
-		meta->pxVehicleInputData.setDigitalSteerLeft(false);
-		meta->pxVehicleInputData.setDigitalSteerRight(false);
+        // todo control throttle better...
+        meta->pxVehicleInputData.setDigitalAccel(true);
 
-		auto bias = perpdot(player_location - ai_location, ai_direction);
-		meta->pxVehicleInputData.setDigitalAccel(true);
+        const auto ai_is_driving_away = heading() < 0.0f;
+        const auto player_is_left = player_direction > 0;
 
-		float result = heading();
-		if (result < 0.0f) {
+        if (ai_is_driving_away) { // turn the ai around...
 
-			meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-			meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
+            meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+            meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-			if (bias > 0) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-			else meta->pxVehicleInputData.setDigitalSteerRight(true);
-		}
-		else {
+            if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
+            else meta->pxVehicleInputData.setDigitalSteerRight(true);
 
-			meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
+        } else { // driving towards player
 
-			if (-0.3f <= bias && bias <= 0.3f) {}
-			else if (bias > 0) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-			else meta->pxVehicleInputData.setDigitalSteerRight(true);
-		}
-	};
-	Component::ComponentId ticker = Engine::EventSystem::createHandler(cb);
+            meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
 
-	// spawn some ai bois
-	for (int x = -2; x <= 2; x++)
-	{
-		for (int y = -2; y <= 2; y++) {
+            const auto pointed_at_player = -0.3f <= player_direction && player_direction <= 0.3f;
 
-			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * 45, 0, y * 45)));
-			ai_vehicle->tickHandler += ticker;
-		}
-	}
+            if (pointed_at_player) { /* drive straight */ }
+            else { // steer towards player
+                if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
+                else meta->pxVehicleInputData.setDigitalSteerRight(true);
+            }
 
+        }
+    };
+    Component::ComponentId ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
+    // spawn some ai bois into the world
 
-	// endregion
+    for (int x = -2; x <= 2; x++) {
+        for (int y = -2; y <= 2; y++) {
 
-	// make a default camera
-	auto camera = Engine::createComponent<Component::Camera>();
-	camera->id().attachExistingComponent(Component::Dirty::id());
-	camera->target = player_vehicle->id();
+            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * 45, 0, y * 45)));
+            ai_vehicle->tickHandler += ticker; // give them brain
 
-	// region initialize game-clocks
-	using namespace std::chrono;
-	typedef duration<float> fmilli; // define this to get float values;
-	auto start = high_resolution_clock::now();
-	auto end = start + milliseconds(1); // do this so physx doesn't complain
-	// endregion
+        }
+    }
 
-	while (running) {
+    // make a default camera
+    auto camera = Engine::createComponent<Component::Camera>();
+    camera->id().attachExistingComponent(Component::Dirty::id());
+    camera->target = player_vehicle->id(); // make camera follow player.
 
-		// region before update
-		fmilli delta = end - start;
-		deltaTime elapsed = static_cast<deltaTime>(duration_cast<milliseconds>(delta).count());
-		// endregion
+    // region initialize game-clocks
+    using namespace std::chrono;
+    typedef duration<float> floatMilliseconds; // define this to get float values;
+    auto start = high_resolution_clock::now();
+    auto end = start + milliseconds(1); // do this so physx doesn't complain about time being 0.
+    // endregion
 
-		// todo remove these hacks...
-		quad_mesh.attachExistingComponent(Component::Visible::id());
-		quad_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+    while (running) {
 
-		//ai_vehicle->id().attachExistingComponent(Component::Visible::id());
-		for (const auto& system : Engine::systems()) {
-			system->update(elapsed);
-		}
+        // region before update
+        floatMilliseconds delta = end - start;
+        deltaTime elapsed = static_cast<deltaTime>(duration_cast<milliseconds>(delta).count());
+        // endregion
 
+        // todo remove these hacks...
+        // force the ground to render...
+        quad_mesh.attachExistingComponent(Component::Visible::id());
+        quad_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
 
+        //ai_vehicle->id().attachExistingComponent(Component::Visible::id());
+        for (const auto &system : Engine::systems()) {
+            system->update(elapsed);
+        }
 
-		// region after update
-		start = end;
-		end = high_resolution_clock::now();
-		//endregion
-	}
+        // region after update
+        start = end;
+        end = high_resolution_clock::now();
+        //endregion
+    }
 }

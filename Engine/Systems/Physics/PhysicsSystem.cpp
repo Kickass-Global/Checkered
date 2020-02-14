@@ -218,14 +218,14 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
     return pxVehicle;
 }
 
-//CHANGE WHEN YOU HAVE MORE VEHICLES
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
+    // update all vehicles in the scene.
 
     for (auto &vehicle : Component::Index::entitiesOf(Component::ClassId::Vehicle)) {
         auto meta = vehicle.data<Component::Vehicle>();
 
-        if (!meta->pxVehicle) continue;
+        if (!meta->pxVehicle) continue; // vehicles might not be initialized yet...
 
         PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
                 meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
@@ -252,11 +252,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 
     }
-    // send the objects transform into the engine ...
 
     cScene->simulate(0.0001 + timestep / 1000.0f);
     cScene->fetchResults(true);
 
+    // replicate physx bodies' world transforms to corresponding components.
     for (auto&[actor, component]: trackedComponents) {
         auto t = actor->getGlobalPose();
         component.attachExistingComponent(
@@ -266,8 +266,6 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
         component.attachExistingComponent(Component::Dirty::id());
     }
-
-
 }
 
 
@@ -309,24 +307,21 @@ void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
 
 void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args) {
 
-    auto vehicleComponent = std::get<0>(args.values);
+    const auto &vehicleComponent = std::get<0>(args.values);
+
+    // grab the vehicle world position and set the physx actors transform accordingly.
     auto meta = vehicleComponent.data<Component::Vehicle>();
     auto position = meta->world_transform[3];
     auto pxVehicle = createDrivableVehicle(PxTransform(position.x, position.y, position.z));
 
-    Engine::log<module, Engine::low>("onVehicleCreate #", pxVehicle);
+    Engine::log<module, Engine::low>("onVehicleCreated #", pxVehicle);
 
+    // link the component with the physx actor so we can replicate updates.
     meta->pxVehicle = pxVehicle;
-
     link(vehicleComponent, pxVehicle->getRigidDynamicActor());
-
-    cScene->addActor(*pxVehicle->getRigidDynamicActor());
 }
 
 void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor) {
     trackedComponents.emplace(actor, sceneComponent);
 }
 
-physx::PxRigidDynamic *Physics::PhysicsSystem::getVehicleActor() {
-    return cVehicle4w->getRigidDynamicActor();
-}
