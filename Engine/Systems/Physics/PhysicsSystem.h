@@ -36,7 +36,7 @@ namespace Physics {
         void update(Engine::deltaTime /*elapsed*/) override;
 
 
-        Component::Vehicle *playerVehicle;
+        Component::Vehicle* playerVehicle = nullptr;
 
         Component::ComponentId onVehicleCreatedHandler;
         Component::ComponentId onKeyPressHandler;

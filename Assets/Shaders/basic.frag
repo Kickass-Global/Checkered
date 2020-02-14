@@ -1,21 +1,20 @@
 #version 330
 
-in vec3 vColour;
-in vec3 fTexCoord;
-in vec3 fPosition;
+uniform vec3 kA = vec3(0.2, 0.2, 0.2);
+uniform vec3 kD = vec3(0.6, 0.6, 0.6);
+uniform vec3 kS = vec3(0.6, 0.6, 0.6);
+
+in vec3 fColour;
+in vec3 fNormal;
+in vec3 fLightDirection;
+in vec3 fViewer;
+in vec3 fLightReflection;
 
 out vec3 colour;
 
-vec3 checker(in float u, in float v)
-{
-  float checkSize = 200;
-  float fmodResult = mod(floor(checkSize * u) + floor(checkSize * v), 2.0);
-  float fin = max(sign(fmodResult), 0.0);
-  return vec3(fin, fin, fin);
-}
 
 void main() {
-    colour = vColour * checker(fTexCoord.x, fTexCoord.y);
+    colour = kA + fColour * max(dot(fLightDirection, fNormal), 0.0);// + kS * pow(dot(fLightReflection, fViewer), 4);
 }
 
 
