@@ -103,6 +103,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     for (auto &&batch : batches) {
 
         if (!batch->details.empty()) {
+
             for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
 
@@ -140,7 +141,6 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                             ),
                             1, false, glm::value_ptr(perspective_matrix));
 
-                    Component::Index::removeComponent(camera, Component::Dirty::id());
                 }
             }
 
@@ -148,6 +148,10 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             batch->bind(*this);
             batch->draw(*this);
         }
+    }
+
+    for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
+        camera.destroyComponentsOfType(Component::ClassId::Dirty);
     }
 
     glfwSwapBuffers(window);
@@ -303,7 +307,7 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
         std::vector<GLchar> infoLog(maxLength);
         glGetShaderInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
 
-        Engine::log<module>(std::string(infoLog.begin(), infoLog.end()));
+        Engine::log<module, Engine::high>(std::string(infoLog.begin(), infoLog.end()));
     }
     Engine::assertLog<module>(success != GL_FALSE, "shader creation");
 }
