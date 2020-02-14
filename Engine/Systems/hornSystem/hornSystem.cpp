@@ -1,11 +1,7 @@
-#pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "winmm.lib")
 
-#include <windows.h>
-#include <Engine.h>
-#include <GLFW\glfw3.h>
 #include <iostream>
-#include <mmsystem.h>
-
+#include <string>
 #include "hornSystem.h"
 
 using namespace std;
@@ -22,27 +18,45 @@ void Horn::hornSystem::initialize()
 
 //std::set<int> keys1;
 void Horn::hornSystem::update(Engine::deltaTime elapsed) {
-    
-}
+   /* auto key = std::get<0>(args.values);
+    if (keys.count(GLFW_KEY_SPACE))
+    {
+        sound();
+
+    }
+    */
+ }
 
 void Horn::hornSystem::onKeyDown(const Component::EventArgs<int>& args) {
-    //Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
-   
-   
+    Engine::log<module, Engine::Importance::low>("onKeyDown=", std::get<0>(args.values));
+   /*
+    auto key = std::get<0>(args.values);
+
+    keys.emplace(key);
+   */
 }
 
 void  Horn::hornSystem::onKeyUp(const Component::EventArgs<int>& args) {
-    
-}
+    Engine::log<module, Engine::Importance::low>("onKeyUp=", std::get<0>(args.values));
+    /*
+    auto key = std::get<0>(args.values);
+    keys.erase(key);
+    */
+    }
 
 void Horn::hornSystem::onKeyPress(const Component::EventArgs<int>& args) {
      Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
  
      auto key = std::get<0>(args.values);
-         if (key == GLFW_KEY_SPACE)
-         {
-             bool played = PlaySound("carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
-             cout << "Success or not: " << played << endl;
-         }
+     if (key == GLFW_KEY_SPACE)
+         sound();
 
+}
+void Horn::hornSystem::sound()
+{ 
+   
+   
+   PlaySound("${CMAKE_CURRENT_SOURCE_DIR}/Assets/Sounds/carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
+   // PlaySound("D:\\carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
+    //system("pause");
 }
