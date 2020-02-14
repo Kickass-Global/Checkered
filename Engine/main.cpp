@@ -28,6 +28,10 @@ int main() {
     auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
 
+    auto hornSystem = Engine::addSystem<Horn::hornSystem>();
+    
+    
+
     // hookup inputs from current window
     inputSystem.initialize(renderingSystem.getWindow());
 
@@ -43,6 +47,11 @@ int main() {
     Input::InputSystem::onKeyDown += physicsSystem.onKeyDownHandler;
     Input::InputSystem::onKeyUp += physicsSystem.onKeyUpHandler;
 
+    Input::InputSystem::onKeyPress += hornSystem.onKeyPressHandler;
+    Input::InputSystem::onKeyDown += hornSystem.onKeyDownHandler;
+    Input::InputSystem::onKeyUp += hornSystem.onKeyUpHandler;
+   
+    
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem.onWindowSizeHandler;
     //endregion
 
