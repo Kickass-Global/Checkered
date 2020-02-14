@@ -41,7 +41,6 @@ int main() {
 	inputSystem->initialize(renderingSystem->getWindow());
 
 	// hookup key press event with camera system
-
 	Engine::addSystem<Engine::EventSystem>();
 
 	Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
@@ -117,11 +116,14 @@ int main() {
 		auto ai_direction = glm::normalize(meta->world_transform[2]);
 		auto ai_location = glm::normalize(meta->world_transform[3]);
 
+		// check if the player is to the left or right of the ai
 		auto perpdot = [](auto v1, auto v2)
 		{
 			return v1.z * v2.x - v1.x * v2.z;
 		};
 
+
+		// check if the player is in front or bahind the ai
 		auto heading = [p = glm::normalize(glm::vec3(player_location - ai_location)), b = glm::vec3(ai_direction)]() {
 
 			return glm::dot(p, b);
