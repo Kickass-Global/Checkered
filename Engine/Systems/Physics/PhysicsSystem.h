@@ -43,8 +43,6 @@ namespace Physics {
         Component::ComponentId onKeyDownHandler;
         Component::ComponentId onKeyUpHandler;
 
-        physx::PxRigidDynamic *getVehicleActor();
-
         void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
     private:
         void createFoundation();
