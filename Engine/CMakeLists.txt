@@ -92,8 +92,7 @@ add_subdirectory("../Assets/" "${CMAKE_CURRENT_BINARY_DIR}/Assets")
 
 target_link_libraries(Engine
         PRIVATE glfw
-        #[[PUBLIC c++fs]]
-        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib"
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCommon_64.lib

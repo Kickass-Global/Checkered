@@ -54,9 +54,7 @@ void Horn::hornSystem::onKeyPress(const Component::EventArgs<int>& args) {
 }
 void Horn::hornSystem::sound()
 { 
-   
-   
-   PlaySound("${CMAKE_CURRENT_SOURCE_DIR}/Assets/Sounds/carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
+   PlaySound("Assets/Sounds/carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
    // PlaySound("D:\\carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
     //system("pause");
 }
