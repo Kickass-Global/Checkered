@@ -30,7 +30,7 @@ namespace Rendering {
     class BatchBuffer {
         
         GLuint m_id;
-        int m_size;
+        int m_size; 
         int m_fill;
         int m_stride;
         int m_type;
@@ -55,7 +55,23 @@ namespace Rendering {
             return {offset, static_cast<int>(data.size())};
         }
 
-        void replace(int size, float* data, BufferDetails details)
+		template <typename T>
+		BufferDetails push_back(int size, T* data) {
+
+			Engine::log<module>("Pushing data into batch#", id());
+
+			glBindBuffer(m_type, m_id);
+			glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
+
+			auto offset = m_fill;
+			m_fill += size * sizeof(T);
+
+			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+
+			return { offset, static_cast<int>(size) };
+		}
+
+        void replace_existing_data(int size, float* data, BufferDetails details)
         {
             Engine::log<module>("Replacing data in batch#", id());
             glBindBuffer(m_type, m_id);
@@ -89,12 +105,22 @@ namespace Rendering {
 
         void push_back(const Component::Mesh& mesh);
 
-        void update(const Component::ComponentId id, int buffer, int size, float* data)
+        void update(const Component::ComponentId id, int buffer, int size, float* data, int stride)
         {
-            Engine::log<module>("Updating component#", id );
+			Engine::log<module>("Updating component#", id);
+
+			auto& detail = details.at(id);
+			int count = size / stride;
+			auto replace_existing_data = count <= detail[2].count;
+
             switch (buffer) {
                 case 2:
-                    instanceBuffer->replace(size, data, details.at(id)[buffer]);
+					if (replace_existing_data) {
+						instanceBuffer->replace_existing_data(size, data, detail[buffer]);
+					}
+					else {
+						detail[2] = instanceBuffer->push_back(count, data);
+					}
                     break;
             }
         }

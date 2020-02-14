@@ -14,7 +14,8 @@ namespace Rendering {
 
     void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
         for(auto [key, detail] : details) {
-            glDrawElementsInstancedBaseVertex(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0, 1, detail[1].offset);
+			// todo pass in the stride somehow
+			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0, detail[2].count, detail[1].offset, detail[2].offset / 64);
         }
     }
 
