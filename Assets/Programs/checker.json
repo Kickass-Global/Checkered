@@ -1,0 +1,18 @@
+{
+  "entity": {
+    "shaders": [
+      {
+        "shader": [
+          0,
+          "Assets/Shaders/checker.vert"
+        ]
+      },
+      {
+        "shader": [
+          1,
+          "Assets/Shaders/checker.frag"
+        ]
+      }
+    ]
+  }
+}

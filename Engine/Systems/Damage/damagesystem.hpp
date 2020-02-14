@@ -42,9 +42,9 @@ class DamageSystem : public Engine::SystemInterface {
 
             const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
             auto has_transform = !transform.empty();
-            assertLog(has_transform, "Checking model has a world transform");
+            //assertLog(has_transform, "Checking model has a world transform");
 
-            if (is_dirty) {
+            if (is_dirty && has_transform) {
                 Engine::log("Updating dirty model#", model);
 
                 for (auto &&part : meta->parts) {
@@ -103,7 +103,9 @@ class DamageSystem : public Engine::SystemInterface {
                     auto &&mesh = part.variations[part.active_variation].mesh;
 
                     mesh.attachExistingComponent(Component::Visible::id());
-                    mesh.attachExistingComponent(*transform.begin());
+
+					if(has_transform)
+						mesh.attachExistingComponent(*transform.begin());
 
                     auto variation_changed = part.active_variation != previous;
 
@@ -117,6 +119,10 @@ class DamageSystem : public Engine::SystemInterface {
 
                 }
             }
+
+			for (auto&&t : transform) {
+				model.destroyComponent(t);
+			}
 
             for (auto &&damage : damages) {
                 model.destroyComponent(damage);

@@ -16,6 +16,8 @@ namespace Component {
     class WorldTransform : public Component::ComponentBase<Component::ClassId::Transform> {
 public:
     glm::mat4 world_matrix{1};
+	WorldTransform() : world_matrix(1) {}
+	WorldTransform(glm::mat4 T) : world_matrix(T) {}
 };
 
 class Dirty {
