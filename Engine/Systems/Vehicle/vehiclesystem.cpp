@@ -30,6 +30,7 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
 
 			auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
 			auto T = glm::translate(physx_data->position) * glm::mat4_cast(physx_data->rotation);
+			meta->world_transform = T;
 
 			if (vehicle.data<Component::Vehicle>()->model) {
 				vehicle.data<Component::Vehicle>()->model.attachExistingComponent(Engine::createComponent<Component::WorldTransform>(T)->id());

@@ -11,6 +11,7 @@
 #include "Engine.h"
 #include "../../Systems/systeminterface.hpp"
 #include "../../Components/EventHandler.h"
+#include <ComponentEvent.h>
 
 namespace Engine {
 
@@ -37,6 +38,8 @@ namespace Engine {
  */
     class EventSystem : public Engine::SystemInterface {
 
+        static Component::ComponentEvent<Engine::deltaTime> onTick;
+
         static std::set<Component::ComponentId> registeredHandlers;
 
     public:
@@ -53,6 +56,20 @@ namespace Engine {
             auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
             handler->callback = std::bind(callback, instance,
                                           std::placeholders::_1);
+            return handler->id();
+
+        }
+
+        template<typename T, typename... Args>
+        static Component::ComponentId createTickHandler(
+            T* instance,
+            void (T::* callback)(const Component::EventArgs<Args...>&)) {
+
+            auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
+            handler->callback = std::bind(callback, instance,
+                std::placeholders::_1);
+
+            onTick += handler->id();
             return handler->id();
 
         }

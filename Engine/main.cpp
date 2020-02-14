@@ -11,9 +11,12 @@
 #include <Vehicle.h>
 
 #include "glm/gtx/transform.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 #include "Systems/Component/scenecomponentsystem.hpp"
 #include "Systems/systeminterface.hpp"
 #include "Engine.h"
+#include <Events/Events.h>
 
 int main() {
 
@@ -69,37 +72,45 @@ int main() {
 
     // region setup damage model for player vehicle
 
-    auto damage_object = Engine::createComponent<Component::SceneComponent>();
-    damage_object->m_localTransform = glm::translate(
-            glm::vec3(0.0f, 0.0f, 0.0f));
-
-    auto damage_model = Engine::createComponent<Component::Model>();
-
-    auto sphere_0_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
-
-    sphere_0_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+    auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
+    car_mesh.attachExistingComponent(Component::Dirty::id());
+    car_mesh.attachExistingComponent(Component::Visible::id());
+    car_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+    car_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
             "Assets/Programs/basic.json",
             Component::ClassId::Program
     );
 
-    damage_model->parts.push_back(Component::Model::Part{});
-    damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, sphere_0_mesh});
-    damage_model->id().attachExistingComponent(Component::Dirty::id());
+    Engine::nameComponent(car_mesh, "car_mesh");
 
-    damage_object->id().attachExistingComponent(damage_model->id());
-    damage_object->id().attachExistingComponent(Component::Dirty::id());
-    damage_object->id().attachExistingComponent(Component::Visible::id());
+    auto player_vehicle = Engine::createComponent<Component::Vehicle>();
+    auto player_damage_model = Engine::createComponent<Component::Model>();
 
-    physicsSystem->link(damage_object->id(), physicsSystem->getVehicleActor());
+    player_damage_model->parts.push_back(Component::Model::Part{});
+    player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh});
+
+    player_vehicle->model = player_damage_model->id();
+    player_vehicle->world_transform = glm::translate(glm::vec3(0.0f, 0.0f, -10.0f));
+    physicsSystem->playerVehicle = player_vehicle;
+
+    //physicsSystem->link(damage_object->id(), physicsSystem->getVehicleActor());
 
     auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
     auto ai_damage_model = Engine::createComponent<Component::Model>();
 
     ai_damage_model->parts.push_back(Component::Model::Part{});
-    ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, sphere_0_mesh});
-    ai_damage_model->id().attachExistingComponent(Component::Dirty::id());
+    ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh});
 
     ai_vehicle->model = ai_damage_model->id();
+
+    std::function<void(const Component::EventArgs<Component::ComponentId>&)> cb = [](const Component::EventArgs<Component::ComponentId>& args) {
+        auto meta = std::get<0>(args.values).data<Component::Vehicle>();
+
+        meta->pxVehicleInputData.setDigitalAccel(true);
+        meta->pxVehicleInputData.setDigitalSteerLeft(true);
+    };
+    Component::ComponentId ticker = Engine::EventSystem::createHandler(cb);
+    ai_vehicle->tickHandler += ticker;
 
 
     // endregion
@@ -107,7 +118,7 @@ int main() {
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
     camera->id().attachExistingComponent(Component::Dirty::id());
-    camera->target = damage_object->id();
+    camera->target = player_vehicle->id();
 
     // region initialize game-clocks
     using namespace std::chrono;
@@ -131,6 +142,8 @@ int main() {
         for (const auto &system : Engine::systems()) {
             system->update(elapsed);
         }
+
+
 
         // region after update
         start = end;

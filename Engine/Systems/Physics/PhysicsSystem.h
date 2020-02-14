@@ -20,6 +20,7 @@
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
 #include "../../Components/ComponentEvent.h"
+#include <Vehicle.h>
 
 
 using namespace physx;
@@ -33,6 +34,9 @@ namespace Physics {
     public:
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
+
+
+        Component::Vehicle *playerVehicle;
 
         Component::ComponentId onVehicleCreatedHandler;
         Component::ComponentId onKeyPressHandler;
@@ -50,7 +54,7 @@ namespace Physics {
         void createScene();
         void createGround();
         void initVehicleSupport();
-        void createDrivableVehicle();
+        void createDrivablePlayerVehicle();
         void stepPhysics(Engine::deltaTime);
 
         void onKeyDown(const Component::EventArgs<int> &args);

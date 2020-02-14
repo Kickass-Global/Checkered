@@ -16,6 +16,7 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <Vehicle.h>
 
 #include "ComponentId.h"
 #include "Camera.h"
@@ -45,16 +46,16 @@ namespace Camera {
         Component::ComponentId onKeyUpHandler;
         Component::ComponentId onWindowSizeHandler;
 
-		CameraSystem() {
+        CameraSystem() {
 
-			// create event handlers
+            // create event handlers
 
-			onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
-			onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
-			onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
-			onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
+            onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
+            onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
+            onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
+            onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
 
-		}
+        }
 
         float x = 0;
         float y = 0;
@@ -74,36 +75,35 @@ namespace Camera {
                         x += increment;
                         break;
                     case GLFW_KEY_DOWN:
-                    y -= increment;
-                    break;
-                case GLFW_KEY_LEFT:
-                    x -= increment;
-                    break;
-                case GLFW_KEY_UP:
-                    y += increment;
-                    break;
-                case GLFW_KEY_PAGE_UP:
-                    u += increment;
-                    break;
-                case GLFW_KEY_PAGE_DOWN:
-                    u -= increment;
-                    break;
+                        y -= increment;
+                        break;
+                    case GLFW_KEY_LEFT:
+                        x -= increment;
+                        break;
+                    case GLFW_KEY_UP:
+                        y += increment;
+                        break;
+                    case GLFW_KEY_PAGE_UP:
+                        u += increment;
+                        break;
+                    case GLFW_KEY_PAGE_DOWN:
+                        u -= increment;
+                        break;
                 }
             }
 
             float x_rotation = x / sensitivity * elapsed;
             float y_rotation = y / sensitivity * elapsed;
             float zoom = u / sensitivity * elapsed;
-            
 
-            for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
-            {
+
+            for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 //if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
 
                 auto data = Component::Index::entityData<Component::Camera>(camera);
 
                 auto delta = glm::quat(glm::vec3(0,
-                    glm::degrees(x_rotation), 0));
+                                                 glm::degrees(x_rotation), 0));
 
                 data->rotation *= delta;
                 data->position.z += u;
@@ -112,29 +112,28 @@ namespace Camera {
                 Component::Index::addComponent(camera, Component::Dirty::id());
                 Engine::log<module, Engine::low>("Marking Camera ", camera, " dirty");
 
-				// check if the camera is attached to a component, get that components 
-				// transform and update the camera to lookat that object.
+                // check if the camera is attached to a component, get that components
+                // transform and update the camera to lookat that object.
 
+                auto meta = data->target.data<Component::Vehicle>();
+                if (data->target && meta->pxVehicle) {
 
-				if (data->target)
-				{
                     const auto &component = data->target;
+                    Engine::log<module>("Updating camera to look at #", component);
 
-					Engine::log<module>("Updating camera to look at #", component);
-
-                    auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset,1);
-					
-					auto component_transform = component.data<Component::SceneComponent>()->getWorldTransform();
+                    auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset, 1);
+                    auto component_transform = meta->world_transform;
                     data->position = component_transform[3] + offset;
-					
+
                     glm::vec3 eye = data->position;
-					glm::vec3 target = component_transform[3];
-					glm::vec3 up = { 0,1,0 };
+                    glm::vec3 target = component_transform[3];
+                    glm::vec3 up = {0, 1, 0};
 
                     data->view = glm::lookAt(eye, target, up);
-				}
+                }
 
-				// reset deltas
+
+                // reset deltas
                 x = 0;
                 y = 0;
                 u = 0;
@@ -142,16 +141,15 @@ namespace Camera {
 
         }
 
-        void onWindowSizeChanged(const Component::EventArgs<int,int>& args) {
+        void onWindowSizeChanged(const Component::EventArgs<int, int> &args) {
 
             Engine::log<module, Engine::low>(
                     "onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
 
-            auto&& width = std::get<0>(args.values);
-            auto&& height = std::get<1>(args.values);
+            auto &&width = std::get<0>(args.values);
+            auto &&height = std::get<1>(args.values);
 
-            for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera))
-            {
+            for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
                 auto data = Component::Index::entityData<Component::Camera>(camera);
                 data->viewport.width = width;
                 data->viewport.height = height;
@@ -160,17 +158,17 @@ namespace Camera {
             }
         }
 
-        void onKeyDown(const Component::EventArgs<int>& args) {
+        void onKeyDown(const Component::EventArgs<int> &args) {
             Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
             keys.emplace(std::get<int>(args.values));
         }
 
-        void onKeyUp(const Component::EventArgs<int>& args) {
+        void onKeyUp(const Component::EventArgs<int> &args) {
             Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
             keys.erase(std::get<int>(args.values));
         }
 
-        void onKeyPress(const Component::EventArgs<int>& args) {
+        void onKeyPress(const Component::EventArgs<int> &args) {
             Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
         }
 

@@ -7,10 +7,15 @@
 
 #include <PxPhysicsAPI.h>
 #include <vehicle/PxVehicleDrive4W.h>
+#include <Events/Events.h>
+#include <EventHandler.h>
+#include <ComponentEvent.h>
 
 #include "Model.h"
 #include "ComponentId.h"
 #include "Dirty.h"
+
+#include <glm/glm.hpp>
 
 namespace Component {
 
@@ -18,13 +23,25 @@ namespace Component {
     public:
 		ComponentId model{};
 		ComponentId input{};
+        ComponentId onTickHandler;
+        ComponentEvent<ComponentId> tickHandler = ("handler");
+            
+        glm::mat4 world_transform = glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
+		bool pxIsVehicleInAir;
+        physx::PxVehicleDrive4WRawInputData pxVehicleInputData;
 		physx::PxVehicleDrive4W *pxVehicle = nullptr;
 		physx::PxVehicleDrivableSurfaceToTireFrictionPairs *pxFrictionPairs = nullptr;
         physx::PxReal pxSteerVsForwardSpeedData[16];
         physx::PxFixedSizeLookupTable<8> pxSteerVsForwardSpeedTable;
         physx::PxVehicleKeySmoothingData pxKeySmoothingData;
         physx::PxVehiclePadSmoothingData pxPadSmoothingData;
+
+        void onTick(const Component::EventArgs<Engine::deltaTime> &args)
+        {
+            Engine::log<module>("onTick");
+            tickHandler(id());
+        }
 
         Vehicle() :
                 pxSteerVsForwardSpeedData{
@@ -70,6 +87,7 @@ namespace Component {
                         }
                 } {
             pxSteerVsForwardSpeedTable = physx::PxFixedSizeLookupTable<8>(pxSteerVsForwardSpeedData, 4);
+            onTickHandler = Engine::EventSystem::createTickHandler(this, &Vehicle::onTick);
         }
 
     };
