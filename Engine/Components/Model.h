@@ -11,13 +11,6 @@
 
 namespace Component {
 
-    /**
-     * A model is a collection of meshes and shaders
-     */
-    class Model {
-        std::vector<ComponentId> shaders;
-        std::vector<ComponentId> meshes;
-    };
 
 }
 

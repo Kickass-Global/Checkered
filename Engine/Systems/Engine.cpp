@@ -8,8 +8,6 @@
 #include "EventHandler.h"
 #include "Events/Events.h"
 
-//const char Engine::module[] = "Engine";
-
 std::vector<std::unique_ptr<Engine::SystemInterface>> Engine::registeredSystems;
 
 void Engine::nameComponent(const Component::ComponentId &componentId,
