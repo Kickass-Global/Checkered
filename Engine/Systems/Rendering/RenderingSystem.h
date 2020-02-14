@@ -35,6 +35,7 @@ namespace Rendering {
     };
 
     class Program : public Component::ComponentBase<Component::ClassId::Program> {
+
         GLuint m_id;
 
     public:

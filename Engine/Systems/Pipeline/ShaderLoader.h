@@ -55,6 +55,8 @@ namespace Pipeline {
             auto type_id = shader["shader"][0].get<int>();
             auto shader_filename = shader["shader"][1].get<std::string>();
 
+            Engine::log<module>("loading shader: ", shader_filename);
+
             shaders.push_back(std::move(type_id == 0 ?
                                         loader.load<GL_VERTEX_SHADER>(
                                                 shader_filename) :
