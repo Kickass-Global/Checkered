@@ -1,13 +1,12 @@
 #pragma once
 
 
-
 #include "ComponentId.h"
 #include "Camera.h"
 #include "systeminterface.hpp"
 #include "Index.h"
-#include "Dirty.h"
-#include "ComponentEvent.h"
+#include "tags.h"
+#include "EventDelegate.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"

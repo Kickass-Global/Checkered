@@ -6,8 +6,9 @@
 #define ENGINE_BILLBOARDSYSTEM_H
 
 #include <vector>
+#include <Billboard.h>
 #include "Component.h"
-#include "Dirty.h"
+#include "tags.h"
 #include "Rendering.h"
 #include "Engine.h"
 
@@ -15,17 +16,15 @@ namespace Rendering {
 
     class BillboardSystem {
 
-        static Component::ComponentEvent<Component::ComponentId> onBillboardChanged;
+        static Component::EventDelegate<Component::ComponentId> onBillboardChanged;
 
         static void update() {
 
             // look for billboard components and notify when they have been modified
 
-            for(auto&& billboard : Component::Index::entitiesOf(Component::ClassId::Billboard))
-            {
-                auto billboard_was_modified = Component::Index::hasComponent(billboard, Component::Dirty::id());
-                if(billboard_was_modified)
-                {
+            for (auto &&billboard : Component::Index::entitiesOf<Component::Billboard>()) {
+                auto billboard_was_modified = billboard.hasTag<Component::Dirty>();
+                if (billboard_was_modified) {
                     Engine::log<module>("Billboard was modified ", billboard);
                     onBillboardChanged(billboard);
                 }

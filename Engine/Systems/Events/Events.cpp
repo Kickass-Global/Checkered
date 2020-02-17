@@ -6,7 +6,7 @@
 
 std::set<Component::ComponentId> Engine::EventSystem::registeredHandlers;
 
-Component::ComponentEvent<Engine::deltaTime> Engine::EventSystem::onTick("onTick");
+Component::EventDelegate<Engine::deltaTime> Engine::EventSystem::onTick("onTick");
 
 void Engine::EventSystem::update(Engine::deltaTime time) {
 

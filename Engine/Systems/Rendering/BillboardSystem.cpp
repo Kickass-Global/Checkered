@@ -4,5 +4,5 @@
 
 #include "BillboardSystem.h"
 
-Component::ComponentEvent<Component::ComponentId>
+Component::EventDelegate<Component::ComponentId>
         Rendering::BillboardSystem::onBillboardChanged("onBillboardChanged");

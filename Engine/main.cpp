@@ -16,6 +16,7 @@
 #include "Systems/Component/scenecomponentsystem.hpp"
 #include "Systems/systeminterface.hpp"
 #include "Engine.h"
+#include "WorldTransform.h"
 #include <Events/Events.h>
 
 int main() {
@@ -25,6 +26,7 @@ int main() {
 
     auto running = true;
 
+    Engine::addSystem<Component::Index>();
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
 
@@ -37,9 +39,9 @@ int main() {
     auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
     auto inputSystem = Engine::addSystem<Input::InputSystem>();
 
-	auto hornSystem = Engine::addSystem<Horn::hornSystem>();
-	// hookup inputs from current window
-	inputSystem->initialize(renderingSystem->getWindow());
+    auto hornSystem = Engine::addSystem<Horn::hornSystem>();
+    // hookup inputs from current window
+    inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
     Engine::addSystem<Engine::EventSystem>();
@@ -52,12 +54,12 @@ int main() {
     Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
     Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-	Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
-	Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
-	Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+    Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
+    Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
+    Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
 
-	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
-	//endregion
+    Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
+    //endregion
 
     // setup the ground mesh
 
@@ -67,19 +69,21 @@ int main() {
             "Assets/Programs/checker.json",
             Component::ClassId::Program
     );
-    quad_mesh.attachExistingComponent(Component::Dirty::id());
+
+    quad_mesh.addTag<Component::Dirty>();
+    quad_mesh.addTag<Component::Visible>();
     Engine::nameComponent(quad_mesh, "quad-boi");
 
-    ground_object->attachComponent(quad_mesh);
-    ground_object->id().attachExistingComponent(Component::Dirty::id());
-    ground_object->id().attachExistingComponent(Component::Visible::id());
+    ground_object->id().attachExistingComponent(quad_mesh);
+    ground_object->id().addTag<Component::Dirty>();
+    ground_object->id().addTag<Component::Visible>();
 
     // setup the mesh used for the cars...
 
     auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/Cartoon_Lowpoly_Car.obj", Component::ClassId::Mesh);
-    car_mesh.attachExistingComponent(Component::Dirty::id());
-    car_mesh.attachExistingComponent(Component::Visible::id());
-    car_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+    car_mesh.addTag<Component::Dirty>();
+    car_mesh.addTag<Component::Visible>();
+    car_mesh.attachExistingComponent(Engine::createComponentWithTTL<Component::WorldTransform>(1)->id());
     car_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
             "Assets/Programs/basic.json",
             Component::ClassId::Program
@@ -170,11 +174,11 @@ int main() {
     Component::ComponentId ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
     // spawn some ai bois into the world
+    auto dim = 2l;
+    for (int x = -dim; x <= dim; x++) {
+        for (int y = -dim; y <= dim; y++) {
 
-    for (int x = -2; x <= 2; x++) {
-        for (int y = -2; y <= 2; y++) {
-
-            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * 45, 0, y * 45)));
+            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * 32, 0, y * 32)));
             ai_vehicle->tickHandler += ticker; // give them brain
 
         }
@@ -182,7 +186,6 @@ int main() {
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
-    camera->id().attachExistingComponent(Component::Dirty::id());
     camera->target = player_vehicle->id(); // make camera follow player.
 
     // region initialize game-clocks
@@ -201,8 +204,9 @@ int main() {
 
         // todo remove these hacks...
         // force the ground to render...
-        quad_mesh.attachExistingComponent(Component::Visible::id());
-        quad_mesh.attachExistingComponent(Engine::createComponent<Component::WorldTransform>()->id());
+
+        //quad_mesh.addTag<Component::Visible>();
+        //quad_mesh.attachExistingComponent(Engine::createComponentWithTTL<Component::WorldTransform>(1)->id());
 
         //ai_vehicle->id().attachExistingComponent(Component::Visible::id());
         for (const auto &system : Engine::systems()) {

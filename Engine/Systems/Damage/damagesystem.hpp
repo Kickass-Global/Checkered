@@ -13,10 +13,10 @@
 #include "../../Components/damage.hpp"
 #include "../../Components/EventHandler.h"
 #include "../Events/Events.h"
-#include "../../Components/ComponentEvent.h"
+#include "EventDelegate.h"
 #include "../../Systems/systeminterface.hpp"
 #include "../systeminterface.hpp"
-#include "../../Components/Dirty.h"
+#include "tags.h"
 
 namespace Engine {
 
@@ -29,16 +29,14 @@ class DamageSystem : public Engine::SystemInterface {
 
     void update(Engine::deltaTime elapsed) override {
 
-        auto models = Component::Index::entitiesOf(
-                Component::ClassId::Model
-        );
+        auto models = Component::Index::entitiesOf<Component::Model>();
 
         for (const auto &model : models) {
 
             auto &&meta = model.data<Component::Model>();
 
-            const bool is_dirty = model.hasChildComponent(Component::Dirty::id());
-            model.destroyComponent(Component::Dirty::id());
+
+            const bool is_dirty = model.hasTag<Component::Dirty>();
 
             const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
             auto has_transform = !transform.empty();
@@ -51,12 +49,11 @@ class DamageSystem : public Engine::SystemInterface {
 
                     auto &&mesh = part.variations[part.active_variation].mesh;
 
-                    mesh.attachExistingComponent(Component::Visible::id());
-                    mesh.attachExistingComponent(Component::Dirty::id());
+                    mesh.addTag<Component::Visible>();
+                    mesh.addTag<Component::Dirty>();
                     mesh.attachExistingComponent(*transform.begin());
 
                 }
-                model.destroyComponent(Component::Dirty::id());
             }
 
             // check to see if this model has received any damage...
@@ -102,10 +99,11 @@ class DamageSystem : public Engine::SystemInterface {
 
                     auto &&mesh = part.variations[part.active_variation].mesh;
 
-                    mesh.attachExistingComponent(Component::Visible::id());
 
-					if(has_transform)
-						mesh.attachExistingComponent(*transform.begin());
+                    mesh.addTag<Component::Visible>();
+
+                    if (has_transform)
+                        mesh.attachExistingComponent(*transform.begin());
 
                     auto variation_changed = part.active_variation != previous;
 
@@ -114,7 +112,7 @@ class DamageSystem : public Engine::SystemInterface {
                                 "Updating variation#",
                                 part.active_variation
                         );
-                        mesh.attachExistingComponent(Component::Dirty::id());
+                        mesh.addTag<Component::Dirty>();
                     }
 
                 }

@@ -9,8 +9,7 @@
 
 #include <ostream>
 #include <memory>
-
-#include "Index.h"
+#include <set>
 
 namespace Component {
 
@@ -20,6 +19,7 @@ namespace Component {
 
     enum class ClassId : unsigned int {
         Camera = 0xBEEF0000,
+        Tag,
         Shader,
         Mesh,
         Model,
@@ -41,16 +41,17 @@ namespace Component {
 
     struct ComponentId {
 
+        enum {
+            UNIQUE_ID = 1
+        };
+
         static const unsigned int Null = 0xffffffffu;
 
         unsigned int id;
 
+        // creates a null-like id
         ComponentId();
-        ComponentId(const ComponentId& other);
-        ComponentId(bool, unsigned int) noexcept;
-
-        ComponentId Create();
-
+        ComponentId(const ComponentId &other);
         explicit ComponentId(bool) noexcept;
 
         bool operator<(const ComponentId &other) const;
@@ -68,25 +69,22 @@ namespace Component {
         friend std::ostream &
         operator<<(std::ostream &out, const Component::ComponentId &id);
 
+        template<typename T>
+        void addTag() const;
+
+        template<typename T>
+        [[nodiscard]] bool hasTag() const;
+
         void attachExistingComponent(Component::ComponentId componentId) const;
         void destroyComponent(Component::ComponentId componentId) const;
         void destroyComponentsOfType(Component::ClassId classId) const;
 
-        ComponentId parent() { return Component::Index::parentOf(*this); }
-
         [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
                 (Component::ClassId classId) const;
 
-        [[nodiscard]] bool hasChildComponent(const Component::ComponentId &componentId) const;
-
     };
 
-    template<typename T>
-    T *Component::ComponentId::data() const {
-        return Index::entityData<T>(*this);
-    }
-
-    std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
+    std::ostream &operator<<(std::ostream &out, const Component::ClassId &id);
 }
 
 #endif //ENGINE_COMPONENTID_H

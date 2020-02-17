@@ -3,40 +3,42 @@
 //
 
 #include <Events/Events.h>
-#include <ComponentEvent.h>
-#include <Dirty.h>
+#include <EventDelegate.h>
+#include <tags.h>
 #include <Vehicle.h>
 #include "vehiclesystem.hpp"
-#include <physicshandler.hpp>
+#include "WorldTransform.h"
+#include <physicspacket.hpp>
 
 void Engine::vehicleSystem::initialize() {
     SystemInterface::initialize();
 }
 void Engine::vehicleSystem::update(Engine::deltaTime) {
-	for (const auto &vehicle : Component::Index::entitiesOf(Component::ClassId::Vehicle)) {
+    for (const auto &vehicle : Component::Index::entitiesOf<Component::Vehicle>()) {
 
-		// check to see if we need to create a new phyx vehicle...
-		if (vehicle.hasChildComponent(Component::Dirty::id()) && !vehicle.data<Component::Vehicle>()->pxVehicle) {
-			onVehicleCreated(vehicle);
-		}
+        // check to see if we need to create a new phyx vehicle...
+        auto is_dirty = vehicle.hasTag<Component::Dirty>();
+        if (is_dirty && !vehicle.data<Component::Vehicle>()->pxVehicle) {
+            onVehicleCreated(vehicle);
+        }
 
-		auto is_dirty = vehicle.hasChildComponent(Component::Dirty::id());
-		auto physicsUpdates = vehicle.childComponentsOfClass(Component::ClassId::PhysicsPacket);
-		auto has_physics_update = !physicsUpdates.empty();
+        auto physicsUpdates = vehicle.childComponentsOfClass(Component::ClassId::PhysicsPacket);
+        auto has_physics_update = !physicsUpdates.empty();
 
-		auto meta = vehicle.data<Component::Vehicle>();
+        auto meta = vehicle.data<Component::Vehicle>();
 
-		if (has_physics_update) {
+        if (has_physics_update) {
 
-			auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
-			auto T = glm::translate(physx_data->position) * glm::mat4_cast(physx_data->rotation);
-			meta->world_transform = T;
+            auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
+            auto T = glm::translate(physx_data->position) * glm::mat4_cast(physx_data->rotation);
+            meta->world_transform = T;
 
-			if (vehicle.data<Component::Vehicle>()->model) {
-				vehicle.data<Component::Vehicle>()->model.attachExistingComponent(Engine::createComponent<Component::WorldTransform>(T)->id());
-			}
-		}
+            if (vehicle.data<Component::Vehicle>()->model) {
+                vehicle.data<Component::Vehicle>()->model.attachExistingComponent(
+                        Engine::createComponentWithTTL<Component::WorldTransform>(3, T)->id());
+            }
+        }
 
-		vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
-	}
+        vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
+    }
 }

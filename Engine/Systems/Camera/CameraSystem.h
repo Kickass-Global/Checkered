@@ -22,8 +22,8 @@
 #include "Camera.h"
 #include "systeminterface.hpp"
 #include "Index.h"
-#include "Dirty.h"
-#include "ComponentEvent.h"
+#include "tags.h"
+#include "EventDelegate.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"
@@ -97,7 +97,7 @@ namespace Camera {
             float zoom = u / sensitivity * elapsed;
 
 
-            for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
+            for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
                 //if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
 
                 auto data = Component::Index::entityData<Component::Camera>(camera);
@@ -109,7 +109,7 @@ namespace Camera {
                 data->position.z += u;
 
                 //if camera view matrix has changed mark it as dirty
-                Component::Index::addComponent(camera, Component::Dirty::id());
+                camera.addTag<Component::Dirty>();
                 Engine::log<module, Engine::low>("Marking Camera ", camera, " dirty");
 
                 // check if the camera is attached to a component, get that components
@@ -149,12 +149,12 @@ namespace Camera {
             auto &&width = std::get<0>(args.values);
             auto &&height = std::get<1>(args.values);
 
-            for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
+            for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
                 auto data = Component::Index::entityData<Component::Camera>(camera);
                 data->viewport.width = width;
                 data->viewport.height = height;
 
-                Component::Index::addComponent(camera, Component::Dirty::id());
+                camera.addTag<Component::Dirty>();
             }
         }
 

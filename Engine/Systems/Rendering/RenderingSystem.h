@@ -83,7 +83,7 @@ namespace Rendering {
 
     public:
 
-        static Component::ComponentEvent<int, int> onWindowSizeChanged;
+        static Component::EventDelegate<int, int> onWindowSizeChanged;
 
         void initialize() override;
 
