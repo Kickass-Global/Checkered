@@ -7,7 +7,8 @@
 
 #include "ComponentBase.h"
 #include "ComponentId.h"
-#include "ComponentEvent.h"
+#include "ComponentId.tpp.h"
+#include "EventDelegate.h"
 #include "EventHandler.h"
 #include "Index.h"
 

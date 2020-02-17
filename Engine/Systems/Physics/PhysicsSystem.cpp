@@ -5,13 +5,14 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include <Vehicle.h>
+#include <algorithm>
 
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
 #include "Events/Events.h"
-#include "physicshandler.hpp"
+#include "physicspacket.hpp"
 #include "snippetvehiclecommon/SnippetVehicleTireFriction.h"
-#include "Dirty.h"
+#include "tags.h"
 #include "Engine.h"
 
 using namespace physx;
@@ -178,7 +179,7 @@ void Physics::PhysicsSystem::createGround() {
 
 void Physics::PhysicsSystem::initVehicleSupport() {
 
-    cVehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, 1,
+    cVehicleSceneQueryData = VehicleSceneQueryData::allocate(100, PX_MAX_NB_WHEELS, 1, 100,
                                                              WheelSceneQueryPreFilterBlocking, nullptr,
                                                              cDefaultAllocator);
     cBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *cVehicleSceneQueryData, cScene);
@@ -192,7 +193,7 @@ void Physics::PhysicsSystem::initVehicleSupport() {
 }
 
 void Physics::PhysicsSystem::createDrivablePlayerVehicle() {
-//    createDrivableVehicle(PxTransform(0,0,0));
+    //    createDrivableVehicle(PxTransform(0,0,0));
 }
 
 PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform) {
@@ -221,50 +222,65 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
     // update all vehicles in the scene.
-
-    for (auto &vehicle : Component::Index::entitiesOf(Component::ClassId::Vehicle)) {
+    auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
+    std::vector<Component::ComponentId> active;
+    std::copy_if(vehicles.begin(), vehicles.end(), std::back_inserter(active), [](auto vehicle) {
         auto meta = vehicle.data<Component::Vehicle>();
+        return meta->pxVehicle; // vehicles might not be initialized yet...
+    });
 
-        if (!meta->pxVehicle) continue; // vehicles might not be initialized yet...
+    std::vector<Component::Vehicle *> metas;
+    std::transform(active.begin(), active.end(), std::back_inserter(metas),
+                   [](auto cid) { return cid.data<Component::Vehicle>(); });
+
+    for (auto &meta : metas) {
 
         PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
                 meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
                 timestep, meta->pxIsVehicleInAir, *meta->pxVehicle);
+    }
 
+    std::vector<PxVehicleWheels *> wheels;
+    std::transform(metas.begin(), metas.end(), std::back_inserter(wheels), [](auto meta) { return meta->pxVehicle; });
+
+    if (wheels.size() > 0) {
         //raycasts
-        PxVehicleWheels *vehicles[1] = {meta->pxVehicle};
         PxRaycastQueryResult *raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
         const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
-        PxVehicleSuspensionRaycasts(cBatchQuery, 1, vehicles, raycastResultsSize,
+        PxVehicleSuspensionRaycasts(cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,
                                     raycastResults);
 
         //vehicle update
         const PxVec3 grav = cScene->getGravity();
         PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-        PxVehicleWheelQueryResult vehicleQueryResults[1] = {{wheelQueryResults, meta->pxVehicle->mWheelsSimData.getNbWheels()}};
 
-        PxVehicleUpdates(0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, 1, vehicles, vehicleQueryResults);
+        std::vector<PxVehicleWheelQueryResult> vehicleQueryResults;
+        for (auto w : wheels) {
+
+            vehicleQueryResults.push_back({wheelQueryResults, wheels[0]->mWheelsSimData.getNbWheels()});
+        }
+        PxVehicleUpdates(0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, wheels.size(), wheels.data(),
+                         vehicleQueryResults.data());
 
         //workout if vehicle is in air
-        cIsVehicleInAir = meta->pxVehicle->getRigidDynamicActor()->isSleeping()
-                          ? false
-                          : PxVehicleIsInAir(vehicleQueryResults[0]);
-
-
+        //cIsVehicleInAir = meta->pxVehicle->getRigidDynamicActor()->isSleeping()
+        //	? false
+        //	: PxVehicleIsInAir(vehicleQueryResults[0]);
     }
 
     cScene->simulate(0.0001 + timestep / 1000.0f);
     cScene->fetchResults(true);
 
     // replicate physx bodies' world transforms to corresponding components.
-    for (auto&[actor, component]: trackedComponents) {
+    for (auto&[actor, component] : trackedComponents) {
         auto t = actor->getGlobalPose();
         component.attachExistingComponent(
-                Engine::createComponent<Component::PhysicsPacket>(
+                Engine::createComponentWithTTL<Component::PhysicsPacket>(
+                        1,
                         glm::vec3(t.p.x, t.p.y, t.p.z),
                         glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id());
 
-        component.attachExistingComponent(Component::Dirty::id());
+        component.addTag<Component::Dirty>();
     }
 }
 

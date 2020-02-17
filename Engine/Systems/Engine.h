@@ -15,21 +15,22 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <WorldTransform.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/transform.hpp"
 
 #include "ComponentId.h"
-#include "Dirty.h"
 #include "Index.h"
+#include "tags.h"
 #include "systeminterface.hpp"
 
 #undef assert
 
 namespace Component {
     template<typename... Args>
-    class ComponentEvent;
+    class EventDelegate;
 
     template<typename... As>
     class EventArgs;
@@ -40,9 +41,9 @@ namespace Component {
 
 namespace Engine {
 
-/**
- * Used to keep track of which systems are currently running in the engine.
- */
+    /**
+     * Used to keep track of which systems are currently running in the engine.
+     */
     extern std::vector<std::unique_ptr<Engine::SystemInterface>> registeredSystems;
 
     typedef float deltaTime;
@@ -51,16 +52,16 @@ namespace Engine {
         const char module[] = "Engine";
     }
 
-/**
- * Returns collection of systems currently running in the engine.
- */
+    /**
+     * Returns collection of systems currently running in the engine.
+     */
     const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
 
-/**
- * Creates a new system to the engine; systems need to be default constructable.
- * @tparam T the type of system
- * @return returns a reference to the new system.
- */
+    /**
+     * Creates a new system to the engine; systems need to be default constructable.
+     * @tparam T the type of system
+     * @return returns a reference to the new system.
+     */
     template<typename T>
     T *addSystem() {
         registeredSystems.push_back(std::make_unique<T>());
@@ -68,24 +69,24 @@ namespace Engine {
         return static_cast<T *>(registeredSystems.back().get());
     }
 
-/**
- * Users to keep track of 'human-readable' names for components; mostly for debugging purposes.
- */
+    /**
+     * Users to keep track of 'human-readable' names for components; mostly for debugging purposes.
+     */
     extern std::map<Component::ComponentId, std::string> identifier;
 
-/**
- * Gives a name to the component; useful for debugging purposes.
- * @param componentId the component to name
- * @param name the name of the component.
- */
+    /**
+     * Gives a name to the component; useful for debugging purposes.
+     * @param componentId the component to name
+     * @param name the name of the component.
+     */
     void nameComponent(const Component::ComponentId &componentId, std::string name);
 
-/**
- * Adds an existing component to the engine; the component ownership is transferred to the engine.
- * @tparam T the type of the component
- * @param data the component data
- * @return returns a valid pointer to the component in the engine.
- */
+    /**
+     * Adds an existing component to the engine; the component ownership is transferred to the engine.
+     * @tparam T the type of the component
+     * @param data the component data
+     * @return returns a valid pointer to the component in the engine.
+     */
     template<typename T>
     T *addComponent(std::unique_ptr<T> data) {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
@@ -94,32 +95,63 @@ namespace Engine {
         auto classId = data->classId();
 
         Component::Index::push_entity(classId, id, std::move(data));
-        id.attachExistingComponent(Component::Dirty::id());
+
+        id.addTag<Component::Dirty>();
 
         return id.data<T>();
     }
 
-/**
- * Creates a new component and adds it to the engine.
- * @tparam T the type of component to create.
- * @tparam Args the types of arguments to pass to the constructor of the component.
- * @param args the actual arguments to pass to the constructor of the component
- * @return returns a pointer to the created component.
- */
+    /**
+     * Creates a new component and adds it to the engine.
+     * @tparam T the type of component to create.
+     * @tparam Args the types of arguments to pass to the constructor of the component.
+     * @param args the actual arguments to pass to the constructor of the component
+     * @return returns a pointer to the created component.
+     */
+
     template<typename T, typename... Args>
-    T *createComponent(Args... args) {
-        static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
+    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
+    *createComponent(Args... args) {
 
-        auto component = std::make_unique<T>(args...);
-        auto id = component->id();
-        auto classId = component->classId();
+        auto allocation = Component::Index::allocate<T>();
+        if (allocation) {
+            *allocation = T(args...);
+            allocation->id().addTag<Component::Dirty>();
+            return allocation;
+        } else {
 
-        Component::Index::push_entity<T>(classId, id, std::move(component));
+            auto component = std::make_unique<T>(args...);
+            auto id = component->id();
+            auto classId = component->classId();
 
-        id.attachExistingComponent(Component::Dirty::id());
-
-        return id.data<T>();
+            Component::Index::push_entity<T>(classId, id, std::move(component));
+            id.addTag<Component::Dirty>();
+            return id.data<T>();
+        }
     }
+
+    template<typename T, typename... Args>
+    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
+    *createComponentWithTTL(int ttl, Args... args) {
+
+        T *result = Component::Index::allocate<T>();
+        if (result) {
+            *result = T(args...);
+            result->id().addTag<Component::Dirty>();
+        } else {
+
+            auto component = std::make_unique<T>(args...);
+            auto id = component->id();
+            auto classId = component->classId();
+
+            Component::Index::push_entity<T>(classId, id, std::move(component));
+            id.addTag<Component::Dirty>();
+            result = id.data<T>();
+        }
+        Component::Index::set_ttl(result->id(), ttl);
+        return result;
+    }
+
 
     struct Name {
         std::string value;
@@ -129,12 +161,12 @@ namespace Engine {
 
     std::ostream &operator<<(std::ostream &out, Name name);
 
-/**
- * Asserts that given condition is successful and logs the given message.
- * @tparam module name to tag log messages with.
- * @param test the condition to test.
- * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
- */
+    /**
+     * Asserts that given condition is successful and logs the given message.
+     * @tparam module name to tag log messages with.
+     * @param test the condition to test.
+     * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
+     */
     template<char const *m = module, class ... Ts>
     void assertLog(bool test, Ts...args) {
 
@@ -154,14 +186,14 @@ namespace Engine {
         high
     };
 
-    static Importance loggingLevel = high;
+    constexpr Importance loggingLevel = high;
 
     template<char const *m = module, Importance importance = medium, class ... Ts>
     void log(Ts...args) {
         if (importance >= loggingLevel) {
-            std::cout << Name(m);
-            (std::cout << ... << args);
-            std::cout << std::endl;
+            //std::cout << Name(m);
+            //(std::cout << ... << args);
+            //std::cout << std::endl;
         }
     }
 

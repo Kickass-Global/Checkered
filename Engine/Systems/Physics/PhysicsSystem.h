@@ -19,7 +19,7 @@
 #include "Engine.h"
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
-#include "../../Components/ComponentEvent.h"
+#include "EventDelegate.h"
 #include <Vehicle.h>
 
 

@@ -3,8 +3,8 @@
 //
 
 #pragma once
-#ifndef ENGINE_COMPONENTEVENT_H
-#define ENGINE_COMPONENTEVENT_H
+#ifndef ENGINE_EVENTDELEGATE_H
+#define ENGINE_EVENTDELEGATE_H
 
 #include <iostream>
 #include <functional>
@@ -34,13 +34,13 @@ namespace Component {
      * This allows components to pass information between one another directly.
      */
     template<typename... Args>
-    class ComponentEvent : public ComponentBase<ClassId::Event>{
+    class EventDelegate : public ComponentBase<ClassId::Event> {
 
         std::vector<Component::ComponentId> subscribers;
 
     public:
 
-        ComponentEvent(std::string name);
+        EventDelegate(std::string name);
 
         /**
          * Invokes the event args to all listeners
@@ -61,7 +61,7 @@ namespace Component {
      * @param args The arguments to pass to subscribers
      */
     template<typename... Args>
-    void ComponentEvent<Args...>::operator()(Args... args) {
+    void EventDelegate<Args...>::operator()(Args... args) {
 
         Engine::log<module>("ComponentEvent#", id(), " called.");
 
@@ -81,7 +81,7 @@ namespace Component {
      * @param subscriber the subscribing component.
      */
     template<typename... Args>
-    void ComponentEvent<Args...>::operator+=(Component::ComponentId subscriber) {
+    void EventDelegate<Args...>::operator+=(Component::ComponentId subscriber) {
 
         Engine::log<module>("Adding subscriber#", subscriber, " to ComponentEvent#", id());
 
@@ -95,9 +95,9 @@ namespace Component {
      * @param name the name of the component event.
      */
     template<typename... Args>
-    ComponentEvent<Args...>::ComponentEvent(std::string name) {
+    EventDelegate<Args...>::EventDelegate(std::string name) {
         Engine::nameComponent(id(), name);
     }
 }
 
-#endif //ENGINE_COMPONENTEVENT_H
+#endif //ENGINE_EVENTDELEGATE_H

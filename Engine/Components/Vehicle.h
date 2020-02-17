@@ -9,11 +9,11 @@
 #include <vehicle/PxVehicleDrive4W.h>
 #include <Events/Events.h>
 #include <EventHandler.h>
-#include <ComponentEvent.h>
+#include <EventDelegate.h>
 
 #include "Model.h"
 #include "ComponentId.h"
-#include "Dirty.h"
+#include "tags.h"
 
 #include <glm/glm.hpp>
 
@@ -24,7 +24,7 @@ namespace Component {
 		ComponentId model{};
 		ComponentId input{};
         ComponentId onTickHandler;
-        ComponentEvent<ComponentId> tickHandler = ("handler");
+        EventDelegate<ComponentId> tickHandler = ("handler");
             
         glm::mat4 world_transform = glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
