@@ -25,6 +25,9 @@ namespace Input {
         keyHandler(GLFWwindow * /*window*/, int key, int /*scancode*/,
                    int action, int /*mods*/);
 
+        static void
+            gamepadHandler(int jid, int action);
+
     public:
 
         static Component::ComponentEvent<int> onKeyPress;

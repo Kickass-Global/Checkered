@@ -9,6 +9,7 @@
 #include <PxPhysicsAPI.h>
 #include <Vehicle/vehiclesystem.hpp>
 #include <Vehicle.h>
+#include "Passenger.h"
 
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -27,6 +28,7 @@ int main() {
 
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
+    
 
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
@@ -113,6 +115,11 @@ int main() {
         return ai_vehicle;
 
     };
+
+
+    //setup passenger
+    auto passenger_entity = Engine::createComponent<Component::Passenger>();
+    passenger_entity->initPassenger();
 
     // setup ai "brain"
 
