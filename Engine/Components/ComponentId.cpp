@@ -42,12 +42,15 @@ Component::ClassId Component::ComponentId::classId() const {
     return meta ? meta->classId() : Component::ClassId::None;
 }
 
-void Component::ComponentId::attachExistingComponent(Component::ComponentId componentId) const {
-    Component::Index::addComponent(*this, componentId);
+void Component::ComponentId::attachExistingComponent(const Component::ComponentId& componentId) const {
+    Component::Index::addComponent(*this, componentId, -1);
 }
 
-void
-Component::ComponentId::destroyComponent(Component::ComponentId componentId) const {
+void Component::ComponentId::attachTemporaryComponent(const Component::ComponentId& componentId, int ttl) const {
+    Component::Index::addComponent(*this, componentId, ttl);
+}
+
+void Component::ComponentId::destroyComponent(const Component::ComponentId& componentId) const {
     Component::Index::removeComponent(*this, componentId);
 }
 

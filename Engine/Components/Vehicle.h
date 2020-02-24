@@ -24,7 +24,7 @@ namespace Component {
 		ComponentId model{};
 		ComponentId input{};
         ComponentId onTickHandler;
-        EventDelegate<ComponentId> tickHandler = ("handler");
+        EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
             
         glm::mat4 world_transform = glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 

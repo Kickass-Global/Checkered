@@ -12,21 +12,16 @@ void Engine::EventSystem::update(Engine::deltaTime time) {
 
     // todo: combine EventArgs between updates so that handlers don't get showered with events. #optimization
 
-    onTick(time);
 
-    for (Component::ComponentId handler : registeredHandlers) {
+    for (const Component::ComponentId& handler : registeredHandlers) {
 
         std::set<Component::ComponentId> set = handler.childComponentsOfClass(Component::ClassId::EventArgs);
-        for (Component::ComponentId eventArgs : set) {
+        for (const Component::ComponentId& eventArgs : set) {
 
             // I want to take all the data and pass it to the callback of the handler
             auto data = eventArgs.data<Component::EventArgs<>>();
             handler.data<Component::EventHandler<>>()->callback(*data);
 
-        }
-        // remove eventArgs from handler
-        for (auto &&id : set) {
-            handler.destroyComponent(id);
         }
     }
 }

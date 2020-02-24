@@ -11,6 +11,7 @@
 #include <vector>
 #include <tuple>
 
+#include "Engine.h"
 #include "Component.h"
 
 namespace Component {
@@ -40,7 +41,7 @@ namespace Component {
 
     public:
 
-        EventDelegate(std::string name);
+        explicit EventDelegate(std::string name);
 
         /**
          * Invokes the event args to all listeners
@@ -66,13 +67,8 @@ namespace Component {
         Engine::log<module>("ComponentEvent#", id(), " called.");
 
         for (Component::ComponentId listener : subscribers) {
-
-            auto eventArgs = std::make_unique<EventArgs<Args...>>(args...);
-            auto id = eventArgs->id();
-            auto classId = eventArgs->classId();
-
-            Index::push_entity(classId, id, std::move(eventArgs));
-            listener.attachExistingComponent(id);
+            auto eventArgs = Engine::createComponent<Component::EventArgs<Args...>>(args...);
+            listener.attachTemporaryComponent(eventArgs->id(), 1);
         }
     }
 
