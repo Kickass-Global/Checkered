@@ -35,6 +35,7 @@ namespace Component {
         EventArgs,
         EventHandler,
         Billboard,
+        Passenger,
         None = 0xFFFFFFFF
     };
 
