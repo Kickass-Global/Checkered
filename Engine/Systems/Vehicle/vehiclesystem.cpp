@@ -34,11 +34,9 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
             meta->world_transform = T;
 
             if (vehicle.data<Component::Vehicle>()->model) {
-                vehicle.data<Component::Vehicle>()->model.attachExistingComponent(
-                        Engine::createComponentWithTTL<Component::WorldTransform>(3, T)->id());
+                vehicle.data<Component::Vehicle>()->model.attachTemporaryComponent(
+                        Engine::createComponent<Component::WorldTransform>(T)->id(), 1);
             }
         }
-
-        vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
     }
 }

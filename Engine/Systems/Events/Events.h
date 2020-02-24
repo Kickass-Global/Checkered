@@ -38,11 +38,11 @@ namespace Engine {
  */
     class EventSystem : public Engine::SystemInterface {
 
-        static Component::EventDelegate<Engine::deltaTime> onTick;
 
         static std::set<Component::ComponentId> registeredHandlers;
 
     public:
+        static Component::EventDelegate<Engine::deltaTime> onTick;
 
         void update(Engine::deltaTime /*elapsed*/) override;
 

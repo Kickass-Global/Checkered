@@ -30,10 +30,7 @@ namespace Component {
 
         ComponentBase() : m_id(true) {}
 
-        ComponentBase &operator=(ComponentBase &other) {
-            if (this != &other) {
-                // uh
-            }
+        ComponentBase &operator=(ComponentBase const&other) {
             return *this;
         }
     };

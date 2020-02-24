@@ -225,13 +225,13 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
     std::vector<Component::ComponentId> active;
     std::copy_if(vehicles.begin(), vehicles.end(), std::back_inserter(active), [](auto vehicle) {
-        auto meta = vehicle.data<Component::Vehicle>();
+        auto meta = vehicle.template data<Component::Vehicle>();
         return meta->pxVehicle; // vehicles might not be initialized yet...
     });
 
     std::vector<Component::Vehicle *> metas;
     std::transform(active.begin(), active.end(), std::back_inserter(metas),
-                   [](auto cid) { return cid.data<Component::Vehicle>(); });
+                   [](auto cid) { return cid.template data<Component::Vehicle>(); });
 
     for (auto &meta : metas) {
 
@@ -243,7 +243,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     std::vector<PxVehicleWheels *> wheels;
     std::transform(metas.begin(), metas.end(), std::back_inserter(wheels), [](auto meta) { return meta->pxVehicle; });
 
-    if (wheels.size() > 0) {
+    if (!wheels.empty()) {
         //raycasts
         PxRaycastQueryResult *raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
         const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
@@ -274,13 +274,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     // replicate physx bodies' world transforms to corresponding components.
     for (auto&[actor, component] : trackedComponents) {
         auto t = actor->getGlobalPose();
-        component.attachExistingComponent(
-                Engine::createComponentWithTTL<Component::PhysicsPacket>(
-                        1,
+        component.attachTemporaryComponent(
+                Engine::createComponent<Component::PhysicsPacket>(
                         glm::vec3(t.p.x, t.p.y, t.p.z),
-                        glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id());
-
-        component.addTag<Component::Dirty>();
+                        glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id(),
+                1);
     }
 }
 
