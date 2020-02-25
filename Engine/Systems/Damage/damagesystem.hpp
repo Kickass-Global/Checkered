@@ -36,7 +36,7 @@ class DamageSystem : public Engine::SystemInterface {
             auto &&meta = model.data<Component::Model>();
 
 
-            const bool is_dirty = model.hasTag<Component::Dirty>();
+            const bool is_dirty = model.hasTag<Component::Dirty>(true);
 
             const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
             auto has_transform = !transform.empty();
@@ -102,9 +102,10 @@ class DamageSystem : public Engine::SystemInterface {
 
                     mesh.addTag<Component::Visible>();
 
-                    if (has_transform)
-                        mesh.attachExistingComponent(*transform.begin());
-
+					if (has_transform)
+					{
+						mesh.attachExistingComponent(*transform.begin());
+					}
                     auto variation_changed = part.active_variation != previous;
 
                     if (variation_changed) {

@@ -10,6 +10,7 @@
 #include <ostream>
 #include <memory>
 #include <set>
+#include <typeindex>
 
 namespace Component {
 
@@ -46,21 +47,21 @@ namespace Component {
 
 		static const unsigned int Null = 0xffffffffu;
 
+		ClassId type;
 		unsigned int id;
 
 		// creates a null-like id
 		ComponentId();
 		ComponentId(const ComponentId& other);
-		explicit ComponentId(bool) noexcept;
+		explicit ComponentId(ClassId type) noexcept;
+
+		ClassId classId() const;
 
 		bool operator<(const ComponentId& other) const;
 
 		operator bool() const noexcept {
 			return id != Null;
 		}
-
-		[[nodiscard]] ComponentInterface* base() const;
-		[[nodiscard]] Component::ClassId classId() const;
 
 		template<typename T>
 		[[nodiscard]] T* data() const;
@@ -72,17 +73,17 @@ namespace Component {
 		void addTag() const;
 
 		template<typename T>
-		[[nodiscard]] bool hasTag() const;
+		[[nodiscard]] bool hasTag(bool clear) const;
 
-		void attachExistingComponent(const Component::ComponentId& componentId) const;
+		void attachExistingComponent(const ComponentId component) const;
 		void destroyComponent(const Component::ComponentId& componentId) const;
 		void destroyComponentsOfType(Component::ClassId classId) const;
 
 		[[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
 		(Component::ClassId classId) const;
 
-        void attachTemporaryComponent(const ComponentId& componentId, int ttl) const;
-    };
+		void attachTemporaryComponent(const ComponentId componentId, int ttl) const;
+	};
 
 	std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
 }

@@ -21,14 +21,15 @@ namespace Rendering {
 
     class RenderingSystem;
 
-    class Shader {
+    class Shader : public Component::ComponentBase<Component::ClassId::Shader> {
         GLuint m_id;
 
     public:
 
         Shader();
 
-        GLuint id() const;
+		GLuint glid() const;
+
         Shader(GLenum shader_type, std::vector<std::string> &lines);
 
         ~Shader();
@@ -47,7 +48,7 @@ namespace Rendering {
 
             Engine::log<module>("Creating program ", m_id);
 
-            for(auto&& shader : shaders) glAttachShader(m_id, shader->id());
+            for(auto&& shader : shaders) glAttachShader(m_id, shader->glid());
 
             glLinkProgram(m_id);
 
@@ -65,7 +66,7 @@ namespace Rendering {
             }
             Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
 
-            for(auto&& shader : shaders) glDetachShader(m_id, shader->id());
+            for(auto&& shader : shaders) glDetachShader(m_id, shader->glid());
         }
 
         GLuint programId();

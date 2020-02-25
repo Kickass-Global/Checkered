@@ -190,7 +190,7 @@ namespace Engine {
 		high
 	};
 
-	constexpr Importance loggingLevel = medium;
+	constexpr Importance loggingLevel = high;
 
 	template<char const* m = module, Importance importance = medium, class ... Ts>
 	void log(Ts...args) {

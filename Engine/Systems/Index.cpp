@@ -14,48 +14,26 @@ using namespace Component;
 using namespace Engine;
 
 
-std::unordered_map<ComponentId, std::set<ComponentId>> Index::entityComponents(8000);
-std::unordered_map<std::type_index, std::set<ComponentId>> Index::entities(8000);
+std::unordered_map<ComponentId, ClassMap> Index::child_components(8000);
+ClassMap Index::scene(8000);
 std::unordered_map<ComponentId, std::unique_ptr<ComponentInterface>> Index::meta(8000);
 std::unordered_map<ComponentId, TTL> Index::ttl(8000);
-std::unordered_map <ComponentId, Reference> Index::refs(8000);
+std::unordered_map <ComponentId, Reference> Index::reference_count(8000);
 
 std::set<ComponentId> Index::componentsOf
 (ComponentId id, ClassId classId) {
-	std::set<ComponentId> children;
-	// Create a copy of all children with matching classId.
-	std::copy_if(entityComponents[id].begin(), entityComponents[id].end(),
-		std::inserter(children, children.end()),
-		[&classId](const ComponentId&
-			componentId) {
-				return
-					componentId.classId() == classId;
-		});
-
-	return children;
+	return child_components[id][classId];
 }
-
-void Index::addComponent(ComponentId eid, ComponentId cid, int ttl = -1) {
-	entityComponents[eid].emplace(cid);
-	if (ttl > 0) Index::ttl[cid] = { ttl, eid };
-	refs[cid].count = refs[cid].count == std::numeric_limits<int>::max() ? 1 : refs[cid].count++;
-}
-
-void Index::removeComponent(ComponentId eid, ComponentId cid) {
-	entityComponents[eid].erase(cid);
-	refs[cid].count--;
-}
-
 
 void Index::update(Engine::deltaTime) {
 
 	std::vector<ComponentId> garbage;
-	for (auto& [cid, life] : ttl) {
+	for (auto&[cid, life] : ttl) {
 		life.ttl--;
-		if (ttl[cid].ttl <= 0) {
+		if (ttl[cid].ttl < 0) {
 			garbage.emplace_back(cid);
-			entityComponents[life.owner].erase(cid);
-			refs[cid].count = 0;
+			//child_components[life.owner][typeid(T)].erase(cid);
+			reference_count[cid].count = 0;
 			life.ttl = 0;
 		}
 	}
