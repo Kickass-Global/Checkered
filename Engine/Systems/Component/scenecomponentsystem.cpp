@@ -26,7 +26,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
     for (const auto &sceneComponent : sceneComponents) {
 
-        auto is_dirty = sceneComponent.hasTag<Component::Dirty>();
+        auto is_dirty = sceneComponent.hasTag<Component::Dirty>(true);
         auto physicsUpdates = sceneComponent.childComponentsOfClass(Component::ClassId::PhysicsPacket);
         auto has_physics_update = !physicsUpdates.empty();
 

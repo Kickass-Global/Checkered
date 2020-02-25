@@ -26,9 +26,11 @@ namespace Component {
     public:
 
         [[nodiscard]] Component::ComponentId id() const override;
-        [[nodiscard]] Component::ClassId classId() const override;
+		[[nodiscard]] Component::ClassId classId() const override;
+		
+		[[nodiscard]] static Component::ClassId ComponentClass() { return m_class; }
 
-        ComponentBase() : m_id(true) {}
+        ComponentBase() : m_id(E) {}
 
         ComponentBase &operator=(ComponentBase const&other) {
             return *this;
@@ -55,7 +57,7 @@ namespace Component {
     }
 
     template<const char *name>
-    const Component::ComponentId Component::ComponentTag<name>::m_id = Component::ComponentId(ComponentId::UNIQUE_ID);
+    const Component::ComponentId Component::ComponentTag<name>::m_id = Component::ComponentId(ClassId::Tag);
 
 
     template<Component::ClassId E>

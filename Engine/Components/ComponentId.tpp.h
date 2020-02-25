@@ -13,8 +13,8 @@ T *Component::ComponentId::data() const {
 }
 
 template<typename T>
-bool Component::ComponentId::hasTag() const {
-    return Index::hasTag<T>(*this, true);
+bool Component::ComponentId::hasTag(bool clear = true) const {
+    return Index::hasTag<T>(*this, clear);
 }
 
 template<typename T>

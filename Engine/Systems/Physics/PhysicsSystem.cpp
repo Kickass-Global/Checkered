@@ -328,7 +328,7 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
     auto position = meta->world_transform[3];
     auto pxVehicle = createDrivableVehicle(PxTransform(position.x, position.y, position.z));
 
-    Engine::log<module, Engine::low>("onVehicleCreated #", pxVehicle);
+    Engine::log<module, Engine::high>("onVehicleCreated #", vehicleComponent);
 
     // link the component with the physx actor so we can replicate updates.
     meta->pxVehicle = pxVehicle;

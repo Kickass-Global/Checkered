@@ -25,10 +25,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glfwSetWindowTitle(window, title.c_str());
 
     // Find and update any GameObjects with meshes that should be drawn...
-    for (const Component::ComponentId &mesh : Component::Index::entitiesOf<Component::Mesh>()) {
+	auto meshes = Component::Index::entitiesOf<Component::Mesh>();
+    for (const Component::ComponentId &mesh : meshes) {
 
-        auto is_dirty = mesh.hasTag<Component::Dirty>();
-        auto is_visible = mesh.hasTag<Component::Visible>();
+        auto is_dirty = mesh.hasTag<Component::Dirty>(true);
+        auto is_visible = mesh.hasTag<Component::Visible>(true);
 
         if (!is_visible) {
             auto match = std::find_if(
@@ -92,12 +93,13 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         if (!batch->details.empty()) {
 
             for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-                auto camera_is_dirty = camera.hasTag<Component::Dirty>();
+                auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
 
                 if (camera_is_dirty) {
                     camera.addTag<Component::Dirty>(); // forward this state to the next batch...
 
-                    auto data = Component::Index::entityData<Component::Camera>(camera);
+					
+					auto data = camera.data<Component::Camera>();
                     auto view_matrix = data->view;
                     auto world_matrix = glm::translate(data->position);
 
@@ -296,6 +298,6 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
     Engine::assertLog<module>(success != GL_FALSE, "shader creation");
 }
 
-GLuint Rendering::Shader::id() const { return m_id; }
+GLuint Rendering::Shader::glid() const { return m_id; }
 
 Rendering::Shader::Shader() : m_id(static_cast<GLuint>(-1)) {}

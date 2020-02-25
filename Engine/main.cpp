@@ -26,7 +26,8 @@ int main() {
 
 	auto running = true;
 
-	Engine::addSystem<Component::Index>();
+	auto index = Engine::addSystem<Component::Index>();
+	index->order = 2;
 	auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
 	auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
 
@@ -102,6 +103,7 @@ int main() {
 
 	player_vehicle->model = player_damage_model->id();
 	player_vehicle->world_transform = glm::translate(glm::vec3(0.0f, 0.0f, -40.0f));
+
 	physicsSystem->playerVehicle = player_vehicle;
 
 	// ai factory method...

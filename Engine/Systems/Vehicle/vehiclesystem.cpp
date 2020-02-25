@@ -14,10 +14,12 @@ void Engine::vehicleSystem::initialize() {
     SystemInterface::initialize();
 }
 void Engine::vehicleSystem::update(Engine::deltaTime) {
-    for (const auto &vehicle : Component::Index::entitiesOf<Component::Vehicle>()) {
+
+	auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
+    for (const auto &vehicle : vehicles) {
 
         // check to see if we need to create a new phyx vehicle...
-        auto is_dirty = vehicle.hasTag<Component::Dirty>();
+        auto is_dirty = vehicle.hasTag<Component::Dirty>(true);
         if (is_dirty && !vehicle.data<Component::Vehicle>()->pxVehicle) {
             onVehicleCreated(vehicle);
         }
@@ -34,9 +36,11 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
             meta->world_transform = T;
 
             if (vehicle.data<Component::Vehicle>()->model) {
-                vehicle.data<Component::Vehicle>()->model.attachTemporaryComponent(
-                        Engine::createComponent<Component::WorldTransform>(T)->id(), 1);
+                vehicle.data<Component::Vehicle>()->model.attachExistingComponent(
+                        Engine::createComponent<Component::WorldTransform>(T)->id());
             }
         }
+
+		vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
     }
 }

@@ -68,7 +68,7 @@ namespace Component {
 
         for (Component::ComponentId listener : subscribers) {
             auto eventArgs = Engine::createComponent<Component::EventArgs<Args...>>(args...);
-            listener.attachTemporaryComponent(eventArgs->id(), 1);
+            listener.attachExistingComponent(eventArgs->id());
         }
     }
 
