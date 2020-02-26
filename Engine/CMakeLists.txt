@@ -10,8 +10,8 @@ file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
 
 set(SRC main.cpp main.h
         Systems/Engine.cpp Systems/Engine.h
-        Components/Index.cpp Components/Index.h
-        Components/Dirty.cpp Components/Dirty.h
+        Systems/Index.cpp Systems/Index.h
+        Components/tags.cpp Components/tags.h
         Components/Mesh.cpp Components/Mesh.h
         Components/SceneComponent.cpp Components/SceneComponent.h
         Systems/Debug/LiveReloadSystem.cpp Systems/Debug/LiveReloadSystem.h
@@ -25,6 +25,7 @@ set(SRC main.cpp main.h
         Systems/Pipeline/MeshLoader.h
         Components/Shader.cpp Components/Shader.h
         Components/ComponentId.cpp Components/ComponentId.h
+        Components/ComponentId.tpp.h
         Components/Camera.cpp Components/Camera.h
         Systems/Rendering/Rendering.h
         Components/Plane.cpp Components/Plane.h
@@ -33,7 +34,7 @@ set(SRC main.cpp main.h
         Components/Passenger.cpp Components/Passenger.h
         Components/Vehicle.cpp Components/Vehicle.h
         Components/EventHandler.cpp Components/EventHandler.h
-        Components/ComponentEvent.cpp Components/ComponentEvent.h
+        Components/EventDelegate.cpp Components/EventDelegate.h
         Systems/Rendering/BillboardSystem.cpp Systems/Rendering/BillboardSystem.h
         Components/Billboard.cpp Components/Billboard.h
         Components/Component.h
@@ -46,13 +47,14 @@ set(SRC main.cpp main.h
         Systems/Damage/damagesystem.hpp
         Components/damage.cpp Components/damage.hpp
         Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp
-        Systems/Component/scenecomponentsystem.hpp Components/physicshandler.cpp
-        Components/physicshandler.hpp
+        Systems/Component/scenecomponentsystem.hpp Components/physicspacket.cpp
+        Components/physicspacket.hpp
         Systems/soundSystem/sound.cpp
         Systems/soundSystem/sound.h
         Systems/hornSystem/hornSystem.cpp
         Systems/hornSystem/hornSystem.h
-        Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp)
+        Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp
+        Components/WorldTransform.h Components/WorldTransform.cpp Components/ComponentId.tpp.h)
 
 # Add source to this project's executable.
 add_executable(Engine

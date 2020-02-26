@@ -6,31 +6,35 @@
 
 std::set<Component::ComponentId> Engine::EventSystem::registeredHandlers;
 
-Component::ComponentEvent<Engine::deltaTime> Engine::EventSystem::onTick("onTick");
+Component::EventDelegate<Engine::deltaTime> Engine::EventSystem::onTick("onTick");
 
 void Engine::EventSystem::update(Engine::deltaTime time) {
 
-    // todo: combine EventArgs between updates so that handlers don't get showered with events. #optimization
+	// todo: combine EventArgs between updates so that handlers don't get showered with events. #optimization
 
-    onTick(time);
+	bool events_pending;
+	do {
+		events_pending = false;
+		for (const Component::ComponentId& handler : registeredHandlers) {
 
-    for (Component::ComponentId handler : registeredHandlers) {
+			std::set<Component::ComponentId> set = handler.childComponentsOfClass(Component::ClassId::EventArgs);
+			events_pending |= !set.empty(); // if any handlers have event args we want to keep proccessing...
 
-        std::set<Component::ComponentId> set = handler.childComponentsOfClass(Component::ClassId::EventArgs);
-        for (Component::ComponentId eventArgs : set) {
+			bool has_events_args = !set.empty();
 
-            // I want to take all the data and pass it to the callback of the handler
-            auto data = eventArgs.data<Component::EventArgs<>>();
-            handler.data<Component::EventHandler<>>()->callback(*data);
+			for (const Component::ComponentId& eventArgs : set) {
 
-        }
-        // remove eventArgs from handler
-        for (auto &&id : set) {
-            handler.destroyComponent(id);
-        }
-    }
+				// I want to take all the data and pass it to the callback of the handler
+				auto data = eventArgs.data<Component::EventArgs<>>();
+				handler.data<Component::EventHandler<>>()->callback(*data);
+
+			}
+
+			handler.destroyComponentsOfType(Component::ClassId::EventArgs);
+		}
+	} while (events_pending);
 }
 
 void Engine::EventSystem::registerHandler(const Component::ComponentId &handler) {
-    registeredHandlers.emplace(handler);
+	registeredHandlers.emplace(handler);
 }

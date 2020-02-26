@@ -2,8 +2,8 @@
 // Created by Jackson Cougar Wiebe on 2/8/2020.
 //
 
-#ifndef ENGINE_PHYSICSHANDLER_HPP
-#define ENGINE_PHYSICSHANDLER_HPP
+#ifndef ENGINE_PHYSICSPACKET_HPP
+#define ENGINE_PHYSICSPACKET_HPP
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -20,4 +20,4 @@ namespace Component {
     };
 }
 
-#endif //ENGINE_PHYSICSHANDLER_HPP
+#endif //ENGINE_PHYSICSPACKET_HPP

@@ -8,7 +8,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "../../main.h"
-#include "../../Components/ComponentEvent.h"
+#include "EventDelegate.h"
 #include "../../Systems/systeminterface.hpp"
 #include <memory>
 #include <functional>
@@ -30,9 +30,9 @@ namespace Input {
 
     public:
 
-        static Component::ComponentEvent<int> onKeyPress;
-        static Component::ComponentEvent<int> onKeyDown;
-        static Component::ComponentEvent<int> onKeyUp;
+        static Component::EventDelegate<int> onKeyPress;
+        static Component::EventDelegate<int> onKeyDown;
+        static Component::EventDelegate<int> onKeyUp;
 
         void initialize(GLFWwindow *window);
 

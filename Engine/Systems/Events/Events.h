@@ -11,7 +11,7 @@
 #include "Engine.h"
 #include "../../Systems/systeminterface.hpp"
 #include "../../Components/EventHandler.h"
-#include <ComponentEvent.h>
+#include <EventDelegate.h>
 
 namespace Engine {
 
@@ -38,11 +38,11 @@ namespace Engine {
  */
     class EventSystem : public Engine::SystemInterface {
 
-        static Component::ComponentEvent<Engine::deltaTime> onTick;
 
         static std::set<Component::ComponentId> registeredHandlers;
 
     public:
+        static Component::EventDelegate<Engine::deltaTime> onTick;
 
         void update(Engine::deltaTime /*elapsed*/) override;
 

@@ -12,6 +12,7 @@ namespace Engine {
 
     class SystemInterface {
     public:
+        int order = 1;
         virtual void update(Engine::deltaTime /*elapsed*/) = 0;
 
         virtual void initialize() {

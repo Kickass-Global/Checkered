@@ -5,12 +5,13 @@
 #include <sstream>
 #include "RenderingSystem.h"
 
-#include "../../Components/Dirty.h"
-#include "../../Components/Camera.h"
-#include "../../Components/SceneComponent.h"
+#include "tags.h"
+#include "Camera.h"
+#include "SceneComponent.h"
 #include "Engine.h"
+#include "WorldTransform.h"
 
-Component::ComponentEvent<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
+Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
 namespace {
     const char module[] = "RenderingSystem";
@@ -24,15 +25,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glfwSetWindowTitle(window, title.c_str());
 
     // Find and update any GameObjects with meshes that should be drawn...
-    for (const Component::ComponentId &mesh : Component::Index::entitiesOf(Component::ClassId::Mesh)) {
+	auto meshes = Component::Index::entitiesOf<Component::Mesh>();
+    for (const Component::ComponentId &mesh : meshes) {
 
-        auto is_dirty = Component::Index::hasComponent(
-                mesh,
-                Component::Dirty::id());
-
-        auto is_visible = Component::Index::hasComponent(
-                mesh,
-                Component::Visible::id());
+        auto is_dirty = mesh.hasTag<Component::Dirty>(true);
+        auto is_visible = mesh.hasTag<Component::Visible>(true);
 
         if (!is_visible) {
             auto match = std::find_if(
@@ -57,24 +54,14 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             auto classId = mesh.classId();
             auto data = mesh.data<Component::Mesh>();
 
-            for (auto &&transform : transforms) {
 
-                if (classId == Component::ClassId::Mesh) {
-                    buffer(*data);
-                    Engine::log("Adding instance transform#", transform);
-                    updateInstanceData(
-                            mesh,
-                            sizeof(glm::mat4),
-                            glm::value_ptr(transform.data<Component::WorldTransform>()->world_matrix), 
-						sizeof(glm::mat4));
-                }
-            }
-
-            mesh.destroyComponent(Component::Dirty::id());
+            Engine::log<module, Engine::high>("Updating batch data of#", mesh);
+            buffer(*data);
 
         }
         if(is_instanced)
         {
+            Engine::log("Updating instances of component#", mesh);
             auto classId = mesh.classId();
 			std::vector<glm::mat4> transform_data;
 
@@ -84,6 +71,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 					transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);   
                 }
             }
+
 			updateInstanceData(
 				mesh,
 				sizeof(glm::mat4) * transform_data.size(),
@@ -91,10 +79,10 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 				sizeof(glm::mat4)
 			);
         }
+
         for (auto &transform : transforms) {
             mesh.destroyComponent(transform);
         }
-        mesh.destroyComponent(Component::Visible::id());
     }
 
     glClearColor(0, 0, 0.5f, 1);
@@ -104,13 +92,15 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
         if (!batch->details.empty()) {
 
-            for (auto &&camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
-                auto camera_is_dirty = Component::Index::hasComponent(camera, Component::Dirty::id());
+            for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
+                auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
 
                 if (camera_is_dirty) {
+                    camera.addTag<Component::Dirty>(); // forward this state to the next batch...
 
-                    auto data = Component::Index::entityData<Component::Camera>(camera);
-					auto view_matrix = data->view;
+					
+					auto data = camera.data<Component::Camera>();
+                    auto view_matrix = data->view;
                     auto world_matrix = glm::translate(data->position);
 
                     auto perspective_matrix = glm::perspective(
@@ -148,10 +138,6 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             batch->bind(*this);
             batch->draw(*this);
         }
-    }
-
-    for (auto&& camera : Component::Index::entitiesOf(Component::ClassId::Camera)) {
-        camera.destroyComponentsOfType(Component::ClassId::Dirty);
     }
 
     glfwSwapBuffers(window);
@@ -312,6 +298,6 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
     Engine::assertLog<module>(success != GL_FALSE, "shader creation");
 }
 
-GLuint Rendering::Shader::id() const { return m_id; }
+GLuint Rendering::Shader::glid() const { return m_id; }
 
 Rendering::Shader::Shader() : m_id(static_cast<GLuint>(-1)) {}

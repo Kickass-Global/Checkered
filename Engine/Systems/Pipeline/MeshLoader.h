@@ -51,10 +51,9 @@ namespace Pipeline {
                 );
             }
 
-            for (auto i = 0u; i < data->mNumFaces; ++i)
-            {
+            for (auto i = 0u; i < data->mNumFaces; ++i) {
                 int x = 000;
-                auto&& face = data->mFaces[i];
+                auto &&face = data->mFaces[i];
                 Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
 
                 for (auto j = 0u; j < face.mNumIndices; ++j) {
@@ -62,9 +61,8 @@ namespace Pipeline {
                 }
             }
 
-            auto shaders = Component::Index::entitiesOf(
-                    Component::ClassId::Shader);
-            if (shaders.size() > 0) {
+            auto shaders = Component::Index::entitiesOf<Rendering::Shader>();
+            if (!shaders.empty()) {
                 mesh.shader = *(shaders.begin());
             }
 
