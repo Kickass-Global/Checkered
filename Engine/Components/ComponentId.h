@@ -9,18 +9,19 @@
 
 #include <ostream>
 #include <memory>
-
-#include "Index.h"
+#include <set>
+#include <typeindex>
 
 namespace Component {
 
-    class ComponentInterface;
+	class ComponentInterface;
 
-    extern unsigned int next_id;
+	extern unsigned int next_id;
 
     enum class ClassId : unsigned int {
         Camera = 0xBEEF0000,
         Shader,
+		Tag,
         Mesh,
         Model,
         GameObject,
@@ -39,55 +40,55 @@ namespace Component {
         None = 0xFFFFFFFF
     };
 
+	struct ComponentId {
 
-    struct ComponentId {
+		enum {
+			UNIQUE_ID = 1
+		};
 
-        static const unsigned int Null = 0xffffffffu;
+		static const unsigned int Null = 0xffffffffu;
 
-        unsigned int id;
+		ClassId type;
+		unsigned int id;
 
-        ComponentId();
-        ComponentId(const ComponentId& other);
-        ComponentId(bool, unsigned int) noexcept;
+		// creates a null-like id
+		ComponentId();
+		ComponentId(const ComponentId& other);
+		explicit ComponentId(ClassId type) noexcept;
 
-        ComponentId Create();
+		ClassId classId() const;
 
-        explicit ComponentId(bool) noexcept;
+		bool operator<(const ComponentId& other) const;
 
-        bool operator<(const ComponentId &other) const;
+		operator bool() const noexcept {
+			return id != Null;
+		}
 
-        operator bool() const noexcept {
-            return id != Null;
-        }
+		template<typename T>
+		[[nodiscard]] T* data() const;
 
-        [[nodiscard]] ComponentInterface *base() const;
-        [[nodiscard]] Component::ClassId classId() const;
+		friend std::ostream&
+			operator<<(std::ostream& out, const Component::ComponentId& id);
 
-        template<typename T>
-        [[nodiscard]] T *data() const;
+		template<typename T>
+		void addTag() const;
 
-        friend std::ostream &
-        operator<<(std::ostream &out, const Component::ComponentId &id);
+		template<typename T>
+		[[nodiscard]] bool hasTag(bool clear) const;
 
-        void attachExistingComponent(Component::ComponentId componentId) const;
-        void destroyComponent(Component::ComponentId componentId) const;
-        void destroyComponentsOfType(Component::ClassId classId) const;
+		void attachExistingComponent(const ComponentId component) const;
+		void destroyComponent(const Component::ComponentId& componentId) const;
+		void destroyComponentsOfType(Component::ClassId classId) const;
 
-        ComponentId parent() { return Component::Index::parentOf(*this); }
+		[[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
+		(Component::ClassId classId) const;
 
-        [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
-                (Component::ClassId classId) const;
+		void attachTemporaryComponent(const ComponentId componentId, int ttl) const;
+	};
 
-        [[nodiscard]] bool hasChildComponent(const Component::ComponentId &componentId) const;
-
-    };
-
-    template<typename T>
-    T *Component::ComponentId::data() const {
-        return Index::entityData<T>(*this);
-    }
-
-    std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
+	std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
 }
+
+
 
 #endif //ENGINE_COMPONENTID_H

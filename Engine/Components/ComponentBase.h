@@ -12,11 +12,8 @@ namespace Component {
 
     class ComponentInterface {
     public:
-        [[nodiscard]] virtual Component::ComponentId id() const  = 0;
+        [[nodiscard]] virtual Component::ComponentId id() const = 0;
         [[nodiscard]] virtual Component::ClassId classId() const = 0;
-
-        virtual void attachComponent(Component::ComponentId id) const = 0;
-        virtual void removeComponent(Component::ComponentId id) const = 0;
     };
 
     template<ClassId E>
@@ -29,25 +26,42 @@ namespace Component {
     public:
 
         [[nodiscard]] Component::ComponentId id() const override;
-        [[nodiscard]] Component::ClassId classId() const override;
-        void attachComponent(Component::ComponentId id) const override;
-        void removeComponent(Component::ComponentId id) const override;
+		[[nodiscard]] Component::ClassId classId() const override;
+		
+		[[nodiscard]] static Component::ClassId ComponentClass() { return m_class; }
 
-        ComponentBase() : m_id(true) {}
+        ComponentBase() : m_id(E) {}
+
+        ComponentBase &operator=(ComponentBase const&other) {
+            return *this;
+        }
     };
+
+    class ComponentTagInterface {
+        virtual Component::ComponentId id() = 0;
+    };
+
+    template<const char *name>
+    class ComponentTag : public ComponentTagInterface {
+    private:
+        const static Component::ComponentId m_id;
+
+    public:
+        Component::ComponentId id() override { return m_id; }
+        ComponentTag();
+    };
+
+    template<const char *name>
+    Component::ComponentTag<name>::ComponentTag() {
+        Engine::nameComponent(m_id, name);
+    }
+
+    template<const char *name>
+    const Component::ComponentId Component::ComponentTag<name>::m_id = Component::ComponentId(ClassId::Tag);
+
 
     template<Component::ClassId E>
     Component::ClassId ComponentBase<E>::classId() const { return m_class; }
-
-    template<Component::ClassId E>
-    void ComponentBase<E>::attachComponent(Component::ComponentId id) const {
-        Component::Index::addComponent(m_id, id);
-    }
-
-    template<Component::ClassId E>
-    void ComponentBase<E>::removeComponent(Component::ComponentId id) const {
-        Component::Index::removeComponent(m_id, id);
-    }
 
     template<Component::ClassId E>
     Component::ComponentId ComponentBase<E>::id() const { return m_id; }
