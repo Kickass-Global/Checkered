@@ -25,6 +25,7 @@
 #include "glm/gtx/quaternion.hpp"
 
 
+
 #include "Components/ComponentId.h"
-#include "Index.h"
-#include "EventDelegate.h"
+#include "Components/Index.h"
+#include "Components/ComponentEvent.h"
