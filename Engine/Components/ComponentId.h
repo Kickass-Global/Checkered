@@ -18,26 +18,27 @@ namespace Component {
 
 	extern unsigned int next_id;
 
-	enum class ClassId : unsigned int {
-		Camera = 0xBEEF0000,
+    enum class ClassId : unsigned int {
+        Camera = 0xBEEF0000,
+        Shader,
 		Tag,
-		Shader,
-		Mesh,
-		Model,
-		GameObject,
-		SceneComponent,
-		PhysicsPacket,
-		Dirty,
-		Damage,
-		Vehicle,
-		Transform,
-		Program,
-		Event,
-		EventArgs,
-		EventHandler,
-		Billboard,
-		None = 0xFFFFFFFF
-	};
+        Mesh,
+        Model,
+        GameObject,
+        SceneComponent,
+        PhysicsPacket,
+        Dirty,
+        Damage,
+        Vehicle,
+        Transform,
+        Program,
+        Event,
+        EventArgs,
+        EventHandler,
+        Billboard,
+        Passenger,
+        None = 0xFFFFFFFF
+    };
 
 	struct ComponentId {
 
