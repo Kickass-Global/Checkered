@@ -22,8 +22,6 @@
 #include "Camera.h"
 #include "systeminterface.hpp"
 #include "Index.h"
-#include "tags.h"
-#include "EventDelegate.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"
@@ -38,6 +36,8 @@ namespace Camera {
     class CameraSystem : public Engine::SystemInterface {
 
     public:
+
+        static Component::ComponentId id();
 
         Component::ComponentId onKeyPressHandler;
         Component::ComponentId onKeyDownHandler;

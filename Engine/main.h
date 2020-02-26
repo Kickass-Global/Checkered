@@ -27,5 +27,3 @@
 
 
 #include "Components/ComponentId.h"
-#include "Components/Index.h"
-#include "Components/ComponentEvent.h"
