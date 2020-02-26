@@ -22,9 +22,6 @@ namespace Component {
 
     class Visible : public ComponentTag<visible> {
     };
-
-    static Dirty dirty();
-    static Visible visible();
 }
 
 #endif //ENGINE_TAGS_H

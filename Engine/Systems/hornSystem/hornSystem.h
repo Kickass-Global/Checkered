@@ -6,8 +6,6 @@
 #include "Camera.h"
 #include "systeminterface.hpp"
 #include "Index.h"
-#include "Dirty.h"
-#include "ComponentEvent.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"

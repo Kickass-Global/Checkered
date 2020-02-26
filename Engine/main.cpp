@@ -34,10 +34,6 @@ int main() {
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 	auto index = Engine::addSystem<Component::Index>();
 	index->order = 2;
-	auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
-	auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
-
-	vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
 	Engine::addSystem<Component::SceneComponentSystem>();
 	Engine::addSystem<Engine::DamageSystem>();
