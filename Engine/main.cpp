@@ -9,6 +9,7 @@
 #include <PxPhysicsAPI.h>
 #include <Vehicle/vehiclesystem.hpp>
 #include <Vehicle.h>
+#include "Passenger.h"
 
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -26,6 +27,11 @@ int main() {
 
 	auto running = true;
 
+    auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
+    auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
+    
+
+    vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 	auto index = Engine::addSystem<Component::Index>();
 	index->order = 2;
 	auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
@@ -122,7 +128,12 @@ int main() {
 
 	};
 
-	// setup ai "brain"
+
+    //setup passenger
+    auto passenger_entity = Engine::createComponent<Component::Passenger>();
+    passenger_entity->initPassenger();
+
+    // setup ai "brain"
 
 	std::function<void(const Component::EventArgs<Component::ComponentId>&)> ai_tick_callback = [player_vehicle](
 		const Component::EventArgs<Component::ComponentId>& args) {

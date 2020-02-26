@@ -12,6 +12,9 @@ Component::EventDelegate<int> Input::InputSystem::onKeyUp("onKeyUp");
 
 void Input::InputSystem::initialize(GLFWwindow *window) {
     glfwSetKeyCallback(window, keyHandler);
+    glfwSetJoystickCallback(gamepadHandler);
+    
+    
 }
 
 void Input::InputSystem::keyHandler(GLFWwindow *, int key, int, int action, int) {
@@ -26,5 +29,24 @@ void Input::InputSystem::keyHandler(GLFWwindow *, int key, int, int action, int)
         onKeyDown(key);
     }
 }
+
+void Input::InputSystem::gamepadHandler(int jid, int event) {
+
+    GLFWgamepadstate state;
+
+    int present = glfwJoystickPresent(jid);
+    
+
+    if (glfwJoystickIsGamepad(jid)) {
+        std::cout << "test" << std::endl;
+    }
+
+   
+
+
+
+}
+
+
 
 void Input::InputSystem::update(Engine::deltaTime) {}
