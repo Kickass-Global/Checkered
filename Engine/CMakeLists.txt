@@ -54,7 +54,7 @@ set(SRC main.cpp main.h
         Systems/hornSystem/hornSystem.cpp
         Systems/hornSystem/hornSystem.h
         Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp
-        Components/WorldTransform.h Components/WorldTransform.cpp Components/ComponentId.tpp.h)
+        Components/WorldTransform.h Components/WorldTransform.cpp Components/ComponentId.tpp.h Components/texture.cpp Components/texture.hpp Components/material.cpp Components/material.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine
@@ -95,6 +95,7 @@ add_subdirectory("../Assets/" "${CMAKE_CURRENT_BINARY_DIR}/Assets")
 
 target_link_libraries(Engine
         PRIVATE glfw
+        PRIVATE SOIL
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib

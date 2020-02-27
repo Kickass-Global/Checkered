@@ -9,11 +9,14 @@
 
 template<typename T>
 T *Component::ComponentId::data() const {
-    return Index::entityData<T>(*this);
+    if (!data_ptr) { // cache the pointer
+        data_ptr = Index::entityData<T>(*this);
+    }
+    return reinterpret_cast<T *>(data_ptr);
 }
 
 template<typename T>
-bool Component::ComponentId::hasTag(bool clear = true) const {
+bool Component::ComponentId::hasTag(bool clear) const {
     return Index::hasTag<T>(*this, clear);
 }
 

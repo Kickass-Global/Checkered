@@ -4,17 +4,17 @@
 
 #include "CameraSystem.h"
 
-void Camera::CameraSystem::update(Engine::deltaTime elapsed) {
-	for (auto &&key : keys) {
-		if (!keys.count(key)) continue;
+void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
+    for (auto &&key : keys) {
+        if (!keys.count(key)) continue;
 
-		switch (key) {
-		case GLFW_KEY_RIGHT:
-			x += increment;
-			break;
-		case GLFW_KEY_DOWN:
-			y -= increment;
-			break;
+        switch (key) {
+            case GLFW_KEY_RIGHT:
+                x += increment;
+                break;
+            case GLFW_KEY_DOWN:
+                y -= increment;
+                break;
 		case GLFW_KEY_LEFT:
 			x -= increment;
 			break;
@@ -78,33 +78,33 @@ void Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 
 }
 
-void Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int, int>& args) {
+void ::Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int, int> &args) {
 
-	Engine::log<module, Engine::low>(
-		"onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
+    Engine::log<module, Engine::low>(
+            "onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
 
-	auto &&width = std::get<0>(args.values);
-	auto &&height = std::get<1>(args.values);
+    auto &&width = std::get<0>(args.values);
+    auto &&height = std::get<1>(args.values);
 
-	for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-		auto data = Component::Index::entityData<Component::Camera>(camera);
-		data->viewport.width = width;
+    for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
+        auto data = Component::Index::entityData<Component::Camera>(camera);
+        data->viewport.width = width;
 		data->viewport.height = height;
 
 		camera.addTag<Component::Dirty>();
 	}
 }
 
-void Camera::CameraSystem::onKeyPress(const Component::EventArgs<int>& args) {
-	Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
+void ::Camera::CameraSystem::onKeyPress(const Component::EventArgs<int> &args) {
+    Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
 }
 
-void Camera::CameraSystem::onKeyUp(const Component::EventArgs<int>& args) {
-	Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
-	keys.erase(std::get<int>(args.values));
+void ::Camera::CameraSystem::onKeyUp(const Component::EventArgs<int> &args) {
+    Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
+    keys.erase(std::get<int>(args.values));
 }
 
-void Camera::CameraSystem::onKeyDown(const Component::EventArgs<int>& args) {
-	Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
-	keys.emplace(std::get<int>(args.values));
+void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
+    Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
+    keys.emplace(std::get<int>(args.values));
 }

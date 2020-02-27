@@ -31,7 +31,7 @@ class DamageSystem : public Engine::SystemInterface {
 
         auto models = Component::Index::entitiesOf<Component::Model>();
 
-        for (const auto &model : models) {
+        for (auto &model : models) {
 
             auto &&meta = model.data<Component::Model>();
 
