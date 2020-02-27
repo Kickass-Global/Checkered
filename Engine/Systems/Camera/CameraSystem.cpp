@@ -55,19 +55,19 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 		auto meta = data->target.data<Component::Vehicle>();
 		if (data->target && meta->pxVehicle) {
 
-			const auto &component = data->target;
-			Engine::log<module>("Updating camera to look at #", component);
+            const auto &component = data->target;
+            Engine::log<module>("Updating camera to look at #", component);
 
-			auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset, 1);
-			auto component_transform = meta->world_transform;
-			data->position = component_transform[3] + offset;
+            auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset, 1);
+            auto component_transform = meta->world_transform();
+            data->position = component_transform[3] + offset;
 
-			glm::vec3 eye = data->position;
-			glm::vec3 target = component_transform[3];
-			glm::vec3 up = { 0, 1, 0 };
+            glm::vec3 eye = data->position;
+            glm::vec3 target = component_transform[3];
+            glm::vec3 up = {0, 1, 0};
 
-			data->view = glm::lookAt(eye, target, up);
-		}
+            data->view = glm::lookAt(eye, target, up);
+        }
 
 
 		// reset deltas

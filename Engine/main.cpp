@@ -115,9 +115,9 @@ int main() {
     player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh});
 
     player_vehicle->model = player_damage_model->id();
-    player_vehicle->world_transform = glm::scale(glm::vec3(0.5f, 0.5f, 0.5f))
-                                      * glm::rotate(180.0f, glm::vec3(0, 1, 0))
-                                      * glm::translate(glm::vec3(0.0f, 0.0f, -40.0f));
+    player_vehicle->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+    player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
 
     physicsSystem->playerVehicle = player_vehicle;
 
@@ -133,10 +133,12 @@ int main() {
         glm::quat orientation;
         glm::vec3 scale, translation, skew;
         glm::vec4 perspective;
-        glm::decompose(meta->world_transform, scale, orientation, translation, skew, perspective);
+        glm::decompose(world_transform, scale, orientation, translation, skew, perspective);
 
         ai_vehicle->model = ai_damage_model->id();
-        ai_vehicle->world_transform = world_transform;
+        ai_vehicle->scale = scale;
+        ai_vehicle->rotation = orientation;
+        ai_vehicle->position = translation;;
 
         return ai_vehicle;
 
@@ -154,7 +156,7 @@ int main() {
         auto meta = std::get<0>(args.values).data<Component::Vehicle>();
 
         auto player_location = glm::normalize(player_vehicle->position); // translation vector of mat4
-        auto ai_direction = glm::normalize(meta->world_transform[2]); // 'z' column vector of mat4 (i.e. forward)
+        auto ai_direction = glm::normalize(-meta->world_transform()[2]); // 'z' column vector of mat4 (i.e. forward)
         auto ai_location = glm::normalize(meta->position); // translation vector of mat4
 
         // check if the player is to the left or right of the ai.
@@ -204,10 +206,13 @@ int main() {
 
     // spawn some ai bois into the world
     auto dim = 1l;
+    int spacing = 20;
     for (int x = -dim; x <= dim; x++) {
         for (int y = -dim; y <= dim; y++) {
 
-            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * 5, 0, y * 5)));
+            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing)));
+            ai_vehicle->scale = glm::vec3(0.5, 0.5, 0.5);
+            ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
             ai_vehicle->tickHandler += ticker; // give them brain
 
         }
