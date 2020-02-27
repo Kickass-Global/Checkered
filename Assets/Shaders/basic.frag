@@ -1,9 +1,12 @@
 #version 330
 
-uniform vec3 kA = vec3(0.2, 0.2, 0.2);
-uniform vec3 kD = vec3(0.6, 0.6, 0.6);
+uniform vec3 kA = vec3(0.1, 0.1, 0.1);
+uniform vec3 kD = vec3(0.8, 0.8, 0.8);
 uniform vec3 kS = vec3(0.6, 0.6, 0.6);
 
+uniform sampler2D tDiffuse;
+
+in vec3 fTexcoord;
 in vec3 fColour;
 in vec3 fNormal;
 in vec3 fLightDirection;
@@ -12,9 +15,10 @@ in vec3 fLightReflection;
 
 out vec3 colour;
 
-
 void main() {
-    colour = kA + fColour * max(dot(fLightDirection, fNormal), 0.0);// + kS * pow(dot(fLightReflection, fViewer), 4);
+    vec3 diffuse = texture(tDiffuse, fTexcoord.st).xyz;
+    colour = 0.2 * diffuse + diffuse * max(dot(fLightDirection, fNormal), 0.0)
+    + diffuse * pow(dot(fLightReflection, fViewer), 4);
 }
 
 

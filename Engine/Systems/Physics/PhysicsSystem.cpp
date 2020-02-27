@@ -326,7 +326,8 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
     // grab the vehicle world position and set the physx actors transform accordingly.
     auto meta = vehicleComponent.data<Component::Vehicle>();
     auto position = meta->world_transform[3];
-    auto pxVehicle = createDrivableVehicle(PxTransform(position.x, position.y, position.z));
+    auto T = PxTransform(position.x, position.y, position.z, PxQuat());
+    auto pxVehicle = createDrivableVehicle(T);
 
     Engine::log<module, Engine::high>("onVehicleCreated #", vehicleComponent);
 
