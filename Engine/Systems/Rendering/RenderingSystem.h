@@ -19,94 +19,94 @@
 
 namespace Rendering {
 
-    class RenderingSystem;
+class RenderingSystem;
 
-    class Shader : public Component::ComponentBase<Component::ClassId::Shader> {
-        GLuint m_id;
+class Shader : public Component::ComponentBase<Component::ClassId::Shader> {
+    GLuint m_id;
 
-    public:
+public:
 
-        Shader();
+    Shader();
 
-		GLuint glid() const;
+    GLuint glid() const;
 
-        Shader(GLenum shader_type, std::vector<std::string> &lines);
+    Shader(GLenum shader_type, std::vector<std::string> &lines);
 
-        ~Shader();
-    };
+    ~Shader();
+};
 
-    class Program : public Component::ComponentBase<Component::ClassId::Program> {
+class Program : public Component::ComponentBase<Component::ClassId::Program> {
 
-        GLuint m_id;
+    GLuint m_id;
 
-    public:
+public:
 
-        template <typename... Ts>
-        explicit Program(std::vector<std::shared_ptr<Rendering::Shader>> shaders) {
+    template<typename... Ts>
+    explicit Program(std::vector<std::shared_ptr<Rendering::Shader>> shaders) {
 
-            m_id = glCreateProgram();
+        m_id = glCreateProgram();
 
-            Engine::log<module>("Creating program ", m_id);
+        Engine::log<module>("Creating program ", m_id);
 
-            for(auto&& shader : shaders) glAttachShader(m_id, shader->glid());
+        for (auto &&shader : shaders) glAttachShader(m_id, shader->glid());
 
-            glLinkProgram(m_id);
+        glLinkProgram(m_id);
 
-            GLint successful_link;
-            glGetProgramiv(m_id, GL_LINK_STATUS, &successful_link);
+        GLint successful_link;
+        glGetProgramiv(m_id, GL_LINK_STATUS, &successful_link);
 
-            if (successful_link != GL_TRUE) {
-                GLint maxLength = 0;
-                glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
+        if (successful_link != GL_TRUE) {
+            GLint maxLength = 0;
+            glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
 
-                std::vector<GLchar> infoLog(maxLength);
-                glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
-                Engine::log<module>(
-                        std::string(infoLog.begin(), infoLog.end()));
-            }
-            Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
-
-            for(auto&& shader : shaders) glDetachShader(m_id, shader->glid());
+            std::vector<GLchar> infoLog(maxLength);
+            glGetProgramInfoLog(m_id, maxLength, &maxLength, &infoLog[0]);
+            Engine::log<module, Engine::high>(std::string(infoLog.begin(), infoLog.end()));
         }
+        Engine::assertLog<module>(successful_link != GL_FALSE, "Link shader program");
 
-        GLuint programId();
+        for (auto &&shader : shaders) glDetachShader(m_id, shader->glid());
+    }
 
-        void bind();
+    GLuint programId();
 
-        ~Program();
-    };
+    void bind();
 
-    class RenderingSystem : public Engine::SystemInterface {
+    ~Program();
+};
 
-        GLFWwindow *window;
+class RenderingSystem : public Engine::SystemInterface {
 
-        std::vector<std::shared_ptr<Rendering::RenderBatch>> batches;
+    GLFWwindow *window;
 
-    public:
+    std::vector<std::shared_ptr<Rendering::RenderBatch>> batches;
 
-        static Component::EventDelegate<int, int> onWindowSizeChanged;
+public:
 
-        void initialize() override;
+    static Component::EventDelegate<int, int> onWindowSizeChanged;
 
-        static void windowSizeHandler(GLFWwindow* /*window*/, int width, int height);
+    void initialize() override;
 
-        GLFWwindow* getWindow();
+    static void windowSizeHandler(GLFWwindow * /*window*/, int width, int height);
 
-        void updateInstanceData(Component::ComponentId id, int size, float* data, int stride);
+    GLFWwindow *getWindow();
 
-        void buffer(const Component::Mesh& data );
+    void updateInstanceData(Component::ComponentId id, int size, float *data, int stride);
 
-        void update(Engine::deltaTime /*elapsedTime*/) override;
+    void buffer(const Component::Mesh &data);
 
-        ~RenderingSystem();
+    void update(Engine::deltaTime /*elapsedTime*/) override;
 
-        std::shared_ptr<Rendering::RenderBatch>
-        findSuitableBufferFor(const std::shared_ptr<Component::Mesh> &data);
+    ~RenderingSystem();
 
-        std::shared_ptr<Rendering::RenderBatch> push_back(
-            std::shared_ptr<Rendering::RenderBatch> batch);
+    std::shared_ptr<Rendering::RenderBatch>
+    findSuitableBufferFor(const std::shared_ptr<Component::Mesh> &data);
 
-    };
+    std::shared_ptr<Rendering::RenderBatch> push_back(
+            std::shared_ptr<Rendering::RenderBatch> batch
+    );
+
+};
 }
 
 #endif //ENGINE_RENDERINGSYSTEM_H

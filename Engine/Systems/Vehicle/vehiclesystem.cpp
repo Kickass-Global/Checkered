@@ -34,21 +34,12 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
 
             auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
 
-            glm::quat orientation;
-            glm::vec3 scale, translation, skew;
-            glm::vec4 perspective;
-            glm::decompose(meta->world_transform, scale, orientation, translation, skew, perspective);
-            auto T = glm::scale(scale)
-                     * glm::translate(physx_data->position)
-                     * glm::mat4_cast(physx_data->rotation);
-
-            meta->scale = scale;
-            meta->rotation = orientation;
-            meta->position = translation;
+            meta->rotation = physx_data->rotation;
+            meta->position = physx_data->position;
 
             if (vehicle.data<Component::Vehicle>()->model) {
                 vehicle.data<Component::Vehicle>()->model.attachExistingComponent(
-                        Engine::createComponent<Component::WorldTransform>(T)->id());
+                        Engine::createComponent<Component::WorldTransform>(meta->world_transform())->id());
             }
         }
 
