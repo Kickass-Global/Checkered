@@ -9,13 +9,14 @@
 #include "vehiclesystem.hpp"
 #include "WorldTransform.h"
 #include <physicspacket.hpp>
+#include "glm/gtx/matrix_decompose.hpp"
 
 void Engine::vehicleSystem::initialize() {
     SystemInterface::initialize();
 }
 void Engine::vehicleSystem::update(Engine::deltaTime) {
 
-	auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
+    auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
     for (const auto &vehicle : vehicles) {
 
         // check to see if we need to create a new phyx vehicle...
@@ -32,15 +33,16 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
         if (has_physics_update) {
 
             auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
-            auto T = glm::translate(physx_data->position) * glm::mat4_cast(physx_data->rotation);
-            meta->world_transform = T;
+
+            meta->rotation = physx_data->rotation;
+            meta->position = physx_data->position;
 
             if (vehicle.data<Component::Vehicle>()->model) {
                 vehicle.data<Component::Vehicle>()->model.attachExistingComponent(
-                        Engine::createComponent<Component::WorldTransform>(T)->id());
+                        Engine::createComponent<Component::WorldTransform>(meta->world_transform())->id());
             }
         }
 
-		vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
+        vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
     }
 }

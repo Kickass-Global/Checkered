@@ -29,15 +29,17 @@
 
 #undef assert
 
+using namespace Component; // import this into anything using the engine header
+
 namespace Component {
-	template<typename... Args>
-	class EventDelegate;
+    template<typename... Args>
+    class EventDelegate;
 
-	template<typename... As>
-	class EventArgs;
+    template<typename... As>
+    class EventArgs;
 
-	struct ComponentId;
-	enum class ClassId : unsigned int;
+    struct ComponentId;
+    enum class ClassId : unsigned int;
 }
 
 namespace Engine {

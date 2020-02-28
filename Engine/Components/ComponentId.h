@@ -21,9 +21,11 @@ namespace Component {
     enum class ClassId : unsigned int {
         Camera = 0xBEEF0000,
         Shader,
-		Tag,
+        Tag,
         Mesh,
         Model,
+        Material,
+        Texture,
         GameObject,
         SceneComponent,
         PhysicsPacket,
@@ -40,25 +42,22 @@ namespace Component {
         None = 0xFFFFFFFF
     };
 
-	struct ComponentId {
+    struct ComponentId {
 
-		enum {
-			UNIQUE_ID = 1
-		};
+        static const unsigned int Null = 0xffffffffu;
 
-		static const unsigned int Null = 0xffffffffu;
+        ClassId type;
+        unsigned int id;
+        mutable void *data_ptr = nullptr;
 
-		ClassId type;
-		unsigned int id;
+        // creates a null-like id
+        ComponentId();
+        ComponentId(const ComponentId &other);
+        explicit ComponentId(ClassId type) noexcept;
 
-		// creates a null-like id
-		ComponentId();
-		ComponentId(const ComponentId& other);
-		explicit ComponentId(ClassId type) noexcept;
+        ClassId classId() const;
 
-		ClassId classId() const;
-
-		bool operator<(const ComponentId& other) const;
+        bool operator<(const ComponentId &other) const;
 
 		operator bool() const noexcept {
 			return id != Null;
@@ -67,24 +66,24 @@ namespace Component {
 		template<typename T>
 		[[nodiscard]] T* data() const;
 
-		friend std::ostream&
-			operator<<(std::ostream& out, const Component::ComponentId& id);
+        friend std::ostream &
+        operator<<(std::ostream &out, const Component::ComponentId &id);
 
-		template<typename T>
-		void addTag() const;
+        template<typename T>
+        void addTag() const;
 
-		template<typename T>
-		[[nodiscard]] bool hasTag(bool clear) const;
+        template<typename T>
+        [[nodiscard]] bool hasTag(bool clear) const;
 
-		void attachExistingComponent(const ComponentId component) const;
-		void destroyComponent(const Component::ComponentId& componentId) const;
-		void destroyComponentsOfType(Component::ClassId classId) const;
+        void attachExistingComponent(ComponentId component) const;
+        void destroyComponent(const Component::ComponentId &componentId) const;
+        void destroyComponentsOfType(Component::ClassId classId) const;
 
-		[[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
-		(Component::ClassId classId) const;
+        [[nodiscard]] std::set<Component::ComponentId> childComponentsOfClass
+                (Component::ClassId classId) const;
 
-		void attachTemporaryComponent(const ComponentId componentId, int ttl) const;
-	};
+        void attachTemporaryComponent(ComponentId componentId, int ttl) const;
+    };
 
 	std::ostream& operator<<(std::ostream& out, const Component::ClassId& id);
 }
