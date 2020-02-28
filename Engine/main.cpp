@@ -23,6 +23,7 @@
 #include <texture.hpp>
 #include <fstream>
 #include <material.hpp>
+#include <Billboard.h>
 
 int main() {
 
@@ -86,8 +87,8 @@ int main() {
     ground_object->id().addTag<Component::Dirty>();
     ground_object->id().addTag<Component::Visible>();
 
-    // setup the mesh used for the cars...
 
+    // setup the mesh used for the cars...
 
     auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/car_mesh.fbx", Component::ClassId::Mesh);
     car_mesh.addTag<Component::Dirty>();
@@ -104,6 +105,25 @@ int main() {
     material->textures.push_back(diffuse->id());
 
     car_mesh.data<Component::Mesh>()->material = material->id();
+
+    Engine::nameComponent(car_mesh, "car-gal");
+
+    // setup a HUD element...
+
+    auto billboard_quad = Pipeline::Library::getAsset("Assets/Meshes/billboard_quad.obj", Component::ClassId::Mesh);
+    billboard_quad.addTag<Component::Dirty>();
+    billboard_quad.addTag<Component::Visible>();
+    billboard_quad.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
+    billboard_quad.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+            "Assets/Programs/billboard.json",
+            Component::ClassId::Program
+    );
+    Engine::nameComponent(billboard_quad, "billboard");
+
+    auto sprite = Engine::createComponent<Component::Billboard>();
+    sprite->plot = {5, 5, 100, 100};
+    sprite->material = diffuse->id();
+    sprite->mesh = billboard_quad;
 
     // setup the vehicle for the player...
 
