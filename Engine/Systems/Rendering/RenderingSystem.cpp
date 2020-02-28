@@ -3,6 +3,7 @@
 //
 
 #include <sstream>
+#include <Billboard.h>
 #include "RenderingSystem.h"
 
 #include "tags.h"
@@ -14,7 +15,7 @@
 Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
 namespace {
-    const char module[] = "RenderingSystem";
+const char module[] = "RenderingSystem";
 }
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
@@ -24,25 +25,27 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     auto title = ss.str();
     glfwSetWindowTitle(window, title.c_str());
 
+
+
     // Find and update any GameObjects with meshes that should be drawn...
-	auto meshes = Component::Index::entitiesOf<Component::Mesh>();
+    auto meshes = Component::Index::entitiesOf<Component::Mesh>();
     for (const Component::ComponentId &mesh : meshes) {
 
         auto is_dirty = mesh.hasTag<Component::Dirty>(true);
         auto is_visible = mesh.hasTag<Component::Visible>(true);
 
-        if (!is_visible) {
-            auto match = std::find_if(
-                    batches.begin(), batches.end(), [id = mesh](const auto &batch) {
-                        return batch->contains(id);
-                    }
-            );
+        //if (!is_visible) {
+        //    auto match = std::find_if(
+        //            batches.begin(), batches.end(), [id = mesh](const auto &batch) {
+        //                return batch->contains(id);
+        //            }
+        //    );
 
-            if (match != batches.end()) {
-                // mark/remove buffered data so its not used
-                (*match)->remove(mesh);
-            }
-        }
+        //    if (match != batches.end()) {
+        //        // mark/remove buffered data so its not used
+        //        (*match)->remove(mesh);
+        //    }
+        //}
 
         auto transforms = mesh.childComponentsOfClass(Component::ClassId::Transform);
         auto is_instanced = !transforms.empty();
@@ -58,20 +61,19 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             buffer(*data);
 
         }
-        if(is_instanced)
-        {
-            Engine::log("Updating instances of component#", mesh);
+        if (is_instanced) {
+            Engine::log<module>("Updating instances of component#", mesh);
             auto classId = mesh.classId();
-			std::vector<glm::mat4> transform_data;
+            std::vector<glm::mat4> transform_data;
 
             for (auto &&transform : transforms) {
                 if (classId == Component::ClassId::Mesh) {
                     Engine::log("Adding instance transform#", transform);
-					transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);   
+                    transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);
                 }
             }
 
-			updateInstanceData(
+            updateInstanceData(
                     mesh,
                     static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
                     (float *) transform_data.data(),
@@ -88,49 +90,85 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto &&batch : batches) {
+        for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
+            auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
 
-        if (!batch->details.empty()) {
+            if (camera_is_dirty) {
+                camera.addTag<Component::Dirty>(); // forward this state to the next batch...
 
-            for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-                auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
+                auto data = camera.data<Component::Camera>();
+                auto view_matrix = data->view;
+                auto world_matrix = glm::translate(data->position);
 
-                if (camera_is_dirty) {
-                    camera.addTag<Component::Dirty>(); // forward this state to the next batch...
+                auto perspective_matrix = glm::perspective(
+                        45.0f,
+                        static_cast<float>(data->viewport.width) /
+                        data->viewport.height,
+                        0.1f,
+                        1000.0f
+                );
 
-					
-					auto data = camera.data<Component::Camera>();
-                    auto view_matrix = data->view;
-                    auto world_matrix = glm::translate(data->position);
+                glViewport(0, 0, data->viewport.width, data->viewport.height);
 
-                    auto perspective_matrix = glm::perspective(
-                            45.0f,
-                            static_cast<float>(data->viewport.width) /
-                            data->viewport.height,
-                            0.1f,
-                            1000.0f
-                    );
+                batch->shader.data<Program>()->bind();
 
-                    glViewport(0, 0, data->viewport.width, data->viewport.height);
+                glUniformMatrix4fv(
+                        glGetUniformLocation(
+                                batch->shader.data<Program>()->programId(),
+                                "M_View"
+                        ),
+                        1, false, glm::value_ptr(view_matrix));
 
-                    batch->shader.data<Program>()->bind();
+                glUniformMatrix4fv(
+                        glGetUniformLocation(
+                                batch->shader.data<Program>()->programId(),
+                                "M_Perspective"
+                        ),
+                        1, false, glm::value_ptr(perspective_matrix));
 
-                    glUniformMatrix4fv(
-                            glGetUniformLocation(
-                                    batch->shader.data<Program>()->programId(),
-                                    "M_View"
-                            ),
-                            1, false, glm::value_ptr(view_matrix));
 
-                    glUniformMatrix4fv(
-                            glGetUniformLocation(
-                                    batch->shader.data<Program>()->programId(),
-                                    "M_Perspective"
-                            ),
-                            1, false, glm::value_ptr(perspective_matrix));
-
-                }
             }
+        }
+    }
 
+    for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
+        auto sprites = Component::Index::entitiesOf<Billboard>();
+        for (const auto &sprite : sprites) {
+
+            // if this is a new sprite add it to a batch...
+            // by attaching a transform that places it at the proper plot location.
+            auto camera_view_matrix = camera.data<Camera>()->view;
+            auto viewport = camera.data<Camera>()->viewport;
+            auto camera_up = camera_view_matrix[1];
+            auto camera_right = camera_view_matrix[0];
+            auto meta = sprite.data<Billboard>();
+
+            // todo, create a perspective matrix to transform plot to NDC....
+
+            auto offset = glm::translate(
+                    glm::vec3(
+                            meta->plot.x / (float) viewport.width - 1,
+                            meta->plot.y / (float) viewport.height - 1,
+                            0.0f
+                    ));
+            auto
+                    scale = glm::scale(
+                    glm::vec3(
+                            (float) meta->plot.width / viewport.width,
+                            (float) meta->plot.height / viewport.height,
+                            1.0f
+                    ));
+
+            meta->mesh.attachTemporaryComponent(
+                    Engine::createComponent<WorldTransform>(offset * scale)->id(), 1
+            );
+        }
+
+        break; // only use the first camera...
+    }
+
+    for (auto &&batch : batches) {
+        if (!batch->details.empty()) {
             // bind programs, textures, and uniforms needed to render the batch
             batch->bind(*this);
             batch->draw(*this);
