@@ -48,12 +48,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         auto is_instanced = !transforms.empty();
 
         if (is_visible && is_dirty) {
+
             // buffer the objects meshes (assuming that all meshes should be buffered and drawn).
             Engine::log("Streaming in component#", mesh);
 
-            auto classId = mesh.classId();
             auto data = mesh.data<Component::Mesh>();
-
 
             Engine::log<module, Engine::high>("Updating batch data of#", mesh);
             buffer(*data);
@@ -73,11 +72,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             }
 
 			updateInstanceData(
-				mesh,
-				sizeof(glm::mat4) * transform_data.size(),
-				(float*)transform_data.data(), 
-				sizeof(glm::mat4)
-			);
+                    mesh,
+                    static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
+                    (float *) transform_data.data(),
+                    sizeof(glm::mat4)
+            );
         }
 
         for (auto &transform : transforms) {
@@ -110,8 +109,6 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                             0.1f,
                             1000.0f
                     );
-
-                    //view_matrix = world_matrix * view_matrix;
 
                     glViewport(0, 0, data->viewport.width, data->viewport.height);
 

@@ -20,17 +20,18 @@
 namespace Rendering {
 
     class RenderingSystem;
-    
-    struct BufferDetails
-    {
-        int offset;
-        int count;
+
+    /** describes a contiguous section of a buffer that can be drawn with a single draw* command. */
+    struct BatchDescription {
+        int offset; // start of element data (from beginning of buffer)
+        int count; // how many elements
+        int stride; // size of each element
     };
-    
+
     class BatchBuffer {
-        
+
         GLuint m_id;
-        int m_size; 
+        int m_size;
         int m_fill;
         int m_stride;
         int m_type;
@@ -39,8 +40,8 @@ namespace Rendering {
 
         BatchBuffer(int bufferMaxSize, int stride, int type);
 
-        template <typename T>
-        BufferDetails push_back(std::vector<T> data) {
+        template<typename T>
+        BatchDescription push_back(std::vector<T> data) {
 
             Engine::log<module>("Pushing data into batch#", id());
 
@@ -52,27 +53,26 @@ namespace Rendering {
 
             Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
 
-            return {offset, static_cast<int>(data.size())};
+            return {offset, static_cast<int>(data.size()), sizeof(T)};
         }
 
-		template <typename T>
-		BufferDetails push_back(int size, T* data) {
+        template<typename T>
+        BatchDescription push_back(int size, T *data) {
 
-			Engine::log<module>("Pushing data into batch#", id());
+            Engine::log<module>("Pushing data into batch#", id());
 
-			glBindBuffer(m_type, m_id);
-			glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
+            glBindBuffer(m_type, m_id);
+            glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
 
-			auto offset = m_fill;
-			m_fill += size * sizeof(T);
+            auto offset = m_fill;
+            m_fill += size * sizeof(T);
 
-			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+            Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
 
-			return { offset, static_cast<int>(size) };
-		}
+            return {offset, static_cast<int>(size), sizeof(T)};
+        }
 
-        void replace_existing_data(int size, float* data, BufferDetails details)
-        {
+        void replace_existing_data(int size, float *data, BatchDescription details) {
             Engine::log<module>("Replacing data in batch#", id());
             glBindBuffer(m_type, m_id);
             glBufferSubData(m_type, details.offset, size, data);
@@ -97,30 +97,28 @@ namespace Rendering {
         std::shared_ptr<Rendering::BatchBuffer> elementBuffer;
         std::shared_ptr<Rendering::BatchBuffer> instanceBuffer;
 
-        std::map<Component::ComponentId, BufferDetails[3]> details;
+        std::map<ComponentId, BatchDescription[3]> details;
 
         RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
                     std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
                     std::shared_ptr<Rendering::BatchBuffer> instanceBuffer);
 
-        void push_back(const Component::Mesh& mesh);
+        void push_back(const Component::Mesh &mesh);
 
-        void update(const Component::ComponentId id, int buffer, int size, float* data, int stride)
-        {
-			Engine::log<module>("Updating component#", id);
+        void update(const Component::ComponentId id, int buffer, int size, float *data, int stride) {
+            Engine::log<module>("Updating component#", id);
 
-			auto& detail = details.at(id);
-			int count = size / stride;
-			auto replace_existing_data = count <= detail[2].count;
+            auto &detail = details.at(id);
+            int count = size / stride;
+            auto replace_existing_data = count <= detail[2].count;
 
             switch (buffer) {
                 case 2:
-					if (replace_existing_data) {
-						instanceBuffer->replace_existing_data(size, data, detail[buffer]);
-					}
-					else {
-						detail[2] = instanceBuffer->push_back(count, data);
-					}
+                    if (replace_existing_data) {
+                        instanceBuffer->replace_existing_data(size, data, detail[buffer]);
+                    } else {
+                        detail[2] = instanceBuffer->push_back(count, data);
+                    }
                     break;
             }
         }
@@ -139,7 +137,6 @@ namespace Rendering {
 
         void remove(Component::ComponentId id);
 
-        void assign_shader(Component::Shader shader);
     };
 }
 #endif //ENGINE_RENDERINGBATCH_H

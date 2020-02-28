@@ -2,23 +2,26 @@
 // Created by root on 11/1/20.
 //
 
+#include <material.hpp>
 #include "RenderingBatch.h"
 #include "RenderingSystem.h"
 #include "../../Components/ComponentId.h"
 
 namespace Rendering {
 
-    void RenderBatch::assign_shader(Component::Shader shader) {
-        this->shader = shader.id();
-    }
-
     void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
 
         for(auto [key, detail] : details) {
 
             Engine::log<module>("Drawing #", key);
-			// todo pass in the stride somehow
-			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0, detail[2].count, detail[1].offset, detail[2].offset / 64);
+            // todo pass in the stride somehow
+            auto &&meta = key.data<Mesh>();
+            if (meta->material) {
+                meta->material.data<Material>()->bind();
+            }
+            glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0,
+                                                          detail[2].count, detail[1].offset, detail[2].offset / 64);
+
         }
     }
 

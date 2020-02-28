@@ -31,7 +31,8 @@ namespace Component {
 
     public:
 
-        Component::ComponentId shader;
+        [[deprecated]]Component::ComponentId shader;
+        Component::ComponentId material;
         std::vector<Vertex> vertices;
         std::vector<int> indices;
 

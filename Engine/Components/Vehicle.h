@@ -19,78 +19,84 @@
 
 namespace Component {
 
-    class Vehicle : public Component::ComponentBase<Component::ClassId::Vehicle> {
-    public:
-		ComponentId model{};
-		ComponentId input{};
-        ComponentId onTickHandler;
-        EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
-            
-        glm::mat4 world_transform = glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+class Vehicle : public Component::ComponentBase<Component::ClassId::Vehicle> {
+public:
+    ComponentId model{};
+    ComponentId input{};
+    ComponentId onTickHandler;
+    EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
 
-		bool pxIsVehicleInAir;
-        physx::PxVehicleDrive4WRawInputData pxVehicleInputData;
-		physx::PxVehicleDrive4W *pxVehicle = nullptr;
-		physx::PxVehicleDrivableSurfaceToTireFrictionPairs *pxFrictionPairs = nullptr;
-        physx::PxReal pxSteerVsForwardSpeedData[16];
-        physx::PxFixedSizeLookupTable<8> pxSteerVsForwardSpeedTable;
-        physx::PxVehicleKeySmoothingData pxKeySmoothingData;
-        physx::PxVehiclePadSmoothingData pxPadSmoothingData;
+    glm::vec3 scale;
+    glm::quat rotation;
+    glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::vec3 position;
 
-        void onTick(const Component::EventArgs<Engine::deltaTime> &args)
-        {
-            Engine::log<module>("onTick");
-            tickHandler(id());
-        }
+    glm::mat4 world_transform() {
+        return glm::translate(position) * glm::mat4_cast(rotation) * glm::mat4_cast(local_rotation) * glm::scale(scale);
+    }
 
-        Vehicle() :
-                pxSteerVsForwardSpeedData{
-                        0.0f, 0.75f,
-                        5.0f, 0.75f,
-                        30.0f, 0.125f,
-                        120.0f, 0.1f,
-                        PX_MAX_F32, PX_MAX_F32,
-                        PX_MAX_F32, PX_MAX_F32,
-                        PX_MAX_F32, PX_MAX_F32,
-                        PX_MAX_F32, PX_MAX_F32
-                },
-                pxKeySmoothingData{
-                        {
-                                6.0f,    //rise rate eANALOG_INPUT_ACCEL
-                                6.0f,    //rise rate eANALOG_INPUT_BRAKE
-                                6.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
-                                2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
-                                2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
-                        },
-                        {
-                                10.0f,    //fall rate eANALOG_INPUT_ACCEL
-                                10.0f,    //fall rate eANALOG_INPUT_BRAKE
-                                10.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
-                                5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
-                                5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
-                        }
-                },
-                pxPadSmoothingData{
-                        {
-                                6.0f,    //rise rate eANALOG_INPUT_ACCEL
-                                6.0f,    //rise rate eANALOG_INPUT_BRAKE
-                                6.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
-                                2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
-                                2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
-                        },
-                        {
-                                10.0f,    //fall rate eANALOG_INPUT_ACCEL
-                                10.0f,    //fall rate eANALOG_INPUT_BRAKE
-                                10.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
-                                5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
-                                5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
-                        }
-                } {
-            pxSteerVsForwardSpeedTable = physx::PxFixedSizeLookupTable<8>(pxSteerVsForwardSpeedData, 4);
-            onTickHandler = Engine::EventSystem::createTickHandler(this, &Vehicle::onTick);
-        }
+    bool pxIsVehicleInAir;
+    physx::PxVehicleDrive4WRawInputData pxVehicleInputData;
+    physx::PxVehicleDrive4W *pxVehicle = nullptr;
+    physx::PxVehicleDrivableSurfaceToTireFrictionPairs *pxFrictionPairs = nullptr;
+    physx::PxReal pxSteerVsForwardSpeedData[16];
+    physx::PxFixedSizeLookupTable<8> pxSteerVsForwardSpeedTable;
+    physx::PxVehicleKeySmoothingData pxKeySmoothingData;
+    physx::PxVehiclePadSmoothingData pxPadSmoothingData;
 
-    };
+    void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
+        Engine::log<module>("onTick");
+        tickHandler(id());
+    }
+
+    Vehicle() :
+            pxSteerVsForwardSpeedData{
+                    0.0f, 0.75f,
+                    5.0f, 0.75f,
+                    30.0f, 0.125f,
+                    120.0f, 0.1f,
+                    PX_MAX_F32, PX_MAX_F32,
+                    PX_MAX_F32, PX_MAX_F32,
+                    PX_MAX_F32, PX_MAX_F32,
+                    PX_MAX_F32, PX_MAX_F32
+            },
+            pxKeySmoothingData{
+                    {
+                            6.0f,    //rise rate eANALOG_INPUT_ACCEL
+                            6.0f,    //rise rate eANALOG_INPUT_BRAKE
+                            6.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+                            2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+                            2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+                    },
+                    {
+                            10.0f,    //fall rate eANALOG_INPUT_ACCEL
+                            10.0f,    //fall rate eANALOG_INPUT_BRAKE
+                            10.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
+                            5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+                            5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+                    }
+            },
+            pxPadSmoothingData{
+                    {
+                            6.0f,    //rise rate eANALOG_INPUT_ACCEL
+                            6.0f,    //rise rate eANALOG_INPUT_BRAKE
+                            6.0f,    //rise rate eANALOG_INPUT_HANDBRAKE
+                            2.5f,    //rise rate eANALOG_INPUT_STEER_LEFT
+                            2.5f,    //rise rate eANALOG_INPUT_STEER_RIGHT
+                    },
+                    {
+                            10.0f,    //fall rate eANALOG_INPUT_ACCEL
+                            10.0f,    //fall rate eANALOG_INPUT_BRAKE
+                            10.0f,    //fall rate eANALOG_INPUT_HANDBRAKE
+                            5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
+                            5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+                    }
+            } {
+        pxSteerVsForwardSpeedTable = physx::PxFixedSizeLookupTable<8>(pxSteerVsForwardSpeedData, 4);
+        onTickHandler = Engine::EventSystem::createTickHandler(this, &Vehicle::onTick);
+    }
+
+};
 
 }
 
