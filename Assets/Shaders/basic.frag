@@ -1,6 +1,6 @@
 #version 330
 
-uniform vec3 kA = vec3(0.1, 0.1, 0.1);
+uniform vec3 kA = vec3(0.5, 0.5, 0.5);
 uniform vec3 kD = vec3(0.8, 0.8, 0.8);
 uniform vec3 kS = vec3(0.6, 0.6, 0.6);
 
@@ -17,8 +17,8 @@ out vec3 colour;
 
 void main() {
     vec3 diffuse = texture(tDiffuse, fTexcoord.st).xyz;
-    colour = 0.2 * diffuse + diffuse * max(dot(fLightDirection, fNormal), 0.0)
-    + diffuse * pow(dot(fLightReflection, fViewer), 4);
+    colour = kA * diffuse + diffuse * max(dot(fLightDirection, fNormal), 0.0);
+    //+ diffuse * pow(dot(fLightReflection, fViewer), 4);
 }
 
 

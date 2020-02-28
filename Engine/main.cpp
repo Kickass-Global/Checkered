@@ -34,7 +34,6 @@ int main() {
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
 
-
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
     auto index = Engine::addSystem<Component::Index>();
     index->order = 2;
@@ -90,7 +89,7 @@ int main() {
     // setup the mesh used for the cars...
 
 
-    auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/cop_mesh.fbx", Component::ClassId::Mesh);
+    auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/car_mesh.fbx", Component::ClassId::Mesh);
     car_mesh.addTag<Component::Dirty>();
     car_mesh.addTag<Component::Visible>();
     car_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
@@ -101,7 +100,7 @@ int main() {
     Engine::nameComponent(car_mesh, "car-gal");
 
     auto material = Engine::createComponent<Component::Material>();
-    auto diffuse = Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Taxi.png");
+    auto diffuse = Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png");
     material->textures.push_back(diffuse->id());
 
     car_mesh.data<Component::Mesh>()->material = material->id();
