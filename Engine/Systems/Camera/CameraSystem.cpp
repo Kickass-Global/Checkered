@@ -61,7 +61,7 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
             auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset, 1);
 
             // this line of code controls the camera returning to 'neutral' position behind the target...
-            data->rotation = glm::lerp(data->rotation, meta->rotation, 0.05f);
+            data->rotation = glm::lerp(data->rotation, meta->rotation, 0.5f);
             data->position = meta->position + glm::vec3(offset);
 
             glm::vec3 eye = data->position;

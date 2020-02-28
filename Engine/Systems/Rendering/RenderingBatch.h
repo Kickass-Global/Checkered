@@ -57,7 +57,7 @@ namespace Rendering {
         }
 
         template<typename T>
-        BatchDescription push_back(int size, T *data) {
+        BatchDescription push_back(int size, T *data, int stride) {
 
             Engine::log<module>("Pushing data into batch#", id());
 
@@ -65,11 +65,11 @@ namespace Rendering {
             glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
 
             auto offset = m_fill;
-            m_fill += size * sizeof(T);
+            m_fill += size * stride;
 
             Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
 
-            return {offset, static_cast<int>(size), sizeof(T)};
+            return {offset, size, stride};
         }
 
         void replace_existing_data(int size, float *data, BatchDescription details) {
@@ -117,7 +117,7 @@ namespace Rendering {
                     if (replace_existing_data) {
                         instanceBuffer->replace_existing_data(size, data, detail[buffer]);
                     } else {
-                        detail[2] = instanceBuffer->push_back(count, data);
+                        detail[2] = instanceBuffer->push_back(count, data, stride);
                     }
                     break;
             }

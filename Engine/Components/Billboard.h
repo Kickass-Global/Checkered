@@ -11,8 +11,8 @@ namespace Component {
 
     class Billboard : public ComponentBase<ClassId::Billboard> {
     public:
-        ComponentId bitmap;
-        ComponentId shader;
+        ComponentId mesh;
+        ComponentId material;
         struct Rectangle {
             int x;
             int y;
