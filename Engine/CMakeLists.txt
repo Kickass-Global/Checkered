@@ -54,7 +54,10 @@ set(SRC main.cpp main.h
         Systems/hornSystem/hornSystem.cpp
         Systems/hornSystem/hornSystem.h
         Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp
-        Components/WorldTransform.h Components/WorldTransform.cpp Components/ComponentId.tpp.h Components/texture.cpp Components/texture.hpp Components/material.cpp Components/material.hpp)
+        Systems/soundSystem/SoundSystem.cpp Systems/soundSystem/SoundSystem.h
+        Components/WorldTransform.h Components/WorldTransform.cpp
+        Components/texture.cpp Components/texture.hpp
+        Components/material.cpp Components/material.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine
@@ -97,6 +100,7 @@ target_link_libraries(Engine
         PRIVATE glfw
         PRIVATE SOIL
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/OpenAL/libs/Win64/OpenAL32.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCommon_64.lib
@@ -122,6 +126,7 @@ find_package(OpenGL REQUIRED)
 target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
         PRIVATE "Components"
         PRIVATE "Systems"
+        SYSTEM PRIVATE "../3rd-party/OpenAL/include"
         SYSTEM PRIVATE "../Include/PhysX/include"
         SYSTEM PRIVATE "../Include/PhysX/source/foundation/include"
         SYSTEM PRIVATE "../Include/PxShared/include"
