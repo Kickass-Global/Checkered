@@ -14,6 +14,7 @@
 
 #include "ComponentId.h"
 #include "ComponentBase.h"
+#include "material.hpp"
 
 namespace Component {
 
@@ -37,6 +38,13 @@ namespace Component {
         std::vector<int> indices;
 
     };
+
+	class MeshInstance : public ComponentBase<ClassId::MeshInstance> {
+	public:
+		ComponentId mesh;
+		ComponentId material;
+		MeshInstance(const Mesh &mesh, const Material& material) : mesh(mesh.id()), material(material.id()) {}
+	};
 
 }
 

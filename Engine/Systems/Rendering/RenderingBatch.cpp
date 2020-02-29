@@ -9,110 +9,114 @@
 
 namespace Rendering {
 
-    void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
-
-        for(auto [key, detail] : details) {
-
-            Engine::log<module>("Drawing #", key);
-            // todo pass in the stride somehow
-            auto &&meta = key.data<Mesh>();
-            if (meta->material) {
-                meta->material.data<Material>()->bind();
-            }
-            glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0,
-                                                          detail[2].count, detail[1].offset, detail[2].offset / 64);
-
-        }
-    }
-
-    void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
-
-        Engine::log<module>("Binding shader#", shader);
-        shader.data<Program>()->bind();
-        glBindVertexArray(vao);
-    }
 
 
-    RenderBatch::RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
-                             std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
-                             std::shared_ptr<Rendering::BatchBuffer> instanceBuffer)
-        : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer), instanceBuffer(instanceBuffer) {
+	void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+		for (auto[key, detail] : details) {
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
-        glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
+			Engine::log<module>("Drawing #", key.first, "#", key.second);
+			// todo pass in the stride somehow
+			auto &&meta = key.first.data<Mesh>();
+			if (meta->material) {
+				meta->material.data<Material>()->bind();
+			}
+			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0,
+				detail[2].count, detail[1].offset, detail[2].offset / 64);
 
-        glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
-        
-        glEnableVertexAttribArray(0);
-        glVertexAttribFormat(0, 3, GL_FLOAT, false, 0);
-        glVertexAttribBinding(0, 0);
+		}
+	}
 
-        glEnableVertexAttribArray(1);
-        glVertexAttribFormat(1, 3, GL_FLOAT, false, 1 * sizeof(glm::vec3));
-        glVertexAttribBinding(1, 0);
+	void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
 
-        glEnableVertexAttribArray(2);
-        glVertexAttribFormat(2, 3, GL_FLOAT, false, 2 * sizeof(glm::vec3));
-        glVertexAttribBinding(2, 0);
+		Engine::log<module>("Binding shader#", shader);
+		shader.data<Program>()->bind();
+		glBindVertexArray(vao);
+	}
 
-        glBindVertexBuffer(1, instanceBuffer->id(), 0, instanceBuffer->stride());
-        glVertexBindingDivisor(1, 1);
+	RenderBatch::RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
+		std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
+		std::shared_ptr<Rendering::BatchBuffer> instanceBuffer)
+		: arrayBuffer(arrayBuffer), elementBuffer(elementBuffer), instanceBuffer(instanceBuffer) {
 
-        // setup instance matrix attribute buffer
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 
-        glEnableVertexAttribArray(4);
-        glEnableVertexAttribArray(5);
-        glEnableVertexAttribArray(6);
-        glEnableVertexAttribArray(7);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
+		glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
 
-        glVertexAttribFormat(4, 4, GL_FLOAT, false, 0);
-        glVertexAttribFormat(5, 4, GL_FLOAT, false, 1 * sizeof(glm::vec4));
-        glVertexAttribFormat(6, 4, GL_FLOAT, false, 2 * sizeof(glm::vec4));
-        glVertexAttribFormat(7, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4));
+		glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
 
-        glVertexAttribBinding(4, 1);
-        glVertexAttribBinding(5, 1);
-        glVertexAttribBinding(6, 1);
-        glVertexAttribBinding(7, 1);
+		glEnableVertexAttribArray(0);
+		glVertexAttribFormat(0, 3, GL_FLOAT, false, 0);
+		glVertexAttribBinding(0, 0);
 
-        glBindVertexArray(0);
-    }
+		glEnableVertexAttribArray(1);
+		glVertexAttribFormat(1, 3, GL_FLOAT, false, 1 * sizeof(glm::vec3));
+		glVertexAttribBinding(1, 0);
 
-    void RenderBatch::push_back(const Component::Mesh &mesh) {
-        details[mesh.id()][0] = arrayBuffer->push_back(mesh.vertices);
-        details[mesh.id()][1] = elementBuffer->push_back(mesh.indices);
-        details[mesh.id()][2] = instanceBuffer->push_back(std::vector<glm::mat4>{glm::mat4(1)});
-    }
+		glEnableVertexAttribArray(2);
+		glVertexAttribFormat(2, 3, GL_FLOAT, false, 2 * sizeof(glm::vec3));
+		glVertexAttribBinding(2, 0);
 
-    bool RenderBatch::contains(Component::ComponentId id) const {
-        return details.count(id) > 0;
-    }
+		glBindVertexBuffer(1, instanceBuffer->id(), 0, instanceBuffer->stride());
+		glVertexBindingDivisor(1, 1);
 
-    void RenderBatch::remove(Component::ComponentId id) {
-        details.erase(id);
-    }
+		// setup instance matrix attribute buffer
 
-    BatchBuffer::BatchBuffer(int bufferMaxSize, int stride, int type)
-    : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
+		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+		glEnableVertexAttribArray(7);
 
-        glGenBuffers(1, &m_id);
-        glBindBuffer(m_type, m_id);
-        glBufferData(m_type, m_size, nullptr, GL_DYNAMIC_DRAW);
+		glVertexAttribFormat(4, 4, GL_FLOAT, false, 0);
+		glVertexAttribFormat(5, 4, GL_FLOAT, false, 1 * sizeof(glm::vec4));
+		glVertexAttribFormat(6, 4, GL_FLOAT, false, 2 * sizeof(glm::vec4));
+		glVertexAttribFormat(7, 4, GL_FLOAT, false, 3 * sizeof(glm::vec4));
 
-    }
+		glVertexAttribBinding(4, 1);
+		glVertexAttribBinding(5, 1);
+		glVertexAttribBinding(6, 1);
+		glVertexAttribBinding(7, 1);
 
-    GLuint BatchBuffer::id() {
-        return m_id;
-    }
+		glBindVertexArray(0);
+	}
 
-    size_t BatchBuffer::stride() {
-        return m_stride;
-    }
+	void RenderBatch::push_back(const Component::Mesh &mesh, const Component::Material material) {
 
-    size_t BatchBuffer::count() {
-        return m_fill / m_stride;
-    }
+		const auto key = std::make_pair(mesh.id(), material.id());
+	
+		details[key][ArrayBuffer] = arrayBuffer->push_back(mesh.vertices);
+		details[key][ElementBuffer] = elementBuffer->push_back(mesh.indices);
+		details[key][InstanceBuffer] = instanceBuffer->push_back(std::vector<glm::mat4>{glm::mat4(1)});
+	}
+
+	bool RenderBatch::contains(Component::ComponentId mesh_id, Component::ComponentId material_id) const {
+		return details.count(std::make_pair(mesh_id, material_id)) > 0;
+	}
+
+	void RenderBatch::remove(Component::ComponentId mesh_id, Component::ComponentId material_id) {
+		details.erase(std::make_pair(mesh_id, material_id));
+	}
+
+	BatchBuffer::BatchBuffer(int bufferMaxSize, int stride, int type)
+		: m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
+
+		glGenBuffers(1, &m_id);
+		glBindBuffer(m_type, m_id);
+		glBufferData(m_type, m_size, nullptr, GL_DYNAMIC_DRAW);
+
+	}
+
+	GLuint BatchBuffer::id() {
+		return m_id;
+	}
+
+	size_t BatchBuffer::stride() {
+		return m_stride;
+	}
+
+	size_t BatchBuffer::count() {
+		return m_fill / m_stride;
+	}
 }
