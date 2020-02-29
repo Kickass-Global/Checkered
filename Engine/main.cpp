@@ -20,19 +20,20 @@
 #include "Engine.h"
 #include "WorldTransform.h"
 #include <Events/Events.h>
+#include "soundSystem/SoundSystem.h"
 #include <texture.hpp>
 #include <fstream>
 #include <material.hpp>
 
 int main() {
 
-    // region initialize engine systems
-    using namespace Engine;
+    // region initialisine;
 
     auto running = true;
 
     auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
+    auto openALSoundSystem = Engine::addSystem<Engine::SoundSystem>();
 
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
     auto index = Engine::addSystem<Component::Index>();
@@ -143,15 +144,14 @@ int main() {
 
     };
 
-
     //setup passenger
-    auto passenger_entity = Engine::createComponent<Component::Passenger>();
-    passenger_entity->initPassenger();
+    //auto passenger_entity = Engine::createComponent<Component::Passenger>();
+    //passenger_entity->initPassenger();
 
     // setup ai "brain"
 
     std::function<void(const Component::EventArgs<Component::ComponentId> &)> ai_tick_callback = [player_vehicle](
-            const Component::EventArgs<Component::ComponentId> &args) {
+        const Component::EventArgs<Component::ComponentId> &args) {
         auto meta = std::get<0>(args.values).data<Component::Vehicle>();
 
         auto player_location = glm::normalize(player_vehicle->position); // translation vector of mat4
@@ -234,7 +234,7 @@ int main() {
 
         // region before update
         floatMilliseconds delta = end - start;
-        deltaTime elapsed = static_cast<deltaTime>(duration_cast<milliseconds>(delta).count());
+        Engine::deltaTime elapsed = static_cast<Engine::deltaTime>(duration_cast<milliseconds>(delta).count());
         // endregion
 
         Engine::EventSystem::onTick(elapsed);
