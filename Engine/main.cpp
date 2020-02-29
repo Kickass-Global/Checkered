@@ -76,8 +76,8 @@ int main() {
     auto ground_object = Engine::createComponent<Component::SceneComponent>();
     auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
     quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/checker.json",
-            Component::ClassId::Program
+        "Assets/Programs/checker.json",
+        Component::ClassId::Program
     );
 
     quad_mesh.addTag<Component::Dirty>();
@@ -96,16 +96,18 @@ int main() {
     car_mesh.addTag<Component::Visible>();
     car_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
     car_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/basic.json",
-            Component::ClassId::Program
+        "Assets/Programs/basic.json",
+        Component::ClassId::Program
     );
     Engine::nameComponent(car_mesh, "car-gal");
 
-    auto material = Engine::createComponent<Component::Material>();
-    auto diffuse = Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png");
-    material->textures.push_back(diffuse->id());
+    {
+        auto material = Engine::createComponent<Component::Material>();
+        auto diffuse = Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png");
+        material->textures.push_back(diffuse->id());
 
-    car_mesh.data<Component::Mesh>()->material = material->id();
+        car_mesh.data<Component::Mesh>()->material = material->id();
+    }
 
     Engine::nameComponent(car_mesh, "car-gal");
 
@@ -116,14 +118,20 @@ int main() {
     billboard_quad.addTag<Component::Visible>();
     billboard_quad.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
     billboard_quad.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-            "Assets/Programs/billboard.json",
-            Component::ClassId::Program
+        "Assets/Programs/billboard.json",
+        Component::ClassId::Program
     );
+
     Engine::nameComponent(billboard_quad, "billboard");
 
     auto sprite = Engine::createComponent<Component::Billboard>();
-    sprite->plot = {5, 5, 100, 100};
-    sprite->material = diffuse->id();
+    sprite->plot = {10, 10, 100, 100};
+    {
+        auto material = Engine::createComponent<Component::Material>();
+        auto diffuse = Engine::createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png");
+        material->textures.push_back(diffuse->id());
+        sprite->material = diffuse->id();
+    }
     sprite->mesh = billboard_quad;
 
     // setup the vehicle for the player...
