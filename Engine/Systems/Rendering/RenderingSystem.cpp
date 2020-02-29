@@ -15,7 +15,7 @@
 Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
 namespace {
-const char module[] = "RenderingSystem";
+    const char module[] = "RenderingSystem";
 }
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
@@ -24,8 +24,6 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     ss << "frametime: " << time << "ms" << std::endl;
     auto title = ss.str();
     glfwSetWindowTitle(window, title.c_str());
-
-
 
     // Find and update any GameObjects with meshes that should be drawn...
     auto meshes = Component::Index::entitiesOf<Component::Mesh>();
@@ -74,10 +72,10 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
             }
 
             updateInstanceData(
-                    mesh,
-                    static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
-                    (float *) transform_data.data(),
-                    sizeof(glm::mat4)
+                mesh,
+                static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
+                (float *) transform_data.data(),
+                sizeof(glm::mat4)
             );
         }
 
@@ -101,11 +99,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                 auto world_matrix = glm::translate(data->position);
 
                 auto perspective_matrix = glm::perspective(
-                        45.0f,
-                        static_cast<float>(data->viewport.width) /
-                        data->viewport.height,
-                        0.1f,
-                        1000.0f
+                    45.0f,
+                    static_cast<float>(data->viewport.width) /
+                    data->viewport.height,
+                    0.1f,
+                    1000.0f
                 );
 
                 glViewport(0, 0, data->viewport.width, data->viewport.height);
@@ -113,54 +111,52 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                 batch->shader.data<Program>()->bind();
 
                 glUniformMatrix4fv(
-                        glGetUniformLocation(
-                                batch->shader.data<Program>()->programId(),
-                                "M_View"
-                        ),
-                        1, false, glm::value_ptr(view_matrix));
+                    glGetUniformLocation(
+                        batch->shader.data<Program>()->programId(),
+                        "M_View"
+                    ),
+                    1, false, glm::value_ptr(view_matrix));
 
                 glUniformMatrix4fv(
-                        glGetUniformLocation(
-                                batch->shader.data<Program>()->programId(),
-                                "M_Perspective"
-                        ),
-                        1, false, glm::value_ptr(perspective_matrix));
+                    glGetUniformLocation(
+                        batch->shader.data<Program>()->programId(),
+                        "M_Perspective"
+                    ),
+                    1, false, glm::value_ptr(perspective_matrix));
 
 
             }
         }
     }
 
-    for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-        auto sprites = Component::Index::entitiesOf<Billboard>();
-        for (const auto &sprite : sprites) {
+    // this code handles drawing billboards into the world (hud, sprites, etc).
+    for (auto &camera : Component::Index::entitiesOf<Component::Camera>()) {
+        for (const auto &sprite : Component::Index::entitiesOf<Billboard>()) {
 
-            // if this is a new sprite add it to a batch...
-            // by attaching a transform that places it at the proper plot location.
-            auto camera_view_matrix = camera.data<Camera>()->view;
-            auto viewport = camera.data<Camera>()->viewport;
-            auto camera_up = camera_view_matrix[1];
-            auto camera_right = camera_view_matrix[0];
-            auto meta = sprite.data<Billboard>();
-
-            // todo, create a perspective matrix to transform plot to NDC....
+            const auto &camera_view_matrix = camera.data<Camera>()->view;
+            const auto &viewport = camera.data<Camera>()->viewport;
+            const auto &meta = sprite.data<Billboard>();
 
             auto offset = glm::translate(
-                    glm::vec3(
-                            meta->plot.x / (float) viewport.width - 1,
-                            meta->plot.y / (float) viewport.height - 1,
-                            0.0f
-                    ));
-            auto
-                    scale = glm::scale(
-                    glm::vec3(
-                            (float) meta->plot.width / viewport.width,
-                            (float) meta->plot.height / viewport.height,
-                            1.0f
-                    ));
+                glm::vec3(
+                    meta->plot.x / viewport.width - meta->anchor.x,
+                    meta->plot.y / viewport.height - meta->anchor.y,
+                    0.0f
+                )
+            );
+
+            auto anchor = glm::translate(glm::vec3(meta->anchor.x, meta->anchor.y, 0.0f));
+
+            auto scale = glm::scale(
+                glm::vec3(
+                    meta->plot.width / viewport.width,
+                    meta->plot.height / viewport.height,
+                    meta->plot.height / viewport.height // todo, hack
+                )
+            );
 
             meta->mesh.attachTemporaryComponent(
-                    Engine::createComponent<WorldTransform>(offset * scale)->id(), 1
+                Engine::createComponent<WorldTransform>(offset * scale * anchor)->id(), 1
             );
         }
 
@@ -185,37 +181,35 @@ Rendering::RenderingSystem::~RenderingSystem() {
 
 std::shared_ptr<Rendering::RenderBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
-        const std::shared_ptr<Component::Mesh> &data
+    const std::shared_ptr<Component::Mesh> &data
 ) {
 
     auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-            10000000,
-            sizeof(data->vertices[0]),
-            GL_ARRAY_BUFFER
+        10000000,
+        sizeof(data->vertices[0]),
+        GL_ARRAY_BUFFER
     );
 
     auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-            10000000,
-            sizeof(data->indices[0]),
-            GL_ELEMENT_ARRAY_BUFFER
+        10000000,
+        sizeof(data->indices[0]),
+        GL_ELEMENT_ARRAY_BUFFER
     );
 
     auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-            10000000,
-            sizeof(glm::mat4),
-            GL_ARRAY_BUFFER
+        10000000,
+        sizeof(glm::mat4),
+        GL_ARRAY_BUFFER
     );
 
     auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-
-
     batch->shader = data->shader;
 
     return push_back(batch);
 }
 
 std::shared_ptr<Rendering::RenderBatch> Rendering::RenderingSystem::push_back(
-        std::shared_ptr<Rendering::RenderBatch> batch
+    const std::shared_ptr<Rendering::RenderBatch> &batch
 ) {
     batches.push_back(batch);
     return batches.back();
@@ -226,9 +220,9 @@ void Rendering::RenderingSystem::buffer(const Component::Mesh &data) {
     // if the data is already buffered we want to update the existing buffer data
     auto id = data.id();
     auto match = std::find_if(
-            batches.begin(), batches.end(), [id](const auto &batch) {
-                return batch->contains(id);
-            }
+        batches.begin(), batches.end(), [id](const auto &batch) {
+            return batch->contains(id);
+        }
     );
 
     if (match != batches.end()) {
@@ -274,8 +268,8 @@ void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId id, i
     Engine::log<module>("Updating instance data of component#", id);
 
     auto it = std::find_if(
-            batches.begin(), batches.end(),
-            [id](auto batch) { return batch->contains(id); }
+        batches.begin(), batches.end(),
+        [id](auto batch) { return batch->contains(id); }
     );
 
     Engine::assertLog<module>(it != batches.end(), "check for valid batch");
