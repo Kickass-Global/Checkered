@@ -22,7 +22,7 @@ namespace Component {
     public:
 
         struct Viewport {
-            int x, y, width, height;
+            float x, y, width, height;
         } viewport;
 
         glm::vec3 position;
