@@ -70,9 +70,8 @@ int main() {
     //endregion
 
     // setup the ground mesh
-
     auto ground_object = Engine::createComponent<Component::SceneComponent>();
-    auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
+    auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/checkeredMap.fbx", Component::ClassId::Mesh);
     quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
             "Assets/Programs/checker.json",
             Component::ClassId::Program
