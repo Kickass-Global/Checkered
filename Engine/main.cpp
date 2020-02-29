@@ -138,7 +138,7 @@ int main() {
         ai_vehicle->model = ai_damage_model->id();
         ai_vehicle->scale = scale;
         ai_vehicle->rotation = orientation;
-        ai_vehicle->position = translation;;
+        ai_vehicle->position = translation;
 
         return ai_vehicle;
 
