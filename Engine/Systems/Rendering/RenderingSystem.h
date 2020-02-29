@@ -91,9 +91,9 @@ public:
 
     GLFWwindow *getWindow();
 
-    void updateInstanceData(Component::ComponentId id, int size, float *data, int stride);
+    void updateInstanceData(Component::ComponentId id, Component::ComponentId material_id, int size, float *data, int stride);
 
-    void buffer(const Component::Mesh &data);
+    void buffer(const Component::Mesh &data, const Component::Material & material);
 
     void update(Engine::deltaTime /*elapsedTime*/) override;
 
