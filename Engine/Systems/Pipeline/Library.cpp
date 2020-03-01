@@ -13,6 +13,7 @@ bool Pipeline::Library::contains(const std::string &asset_name) {
 
 std::pair<std::map<std::string, Component::ComponentId>::iterator, bool>
         Pipeline::Library::emplace(const std::string &asset_name, const Component::ComponentId& id) {
+	Engine::nameComponent(id, asset_name);
     return assets.emplace(asset_name, id);
 }
 

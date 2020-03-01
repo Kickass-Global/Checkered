@@ -64,7 +64,7 @@ namespace Component {
     template<typename... Args>
     void EventDelegate<Args...>::operator()(Args... args) {
 
-        Engine::log<module>("ComponentEvent#", id(), " called.");
+        Engine::log<module, Engine::low>("ComponentEvent#", id(), " called.");
 
         for (Component::ComponentId listener : subscribers) {
             auto eventArgs = Engine::createComponent<Component::EventArgs<Args...>>(args...);

@@ -75,70 +75,72 @@ int main() {
 
 	// setup the ground mesh
 
+	auto basic_shader_program = Pipeline::Library::getAsset(
+		"Assets/Programs/basic.json",
+		Component::ClassId::Program
+	);
+
+
+	// create a scene object to hold the ground components to follow.
 	auto ground_object = Engine::createComponent<Component::SceneComponent>();
-	auto quad_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
-	quad_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
+
+	// make a material component
+	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
+	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
+	ground_material->shader = Pipeline::Library::getAsset(
 		"Assets/Programs/checker.json",
 		Component::ClassId::Program
 	);
 
-	quad_mesh.addTag<Component::Dirty>();
-	quad_mesh.addTag<Component::Visible>();
-	Engine::nameComponent(quad_mesh, "quad-boi");
+	// load the mesh component
+	auto plane_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
 
-	ground_object->id().attachExistingComponent(quad_mesh);
-	ground_object->id().addTag<Component::Dirty>();
+	// create a mesh isnatnce (binds material with mesh)
+	auto ground_mesh_instance = Engine::createNamedComponent<Component::MeshInstance>(
+		"ground_mesh_instance", plane_mesh, ground_material->id()
+		);
+
+	ground_object->id().attachExistingComponent(ground_mesh_instance->id());
 	ground_object->id().addTag<Component::Visible>();
 
 	// create some buildings
 
-	auto building_material = Engine::createComponent<Component::Material>();
-	building_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
-	auto building_mesh = Pipeline::Library::getAsset("Assets/Meshes/Building_House_01.fbx", Component::ClassId::Mesh);
-	auto building1 = Engine::createComponent<Component::Scenery>(*building_mesh.data<Component::Mesh>(), *building_material);
+	//auto building_material = Engine::createComponent<Component::Material>(basic_shader_program);
+	//building_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
+	//auto building_mesh = Pipeline::Library::getAsset("Assets/Meshes/Building_House_01.fbx", Component::ClassId::Mesh);
+	//auto building1 = Engine::createComponent<Component::Scenery>(*building_mesh.data<Component::Mesh>(), *building_material);
 
-	// setup the mesh used for the cars...
-
-	auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/car_mesh.fbx", Component::ClassId::Mesh);
-	car_mesh.addTag<Component::Dirty>();
-	car_mesh.addTag<Component::Visible>();
-	car_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
-	car_mesh.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-		"Assets/Programs/basic.json",
-		Component::ClassId::Program
-	);
-	Engine::nameComponent(car_mesh, "car-gal");
-
-
-	auto car_material = Engine::createComponent<Component::Material>();
-	car_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
-	car_mesh.data<Component::Mesh>()->material = car_material->id();
+	
 
 
 
 	// setup a HUD element...
 
-	auto billboard_quad = Pipeline::Library::getAsset("Assets/Meshes/billboard_quad.obj", Component::ClassId::Mesh);
-	billboard_quad.addTag<Component::Dirty>();
-	billboard_quad.addTag<Component::Visible>();
-	billboard_quad.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
+	auto billboard_mesh = Pipeline::Library::getAsset("Assets/Meshes/billboard_quad.obj", Component::ClassId::Mesh);
+	billboard_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
 
-	billboard_quad.data<Component::Mesh>()->shader = Pipeline::Library::getAsset(
-		"Assets/Programs/billboard.json",
-		Component::ClassId::Program
-	);
-
-	Engine::nameComponent(billboard_quad, "billboard");
 
 	auto sprite = Engine::createComponent<Component::Billboard>();
 	sprite->plot = { 10, 10, 100, 100 };
 	{
-		auto material = Engine::createComponent<Component::Material>();
-		auto diffuse = Engine::createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png");
-		material->textures.push_back(diffuse->id());
-		sprite->material = diffuse->id();
+		auto material = Engine::createComponent<Component::Material>(Pipeline::Library::getAsset(
+			"Assets/Programs/billboard.json",
+			Component::ClassId::Program
+		));
+
+		material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png")->id());
+		sprite->mesh_instance = Engine::createComponent<MeshInstance>(billboard_mesh, material->id())->id();
 	}
-	sprite->mesh = billboard_quad;
+
+	// setup the mesh used for the cars...
+
+	//car_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
+
+	auto car_material = Engine::createComponent<Component::Material>(basic_shader_program);
+	car_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
+
+	auto car_mesh_instance = Engine::createComponent<MeshInstance>(
+		Pipeline::Library::getAsset("Assets/Meshes/car_mesh.fbx", Component::ClassId::Mesh), car_material->id());
 
 	// setup the vehicle for the player...
 
@@ -146,7 +148,7 @@ int main() {
 	auto player_damage_model = Engine::createComponent<Component::Model>();
 
 	player_damage_model->parts.push_back(Component::Model::Part{});
-	player_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, Engine::createComponent<MeshInstance>(*car_mesh.data<Component::Mesh>(), *car_material)->id() });
+	player_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, car_mesh_instance->id() });
 
 	player_vehicle->model = player_damage_model->id();
 	player_vehicle->scale = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -156,13 +158,13 @@ int main() {
 	physicsSystem->playerVehicle = player_vehicle;
 
 	// ai factory method...
-	auto make_ai = [car_mesh, car_material](glm::mat4 world_transform = glm::mat4{ 1 }) {
+	auto make_ai = [car_mesh_instance](glm::mat4 world_transform = glm::mat4{ 1 }) {
 
 		auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
 		auto ai_damage_model = Engine::createComponent<Component::Model>();
 
 		ai_damage_model->parts.push_back(Component::Model::Part{});
-		ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, Engine::createComponent<MeshInstance>(*car_mesh.data<Component::Mesh>(), *car_material)->id() });
+		ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, car_mesh_instance->id() });
 
 		glm::quat orientation;
 		glm::vec3 scale, translation, skew;
@@ -277,8 +279,7 @@ int main() {
 		// todo remove these hacks...
 		// force the ground to render...
 
-		quad_mesh.addTag<Component::Visible>();
-		quad_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
+		plane_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
 
 		//ai_vehicle->id().attachExistingComponent(Component::Visible::id());
 		for (const auto &system : Engine::systems()) {

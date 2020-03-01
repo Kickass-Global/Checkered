@@ -29,36 +29,36 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	auto meshes = Component::Index::entitiesOf<Component::MeshInstance>();
 	for (const Component::ComponentId &instance : meshes) {
 
+		auto meta = instance.data<Component::MeshInstance>();
+
 		auto is_dirty = instance.hasTag<Component::Dirty>(true);
-		auto is_visible = instance.hasTag<Component::Visible>(true);
+		auto is_visible = true || instance.hasTag<Component::Visible>(true);
 
 
 		auto transforms = instance.childComponentsOfClass(Component::ClassId::Transform);
 		auto is_instanced = !transforms.empty();
 
-		auto meta = instance.data<Component::MeshInstance>();
-
 		if (is_visible && is_dirty) {
 
 			// buffer the objects meshes (assuming that all meshes should be buffered and drawn).
-			Engine::log("Streaming in component#", instance);
-
-
 			Engine::log<module, Engine::high>("Updating batch data of#", instance);
-			buffer(*meta->mesh.data<Mesh>(), *meta->mesh.data<Material>());
+			buffer(*meta->mesh.data<Mesh>(), *meta->material.data<Material>());
 
 		}
+
 		if (is_instanced) {
-			Engine::log<module>("Updating instances of component#", instance);
+			Engine::log<module, Engine::low>("Updating instances(", transforms.size(), ") of component#", instance);
 			auto classId = instance.classId();
 			std::vector<glm::mat4> transform_data;
 
 			for (auto &&transform : transforms) {
-				if (classId == Component::ClassId::Mesh) {
-					Engine::log("Adding instance transform#", transform);
+				if (classId == Component::ClassId::MeshInstance) {
+					Engine::log<module, Engine::low>("Adding instance transform#", transform);
 					transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);
 				}
 			}
+
+			Engine::assertLog(!transform_data.empty(), "Checking that instance data is not empty.");
 
 			updateInstanceData(
 				meta->mesh,
@@ -145,7 +145,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 				)
 			);
 
-			meta->mesh.attachTemporaryComponent(
+			meta->mesh_instance.attachTemporaryComponent(
 				Engine::createComponent<WorldTransform>(offset * scale * anchor)->id(), 1
 			);
 		}
@@ -171,18 +171,18 @@ Rendering::RenderingSystem::~RenderingSystem() {
 
 std::shared_ptr<Rendering::RenderBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
-	const std::shared_ptr<Component::Mesh> &data
+	const Component::Mesh& data, const Material& material
 ) {
 
 	auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
 		10000000,
-		sizeof(data->vertices[0]),
+		sizeof(data.vertices[0]),
 		GL_ARRAY_BUFFER
 		);
 
 	auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
 		10000000,
-		sizeof(data->indices[0]),
+		sizeof(data.indices[0]),
 		GL_ELEMENT_ARRAY_BUFFER
 		);
 
@@ -193,7 +193,7 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 		);
 
 	auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-	batch->shader = data->shader;
+	batch->shader = material.shader;
 
 	return push_back(batch);
 }
@@ -222,7 +222,7 @@ void Rendering::RenderingSystem::buffer(const Component::Mesh &mesh, const Compo
 	}
 
 	// find a batch that can hold the data, or make one
-	auto batch = findSuitableBufferFor(std::make_shared<Component::Mesh>(mesh));
+	auto batch = findSuitableBufferFor(mesh, material);
 
 	// todo: if the buffered data size matches that in the buffer we should actually replace it here...
 	batch->push_back(mesh, material);
@@ -256,11 +256,11 @@ void Rendering::RenderingSystem::initialize() {
 
 void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId mesh_id, Component::ComponentId material_id, int size, float *data, int stride) {
 
-	Engine::log<module>("Updating instance data of component#", mesh_id);
+	Engine::log<module, Engine::low>("Updating instance data of component#", mesh_id);
 
 	auto it = std::find_if(
 		batches.begin(), batches.end(),
-		[mesh_id, material_id](const std::shared_ptr<RenderBatch>& batch)
+		[mesh_id, material_id](const auto batch)
 	{
 		return batch->contains(mesh_id, material_id);
 	}

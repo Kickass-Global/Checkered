@@ -12,8 +12,7 @@ namespace Component {
 
     class Billboard : public ComponentBase<ClassId::Billboard> {
     public:
-        ComponentId mesh;
-        ComponentId material;
+        ComponentId mesh_instance;
         struct Rectangle {
             float x;
             float y;
