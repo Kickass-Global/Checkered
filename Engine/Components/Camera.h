@@ -17,21 +17,21 @@
 
 namespace Component {
 
-    class Camera : public ComponentBase<ClassId::Camera> {
+	class Camera : public ComponentBase<ClassId::Camera> {
 
-    public:
+	public:
 
-        struct Viewport {
-            int x, y, width, height;
-        } viewport;
+		struct Viewport {
+			float x, y, width, height;
+		} viewport;
 
-        glm::vec3 position;
+		glm::vec3 position;
         glm::quat rotation;
 		glm::mat4 view{1};
         Component::ComponentId target;
         glm::vec3 offset = { 0,2,-5 };
 
-        Camera();
+		Camera();
     };
 
 }

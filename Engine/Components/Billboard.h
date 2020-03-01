@@ -9,16 +9,17 @@
 
 namespace Component {
 
+
     class Billboard : public ComponentBase<ClassId::Billboard> {
     public:
-        ComponentId bitmap;
-        ComponentId shader;
+        ComponentId mesh_instance;
         struct Rectangle {
-            int x;
-            int y;
-            int width;
-            int height;
+            float x;
+            float y;
+            float width;
+            float height;
         } plot;
+        glm::vec2 anchor = {1, 1};
     };
 
 }

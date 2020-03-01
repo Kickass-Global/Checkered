@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <sstream>
 #include <algorithm>
 #include <WorldTransform.h>
 
@@ -27,19 +28,23 @@
 #include "tags.h"
 #include "systeminterface.hpp"
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 #undef assert
 
 using namespace Component; // import this into anything using the engine header
 
 namespace Component {
-    template<typename... Args>
-    class EventDelegate;
+	template<typename... Args>
+	class EventDelegate;
 
-    template<typename... As>
-    class EventArgs;
+	template<typename... As>
+	class EventArgs;
 
-    struct ComponentId;
-    enum class ClassId : unsigned int;
+	struct ComponentId;
+	enum class ClassId : unsigned int;
 }
 
 namespace Engine {
@@ -138,6 +143,14 @@ namespace Engine {
 
 	template<typename T, typename... Args>
 	inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
+		* createNamedComponent(std::string name, Args... args) {
+		auto result = createComponent<T>(args...);
+		Engine::nameComponent(result->id(), name);
+		return result;
+	}
+
+	template<typename T, typename... Args>
+	inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
 		* createComponentWithTTL(int ttl, Args... args) {
 
 		T* result = Component::Index::allocate<T>();
@@ -175,13 +188,18 @@ namespace Engine {
 	 */
 	template<char const* m = module, class ... Ts>
 	void assertLog(bool test, Ts...args) {
-
 		if (!test) {
 
-			std::cout << Name(m);
-			(std::cout << ... << args);
-			std::cout << " [FAILURE]" << std::endl;
-			exit(-1);
+			std::ostringstream buffer;
+
+			buffer << Name(m);
+			(buffer << ... << args);
+			buffer << " [FAILURE]\n";
+
+			std::cerr << buffer.str() << std::endl;
+			OutputDebugString(buffer.str().c_str());
+
+			throw;
 		}
 
 	}
@@ -192,14 +210,21 @@ namespace Engine {
 		high
 	};
 
-	constexpr Importance loggingLevel = high;
+	constexpr Importance loggingLevel = medium;
 
 	template<char const* m = module, Importance importance = medium, class ... Ts>
 	void log(Ts...args) {
 		if (importance >= loggingLevel) {
-			std::cout << Name(m);
-			(std::cout << ... << args);
-			std::cout << std::endl;
+
+			std::ostringstream buffer;
+
+			buffer << Name(m);
+			(buffer << ... << args);
+			buffer << "\n";
+
+			std::cout << buffer.str() << std::endl;
+			OutputDebugString(buffer.str().c_str());
+
 		}
 	}
 

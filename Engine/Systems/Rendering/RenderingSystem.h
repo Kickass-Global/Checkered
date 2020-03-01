@@ -91,19 +91,19 @@ public:
 
     GLFWwindow *getWindow();
 
-    void updateInstanceData(Component::ComponentId id, int size, float *data, int stride);
+    void updateInstanceData(Component::ComponentId id, Component::ComponentId material_id, int size, float *data, int stride);
 
-    void buffer(const Component::Mesh &data);
+    void buffer(const Component::Mesh &data, const Component::Material & material);
 
     void update(Engine::deltaTime /*elapsedTime*/) override;
 
     ~RenderingSystem();
 
     std::shared_ptr<Rendering::RenderBatch>
-    findSuitableBufferFor(const std::shared_ptr<Component::Mesh> &data);
+    findSuitableBufferFor(const Component::Mesh& data, const Material& material);
 
     std::shared_ptr<Rendering::RenderBatch> push_back(
-            std::shared_ptr<Rendering::RenderBatch> batch
+            const std::shared_ptr<Rendering::RenderBatch>& batch
     );
 
 };

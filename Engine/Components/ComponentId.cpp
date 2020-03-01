@@ -10,7 +10,7 @@
 #include "ComponentBase.h"
 #include "Engine.h"
 
-unsigned int Component::next_id = 0xFEED0000;
+unsigned int Component::next_id = 80000000;
 
 std::ostream &Component::operator<<(std::ostream &out, const Component::ClassId &id) {
 	return out << (int)id;
@@ -24,7 +24,7 @@ bool Component::ComponentId::operator<(const Component::ComponentId &other) cons
 }
 
 std::ostream &Component::operator<<(std::ostream &out, const Component::ComponentId &id) {
-	if (Engine::identifier.count(id) <= 0) return out << id.id;
+	if (Engine::identifier.count(id) <= 0) return out << id.type << " " << id.id;
 	else return out << id.id << "[" << Engine::identifier[id] << "]";
 }
 
