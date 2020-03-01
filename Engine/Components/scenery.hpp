@@ -13,13 +13,14 @@ namespace Component {
 	 * Scenery components are things that can be placed into the world and have collision properties
 	 */
 	class Scenery : public SceneComponent {
-	public:
-		Scenery(const class Mesh& mesh, const Material &material)
-		{
-			const auto mesh_instance = Engine::createComponent<MeshInstance>(mesh, material);
-			id().attachExistingComponent(mesh_instance->id());
-		}
-	};
+    public:
+        ComponentReference<ClassId::MeshInstance> mesh;
+
+        Scenery(const class Mesh &mesh, const Material &material) :
+            mesh(Engine::createComponent<MeshInstance>(mesh, material)->id()) {
+            // todo: get an object from the physics system
+        }
+    };
 
 }
 

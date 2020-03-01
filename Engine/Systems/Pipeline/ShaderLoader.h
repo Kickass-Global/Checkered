@@ -2,6 +2,8 @@
 // Created by root on 10/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_SHADERLOADER_H
 #define ENGINE_SHADERLOADER_H
 

@@ -2,6 +2,8 @@
 // Created by Jackson Cougar Wiebe on 1/27/2020.
 //
 
+#pragma once
+
 #ifndef ENGINE_DAMAGE_HPP
 #define ENGINE_DAMAGE_HPP
 
@@ -13,7 +15,7 @@ namespace Component {
 /**
  * This component communicates damage between entities
  */
-    class Damage : public Component::ComponentBase<Component::ClassId::Damage> {
+    class Damage : public ComponentBase<ClassId::Damage> {
     public:
         int damage_amount;
     };
@@ -22,12 +24,12 @@ namespace Component {
  * This component controls how entities change in response to damage and
  * other effects.
  */
-    class Model : public Component::ComponentBase<Component::ClassId::Model> {
+    class Model : public ComponentBase<ClassId::Model> {
 
     public:
         struct Variation {
             int damage_threshold;
-            Component::ComponentId mesh;
+            ComponentId mesh = ComponentId(ClassId::MeshInstance);
         };
 
         struct Part {

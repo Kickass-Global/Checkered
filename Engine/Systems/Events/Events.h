@@ -2,6 +2,8 @@
 // Created by root on 20/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_EVENTS_H
 #define ENGINE_EVENTS_H
 

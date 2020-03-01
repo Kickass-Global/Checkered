@@ -1,6 +1,7 @@
 //
 // Created by root on 15/1/20.
 //
+#pragma once
 
 #ifndef ENGINE_COMPONENTBASE_H
 #define ENGINE_COMPONENTBASE_H
@@ -32,7 +33,7 @@ namespace Component {
 
         ComponentBase() : m_id(E) {}
 
-        ComponentBase &operator=(ComponentBase const&other) {
+        ComponentBase &operator=(const ComponentBase &other) {
             return *this;
         }
     };

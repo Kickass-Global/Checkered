@@ -2,6 +2,8 @@
 // Created by root on 22/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_LIBRARY_H
 #define ENGINE_LIBRARY_H
 

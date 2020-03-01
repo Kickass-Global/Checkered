@@ -13,9 +13,6 @@ void Pipeline::load_meta_data<Component::Mesh>(const json &config, Component::Me
         if (is_component_reference) {
             auto classId = value["component-id"]["class-id"];
             auto dataName = value["component-id"]["data"];
-
-            auto componentId = Library::getAsset(dataName, parse(classId));
-            data.shader = componentId;
         }
     }
 }

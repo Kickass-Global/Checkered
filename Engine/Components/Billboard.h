@@ -2,6 +2,7 @@
 // Created by root on 19/1/20.
 //
 
+#pragma once
 #ifndef ENGINE_BILLBOARD_H
 #define ENGINE_BILLBOARD_H
 

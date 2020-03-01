@@ -2,6 +2,8 @@
 // Created by Jackson Cougar Wiebe on 2/16/2020.
 //
 
+#pragma once
+
 #ifndef ENGINE_WORLDTRANSFORM_H
 #define ENGINE_WORLDTRANSFORM_H
 

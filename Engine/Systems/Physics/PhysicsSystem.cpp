@@ -241,8 +241,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
     std::vector<Component::Vehicle *> metas;
     std::transform(
-            active.begin(), active.end(), std::back_inserter(metas),
-            [](auto cid) { return cid.template data<Component::Vehicle>(); }
+        active.begin(), active.end(), std::back_inserter(metas),
+        [](ComponentId cid) { return cid.data<Component::Vehicle>(); }
     );
 
     for (auto &meta : metas) {
