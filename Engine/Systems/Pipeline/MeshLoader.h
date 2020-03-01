@@ -61,11 +61,6 @@ namespace Pipeline {
                 }
             }
 
-            auto shaders = Component::Index::entitiesOf<Rendering::Shader>();
-            if (!shaders.empty()) {
-                mesh.shader = *(shaders.begin());
-            }
-
             Library::emplace(filename, mesh.id());
             return Engine::addComponent(std::make_unique<Component::Mesh>(mesh));
         }

@@ -2,6 +2,8 @@
 // Created by root on 11/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_INDEX_H
 #define ENGINE_INDEX_H
 
@@ -16,16 +18,6 @@
 #include "ComponentId.h"
 #include "systeminterface.hpp"
 
-namespace std
-{
-	template<> struct hash<Component::ComponentId>
-	{
-		std::size_t operator()(Component::ComponentId const& s) const noexcept
-		{
-			return s.id;
-		}
-	};
-}
 
 namespace Component {
 	enum class ClassId : unsigned int;
@@ -35,11 +27,11 @@ namespace Component {
 
 namespace Component {
 
-	struct Reference {
-		bool allow_reuse = false;
-		int count = 0;
-		std::type_index type = typeid(Component::ClassId);
-	};
+    struct Reference {
+        bool allow_reuse = false;
+        int count = 0;
+        std::type_index type = typeid(nullptr);
+    };
 
 	struct TTL {
 		int ttl = 0;
@@ -78,16 +70,24 @@ namespace Component {
 		template<typename T>
 		static inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
 			* allocate() {
-			static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
+            static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
-			T* result = nullptr;
-			for (auto cid : scene[T::ComponentClass()]) {
+            T *result = nullptr;
+            auto type = T::ComponentClass();
+            for (auto cid : scene[type]) {
 
-				if (reference_count[cid].allow_reuse && reference_count[cid].count <= 0) {
-					reference_count[cid] = { false, 0, typeid(T) };
-					result = static_cast<T*>(meta[cid].get());
-					break;
-				}
+                if (reference_count.count(cid) > 0 && reference_count[cid].allow_reuse
+                    && reference_count[cid].count <= 0
+                    && reference_count[cid].type == typeid(T)) {
+
+                    reference_count[cid] = {false, 0, typeid(T)};
+
+                    auto data = meta.at(cid).get();
+                    Engine::assertLog(typeid(*data) == typeid(T),
+                                      "Checking meta data type: ", typeid(*data).name(), " == ", typeid(T).name());
+                    result = static_cast<T *>(data);
+                    break;
+                }
 
 			}
 
@@ -106,27 +106,35 @@ namespace Component {
 
 		template<typename T>
 		static void addTag(Component::ComponentId eid) {
-			static_assert(std::is_base_of<Component::ComponentTagInterface, T>::value);
+            static_assert(std::is_base_of<Component::ComponentTagInterface, T>::value);
 
-			auto tagId = T().id();
-			Engine::log<module, Engine::low>("Adding tag#", tagId, " to component#", eid);
-			child_components[eid][tagId.type].emplace(tagId);
-		}
+            auto tagId = T().id();
+            auto classId = eid.classId();
+
+            if (classId == Component::ClassId::Model)
+                Engine::log<module>("Adding tag#", tagId, " to component#", eid);
+
+            Engine::log<module, Engine::low>("Adding tag#", tagId, " to component#", eid);
+            child_components[eid][tagId.type].emplace(tagId);
+        }
 
 		template<typename T>
 		static bool hasTag(Component::ComponentId eid, bool removeTag = true) {
-			static_assert(std::is_base_of<Component::ComponentTagInterface, T>::value);
+            static_assert(std::is_base_of<Component::ComponentTagInterface, T>::value);
 
-			auto tagId = T().id();
-			auto result = child_components[eid][tagId.classId()].count(tagId) > 0;
+            auto tagId = T().id();
+            auto result = child_components[eid][tagId.classId()].count(tagId) > 0;
+            auto classId = eid.classId();
 
-			if (removeTag) {
-				Engine::log<module, Engine::low>("Removing tag#", tagId, " from component#", eid);
-				child_components[eid][tagId.type].erase(tagId);
-			}
+            if (result && removeTag) {
+                if (classId == Component::ClassId::Model)
+                    Engine::log<module>("Removing tag#", tagId, " from component#", eid);
+                Engine::log<module, Engine::low>("Removing tag#", tagId, " from component#", eid);
+                child_components[eid][tagId.type].erase(tagId);
+            }
 
-			return result;
-		}
+            return result;
+        }
 
 		static void addComponent(Component::ComponentId parent, Component::ComponentId child, int ttl = -1)
 		{

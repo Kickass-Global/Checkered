@@ -2,6 +2,8 @@
 // Created by root on 9/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_RENDERINGSYSTEM_H
 #define ENGINE_RENDERINGSYSTEM_H
 
@@ -79,7 +81,7 @@ class RenderingSystem : public Engine::SystemInterface {
 
     GLFWwindow *window;
 
-    std::vector<std::shared_ptr<Rendering::RenderBatch>> batches;
+    std::vector<std::shared_ptr<Rendering::GeometryBatch>> batches;
 
 public:
 
@@ -93,17 +95,17 @@ public:
 
     void updateInstanceData(Component::ComponentId id, Component::ComponentId material_id, int size, float *data, int stride);
 
-    void buffer(const Component::Mesh &data, const Component::Material & material);
+    void buffer(const Component::Mesh &data, const Component::Material &material);
 
     void update(Engine::deltaTime /*elapsedTime*/) override;
 
     ~RenderingSystem();
 
-    std::shared_ptr<Rendering::RenderBatch>
-    findSuitableBufferFor(const Component::Mesh& data, const Material& material);
+    std::shared_ptr<Rendering::GeometryBatch>
+    findSuitableBufferFor(const Component::Mesh &data, const Material &material);
 
-    std::shared_ptr<Rendering::RenderBatch> push_back(
-            const std::shared_ptr<Rendering::RenderBatch>& batch
+    std::shared_ptr<Rendering::GeometryBatch> push_back(
+        const std::shared_ptr<Rendering::GeometryBatch> &batch
     );
 
 };

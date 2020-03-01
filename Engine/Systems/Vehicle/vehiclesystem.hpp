@@ -2,6 +2,8 @@
 // Created by Jackson Cougar Wiebe on 2/13/2020.
 //
 
+#pragma once
+
 #ifndef ENGINE_VEHICLESYSTEM_HPP
 #define ENGINE_VEHICLESYSTEM_HPP
 

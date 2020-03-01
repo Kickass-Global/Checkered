@@ -2,6 +2,8 @@
 // Created by Jackson Cougar Wiebe on 2/26/2020.
 //
 
+#pragma once
+
 #ifndef ENGINE_MATERIAL_HPP
 #define ENGINE_MATERIAL_HPP
 

@@ -2,6 +2,8 @@
 // Created by root on 15/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_SCENECOMPONENT_H
 #define ENGINE_SCENECOMPONENT_H
 

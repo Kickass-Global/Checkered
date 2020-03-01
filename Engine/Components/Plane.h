@@ -2,6 +2,8 @@
 // Created by root on 17/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_PLANE_H
 #define ENGINE_PLANE_H
 

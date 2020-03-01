@@ -169,7 +169,7 @@ Rendering::RenderingSystem::~RenderingSystem() {
 	glfwDestroyWindow(window);
 }
 
-std::shared_ptr<Rendering::RenderBatch>
+std::shared_ptr<Rendering::GeometryBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
 	const Component::Mesh& data, const Material& material
 ) {
@@ -181,28 +181,29 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 		);
 
 	auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-		10000000,
-		sizeof(data.indices[0]),
-		GL_ELEMENT_ARRAY_BUFFER
-		);
+        10000000,
+        sizeof(data.indices[0]),
+        GL_ELEMENT_ARRAY_BUFFER
+    );
 
-	auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-		10000000,
-		sizeof(glm::mat4),
-		GL_ARRAY_BUFFER
-		);
+    auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
+        10000000,
+        sizeof(glm::mat4),
+        GL_ARRAY_BUFFER
+    );
 
-	auto batch = std::make_shared<RenderBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-	batch->shader = material.shader;
+    auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer, instanceBuffer);
+    batch->shader = material.shader;
 
-	return push_back(batch);
+
+    return push_back(batch);
 }
 
-std::shared_ptr<Rendering::RenderBatch> Rendering::RenderingSystem::push_back(
-	const std::shared_ptr<Rendering::RenderBatch> &batch
+std::shared_ptr<Rendering::GeometryBatch> Rendering::RenderingSystem::push_back(
+    const std::shared_ptr<Rendering::GeometryBatch> &batch
 ) {
-	batches.push_back(batch);
-	return batches.back();
+    batches.push_back(batch);
+    return batches.back();
 }
 
 void Rendering::RenderingSystem::buffer(const Component::Mesh &mesh, const Component::Material & material) {
@@ -210,16 +211,17 @@ void Rendering::RenderingSystem::buffer(const Component::Mesh &mesh, const Compo
 	// if the data is already buffered we want to update the existing buffer data
 	auto id = mesh.id();
 	auto match = std::find_if(
-		batches.begin(), batches.end(),
-		[mesh_id = id, material_id = material.id()](const std::shared_ptr<RenderBatch> &batch) {
-		return batch->contains(mesh_id, material_id);
-	}
-	);
+        batches.begin(), batches.end(),
+        [mesh_id = id, material_id = material.id()](const std::shared_ptr<GeometryBatch> &batch) {
+            return batch->contains(mesh_id, material_id);
+        }
+    );
 
 	if (match != batches.end()) {
-		// mark/remove buffered data so its not used
-		(*match)->remove(id, material.id());
-	}
+        // mark/remove buffered data so its not used
+        Engine::log<module>("Removing #", mesh.id(), " from batch#", (*match)->vao);
+        (*match)->remove(id, material.id());
+    }
 
 	// find a batch that can hold the data, or make one
 	auto batch = findSuitableBufferFor(mesh, material);

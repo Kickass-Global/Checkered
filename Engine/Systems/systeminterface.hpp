@@ -2,6 +2,8 @@
 // Created by Jackson Cougar Wiebe on 1/27/2020.
 //
 
+#pragma once
+
 #ifndef ENGINE_SYSTEMINTERFACE_HPP
 #define ENGINE_SYSTEMINTERFACE_HPP
 

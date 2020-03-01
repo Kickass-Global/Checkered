@@ -2,6 +2,8 @@
 // Created by root on 11/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_INPUTSYSTEM_H
 #define ENGINE_INPUTSYSTEM_H
 
