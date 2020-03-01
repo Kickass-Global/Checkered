@@ -31,6 +31,7 @@ namespace Component {
         GameObject,
         SceneComponent,
         PhysicsPacket,
+        PhysicsActor,
         Dirty,
         Damage,
         Vehicle,
@@ -80,7 +81,7 @@ namespace Component {
         void addTag() const;
 
         template<typename T>
-        [[nodiscard]] bool hasTag(bool clear) const;
+        [[nodiscard]] bool hasTag(bool clear = true) const;
 
         void attachExistingComponent(ComponentId component) const;
 
