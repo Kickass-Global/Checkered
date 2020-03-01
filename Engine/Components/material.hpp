@@ -18,6 +18,8 @@ namespace Component {
         std::vector<Component::ComponentId> textures;
         // maybe some uniforms down here, you know, whatever feels right...
 
+		Material(const ComponentId shader_id) : shader(shader_id), textures() {}
+
         void bind() {
             int index = 0;
             for (auto &&texture : textures) {

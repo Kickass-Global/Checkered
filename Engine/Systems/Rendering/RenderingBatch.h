@@ -49,7 +49,7 @@ namespace Rendering {
 		template<typename T>
 		BatchDescription push_back(std::vector<T> data) {
 
-			Engine::log<module>("Pushing data into batch#", id());
+			Engine::log<module, Engine::low>("Pushing data into batch#", id());
 
 			glBindBuffer(m_type, m_id);
 			glBufferSubData(m_type, m_fill, sizeof(T) * data.size(), data.data());
@@ -65,7 +65,7 @@ namespace Rendering {
 		template<typename T>
 		BatchDescription push_back(int size, T *data, int stride) {
 
-			Engine::log<module>("Pushing data into batch#", id());
+			Engine::log<module, Engine::low>("Pushing data into batch#", id());
 
 			glBindBuffer(m_type, m_id);
 			glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
@@ -79,7 +79,7 @@ namespace Rendering {
 		}
 
 		void replace_existing_data(int size, float *data, BatchDescription details) {
-			Engine::log<module>("Replacing data in batch#", id());
+			Engine::log<module, Engine::low>("Replacing data in batch#", id());
 			glBindBuffer(m_type, m_id);
 			glBufferSubData(m_type, details.offset, size, data);
 		}
@@ -112,7 +112,7 @@ namespace Rendering {
 		void push_back(const Component::Mesh &mesh, const Component::Material material);
 
 		void update(const Component::ComponentId mesh_id, const ComponentId material_id, int buffer, int size, float *data, int stride) {
-			Engine::log<module>("Updating component#", mesh_id);
+			Engine::log<module, Engine::low>("Updating component#", mesh_id);
 
 			auto &detail = details.at(std::make_pair(mesh_id, material_id));
 			int count = size / stride;

@@ -49,7 +49,7 @@ namespace Component {
         static const unsigned int Null = 0xffffffffu;
 
         ClassId type;
-        unsigned int id;
+		unsigned int id = Null;
         mutable void *data_ptr = nullptr;
 
         // creates a null-like id

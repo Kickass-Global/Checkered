@@ -2,6 +2,10 @@
 #ifndef ENGINE_COMPONENTS_SCENERY_HPP
 #define ENGINE_COMPONENTS_SCENERY_HPP
 
+#include <Engine.h>
+#include <material.hpp>
+#include <Mesh.h>
+#include <SceneComponent.h>
 
 namespace Component {
 
@@ -10,9 +14,9 @@ namespace Component {
 	 */
 	class Scenery : public SceneComponent {
 	public:
-		Scenery(const class Mesh& mesh, const class Material &material)
+		Scenery(const class Mesh& mesh, const Material &material)
 		{
-			const auto mesh_instance = Engine::createComponent<class MeshInstance>(mesh, material);
+			const auto mesh_instance = Engine::createComponent<MeshInstance>(mesh, material);
 			id().attachExistingComponent(mesh_instance->id());
 		}
 	};
