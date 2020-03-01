@@ -42,20 +42,22 @@ namespace Component {
 	typedef std::unordered_map<ClassId, std::set<ComponentId>> ClassMap;
 
 	class Index : public Engine::SystemInterface {
-	private:
+    private:
 
-		static std::unordered_map<Component::ComponentId, ClassMap> child_components;
-		static ClassMap scene;
+        static std::unordered_map<Component::ComponentId, ClassMap> child_components;
+        static ClassMap scene;
+        static std::unordered_map<ClassId, std::set<Component::ComponentInterface *>> raw_scene;
 
-		static std::unordered_map<Component::ComponentId, std::unique_ptr<Component::ComponentInterface>> meta;
+        static std::unordered_map<Component::ComponentId, std::unique_ptr<Component::ComponentInterface>> meta;
 
-		static std::unordered_map<ComponentId, Reference> reference_count;
-		static std::unordered_map<ComponentId, TTL> ttl;
+        static std::unordered_map<ComponentId, Reference> reference_count;
+        static std::unordered_map<ComponentId, TTL> ttl;
 
-	public:
+    public:
 
-		void update(Engine::deltaTime /*elapsed*/) override;
-		void initialize() override;
+        void update(Engine::deltaTime /*elapsed*/) override;
+
+        void initialize() override;
 
 		template<typename T>
 		static void push_entity(Component::ClassId cid, Component::ComponentId id, std::unique_ptr<T> data) {
@@ -89,19 +91,25 @@ namespace Component {
                     break;
                 }
 
-			}
+            }
 
-			return result;
-		}
+            return result;
+        }
 
-		template<typename T>
-		static const std::set<Component::ComponentId>&entitiesOf() {
-			static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
-			return scene[T::ComponentClass()];
-		}
+        template<typename T>
+        static const std::set<T *> getComponentsOfType() {
+            static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
+            return raw_scene[T::ComponentClass()];
+        }
 
-		static std::set<Component::ComponentId> componentsOf
-		(Component::ComponentId id, Component::ClassId classId);
+        template<typename T>
+        static const std::set<Component::ComponentId> &entitiesOf() {
+            static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
+            return scene[T::ComponentClass()];
+        }
+
+        static std::set<Component::ComponentId> componentsOf
+            (Component::ComponentId id, Component::ClassId classId);
 
 
 		template<typename T>

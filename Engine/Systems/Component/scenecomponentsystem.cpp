@@ -2,13 +2,11 @@
 // Created by Jackson Cougar Wiebe on 2/8/2020.
 //
 
-#include <algorithm>
-#include <set>
+#include <PhysicsActor.h>
 
 #include "scenecomponentsystem.hpp"
 #include "tags.h"
 #include "../../Components/SceneComponent.h"
-#include "../../Components/Component.h"
 #include "physicspacket.hpp"
 #include "Engine.h"
 #include "WorldTransform.h"
@@ -21,6 +19,9 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
     // Go through every SceneComponent in the scene and update its transformation matrix, then update each component
     // attached to the SceneComponent with the new world transform.
+
+
+
 
     auto sceneComponents = Component::Index::entitiesOf<SceneComponent>();
 
@@ -74,6 +75,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
         }
     }
 }
+
 void Component::SceneComponentSystem::initialize() {
     Engine::log<module>("Initializing system");
 }

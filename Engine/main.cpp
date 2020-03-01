@@ -39,6 +39,7 @@ int main() {
     auto openALSoundSystem = Engine::addSystem<Engine::SoundSystem>();
 
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
+    vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
     auto index = Engine::addSystem<Component::Index>();
     index->order = 2;
 
