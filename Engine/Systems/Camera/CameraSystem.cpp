@@ -52,11 +52,11 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
         // check if the camera is attached to a component, get that components
         // transform and update the camera to look at that object.
 
-        auto meta = data->target.data<Component::Vehicle>();
-        if (data->target && meta->pxVehicle) {
+        if (data->target && data->target.data<Component::Vehicle>()->pxVehicle) {
 
+			auto meta = data->target.data<Component::Vehicle>();
             const auto &component = data->target;
-            Engine::log<module>("Updating camera to look at #", component);
+            Engine::log<module, Engine::low>("Updating camera to look at #", component);
 
             auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset, 1);
 
@@ -68,8 +68,13 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
             glm::vec3 target = meta->position;
             glm::vec3 world_up = {0, 1, 0};
 
-            data->view = glm::lookAt(eye, target, world_up);
+			data->view = glm::lookAt(eye, target, world_up);
+
         }
+		else
+		{
+			data->view = glm::translate(data->position);
+		}
         // reset deltas
         x = 0;
         y = 0;

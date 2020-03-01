@@ -45,7 +45,7 @@ public:
     physx::PxVehiclePadSmoothingData pxPadSmoothingData;
 
     void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
-        Engine::log<module>("onTick");
+        Engine::log<module, Engine::low>("onTick");
         tickHandler(id());
     }
 

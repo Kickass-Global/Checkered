@@ -100,7 +100,7 @@ public:
     ~RenderingSystem();
 
     std::shared_ptr<Rendering::RenderBatch>
-    findSuitableBufferFor(const std::shared_ptr<Component::Mesh> &data);
+    findSuitableBufferFor(const Component::Mesh& data, const Material& material);
 
     std::shared_ptr<Rendering::RenderBatch> push_back(
             const std::shared_ptr<Rendering::RenderBatch>& batch
