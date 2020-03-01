@@ -39,6 +39,7 @@ namespace Physics {
         Component::Vehicle* playerVehicle = nullptr;
 
         Component::ComponentId onVehicleCreatedHandler;
+        Component::ComponentId onActorCreatedHandler;
         Component::ComponentId onKeyPressHandler;
         Component::ComponentId onKeyDownHandler;
         Component::ComponentId onKeyUpHandler;
@@ -50,16 +51,26 @@ namespace Physics {
         void createPVD();
         void createCooking();
         void createScene();
+
         void createGround();
+
         void initVehicleSupport();
+
         void createDrivablePlayerVehicle();
+
         void stepPhysics(Engine::deltaTime);
 
         void onKeyDown(const Component::EventArgs<int> &args);
+
         void onKeyUp(const Component::EventArgs<int> &args);
+
         void onKeyPress(const Component::EventArgs<int> &args);
+
         PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+
         void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
+
+        void onActorCreated(const EventArgs<PhysicsActor *, Mesh *> &args);
     };
 
 }

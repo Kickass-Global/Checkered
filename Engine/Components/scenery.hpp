@@ -6,20 +6,21 @@
 #include <material.hpp>
 #include <Mesh.h>
 #include <SceneComponent.h>
+#include <PhysicsActor.h>
 
 namespace Component {
 
-	/**
-	 * Scenery components are things that can be placed into the world and have collision properties
-	 */
-	class Scenery : public SceneComponent {
+    /**
+     * Scenery components are things that can be placed into the world and have collision properties
+     */
+    class Scenery : public SceneComponent {
     public:
-        ComponentReference<ClassId::MeshInstance> mesh;
+        ComponentReference<ClassId::PhysicsActor> actor;
+        std::vector<ComponentReference<ClassId::Transform>> instances;
 
         Scenery(const class Mesh &mesh, const Material &material) :
-            mesh(Engine::createComponent<MeshInstance>(mesh, material)->id()) {
-            // todo: get an object from the physics system
-        }
+            mesh(Engine::createComponent<MeshInstance>(mesh, material)->id()),
+            actor(Engine::createComponent<PhysicsActor>(mesh)->id()) {}
     };
 
 }
