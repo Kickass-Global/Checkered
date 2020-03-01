@@ -22,7 +22,7 @@ namespace Component {
      */
     class SceneComponent : public ComponentBase<ClassId::SceneComponent> {
     public:
-        SceneComponent *m_parent;
+		SceneComponent *m_parent = nullptr;
         std::vector<SceneComponent *> m_children;
         glm::mat4 m_localTransform;
 

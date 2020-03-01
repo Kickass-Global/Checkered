@@ -9,6 +9,9 @@
 
 template<typename T>
 T *Component::ComponentId::data() const {
+
+	Engine::assertLog(T::ComponentClass() == type, "Checking data<T>() corresponds to component type");
+
     if (!data_ptr) { // cache the pointer
         data_ptr = Index::entityData<T>(*this);
     }

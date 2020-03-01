@@ -302,6 +302,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 
+	if (!playerVehicle) return;
     // using our key states to set input data directly...
     playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
     playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
