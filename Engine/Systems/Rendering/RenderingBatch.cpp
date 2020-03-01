@@ -15,11 +15,11 @@ namespace Rendering {
 
 		for (auto[key, detail] : details) {
 
-			Engine::log<module>("Drawing #", key.first, "#", key.second);
+			Engine::log<module, Engine::low>("Drawing #", key.first, "#", key.second);
 			// todo pass in the stride somehow
 			auto &&meta = key.first.data<Mesh>();
-			if (meta->material) {
-				meta->material.data<Material>()->bind();
+			if (key.second) {
+				key.second.data<Material>()->bind();
 			}
 			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0,
 				detail[2].count, detail[1].offset, detail[2].offset / 64);
@@ -29,7 +29,7 @@ namespace Rendering {
 
 	void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
 
-		Engine::log<module>("Binding shader#", shader);
+		Engine::log<module, Engine::low>("Binding shader#", shader);
 		shader.data<Program>()->bind();
 		glBindVertexArray(vao);
 	}

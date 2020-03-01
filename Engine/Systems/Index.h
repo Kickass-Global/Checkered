@@ -109,7 +109,7 @@ namespace Component {
 			static_assert(std::is_base_of<Component::ComponentTagInterface, T>::value);
 
 			auto tagId = T().id();
-			Engine::log<module, Engine::low>("Adding tag#", tagId, "to component#", eid);
+			Engine::log<module, Engine::low>("Adding tag#", tagId, " to component#", eid);
 			child_components[eid][tagId.type].emplace(tagId);
 		}
 
@@ -121,7 +121,7 @@ namespace Component {
 			auto result = child_components[eid][tagId.classId()].count(tagId) > 0;
 
 			if (removeTag) {
-				Engine::log<module, Engine::low>("Removing tag#", tagId, "to component#", eid);
+				Engine::log<module, Engine::low>("Removing tag#", tagId, " from component#", eid);
 				child_components[eid][tagId.type].erase(tagId);
 			}
 

@@ -33,7 +33,7 @@ namespace Component {
     public:
 
         [[deprecated]]Component::ComponentId shader;
-        Component::ComponentId material;
+		[[deprecated]]Component::ComponentId material;
         std::vector<Vertex> vertices;
         std::vector<int> indices;
 
@@ -44,6 +44,7 @@ namespace Component {
 		ComponentId mesh;
 		ComponentId material;
 		MeshInstance(const Mesh &mesh, const Material& material) : mesh(mesh.id()), material(material.id()) {}
+		MeshInstance(const ComponentId mesh_id, const ComponentId material_id) : mesh(mesh_id), material(material_id) {}
 	};
 
 }
