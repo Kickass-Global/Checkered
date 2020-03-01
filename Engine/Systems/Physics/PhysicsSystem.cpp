@@ -6,6 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <Vehicle.h>
 #include <algorithm>
+#include <PhysicsActor.h>
+#include <Mesh.h>
 
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
@@ -26,7 +28,7 @@ const float RESTITUTION = 0.6f;
 Component::Passenger* activePassenger;
 
 namespace {
-const char module[] = "Physics";
+    const char module[] = "Physics";
 }
 
 std::vector<PxVehicleDrive4W *> vehicles;
@@ -77,13 +79,13 @@ VehicleDesc initVehicleDescription() {
     const PxF32 chassisMass = 1500.0f;
     const PxVec3 chassisDims(1.5f, 1.0f, 2.0f);
     const PxVec3 chassisMOI
-            ((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
-             chassisMass / 12.0f,
-             (chassisDims.x * chassisDims.x + chassisDims.z * chassisDims.z) *
-             0.8f * chassisMass / 12.0f,
-             (chassisDims.x * chassisDims.x + chassisDims.y * chassisDims.y) *
-             chassisMass / 12.0f
-            );
+        ((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
+         chassisMass / 12.0f,
+         (chassisDims.x * chassisDims.x + chassisDims.z * chassisDims.z) *
+         0.8f * chassisMass / 12.0f,
+         (chassisDims.x * chassisDims.x + chassisDims.y * chassisDims.y) *
+         chassisMass / 12.0f
+        );
     const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f + 0.65f, 0.25f);
 
     //Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
@@ -102,9 +104,9 @@ VehicleDesc initVehicleDescription() {
     vehicleDesc.chassisCMOffset = chassisCMOffset;
     vehicleDesc.chassisMaterial = cMaterial;
     vehicleDesc.chassisSimFilterData = PxFilterData(
-            COLLISION_FLAG_CHASSIS,
-            COLLISION_FLAG_CHASSIS_AGAINST,
-            0, 0
+        COLLISION_FLAG_CHASSIS,
+        COLLISION_FLAG_CHASSIS_AGAINST,
+        0, 0
     );
 
     vehicleDesc.wheelMass = wheelMass;
@@ -114,9 +116,9 @@ VehicleDesc initVehicleDescription() {
     vehicleDesc.numWheels = nbWheels;
     vehicleDesc.wheelMaterial = cMaterial;
     vehicleDesc.chassisSimFilterData = PxFilterData(
-            COLLISION_FLAG_WHEEL,
-            COLLISION_FLAG_WHEEL_AGAINST,
-            0, 0
+        COLLISION_FLAG_WHEEL,
+        COLLISION_FLAG_WHEEL_AGAINST,
+        0, 0
     );
 
     return vehicleDesc;
@@ -129,6 +131,7 @@ void Physics::PhysicsSystem::initialize() {
     onKeyDownHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyDown);
     onKeyUpHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyUp);
     onVehicleCreatedHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onVehicleCreated);
+    onActorCreatedHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onActorCreated);
 
     createFoundation();
     createPVD();
@@ -209,9 +212,9 @@ void Physics::PhysicsSystem::createGround() {
 void Physics::PhysicsSystem::initVehicleSupport() {
 
     cVehicleSceneQueryData = VehicleSceneQueryData::allocate(
-            100, PX_MAX_NB_WHEELS, 1, 100,
-            WheelSceneQueryPreFilterBlocking, nullptr,
-            cDefaultAllocator
+        100, PX_MAX_NB_WHEELS, 1, 100,
+        WheelSceneQueryPreFilterBlocking, nullptr,
+        cDefaultAllocator
     );
     cBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *cVehicleSceneQueryData, cScene);
 
@@ -238,8 +241,8 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
     pxVehicle = vehicles.back();
 
     PxTransform startTransform(
-            PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
-            PxQuat(PxIdentity));
+        PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f + vehicleDesc.wheelRadius + 2.0f), -10),
+        PxQuat(PxIdentity));
 
     pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
     
@@ -263,10 +266,10 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
     std::vector<Component::ComponentId> active;
     std::copy_if(
-            vehicles.begin(), vehicles.end(), std::back_inserter(active), [](auto vehicle) {
-                auto meta = vehicle.template data<Component::Vehicle>();
-                return meta->pxVehicle; // vehicles might not be initialized yet...
-            }
+        vehicles.begin(), vehicles.end(), std::back_inserter(active), [](auto vehicle) {
+            auto meta = vehicle.template data<Component::Vehicle>();
+            return meta->pxVehicle; // vehicles might not be initialized yet...
+        }
     );
 
     std::vector<Component::Vehicle *> metas;
@@ -278,8 +281,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     for (auto &meta : metas) {
 
         PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
-                meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
-                timestep, meta->pxIsVehicleInAir, *meta->pxVehicle
+            meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
+            timestep, meta->pxIsVehicleInAir, *meta->pxVehicle
         );
     }
 
@@ -291,8 +294,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
         PxRaycastQueryResult *raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
         const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
         PxVehicleSuspensionRaycasts(
-                cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,
-                raycastResults
+            cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,
+            raycastResults
         );
 
         //vehicle update
@@ -305,8 +308,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
             vehicleQueryResults.push_back({wheelQueryResults, wheels[0]->mWheelsSimData.getNbWheels()});
         }
         PxVehicleUpdates(
-                0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, wheels.size(), wheels.data(),
-                vehicleQueryResults.data());
+            0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, wheels.size(), wheels.data(),
+            vehicleQueryResults.data());
 
         //workout if vehicle is in air
         //cIsVehicleInAir = meta->pxVehicle->getRigidDynamicActor()->isSleeping()
@@ -324,10 +327,10 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     for (auto&[actor, component] : trackedComponents) {
         auto t = actor->getGlobalPose();
         component.attachTemporaryComponent(
-                Engine::createComponent<Component::PhysicsPacket>(
-                        glm::vec3(t.p.x, t.p.y, t.p.z),
-                        glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id(),
-                1
+            Engine::createComponent<Component::PhysicsPacket>(
+                glm::vec3(t.p.x, t.p.y, t.p.z),
+                glm::quat(t.q.w, t.q.x, t.q.y, t.q.z))->id(),
+            1
         );
     }
 
@@ -382,9 +385,9 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
     auto meta = vehicleComponent.data<Component::Vehicle>();
 
     auto T = PxTransform(
-            meta->position.x,
-            meta->position.y,
-            meta->position.z
+        meta->position.x,
+        meta->position.y,
+        meta->position.z
     );
     auto pxVehicle = createDrivableVehicle(T);
 

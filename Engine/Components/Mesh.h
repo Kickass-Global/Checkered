@@ -20,12 +20,12 @@
 
 namespace Component {
 
-    class Vertex {
+    struct Vertex {
 
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec3 texcoord;
-    
+
     public:
         Vertex(aiVector3D position, aiVector3D normal, aiVector3D texcoord);
     };
