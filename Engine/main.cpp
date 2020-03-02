@@ -156,6 +156,9 @@ int main() {
                                                                         ), car_material->id());
 
     // setup the vehicle for the player...
+    
+    auto player_vehicle = Engine::createComponent<Component::Vehicle>();
+    
 
     auto player_vehicle = Engine::createNamedComponent<Component::Vehicle>("player_vehicle");
     auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
@@ -169,6 +172,13 @@ int main() {
     player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
 
     physicsSystem->playerVehicle = player_vehicle;
+
+    //setup passenger system
+    auto passenger = Engine::createComponent<Component::Passenger>();
+    
+
+
+
 
     // ai factory method...
     auto make_ai = [car_mesh_instance](glm::mat4 world_transform = glm::mat4{1}) {
@@ -265,7 +275,7 @@ int main() {
             ai_vehicle->tickHandler += ticker; // give them brain
 
         }
-    }
+    }*/
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();

@@ -23,6 +23,8 @@ const float STATIC_FRICTION = 0.5F;
 const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.6f;
 
+Component::Passenger* activePassenger;
+
 namespace {
 const char module[] = "Physics";
 }
@@ -32,11 +34,10 @@ std::vector<PxVehicleDrive4W *> vehicles;
 PxVehicleDrivableSurfaceToTireFrictionPairs *cFrictionPairs = NULL;
 
 PxFoundation *cFoundation = NULL;
-PxPhysics *cPhysics = NULL;
+
 PxPvd *cPVD = NULL;
 PxPvdTransport *cTransport = NULL;
 PxCooking *cCooking = NULL;
-PxScene *cScene = NULL;
 PxCpuDispatcher *cDispatcher = NULL;
 PxMaterial *cMaterial = NULL;
 PxRigidStatic *cGroundPlane = NULL;
@@ -53,7 +54,21 @@ static PxDefaultErrorCallback cErrorCallback;
 
 std::map<physx::PxRigidDynamic *, Component::ComponentId> trackedComponents;
 
+struct FliterGroup {
+    enum Enum
+    {
+        ePlayerVehicle = (1 << 0),
+        eEnemyVehicle = (1 << 1),
+        ePasenger = (1 << 2)
+    };
+};
+
 extern VehicleDesc initVehicleDesc();
+
+
+
+
+
 
 VehicleDesc initVehicleDescription() {
     //Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
@@ -123,8 +138,15 @@ void Physics::PhysicsSystem::initialize() {
     createGround();
     initVehicleSupport();
     createDrivablePlayerVehicle();
+    createPhysicsCallbacks();
 
     std::cout << "Physics System Successfully Initalized" << std::endl;
+
+}
+
+void Physics::PhysicsSystem::createPhysicsCallbacks() {
+
+    
 
 }
 
@@ -160,6 +182,8 @@ void Physics::PhysicsSystem::createCooking() {
 
 void Physics::PhysicsSystem::createScene() {
 
+    
+
     PxSceneDesc sceneDesc(cPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0.f, GRAVITY, 0.f);
 
@@ -169,7 +193,7 @@ void Physics::PhysicsSystem::createScene() {
     sceneDesc.filterShader = snippetvehicle::VehicleFilterShader;
 
     cScene = cPhysics->createScene(sceneDesc);
-
+    
 }
 
 void Physics::PhysicsSystem::createGround() {
@@ -203,6 +227,7 @@ void Physics::PhysicsSystem::createDrivablePlayerVehicle() {
     //    createDrivableVehicle(PxTransform(0,0,0));
 }
 
+//TODO DIFFERENTIATE BETWEEN ENEMY VEHICLE AND PLAYER VEHICLE FOR COLLIDERS
 PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform) {
 
     PxVehicleDrive4W *pxVehicle;
@@ -217,12 +242,17 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
             PxQuat(PxIdentity));
 
     pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
+    
 
     cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
     pxVehicle->setToRestState();
     pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
     pxVehicle->mDriveDynData.setUseAutoGears(true);
+
+    FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(),FliterGroup::ePlayerVehicle,FliterGroup::ePasenger);
+
+    
 
     return pxVehicle;
 }
@@ -284,8 +314,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
         //	: PxVehicleIsInAir(vehicleQueryResults[0]);
     }
 
+
     cScene->simulate(0.0001 + timestep / 1000.0f);
     cScene->fetchResults(true);
+
+
 
     // replicate physx bodies' world transforms to corresponding components.
     for (auto&[actor, component] : trackedComponents) {
@@ -297,6 +330,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
                 1
         );
     }
+
+    
 }
 
 
@@ -308,6 +343,7 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
     playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
     playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
     playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
+
 
     stepPhysics(deltaTime);
 }
@@ -340,7 +376,8 @@ void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) {
 void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args) {
 
     const auto &vehicleComponent = std::get<0>(args.values);
-
+  
+   
     // grab the vehicle world position and set the physx actors transform accordingly.
     auto meta = vehicleComponent.data<Component::Vehicle>();
 
@@ -358,7 +395,55 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
     link(vehicleComponent, pxVehicle->getRigidDynamicActor());
 }
 
+
+
+void Physics::PhysicsSystem::onPassengerCreated(const Component::EventArgs<Component::ComponentId>& args) {
+
+    const auto& passengerComponent = std::get<0>(args.values);
+
+    auto meta = passengerComponent.data<Component::Passenger>();
+    auto initPosition = meta->pickupTransform;
+    auto dropOffPosition = meta->dropOffTransform;
+
+
+    activePassenger = createPassenger(PxTransform( initPosition),PxTransform( dropOffPosition));
+
+    cScene->addActor(*activePassenger->pass_actor);
+    
+
+
+}
+
+Component::Passenger* Physics::PhysicsSystem::createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans) {
+
+    Component::Passenger* temp_pass;
+    PxRigidStatic* temp_rigstat = cPhysics->createRigidStatic(pickupTrans);
+    temp_pass->pass_actor = temp_rigstat;
+
+
+    temp_pass->pickupTransform = pickupTrans;
+    temp_pass->dropOffTransform = dropOffTrans;
+
+    temp_pass->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
+
+    PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
+    
+    temp_pass->pass_shape = cPhysics->createShape(PxSphereGeometry(1.0f), *temp_pass->pass_material, true, pass_flags);
+    temp_pass->pass_actor->attachShape(*temp_pass->pass_shape);
+    temp_pass->pass_shape->release();
+
+    return(temp_pass);
+
+}
+
+
+
 void Physics::PhysicsSystem::link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor) {
     trackedComponents.emplace(actor, sceneComponent);
 }
+
+
+
+
+
 
