@@ -22,6 +22,7 @@
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
 #include "EventDelegate.h"
+#include "PhysicsActor.h"
 #include <Vehicle.h>
 #include "FilterShader.h"
 #include "SimulationCallback.h"
@@ -46,10 +47,11 @@ namespace Physics {
 
 
         void initialize() override;
+
         void update(Engine::deltaTime /*elapsed*/) override;
 
 
-        Component::Vehicle* playerVehicle = nullptr;
+        Component::Vehicle *playerVehicle = nullptr;
 
         Component::ComponentId onVehicleCreatedHandler;
         Component::ComponentId onActorCreatedHandler;
@@ -65,8 +67,11 @@ namespace Physics {
         void createFoundation();
         void createPhysicsCallbacks();
         void createPhysicsObject();
+
         void createPVD();
+
         void createCooking();
+
         void createScene();
 
         void createGround();
@@ -89,7 +94,7 @@ namespace Physics {
         Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
         void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
 
-        void onActorCreated(const EventArgs<PhysicsActor *, Mesh *> &args);
+        void onActorCreated(const EventArgs<Component::PhysicsActor *, Component::Mesh *> &args);
     };
 
 

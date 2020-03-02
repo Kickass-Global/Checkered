@@ -97,12 +97,6 @@ namespace Component {
         }
 
         template<typename T>
-        static const std::set<T *> getComponentsOfType() {
-            static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
-            return raw_scene[T::ComponentClass()];
-        }
-
-        template<typename T>
         static const std::set<Component::ComponentId> &entitiesOf() {
             static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
             return scene[T::ComponentClass()];
