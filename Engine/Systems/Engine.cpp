@@ -10,13 +10,15 @@
 
 std::vector<std::unique_ptr<Engine::SystemInterface>> Engine::registeredSystems;
 
-void Engine::nameComponent(const Component::ComponentId& componentId,
-	std::string name) {
-	identifier[componentId] = name;
+EngineStore Engine::store;
+
+void Engine::nameComponent(const Component::ComponentId &componentId,
+                           std::string name) {
+    identifier[componentId] = name;
 }
 
-const std::vector<std::unique_ptr<Engine::SystemInterface>>& Engine::systems() {
-	return registeredSystems;
+const std::vector<std::unique_ptr<Engine::SystemInterface>> &Engine::systems() {
+    return registeredSystems;
 }
 
 std::ostream& operator<<(std::ostream& out, Engine::Name name) {

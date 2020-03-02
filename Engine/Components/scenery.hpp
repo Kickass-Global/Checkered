@@ -18,8 +18,7 @@ namespace Component {
         ComponentReference<ClassId::PhysicsActor> actor;
         std::vector<ComponentReference<ClassId::Transform>> instances;
 
-        Scenery(const class Mesh &mesh, const Material &material) :
-            mesh(Engine::createComponent<MeshInstance>(mesh, material)->id()),
+        Scenery(std::shared_ptr<Mesh> &mesh, std::shared_ptr<Material> &material) :
             actor(Engine::createComponent<PhysicsActor>(mesh)->id()) {}
     };
 

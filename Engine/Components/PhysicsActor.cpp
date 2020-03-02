@@ -4,4 +4,4 @@
 
 #include "PhysicsActor.h"
 
-PhysicsActor::PhysicsActor(struct Mesh *mesh) : mesh(mesh), actor(nullptr) {}
+PhysicsActor::PhysicsActor(std::shared_ptr<Component::Mesh> &mesh) : mesh(mesh), actor(nullptr) {}

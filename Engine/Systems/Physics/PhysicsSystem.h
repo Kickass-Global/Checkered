@@ -20,6 +20,7 @@
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
 #include "EventDelegate.h"
+#include "PhysicsActor.h"
 #include <Vehicle.h>
 
 
@@ -33,10 +34,11 @@ namespace Physics {
 
     public:
         void initialize() override;
+
         void update(Engine::deltaTime /*elapsed*/) override;
 
 
-        Component::Vehicle* playerVehicle = nullptr;
+        Component::Vehicle *playerVehicle = nullptr;
 
         Component::ComponentId onVehicleCreatedHandler;
         Component::ComponentId onActorCreatedHandler;
@@ -45,11 +47,16 @@ namespace Physics {
         Component::ComponentId onKeyUpHandler;
 
         void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
+
     private:
         void createFoundation();
+
         void createPhysicsObject();
+
         void createPVD();
+
         void createCooking();
+
         void createScene();
 
         void createGround();
@@ -70,7 +77,7 @@ namespace Physics {
 
         void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
 
-        void onActorCreated(const EventArgs<PhysicsActor *, Mesh *> &args);
+        void onActorCreated(const EventArgs<Component::PhysicsActor *, Component::Mesh *> &args);
     };
 
 }
