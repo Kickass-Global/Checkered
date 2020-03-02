@@ -6,7 +6,9 @@
 #ifndef ENGINE_PHYSICSSYSTEM_H
 #define ENGINE_PHYSICSSYSTEM_H
 
+#include <cstdlib>
 #include "PxPhysicsAPI.h"
+#include <PxSimulationEventCallback.h>
 #include "extensions/PxDefaultAllocator.h"
 #include "extensions/PxDefaultErrorCallback.h"
 #include "pvd/PxPvd.h"
@@ -21,6 +23,10 @@
 #include "../systeminterface.hpp"
 #include "EventDelegate.h"
 #include <Vehicle.h>
+#include "FilterShader.h"
+#include "SimulationCallback.h"
+#include "Passenger.h"
+
 
 
 using namespace physx;
@@ -32,6 +38,13 @@ namespace Physics {
     class PhysicsSystem : public Engine::SystemInterface {
 
     public:
+        PxPhysics* cPhysics = NULL;
+        PxScene* cScene = NULL;
+        PxTriggerPair* playPassTriggerPair;
+        
+
+
+
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
 
@@ -44,8 +57,11 @@ namespace Physics {
         Component::ComponentId onKeyUpHandler;
 
         void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
+  
+
     private:
         void createFoundation();
+        void createPhysicsCallbacks();
         void createPhysicsObject();
         void createPVD();
         void createCooking();
@@ -55,12 +71,22 @@ namespace Physics {
         void createDrivablePlayerVehicle();
         void stepPhysics(Engine::deltaTime);
 
+        
+
         void onKeyDown(const Component::EventArgs<int> &args);
         void onKeyUp(const Component::EventArgs<int> &args);
         void onKeyPress(const Component::EventArgs<int> &args);
         PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+        Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
         void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
+        void onPassengerCreated(const Component::EventArgs<Component::ComponentId>& args);
+
+
+        
+
     };
+
+
 
 }
 

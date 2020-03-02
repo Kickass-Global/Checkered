@@ -11,6 +11,8 @@
 #include <vehicle/PxVehicleDrive4W.h>
 #include <Events/Events.h>
 #include <EventHandler.h>
+#include <ComponentEvent.h>
+#include <PxFiltering.h>
 #include <EventDelegate.h>
 
 #include "Model.h"

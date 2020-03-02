@@ -1,4 +1,6 @@
 
+#ifndef PASSENGER_H
+#define PASSENGER_H
 
 #include <PxPhysicsAPI.h>
 #include <PxPhysics.h>
@@ -8,6 +10,7 @@
 #include "ComponentId.h"
 #include "Component.h"
 #include "Engine.h"
+#include "Physics/PhysicsSystem.h"
 
 using namespace physx;
 
@@ -17,20 +20,20 @@ namespace Component {
 
 	public:
 		
-		void initPassenger();
+
+		PxRigidStatic* pass_actor;
+		PxShape* pass_shape;
+		PxPhysics* pass_physics;
+		PxMaterial* pass_material;
+
+		PxTransform pickupTransform;
+		PxTransform dropOffTransform;
 
 
 	private:
 
-		float PASS_STATIC_FRICTION = 100.0F;
-		float PASS_DYNAMIC_FRICTION = 100.0f;
-		float PASS_RESTITUTION = 100.0f;
+		
 
-
-		PxShape* pass_shape;
-		PxRigidActor* pass_actor;
-		PxPhysics* pass_physics;
-		PxMaterial* pass_material;
 
 
 
@@ -38,4 +41,4 @@ namespace Component {
 
 
 }
-
+#endif

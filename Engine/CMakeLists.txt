@@ -23,11 +23,13 @@ set(SRC main.cpp main.h
         Systems/Camera/CameraSystem.cpp Systems/Camera/CameraSystem.h
         Systems/Input/InputSystem.cpp Systems/Input/InputSystem.h
         Systems/Pipeline/MeshLoader.h
+        Systems/Physics/SimulationCallback.h Systems/Physics/SimulationCallback.cpp
         Components/Shader.cpp Components/Shader.h
         Components/ComponentId.cpp Components/ComponentId.h
         Components/ComponentId.tpp.h
         Components/Camera.cpp Components/Camera.h
         Systems/Rendering/Rendering.h
+        Systems/Physics/FilterShader.cpp Systems/Physics/FilterShader.h
         Components/Plane.cpp Components/Plane.h
         Systems/Pipeline/EntityLoader.cpp Systems/Pipeline/EntityLoader.h
         Components/Model.cpp Components/Model.h
