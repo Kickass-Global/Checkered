@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Vehicle.h>
 #include <algorithm>
@@ -20,8 +21,8 @@
 using namespace physx;
 using namespace snippetvehicle;
 
-const float GRAVITY = -9.81;
-const float STATIC_FRICTION = 0.5F;
+const float GRAVITY = -9.81f;
+const float STATIC_FRICTION = 0.5f;
 const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.6f;
 
