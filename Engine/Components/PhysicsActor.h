@@ -8,15 +8,16 @@
 #include <Component.h>
 #include <PxPhysicsAPI.h>
 #include "Mesh.h"
+#include <memory>
 
 namespace Component {
     class PhysicsActor : public ComponentBase<ClassId::PhysicsActor> {
 
     public:
-        Mesh *mesh;
+        std::shared_ptr<Mesh> mesh;
         physx::PxRigidActor *actor;
 
-        explicit PhysicsActor(class Mesh *mesh);
+        explicit PhysicsActor(std::shared_ptr<Component::Mesh> &mesh);
     };
 }
 

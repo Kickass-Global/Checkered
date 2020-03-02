@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Vehicle.h>
 #include <algorithm>
@@ -20,8 +21,8 @@
 using namespace physx;
 using namespace snippetvehicle;
 
-const float GRAVITY = -9.81;
-const float STATIC_FRICTION = 0.5F;
+const float GRAVITY = -9.81f;
+const float STATIC_FRICTION = 0.5f;
 const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.6f;
 
@@ -366,7 +367,8 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
     link(vehicleComponent, pxVehicle->getRigidDynamicActor());
 }
 
-void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor *, Component::Mesh *> &args) {
+void
+Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor *, Component::Mesh *> &args) {
 
     Engine::log<module>("Running onActorCreated");
 
@@ -379,7 +381,7 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
                    aMesh->vertices.end(),
                    std::back_inserter(convexVerts),
                    [](const Vertex &vertex) {
-                       return vertex.position;
+                       return PxVec3{vertex.position.x, vertex.position.y, vertex.position.z};
                    }
     );
 

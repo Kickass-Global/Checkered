@@ -5,8 +5,8 @@
 #ifndef ENGINE_TEXTURE_HPP
 #define ENGINE_TEXTURE_HPP
 
-#include <istream>
 #include <glad/glad.h>
+#include <istream>
 #include <SOIL2.h>
 #include "Component.h"
 

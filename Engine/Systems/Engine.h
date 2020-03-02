@@ -27,6 +27,7 @@
 #include "Index.h"
 #include "tags.h"
 #include "systeminterface.hpp"
+#include "EngineStore.h"
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -54,6 +55,7 @@ namespace Engine {
      * Used to keep track of which systems are currently running in the engine.
      */
     extern std::vector<std::unique_ptr<Engine::SystemInterface>> registeredSystems;
+    extern EngineStore store;
 
     typedef float deltaTime;
 
@@ -122,23 +124,8 @@ namespace Engine {
 
     template<typename T, typename... Args>
     inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createComponent(const Args &... args) {
-
-        auto allocation = Component::Index::allocate<T>();
-        if (allocation) {
-            *allocation = T(args...); // call move assingment operator...
-            allocation->id().addTag<Component::Dirty>();
-            return allocation;
-        } else {
-
-            auto component = std::make_unique<T>(args...);
-            auto id = component->id();
-            auto classId = component->classId();
-
-            Component::Index::push_entity<T>(classId, id, std::move(component));
-            id.addTag<Component::Dirty>();
-            return id.data<T>();
-        }
+    *createComponent(Args &... args) {
+        return store.create<T>(args...).get();
     }
 
     template<typename T, typename... Args>
