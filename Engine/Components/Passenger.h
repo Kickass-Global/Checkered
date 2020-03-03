@@ -10,7 +10,6 @@
 #include "ComponentId.h"
 #include "Component.h"
 #include "Engine.h"
-#include "Physics/PhysicsSystem.h"
 
 using namespace physx;
 
@@ -21,14 +20,17 @@ namespace Component {
 	public:
 		
 
-		PxRigidStatic* pass_actor;
-		PxShape* pass_shape;
+		PxRigidStatic* pass_actor_pickup;
+		PxRigidStatic* pass_actor_dropoff;
+
 		PxPhysics* pass_physics;
 		PxMaterial* pass_material;
 
 		PxTransform pickupTransform;
 		PxTransform dropOffTransform;
 
+		void setPickupTransform(PxTransform pickupTrans);
+		void setDropoffTransform(PxTransform dropoffTrans);
 
 	private:
 
@@ -38,6 +40,9 @@ namespace Component {
 
 
 	};
+
+
+	
 
 
 }

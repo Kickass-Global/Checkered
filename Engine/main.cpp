@@ -174,8 +174,12 @@ int main() {
     physicsSystem->playerVehicle = player_vehicle;
 
     //setup passenger system
+    PxTransform temp_pickup(0.f, 0.f, 2.0f);
+    PxTransform temp_dropoff(3.0f, 0.f, 2.0f);
     auto passenger = Engine::createComponent<Component::Passenger>();
-    
+    passenger->setPickupTransform(temp_pickup);
+    passenger->setDropoffTransform(temp_dropoff);
+    physicsSystem->onPassengerCreated(passenger);
 
 
 
