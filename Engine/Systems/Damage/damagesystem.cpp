@@ -6,28 +6,21 @@
 
 void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 
-    auto models = Component::Index::entitiesOf<Component::Model>();
+	auto models = Engine::getStore().getComponentsOfType<Component::Model>();
 
     for (auto &model : models) {
 
-        auto &&meta = model.data<Component::Model>();
 
-        const bool is_dirty = model.hasTag<Component::Dirty>(true);
+		const bool is_dirty = model->is_outdated;
 
-        const auto transform = model.childComponentsOfClass(Component::ClassId::Transform);
-        auto has_transform = !transform.empty();
-        //assertLog(has_transform, "Checking model has a world transform");
 
-        if (is_dirty && has_transform) {
+        if (is_dirty) {
             Engine::log("Updating dirty model#", model);
 
-            for (auto &&part : meta->parts) {
+            for (auto &&part : model->parts) {
 
-                auto &&mesh = part.variations[part.active_variation].mesh;
-                mesh.addTag<Component::Visible>();
-                mesh.addTag<Component::Dirty>();
-                mesh.attachExistingComponent(*transform.begin());
-
+				auto &&mesh = part.variations[part.active_variation].mesh;
+				if (mesh) mesh->instances.push_back(model->transform);
             }
         }
 

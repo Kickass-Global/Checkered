@@ -11,10 +11,11 @@
 
 namespace Component {
 
+
     class ComponentInterface {
     public:
         [[nodiscard]] virtual Component::ComponentId id() const = 0;
-        [[nodiscard]] virtual Component::ClassId classId() const = 0;
+		[[nodiscard]] virtual Component::ClassId classId() const = 0;
     };
 
     template<ClassId E>
