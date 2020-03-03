@@ -57,7 +57,8 @@ namespace Physics {
         Component::ComponentId onKeyUpHandler;
 
         void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
-  
+        void onPassengerCreated(Component::Passenger *pass);
+
 
     private:
         void createFoundation();
@@ -79,7 +80,6 @@ namespace Physics {
         PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
         Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
         void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
-        void onPassengerCreated(const Component::EventArgs<Component::ComponentId>& args);
 
 
         
