@@ -26,98 +26,99 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	glfwSetWindowTitle(window, title.c_str());
 
 	// Find and update any GameObjects with meshes that should be drawn...
-	auto meshes = Component::Index::entitiesOf<Component::MeshInstance>();
-	for (const Component::ComponentId &instance : meshes) {
+	auto meshes = Engine::getStore().getComponentsOfType<MeshInstance>();
+	for (const auto& instance : meshes) {
 
-		auto meta = instance.data<Component::MeshInstance>();
-
-		auto is_dirty = instance.hasTag<Component::Dirty>(true);
-		auto is_visible = true || instance.hasTag<Component::Visible>(true);
-
-
-		auto transforms = instance.childComponentsOfClass(Component::ClassId::Transform);
-		auto is_instanced = !transforms.empty();
-
-		if (is_visible && is_dirty) {
-
-			// buffer the objects meshes (assuming that all meshes should be buffered and drawn).
-			Engine::log<module, Engine::high>("Updating batch data of#", instance);
-			buffer(*meta->mesh.data<Mesh>(), *meta->material.data<Material>());
-
-		}
-
-		if (is_instanced) {
-			Engine::log<module, Engine::low>("Updating instances(", transforms.size(), ") of component#", instance);
-			auto classId = instance.classId();
-			std::vector<glm::mat4> transform_data;
-
-			for (auto &&transform : transforms) {
-				if (classId == Component::ClassId::MeshInstance) {
-					Engine::log<module, Engine::low>("Adding instance transform#", transform);
-					transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);
-				}
-			}
-
-			Engine::assertLog(!transform_data.empty(), "Checking that instance data is not empty.");
-
-			updateInstanceData(
-				meta->mesh,
-				meta->material,
-				static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
-				(float *)transform_data.data(),
-				sizeof(glm::mat4)
-			);
-		}
-
-		for (auto &transform : transforms) {
-			instance.destroyComponent(transform);
-		}
+		// hmm
 	}
-
-	glClearColor(0, 0, 0.5f, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (auto &&batch : batches) {
-		for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-			auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
-
-			if (camera_is_dirty) {
-				camera.addTag<Component::Dirty>(); // forward this state to the next batch...
-
-				auto data = camera.data<Component::Camera>();
-				auto view_matrix = data->view;
-				auto world_matrix = glm::translate(data->position);
-
-				auto perspective_matrix = glm::perspective(
-					45.0f,
-					static_cast<float>(data->viewport.width) /
-					data->viewport.height,
-					0.1f,
-					1000.0f
-				);
-
-				glViewport(0, 0, data->viewport.width, data->viewport.height);
-
-				batch->shader.data<Program>()->bind();
-
-				glUniformMatrix4fv(
-					glGetUniformLocation(
-						batch->shader.data<Program>()->programId(),
-						"M_View"
-					),
-					1, false, glm::value_ptr(view_matrix));
-
-				glUniformMatrix4fv(
-					glGetUniformLocation(
-						batch->shader.data<Program>()->programId(),
-						"M_Perspective"
-					),
-					1, false, glm::value_ptr(perspective_matrix));
+	//{
+	//	auto is_dirty = instance.hasTag<Component::Dirty>(true);
+	//	auto is_visible = true || instance.hasTag<Component::Visible>(true);
 
 
-			}
-		}
-	}
+	//	auto transforms = instance.childComponentsOfClass(Component::ClassId::Transform);
+	//	auto is_instanced = !transforms.empty();
+
+	//	if (is_visible && is_dirty) {
+
+	//		// buffer the objects meshes (assuming that all meshes should be buffered and drawn).
+	//		Engine::log<module, Engine::high>("Updating batch data of#", instance);
+	//		buffer(*meta->mesh.data<Mesh>(), *meta->material.data<Material>());
+
+	//	}
+
+	//	if (is_instanced) {
+	//		Engine::log<module, Engine::low>("Updating instances(", transforms.size(), ") of component#", instance);
+	//		auto classId = instance.classId();
+	//		std::vector<glm::mat4> transform_data;
+
+	//		for (auto &&transform : transforms) {
+	//			if (classId == Component::ClassId::MeshInstance) {
+	//				Engine::log<module, Engine::low>("Adding instance transform#", transform);
+	//				transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);
+	//			}
+	//		}
+
+	//		Engine::assertLog(!transform_data.empty(), "Checking that instance data is not empty.");
+
+	//		updateInstanceData(
+	//			meta->mesh,
+	//			meta->material,
+	//			static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
+	//			(float *)transform_data.data(),
+	//			sizeof(glm::mat4)
+	//		);
+	//	}
+
+	//	for (auto &transform : transforms) {
+	//		instance.destroyComponent(transform);
+	//	}
+	//}
+
+	//glClearColor(0, 0, 0.5f, 1);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//for (auto &&batch : batches) {
+	//	for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
+	//		auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
+
+	//		if (camera_is_dirty) {
+	//			camera.addTag<Component::Dirty>(); // forward this state to the next batch...
+
+	//			auto data = camera.data<Component::Camera>();
+	//			auto view_matrix = data->view;
+	//			auto world_matrix = glm::translate(data->position);
+
+	//			auto perspective_matrix = glm::perspective(
+	//				45.0f,
+	//				static_cast<float>(data->viewport.width) /
+	//				data->viewport.height,
+	//				0.1f,
+	//				1000.0f
+	//			);
+
+	//			glViewport(0, 0, data->viewport.width, data->viewport.height);
+
+	//			batch->shader.data<Program>()->bind();
+
+	//			glUniformMatrix4fv(
+	//				glGetUniformLocation(
+	//					batch->shader.data<Program>()->programId(),
+	//					"M_View"
+	//				),
+	//				1, false, glm::value_ptr(view_matrix));
+
+	//			glUniformMatrix4fv(
+	//				glGetUniformLocation(
+	//					batch->shader.data<Program>()->programId(),
+	//					"M_Perspective"
+	//				),
+	//				1, false, glm::value_ptr(perspective_matrix));
+
+
+	//		}
+	//	}
+	//}
 
 	// this code handles drawing billboards into the world (hud, sprites, etc).
 	for (auto &camera : Component::Index::entitiesOf<Component::Camera>()) {

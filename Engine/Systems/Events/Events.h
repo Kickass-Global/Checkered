@@ -33,11 +33,11 @@ namespace Engine {
         }
     };
 
-/**
- * Monitors registered components for EventArg data and passes it on to the corresponding event handler.
- * Notes:
- * A component must be registered with this system to receive events through ComponentEvent events.
- */
+    /**
+     * Monitors registered components for EventArg data and passes it on to the corresponding event handler.
+     * Notes:
+     * A component must be registered with this system to receive events through ComponentEvent events.
+     */
     class EventSystem : public Engine::SystemInterface {
 
 
@@ -52,24 +52,26 @@ namespace Engine {
 
         template<typename T, typename... Args>
         static Component::ComponentId createHandler(
-                T *instance,
-                void (T::*callback)(const Component::EventArgs<Args...> &)) {
+            T *instance,
+            void (T::*callback)(const Component::EventArgs<Args...> &)) {
 
             auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
             handler->callback = std::bind(callback, instance,
-                                          std::placeholders::_1);
+                                          std::placeholders::_1
+            );
             return handler->id();
 
         }
 
         template<typename T, typename... Args>
         static Component::ComponentId createTickHandler(
-            T* instance,
-            void (T::* callback)(const Component::EventArgs<Args...>&)) {
+            T *instance,
+            void (T::* callback)(const Component::EventArgs<Args...> &)) {
 
             auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
             handler->callback = std::bind(callback, instance,
-                std::placeholders::_1);
+                                          std::placeholders::_1
+            );
 
             onTick += handler->id();
             return handler->id();
@@ -79,8 +81,8 @@ namespace Engine {
 
         template<typename... Args>
         static Component::ComponentId createHandler(
-                std::function<void(const Component::EventArgs<Args...> &)>
-                callback) {
+            std::function<void(const Component::EventArgs<Args...> &)>
+            callback) {
 
             auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
             handler->callback = callback;

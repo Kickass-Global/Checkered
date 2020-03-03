@@ -122,7 +122,7 @@ namespace std {
     template<>
     struct hash<Component::ComponentId> {
         std::size_t operator()(Component::ComponentId const &s) const noexcept {
-            return s.id;
+            return hash<int>()(s.id);
         }
     };
 }

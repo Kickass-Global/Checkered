@@ -144,32 +144,32 @@ int main() {
 //                                                                           material->id())->id();
 //    }
 //
-//    // setup the mesh used for the cars...
-//
-//    auto car_material = Engine::createComponent<Component::Material>(basic_shader_program);
-//    car_material->textures.push_back(
-//        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
-//
-//    auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
-//                                                                        Pipeline::Library::getAsset(
-//                                                                            "Assets/Meshes/car_mesh.fbx",
-//                                                                            Component::ClassId::Mesh
-//                                                                        ), car_material->id());
-//
-//    // setup the vehicle for the player...
-//
-//    auto player_vehicle = Engine::createNamedComponent<Component::Vehicle>("player_vehicle");
-//    auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
-//
-//    player_damage_model->parts.push_back(Component::Model::Part{});
-//    player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh_instance->id()});
-//
-//    player_vehicle->model = player_damage_model->id();
-//    player_vehicle->scale = glm::vec3(0.5f, 0.5f, 0.5f);
-//    player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-//    player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
-//
-//    physicsSystem->playerVehicle = player_vehicle;
+    // setup the mesh used for the cars...
+
+    auto car_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    car_material->textures.push_back(
+        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
+
+    auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
+                                                                        Pipeline::Library::getAsset(
+                                                                            "Assets/Meshes/car_mesh.fbx",
+                                                                            Component::ClassId::Mesh
+                                                                        ), car_material->id());
+
+    // setup the vehicle for the player...
+
+    auto player_vehicle = Engine::createNamedComponent<Component::Vehicle>("player_vehicle");
+    auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
+
+    player_damage_model->parts.push_back(Component::Model::Part{});
+    player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh_instance->id()});
+
+    player_vehicle->model = player_damage_model->id();
+    player_vehicle->scale = glm::vec3(0.5f, 0.5f, 0.5f);
+    player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
+
+    physicsSystem->playerVehicle = player_vehicle;
 //
 //    // ai factory method...
 //    auto make_ai = [car_mesh_instance](glm::mat4 world_transform = glm::mat4{1}) {
@@ -270,7 +270,7 @@ int main() {
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
-//    camera->target = player_vehicle->id(); // make camera follow player.
+    camera->target = player_vehicle->id(); // make camera follow player.
 
     // region initialize game-clocks
     using namespace std::chrono;

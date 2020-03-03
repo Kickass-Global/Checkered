@@ -21,12 +21,13 @@ void Engine::EventSystem::update(Engine::deltaTime time) {
 			events_pending |= !set.empty(); // if any handlers have event args we want to keep proccessing...
 
 			bool has_events_args = !set.empty();
+			auto handler_data = handler.data<Component::EventHandler<>>();
 
 			for (const Component::ComponentId& eventArgs : set) {
 
 				// I want to take all the data and pass it to the callback of the handler
 				auto data = eventArgs.data<Component::EventArgs<>>();
-				handler.data<Component::EventHandler<>>()->callback(*data);
+				handler_data->callback(*data);
 
 			}
 
