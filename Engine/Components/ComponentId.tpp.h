@@ -6,6 +6,7 @@
 #define ENGINE_COMPONENTID_TPP
 
 #include "Index.h"
+#include "Engine.h"
 
 template<typename T>
 T *Component::ComponentId::data() const {
@@ -13,7 +14,7 @@ T *Component::ComponentId::data() const {
 	Engine::assertLog(T::ComponentClass() == type, "Checking data<T>() corresponds to component type");
 
     if (!data_ptr) { // cache the pointer
-        data_ptr = Index::entityData<T>(*this);
+        data_ptr = Engine::getStore().getComponentById<T>(*this).get();
     }
     return reinterpret_cast<T *>(data_ptr);
 }
