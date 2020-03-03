@@ -67,7 +67,7 @@ namespace Pipeline {
             );
         }
 
-            return Engine::createComponent<Rendering::Program>(shaders);
+		return Engine::createComponent<Rendering::Program>(shaders);
     }
 };
 }

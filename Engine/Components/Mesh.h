@@ -43,8 +43,10 @@ namespace Component {
 
 	class MeshInstance : public ComponentBase<ClassId::MeshInstance> {
 	public:
+		bool is_buffered = false;
 		ComponentId mesh;
 		ComponentId material;
+		std::vector<WorldTransform> instances{};
 		MeshInstance(const Mesh &mesh, const Material& material) : mesh(mesh.id()), material(material.id()) {}
 		MeshInstance(const ComponentId mesh_id, const ComponentId material_id) : mesh(mesh_id), material(material_id) {}
 	};
