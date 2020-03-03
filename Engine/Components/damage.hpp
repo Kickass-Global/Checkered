@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "ComponentBase.h"
+#include "Mesh.h"
 
 namespace Component {
 
@@ -29,14 +30,15 @@ namespace Component {
     public:
         struct Variation {
             int damage_threshold;
-            ComponentId mesh = ComponentId(ClassId::MeshInstance);
+			std::shared_ptr<Component::MeshInstance> mesh;
         };
 
         struct Part {
             std::vector<Variation> variations = {};
             int active_variation;
         };
-
+		bool is_outdated = false;
+		WorldTransform transform;
         int current_damage;
         int max_damage;
         std::vector<Part> parts;
