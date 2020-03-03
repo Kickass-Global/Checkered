@@ -68,6 +68,10 @@ namespace Engine {
      */
     const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
 
+    inline EngineStore& getStore() {
+        return store;
+    }
+
     /**
      * Creates a new system to the engine; systems need to be default constructable.
      * @tparam T the type of system
@@ -113,6 +117,7 @@ namespace Engine {
 
         return id.data<T>();
     }
+
 
     /**
      * Creates a new component and adds it to the engine.

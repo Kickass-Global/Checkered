@@ -284,7 +284,7 @@ int main() {
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
-//    camera->target = player_vehicle->id(); // make camera follow player.
+    camera->target = player_vehicle->id(); // make camera follow player.
 
     // region initialize game-clocks
     using namespace std::chrono;

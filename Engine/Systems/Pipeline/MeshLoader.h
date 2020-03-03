@@ -38,13 +38,13 @@ namespace Pipeline {
             auto&& data = scene->mMeshes[0];
 			Engine::assertLog<module>(data, "Loading mesh data");
 
-            Component::Mesh mesh = Component::Mesh();
+            auto mesh = Engine::createComponent<Component::Mesh>();
 
             // todo: error checking & sanity
 
             for (auto i = 0u; i < data->mNumVertices; ++i)
             {
-                mesh.vertices.emplace_back(
+                mesh->vertices.emplace_back(
                     data->mVertices[i],
                     data->mNormals[i],
                     data->mTextureCoords[0][i]
@@ -57,12 +57,12 @@ namespace Pipeline {
                 Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
 
                 for (auto j = 0u; j < face.mNumIndices; ++j) {
-                    mesh.indices.push_back(face.mIndices[j]);
+                    mesh->indices.push_back(face.mIndices[j]);
                 }
             }
 
-            Library::emplace(filename, mesh.id());
-            return Engine::addComponent(std::make_unique<Component::Mesh>(mesh));
+            Library::emplace(filename, mesh->id());
+            return mesh;
         }
 	};
 
