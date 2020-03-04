@@ -11,7 +11,7 @@
 #include "Component.h"
 
 namespace Component {
-    class Texture : public Component::ComponentBase<Component::ClassId::Texture> {
+    class Texture : public ComponentBase {
     public:
         GLuint m_texture_id;
         explicit Texture(const std::string &filename) : m_texture_id(0) { load(filename); }

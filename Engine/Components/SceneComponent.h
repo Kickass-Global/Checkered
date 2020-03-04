@@ -22,7 +22,7 @@ namespace Component {
      * A scene component has a transformation related with it; scene components can contain other scene components
      * to form a hierarchy of transformations which are relative to one another.
      */
-    class SceneComponent : public ComponentBase<ClassId::SceneComponent> {
+    class SceneComponent : public ComponentBase {
     public:
 		SceneComponent *m_parent = nullptr;
         std::vector<SceneComponent *> m_children;

@@ -13,148 +13,152 @@
 #include "../../Components/ComponentId.h"
 #include "../../Components/Mesh.h"
 #include "../../Components/Shader.h"
+#include "material.hpp"
 #include "Rendering.h"
 
 #include "glad/glad.h"
 #include "Engine.h"
 #include <GLFW/glfw3.h>
 
+using Component::Material;
+using Component::Mesh;
+using Component::ComponentId;
+
 namespace Rendering {
 
-    enum BatchBufferType {
-        ArrayBuffer,
-        ElementBuffer,
-        InstanceBuffer
-    };
+	enum BatchBufferType {
+		ArrayBuffer,
+		ElementBuffer,
+		InstanceBuffer
+	};
 
-    class RenderingSystem;
+	class RenderingSystem;
 
-    /** describes a contiguous section of a buffer that can be drawn with a single draw* command. */
-    struct BatchDescription {
-        int offset; // start of element data (from beginning of buffer)
-        int count; // how many elements
-        int stride; // size of each element
-    };
+	/** describes a contiguous section of a buffer that can be drawn with a single draw* command. */
+	struct BatchDescription {
+		int offset; // start of element data (from beginning of buffer)
+		int count; // how many elements
+		int stride; // size of each element
+	};
 
-    class BatchBuffer {
+	class BatchBuffer {
 
-        GLuint m_id;
-        int m_size;
-        int m_fill;
-        int m_stride;
-        int m_type;
+		GLuint m_id;
+		int m_size;
+		int m_fill;
+		int m_stride;
+		int m_type;
 
-    public:
+	public:
 
-        BatchBuffer(int bufferMaxSize, int stride, int type);
+		BatchBuffer(int bufferMaxSize, int stride, int type);
 
-        template<typename T>
-        BatchDescription push_back(std::vector<T> data) {
+		template<typename T>
+		BatchDescription push_back(std::vector<T> data) {
 
-            Engine::log<module>("Pushing data into batch#", id());
+			Engine::log<module>("Pushing data into batch#", id());
 
-            glBindBuffer(m_type, m_id);
-            glBufferSubData(m_type, m_fill, sizeof(T) * data.size(), data.data());
+			glBindBuffer(m_type, m_id);
+			glBufferSubData(m_type, m_fill, sizeof(T) * data.size(), data.data());
 
-            auto offset = m_fill;
-            m_fill += data.size() * sizeof(T);
+			auto offset = m_fill;
+			m_fill += data.size() * sizeof(T);
 
-            Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
 
-            return {offset, static_cast<int>(data.size()), sizeof(T)};
-        }
+			return { offset, static_cast<int>(data.size()), sizeof(T) };
+		}
 
-        template<typename T>
-        BatchDescription push_back(int size, T *data, int stride) {
+		template<typename T>
+		BatchDescription push_back(int size, T *data, int stride) {
 
-            Engine::log<module>("Pushing data into batch#", id());
+			Engine::log<module>("Pushing data into batch#", id());
 
-            glBindBuffer(m_type, m_id);
-            glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
+			glBindBuffer(m_type, m_id);
+			glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
 
-            auto offset = m_fill;
-            m_fill += size * stride;
+			auto offset = m_fill;
+			m_fill += size * stride;
 
-            Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
 
-            return {offset, size, stride};
-        }
+			return { offset, size, stride };
+		}
 
-        void replace_existing_data(int size, float *data, BatchDescription details) {
-            Engine::log<module, Engine::low>("Replacing data in batch#", id());
-            glBindBuffer(m_type, m_id);
-            glBufferSubData(m_type, details.offset, size, data);
-        }
+		void replace_existing_data(int size, float *data, BatchDescription details) {
+			Engine::log<module, Engine::low>("Replacing data in batch#", id());
+			glBindBuffer(m_type, m_id);
+			glBufferSubData(m_type, details.offset, size, data);
+		}
 
-        GLuint id();
+		GLuint id();
 
-        size_t stride();
+		size_t stride();
 
-        size_t count();
-    };
+		size_t count();
+	};
 
-    class GeometryBatch {
+	class GeometryBatch {
 
-    public:
+	public:
 
-        Component::ComponentId shader;
+		std::shared_ptr<Program> shader;
 
-        std::shared_ptr<Rendering::BatchBuffer> arrayBuffer;
-        std::shared_ptr<Rendering::BatchBuffer> elementBuffer;
-        std::shared_ptr<Rendering::BatchBuffer> instanceBuffer;
+		std::shared_ptr<Rendering::BatchBuffer> arrayBuffer;
+		std::shared_ptr<Rendering::BatchBuffer> elementBuffer;
+		std::shared_ptr<Rendering::BatchBuffer> instanceBuffer;
 
-        std::map<std::pair<ComponentId, ComponentId>, BatchDescription[3]> details;
+		std::map<std::pair<std::shared_ptr<Mesh>, std::shared_ptr<Material>>, BatchDescription[3]> details;
 
-        GeometryBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
-                      std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
-                      std::shared_ptr<Rendering::BatchBuffer> instanceBuffer
-        );
+		GeometryBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
+			std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
+			std::shared_ptr<Rendering::BatchBuffer> instanceBuffer
+		);
 
-        void push_back(const Component::Mesh &mesh, const Component::Material &material);
+		void push_back(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
 
-        void update(const Component::ComponentId mesh_id,
-                    const ComponentId material_id,
-                    int buffer,
-                    int size,
-                    float *data,
-                    int stride
-        ) {
-            Engine::log<module, Engine::low>("Updating component#", mesh_id);
+		void update(std::shared_ptr<Mesh>& mesh,
+			std::shared_ptr<Material>& material,
+			int buffer,
+			int size,
+			float *data,
+			int stride
+		) {
+			auto &detail = details.at(std::make_pair(mesh, material));
+			int count = size / stride;
+			auto replace_existing_data = count <= detail[2].count;
 
-            auto &detail = details.at(std::make_pair(mesh_id, material_id));
-            int count = size / stride;
-            auto replace_existing_data = count <= detail[2].count;
+			switch (buffer) {
+			case 2:
+				if (replace_existing_data) {
+					instanceBuffer->replace_existing_data(size, data, detail[buffer]);
+				}
+				else {
+					detail[2] = instanceBuffer->push_back(count, data, stride);
+				}
+				break;
+			}
+		}
 
-            switch (buffer) {
-                case 2:
-                    if (replace_existing_data) {
-                        instanceBuffer->replace_existing_data(size, data, detail[buffer]);
-                    } else {
-                        detail[2] = instanceBuffer->push_back(count, data, stride);
-                    }
-                    break;
-            }
-        }
+		/**
+		 * Binds the VAO and sets up all resources needed to draw the geometry in the batch.
+		 */
+		void bind(Rendering::RenderingSystem &renderingSystem);
 
-        /**
-         * Binds the VAO and sets up all resources needed to draw the geometry in the batch.
-         */
-        void bind(Rendering::RenderingSystem &renderingSystem);
+		/**
+		 * Calls appropriate glDraw* command to draw the geometry in the batch.
+		 */
+		void draw(Rendering::RenderingSystem &renderingSystem);
 
-        /**
-         * Calls appropriate glDraw* command to draw the geometry in the batch.
-         */
-        void draw(Rendering::RenderingSystem &renderingSystem);
+		bool contains(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) const;
 
-        bool contains(Component::ComponentId mesh_id, Component::ComponentId material_id) const;
+		void remove(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
 
-        void remove(Component::ComponentId id, Component::ComponentId material_id);
+		~GeometryBatch() {
+			Engine::log<module>("Deleting batch#", vao);
+		}
 
-        ~GeometryBatch() {
-            Engine::log<module>("Deleting batch#", vao);
-        }
-
-        GLuint vao;
-    };
+		GLuint vao;
+	};
 }
 #endif //ENGINE_RENDERINGBATCH_H

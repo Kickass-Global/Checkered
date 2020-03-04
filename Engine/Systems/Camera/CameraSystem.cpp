@@ -35,46 +35,45 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
     float zoom = u / sensitivity * elapsed;
 
 
-    for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
+    for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
         //if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
-
-        auto data = Component::Index::entityData<Component::Camera>(camera);
-
+		
         auto delta = glm::quat(glm::vec3(0, glm::degrees(x_rotation), 0));
 
-        data->rotation *= delta;
-        data->position.z += u;
+        camera->rotation *= delta;
+        camera->position.z += u;
 
-        //if camera view matrix has changed mark it as dirty
-        camera.addTag<Component::Dirty>();
-        Engine::log<module, Engine::low>("Marking Camera ", camera, " dirty");
 
         // check if the camera is attached to a component, get that components
         // transform and update the camera to look at that object.
 
-        if (data->target && data->target.data<Component::Vehicle>()->pxVehicle) {
+        if (camera->target) {
 
-			auto meta = data->target.data<Component::Vehicle>();
-            const auto &component = data->target;
-            Engine::log<module, Engine::low>("Updating camera to look at #", component);
+			Engine::log<module, Engine::low>("Updating camera to look at #", camera->target->getId());
 
-            auto offset = glm::toMat4(data->rotation) * glm::vec4(data->offset, 1);
+			const auto transforms = camera->target->getChildren().getComponentsOfType<WorldTransform>();
+			if (!transforms.empty())
+			{
+				auto transform = transforms[0];
+				auto offset = glm::toMat4(camera->rotation) * glm::vec4(camera->offset, 1);
 
-            // this line of code controls the camera returning to 'neutral' position behind the target...
-            data->rotation = glm::lerp(data->rotation, meta->rotation, 0.5f);
-            data->position = meta->position + glm::vec3(offset);
+				// this line of code controls the camera returning to 'neutral' position behind the target...
+				camera->rotation = glm::lerp(camera->rotation, transform->rotation, 0.5f);
+				camera->position = transform->position + glm::vec3(offset);
 
-            glm::vec3 eye = data->position;
-            glm::vec3 target = meta->position;
-            glm::vec3 world_up = {0, 1, 0};
+				glm::vec3 eye = camera->position;
+				glm::vec3 target = transform->position;
+				glm::vec3 world_up = { 0, 1, 0 };
 
-			data->view = glm::lookAt(eye, target, world_up);
-
+				camera->view = glm::lookAt(eye, target, world_up);
+			}
         }
 		else
 		{
-			data->view = glm::translate(data->position);
+			camera->view = glm::translate(camera->position);
 		}
+
+		camera->is_dirty = true;
         // reset deltas
         x = 0;
         y = 0;
@@ -91,12 +90,10 @@ void ::Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int,
     auto &&width = std::get<0>(args.values);
     auto &&height = std::get<1>(args.values);
 
-    for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-        auto data = Component::Index::entityData<Component::Camera>(camera);
-        data->viewport.width = width;
-        data->viewport.height = height;
-
-        camera.addTag<Component::Dirty>();
+    for (auto &&camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+		camera->viewport.width = width;
+		camera->viewport.height = height;
+		camera->is_dirty = true;
     }
 }
 
