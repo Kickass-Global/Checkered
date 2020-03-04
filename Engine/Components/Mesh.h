@@ -44,7 +44,7 @@ namespace Component {
 		bool is_buffered = false;
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Material> material;
-		std::vector<WorldTransform> instances{};
+		std::vector<glm::mat4> instances{};
 		MeshInstance(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) : mesh(mesh), material(material) {}
 	};
 

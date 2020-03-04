@@ -320,11 +320,10 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 	for (auto&[actor, component] : trackedComponents) {
 		auto t = actor->getGlobalPose();
 
-		component->getChildren()
-			.addComponent<Component::PhysicsPacket>(Engine::createComponent<Component::PhysicsPacket>(
-				glm::vec3(t.p.x, t.p.y, t.p.z),
-				glm::quat(t.q.w, t.q.x, t.q.y, t.q.z)
-				));
+		component->emplaceChildComponent<Component::PhysicsPacket>(
+			glm::vec3(t.p.x, t.p.y, t.p.z),
+			glm::quat(t.q.w, t.q.x, t.q.y, t.q.z)
+			);
 	}
 }
 

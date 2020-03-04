@@ -25,7 +25,7 @@ namespace Component {
 		}
 
 		template<typename T>
-		void addComponent(std::shared_ptr<T> component) {
+		std::shared_ptr<T> addComponent(std::shared_ptr<T> component) {
 			static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
 			if (!components[typeid(T)].has_value())
@@ -35,6 +35,7 @@ namespace Component {
 
 			auto& scene = std::any_cast<std::vector<std::shared_ptr<T>>&>(components[typeid(T)]);
 			scene.emplace_back(std::move(component));
+			return scene.back();
 		}
 
 		template<typename T>
@@ -48,6 +49,7 @@ namespace Component {
 
 
 	typedef int ComponentId;
+	static ComponentId next_id = 800000000;
 
 	class ComponentInterface {
 	public:
@@ -62,7 +64,7 @@ namespace Component {
 		Node children;
 
 	public:
-		const ComponentId id = 0;
+		ComponentId id = ++++next_id;
 
 		[[nodiscard]] Node& getChildren() override { return children; }
 		[[nodiscard]] ComponentId getId() const override { return id; }
@@ -78,7 +80,10 @@ namespace Component {
 		}
 
 		ComponentBase &operator=(const ComponentBase &other) {
-			return *this;
+			if(this == &other)return *this;
+
+			children = other.children;
+			//id  = other.id; // don't change it
 		}
 	};
 }

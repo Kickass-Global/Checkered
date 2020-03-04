@@ -14,7 +14,6 @@ namespace Component {
 
 	template<typename... Args>
 	class EventArgs;
-	class EventArgsBase;
 
 
 	class EventHandlerBase : public ComponentBase {
