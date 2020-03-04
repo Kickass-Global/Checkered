@@ -8,12 +8,12 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <typeindex>
-#include <ComponentBase.h>
 #include <memory>
 #include <bitset>
+#include <ComponentBase.h>
 
 using Component::ComponentInterface;
-
+using Component::Node;
 
 // Index 2.0
 class EngineStore {
@@ -44,32 +44,14 @@ public:
 
 private:
 
-
-	typedef std::unordered_map<std::type_index, std::any> Node;
+	//typedef std::unordered_map<std::type_index, std::any> Node;
 	Node root; // this is the root of the component tree (owner)
 	std::unordered_map<std::type_index, std::vector<std::weak_ptr<ComponentInterface>>> component_types; // one to many
-	std::map<std::shared_ptr<ComponentInterface>, Node> component_children;
-	[[deprecated]] std::map<Component::ComponentId, std::weak_ptr<ComponentInterface>> component_ids; // one to one
 
 public:
 
-
-	template<typename T>
-	std::vector<std::shared_ptr<T>> getComponentsOfType(const Node& node = root) {
-		static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
-		auto components = std::any_cast<std::vector<std::shared_ptr<T>>>(node[typeid(T)]);
-		return components;
-	}
-
-	template<typename T>
-	std::shared_ptr<T> getComponentById(Component::ComponentId id) {
-		return std::static_pointer_cast<T>(component_ids.at(id).lock());
-	}
-
-	template<typename S, typename T>
-	void attachChildTo(std::shared_ptr<S> parent, std::shared_ptr<T> child)
-	{
-		component_children[parent].emplace(child);
+	Node& getRoot() {
+		return root;
 	}
 
 	/**
@@ -107,14 +89,13 @@ private:
 
 		std::shared_ptr<T> shared = std::move(component);
 
-		component_ids.emplace(shared->id(), shared);
 		component_types[typeid(T)].emplace_back(shared);
-		if (!root[typeid(T)].has_value())
+		if (!root.components[typeid(T)].has_value())
 		{
-			root[typeid(T)] = std::vector<std::shared_ptr<T>>();
+			root.components[typeid(T)] = std::vector<std::shared_ptr<T>>();
 		}
 
-		auto& scene = std::any_cast<std::vector<std::shared_ptr<T>>&>(root[typeid(T)]);
+		auto& scene = std::any_cast<std::vector<std::shared_ptr<T>>&>(root.components[typeid(T)]);
 		scene.emplace_back(std::move(shared));
 
 		return std::static_pointer_cast<T>(scene.back());;

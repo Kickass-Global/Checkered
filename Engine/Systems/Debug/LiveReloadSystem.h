@@ -28,7 +28,6 @@ class LiveReloadSystem : public Engine::SystemInterface {
 
     struct AssetDetails {
         std::filesystem::file_time_type last_modified_time;
-        Component::ClassId classId;
         Component::ComponentId componentId;
     };
 
@@ -36,10 +35,10 @@ class LiveReloadSystem : public Engine::SystemInterface {
 
 public:
 
-        Engine::Event<std::string, Component::ClassId, Component::ComponentId> onAssetModified;
+        Engine::Event<std::string, Component::ComponentId> onAssetModified;
 
-        void watch(const std::string &filename, Component::ClassId classId, Component::ComponentId componentId) {
-            modified[filename] = {std::filesystem::last_write_time(filename), classId, componentId};
+        void watch(const std::string &filename, Component::ComponentId componentId) {
+            modified[filename] = {std::filesystem::last_write_time(filename), componentId};
         }
 
     void update(Engine::deltaTime /*elapsed*/) {
@@ -53,10 +52,10 @@ public:
                     modified[filename].last_modified_time = last_modified_time;
 
                     Engine::log<module>("Asset was modified: ",
-                                        filename, details.classId,
+                                        filename,
                                         details.componentId);
 
-                        onAssetModified(filename, details.classId, details.componentId);
+                        onAssetModified(filename, details.componentId);
 
                     }
                 } catch (std::exception &/*ignored*/) {

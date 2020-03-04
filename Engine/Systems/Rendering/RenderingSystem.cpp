@@ -26,25 +26,21 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	glfwSetWindowTitle(window, title.c_str());
 
 	// Find and update any GameObjects with meshes that should be drawn...
-	auto meshes = Engine::getStore().getComponentsOfType<MeshInstance>();
+	auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
 	for (const auto& instance : meshes) {
 		if (!instance->is_buffered)
 		{
 			instance->is_buffered = true;
-			Engine::log<module, Engine::high>("Updating batch data of#", instance->id());
-			buffer(*instance->mesh.data<Mesh>(), *instance->material.data<Material>());
+			Engine::log<module, Engine::high>("Updating batch data of#", instance->getId());
+			buffer(instance->mesh, instance->material);
 		}
 		if (instance->instances.size() > 0)
 		{
 			Engine::log<module, Engine::low>("Updating instances(", instance->instances.size(), ") of component#", instance);
-			auto classId = instance->classId();
 			std::vector<glm::mat4> transform_data;
 
 			for (auto &&transform : instance->instances) {
-				if (classId == Component::ClassId::MeshInstance) {
-					Engine::log<module, Engine::low>("Adding instance transform#", transform);
-					transform_data.push_back(transform->world_matrix);
-				}
+				transform_data.push_back(transform.world_matrix);
 			}
 
 			Engine::assertLog(!transform_data.empty(), "Checking that instance data is not empty.");
@@ -59,44 +55,41 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
 		}
 	}
-	
+
 
 	glClearColor(0, 0, 0.5f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (auto &&batch : batches) {
-		for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-			auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
+		for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
 
-			if (camera_is_dirty) {
-				camera.addTag<Component::Dirty>(); // forward this state to the next batch...
+			if (camera->is_dirty) {
 
-				auto data = camera.data<Component::Camera>();
-				auto view_matrix = data->view;
-				auto world_matrix = glm::translate(data->position);
+				auto view_matrix = camera->view;
+				auto world_matrix = glm::translate(camera->position);
 
 				auto perspective_matrix = glm::perspective(
 					45.0f,
-					static_cast<float>(data->viewport.width) /
-					data->viewport.height,
+					static_cast<float>(camera->viewport.width) /
+					camera->viewport.height,
 					0.1f,
 					1000.0f
 				);
 
-				glViewport(0, 0, data->viewport.width, data->viewport.height);
+				glViewport(0, 0, camera->viewport.width, camera->viewport.height);
 
-				batch->shader.data<Program>()->bind();
+				batch->shader->bind();
 
 				glUniformMatrix4fv(
 					glGetUniformLocation(
-						batch->shader.data<Program>()->programId(),
+						batch->shader->programId(),
 						"M_View"
 					),
 					1, false, glm::value_ptr(view_matrix));
 
 				glUniformMatrix4fv(
 					glGetUniformLocation(
-						batch->shader.data<Program>()->programId(),
+						batch->shader->programId(),
 						"M_Perspective"
 					),
 					1, false, glm::value_ptr(perspective_matrix));
@@ -107,34 +100,32 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	}
 
 	// this code handles drawing billboards into the world (hud, sprites, etc).
-	for (auto &camera : Component::Index::entitiesOf<Component::Camera>()) {
-		for (const auto &sprite : Component::Index::entitiesOf<Billboard>()) {
+	for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+		for (const auto &sprite : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
 
-			const auto &camera_view_matrix = camera.data<Camera>()->view;
-			const auto &viewport = camera.data<Camera>()->viewport;
-			const auto &meta = sprite.data<Billboard>();
+			const auto &camera_view_matrix = camera->view;
+			const auto &viewport = camera->viewport;
 
 			auto offset = glm::translate(
 				glm::vec3(
-					meta->plot.x / viewport.width - meta->anchor.x,
-					meta->plot.y / viewport.height - meta->anchor.y,
+					sprite->plot.x / viewport.width - sprite->anchor.x,
+					sprite->plot.y / viewport.height - sprite->anchor.y,
 					0.0f
 				)
 			);
 
-			auto anchor = glm::translate(glm::vec3(meta->anchor.x, meta->anchor.y, 0.0f));
+			auto anchor = glm::translate(glm::vec3(sprite->anchor.x, sprite->anchor.y, 0.0f));
 
 			auto scale = glm::scale(
 				glm::vec3(
-					meta->plot.width / viewport.width,
-					meta->plot.height / viewport.height,
-					meta->plot.height / viewport.height // todo, hack
+					sprite->plot.width / viewport.width,
+					sprite->plot.height / viewport.height,
+					sprite->plot.height / viewport.height // todo, hack
 				)
 			);
 
-			meta->mesh_instance.attachTemporaryComponent(
-				Engine::createComponent<WorldTransform>(offset * scale * anchor)->id(), 1
-			);
+
+			sprite->mesh_instance->instances.push_back(WorldTransform(offset * scale * anchor));
 		}
 
 		break; // only use the first camera...
@@ -158,18 +149,18 @@ Rendering::RenderingSystem::~RenderingSystem() {
 
 std::shared_ptr<Rendering::GeometryBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
-	const Component::Mesh& data, const Material& material
+	std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material
 ) {
 
 	auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
 		10000000,
-		sizeof(data.vertices[0]),
+		sizeof(mesh->vertices[0]),
 		GL_ARRAY_BUFFER
 		);
 
 	auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
 		10000000,
-		sizeof(data.indices[0]),
+		sizeof(mesh->indices[0]),
 		GL_ELEMENT_ARRAY_BUFFER
 		);
 
@@ -180,7 +171,7 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 		);
 
 	auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-	batch->shader = material.shader;
+	batch->shader = material->shader;
 
 
 	return push_back(batch);
@@ -193,21 +184,21 @@ std::shared_ptr<Rendering::GeometryBatch> Rendering::RenderingSystem::push_back(
 	return batches.back();
 }
 
-void Rendering::RenderingSystem::buffer(const Component::Mesh &mesh, const Component::Material & material) {
+void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh>&mesh, std::shared_ptr<Material>& material) {
 
 	// if the data is already buffered we want to update the existing buffer data
-	auto id = mesh.id();
+
 	auto match = std::find_if(
 		batches.begin(), batches.end(),
-		[mesh_id = id, material_id = material.id()](const std::shared_ptr<GeometryBatch> &batch) {
-		return batch->contains(mesh_id, material_id);
+		[mesh, material](const std::shared_ptr<GeometryBatch> &batch) {
+		return batch->contains(mesh, material);
 	}
 	);
 
 	if (match != batches.end()) {
 		// mark/remove buffered data so its not used
-		Engine::log<module>("Removing #", mesh.id(), " from batch#", (*match)->vao);
-		(*match)->remove(id, material.id());
+		Engine::log<module>("Removing #", mesh->id, " from batch#", (*match)->vao);
+		(*match)->remove(mesh, material);
 	}
 
 	// find a batch that can hold the data, or make one
@@ -243,21 +234,21 @@ void Rendering::RenderingSystem::initialize() {
 
 }
 
-void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId mesh_id, Component::ComponentId material_id, int size, float *data, int stride) {
+void Rendering::RenderingSystem::updateInstanceData(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material, int size, float *data, int stride) {
 
-	Engine::log<module, Engine::low>("Updating instance data of component#", mesh_id);
+	Engine::log<module, Engine::low>("Updating instance data of component#", mesh);
 
 	auto it = std::find_if(
 		batches.begin(), batches.end(),
-		[mesh_id, material_id](const auto batch)
+		[mesh, material](const auto batch)
 	{
-		return batch->contains(mesh_id, material_id);
+		return batch->contains(mesh, material);
 	}
 	);
 
 	Engine::assertLog<module>(it != batches.end(), "check for valid batch");
 
-	it->get()->update(mesh_id, material_id, 2, size, data, stride);
+	it->get()->update(mesh, material, 2, size, data, stride);
 }
 
 Rendering::Program::~Program() {

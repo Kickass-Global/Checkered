@@ -15,7 +15,7 @@ using namespace physx;
 
 namespace Component {
 
-	class Passenger : public Component::ComponentBase<Component::ClassId::Passenger> {
+	class Passenger : public ComponentBase {
 
 	public:
 		

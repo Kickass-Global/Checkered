@@ -3,35 +3,16 @@
 //
 
 #include "Library.h"
-#include "EntityLoader.h"
+#include <Engine.h>
 
-std::map<std::string, Component::ComponentId> Pipeline::Library::assets;
+std::map<std::string, std::shared_ptr<ComponentInterface>> Pipeline::Library::assets;
 
 bool Pipeline::Library::contains(const std::string &asset_name) {
     return assets.count(asset_name) > 0;
 }
 
-std::pair<std::map<std::string, Component::ComponentId>::iterator, bool>
-        Pipeline::Library::emplace(const std::string &asset_name, const Component::ComponentId& id) {
-	Engine::nameComponent(id, asset_name);
-    return assets.emplace(asset_name, id);
-}
-
-Component::ComponentId Pipeline::Library::getAsset(const std::string &name, Component::ClassId classId) {
-    auto exists = assets.count(name) > 0;
-    if (!exists) {
-        switch (classId) {
-            case Component::ClassId::Program: {
-                auto program = Pipeline::ProgramLoader::load(name);
-                emplace(name, program->id());
-                return program->id();
-            }
-            case Component::ClassId::Mesh: {
-                auto component = Pipeline::MeshLoader::load(name);
-                emplace(name, component->id());
-                return component->id();
-            }
-        }
-    }
-    return assets[name];
+std::pair<std::map<std::string, std::shared_ptr<ComponentInterface>>::iterator, bool>
+        Pipeline::Library::emplace(const std::string &asset_name, std::shared_ptr<ComponentInterface> component) {
+	Engine::nameComponent(component->getId(), asset_name);
+    return assets.emplace(asset_name, component);
 }
