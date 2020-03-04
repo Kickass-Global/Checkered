@@ -25,7 +25,7 @@ using json = nlohmann::json;
 
 namespace Pipeline {
 
-    template<typename T = Component::ComponentBase<Component::ClassId::GameObject>>
+    template<typename T = Component::ComponentBase>
     std::shared_ptr<T> load(std::string filename) {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 

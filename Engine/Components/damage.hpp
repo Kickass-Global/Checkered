@@ -16,7 +16,7 @@ namespace Component {
 /**
  * This component communicates damage between entities
  */
-    class Damage : public ComponentBase<ClassId::Damage> {
+    class Damage : public ComponentBase {
     public:
         int damage_amount;
     };
@@ -25,7 +25,7 @@ namespace Component {
  * This component controls how entities change in response to damage and
  * other effects.
  */
-    class Model : public ComponentBase<ClassId::Model> {
+    class Model : public ComponentBase {
 
     public:
         struct Variation {

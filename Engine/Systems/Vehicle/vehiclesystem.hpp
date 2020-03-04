@@ -13,7 +13,7 @@
 namespace Engine {
     class vehicleSystem : public Engine::SystemInterface {
     public:
-        Component::EventDelegate<Component::ComponentId> onVehicleCreated;
+        Component::EventDelegate<Vehicle*> onVehicleCreated;
 
         vehicleSystem() : onVehicleCreated("onVehicleCreated") {}
 

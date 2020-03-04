@@ -39,9 +39,6 @@ int main() {
     auto openALSoundSystem = Engine::addSystem<Engine::SoundSystem>();
 
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
-    vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
-    auto index = Engine::addSystem<Component::Index>();
-    index->order = 2;
 
     Engine::addSystem<Component::SceneComponentSystem>();
     Engine::addSystem<Engine::DamageSystem>();
@@ -67,18 +64,17 @@ int main() {
     Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
     Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-    Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
-    Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
-    Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+    //Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
+    //Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
+    //Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
     //endregion
 
     // setup the ground mesh
 
-    auto basic_shader_program = Pipeline::Library::getAsset(
-        "Assets/Programs/basic.json",
-        Component::ClassId::Program
+    auto basic_shader_program = Pipeline::Library::getAsset<Program>(
+        "Assets/Programs/basic.json"
     );
 
 
@@ -87,15 +83,13 @@ int main() {
 
     // make a material component
     auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
-    ground_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
-    ground_material->shader = Pipeline::Library::getAsset(
-        "Assets/Programs/checker.json",
-        Component::ClassId::Program
+    ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
+    ground_material->shader = Pipeline::Library::getAsset<Program>(
+        "Assets/Programs/checker.json"
     );
 
     // load the mesh component
-    auto plane_mesh = Pipeline::Library::getAsset("Assets/Meshes/plane.obj", Component::ClassId::Mesh);
+    auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/plane.obj");
 
 //    // create a mesh isnatnce (binds material with mesh)
 //    auto ground_mesh_instance = Engine::createNamedComponent<Component::MeshInstance>(
@@ -148,13 +142,12 @@ int main() {
 
     auto car_material = Engine::createComponent<Component::Material>(basic_shader_program);
     car_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png")->id());
+        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
 
     auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
-                                                                        Pipeline::Library::getAsset(
-                                                                            "Assets/Meshes/car_mesh.fbx",
-                                                                            Component::ClassId::Mesh
-                                                                        ), car_material->id());
+                                                                        Pipeline::Library::getAsset<Mesh>(
+                                                                            "Assets/Meshes/car_mesh.fbx"
+                                                                        ), car_material);
 
     // setup the vehicle for the player...
 
@@ -162,14 +155,14 @@ int main() {
     auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
 
     player_damage_model->parts.push_back(Component::Model::Part{});
-    player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh_instance->id()});
+    player_damage_model->parts[0].variations.push_back(Component::Model::Variation{2000000, car_mesh_instance});
 
-    player_vehicle->model = player_damage_model->id();
+	player_vehicle->model = player_damage_model;
     player_vehicle->scale = glm::vec3(0.5f, 0.5f, 0.5f);
     player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
     player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
 
-    physicsSystem->playerVehicle = player_vehicle;
+	physicsSystem->playerVehicle = player_vehicle;
 //
 //    // ai factory method...
 //    auto make_ai = [car_mesh_instance](glm::mat4 world_transform = glm::mat4{1}) {
@@ -270,7 +263,7 @@ int main() {
 
     // make a default camera
     auto camera = Engine::createComponent<Component::Camera>();
-    camera->target = player_vehicle->id(); // make camera follow player.
+    camera->target = player_vehicle; // make camera follow player.
 
     // region initialize game-clocks
     using namespace std::chrono;

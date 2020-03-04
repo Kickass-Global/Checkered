@@ -11,7 +11,7 @@
 #include <memory>
 
 namespace Component {
-    class PhysicsActor : public ComponentBase<ClassId::PhysicsActor> {
+    class PhysicsActor : public ComponentBase {
 
     public:
         std::shared_ptr<Mesh> mesh;

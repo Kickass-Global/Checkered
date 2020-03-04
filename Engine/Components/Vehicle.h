@@ -16,16 +16,18 @@
 #include "Model.h"
 #include "ComponentId.h"
 #include "tags.h"
+#include "damage.hpp"
 
 #include <glm/glm.hpp>
 
 namespace Component {
 
-class Vehicle : public Component::ComponentBase<Component::ClassId::Vehicle> {
+class Vehicle : public ComponentBase {
 public:
-    ComponentId model{};
+	bool is_outdated = true;
+	std::shared_ptr<Model> model;
     ComponentId input{};
-    ComponentId onTickHandler;
+	std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
     EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
 
     glm::vec3 scale;
@@ -48,7 +50,7 @@ public:
 
     void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
         Engine::log<module, Engine::low>("onTick");
-        tickHandler(id());
+        tickHandler(id);
     }
 
     Vehicle() :

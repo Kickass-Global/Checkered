@@ -11,7 +11,6 @@
 
 namespace Pipeline {
 
-    Component::ClassId parse(const std::string &value);
 
 }
 

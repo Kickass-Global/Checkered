@@ -23,11 +23,11 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
 
 
-    auto sceneComponents = Component::Index::entitiesOf<SceneComponent>();
+    auto sceneComponents = Engine::getStore().getRoot().getComponentsOfType<SceneComponent>();
 
     for (const auto &sceneComponent : sceneComponents) {
-
-        auto is_dirty = sceneComponent.hasTag<Component::Dirty>(true);
+/*
+        auto is_dirty = sceneComponent->
         auto physicsUpdates = sceneComponent.childComponentsOfClass(Component::ClassId::PhysicsPacket);
         auto has_physics_update = !physicsUpdates.empty();
 
@@ -72,7 +72,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
                 model.attachExistingComponent(worldTransform->id());
 
             }
-        }
+        }*/
     }
 }
 

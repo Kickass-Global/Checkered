@@ -10,7 +10,6 @@ file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
 
 set(SRC main.cpp main.h
         Systems/Engine.cpp Systems/Engine.h
-        Systems/Index.cpp Systems/Index.h
         Components/tags.cpp Components/tags.h
         Components/Mesh.cpp Components/Mesh.h
         Components/SceneComponent.cpp Components/SceneComponent.h

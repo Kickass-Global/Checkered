@@ -24,7 +24,6 @@
 #include "glm/gtx/transform.hpp"
 
 #include "ComponentId.h"
-#include "Index.h"
 #include "tags.h"
 #include "systeminterface.hpp"
 #include "EngineStore.h"
@@ -43,10 +42,7 @@ namespace Component {
     class EventDelegate;
 
     template<typename... As>
-    class EventArgs;
-
-    struct ComponentId;
-    enum class ClassId : unsigned int;
+	class EventArgs;
 }
 
 namespace Engine {
@@ -128,22 +124,22 @@ namespace Engine {
      */
 
     template<typename T, typename... Args>
-    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createComponent(Args &... args) {
-        return store.create<T>(args...).get();
+	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
+		createComponent(Args &... args) {
+		return store.create<T>(args...);
     }
 
     template<typename T, typename... Args>
-    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createNamedComponent(std::string name, Args... args) {
+    inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
+    createNamedComponent(std::string name, Args... args) {
         auto result = createComponent<T>(args...);
-        Engine::nameComponent(result->id(), name);
+        Engine::nameComponent(result->getId(), name);
         return result;
     }
 
     template<typename T, typename... Args>
-    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createComponentWithTTL(int ttl, const Args &... args) {
+	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
+		createComponentWithTTL(int ttl, const Args &... args) {
         return createComponent<T>(args...);
     }
 
