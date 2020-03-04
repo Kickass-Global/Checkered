@@ -10,7 +10,7 @@
 #include <Events/Events.h>
 #include <EventHandler.h>
 #include <EventDelegate.h>
-
+#include "..\Systems\Navigation\astar.h"
 #include "Model.h"
 #include "ComponentId.h"
 #include "tags.h"
@@ -26,6 +26,7 @@ public:
     ComponentId onTickHandler;
     EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
 
+    AStar path;
     glm::vec3 scale;
     glm::quat rotation;
     glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));

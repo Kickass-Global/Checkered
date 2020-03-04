@@ -16,6 +16,7 @@
 #include "glm/gtx/matrix_decompose.hpp"
 
 #include "Systems/Component/scenecomponentsystem.hpp"
+#include "Systems/Navigation/astar.h"
 #include "Systems/systeminterface.hpp"
 #include "Engine.h"
 #include "WorldTransform.h"
@@ -87,7 +88,6 @@ int main() {
 
     // setup the mesh used for the cars...
 
-
     auto car_mesh = Pipeline::Library::getAsset("Assets/Meshes/car_mesh.fbx", Component::ClassId::Mesh);
     car_mesh.addTag<Component::Dirty>();
     car_mesh.addTag<Component::Visible>();
@@ -120,6 +120,7 @@ int main() {
     physicsSystem->playerVehicle = player_vehicle;
 
     // ai factory method...
+
     auto make_ai = [car_mesh](glm::mat4 world_transform = glm::mat4{1}) {
 
         auto ai_vehicle = Engine::createComponent<Component::Vehicle>();
@@ -136,7 +137,7 @@ int main() {
         ai_vehicle->model = ai_damage_model->id();
         ai_vehicle->scale = scale;
         ai_vehicle->rotation = orientation;
-        ai_vehicle->position = translation;;
+        ai_vehicle->position = translation;
 
         return ai_vehicle;
 
@@ -148,69 +149,120 @@ int main() {
     passenger_entity->initPassenger();
 
     // setup ai "brain"
-
     std::function<void(const Component::EventArgs<Component::ComponentId> &)> ai_tick_callback = [player_vehicle](
             const Component::EventArgs<Component::ComponentId> &args) {
         auto meta = std::get<0>(args.values).data<Component::Vehicle>();
 
-        auto player_location = glm::normalize(player_vehicle->position); // translation vector of mat4
+        auto player_location = player_vehicle->position; // translation vector of mat4
         auto ai_direction = glm::normalize(-meta->world_transform()[2]); // 'z' column vector of mat4 (i.e. forward)
-        auto ai_location = glm::normalize(meta->position); // translation vector of mat4
+        auto ai_location = meta->position; // translation vector of mat4
 
         // check if the player is to the left or right of the ai.
         auto perpdot = [](auto v1, auto v2) {
             return v1.z * v2.x - v1.x * v2.z;
         };
 
-        // check if the player is in front or behind the ai.
-        auto heading = [p = glm::normalize(glm::vec3(player_location - ai_location)), b = glm::vec3(ai_direction)]() {
-            return glm::dot(p, b);
-        };
-
         meta->pxVehicleInputData.setDigitalSteerLeft(false);
         meta->pxVehicleInputData.setDigitalSteerRight(false);
-
-        auto player_direction = perpdot(player_location - ai_location, ai_direction);
 
         // todo control throttle better...
         meta->pxVehicleInputData.setDigitalAccel(true);
 
-        const auto ai_is_driving_away = heading() < 0.0f;
-        const auto player_is_left = player_direction > 0;
+        meta->path.ReachedPoint(ai_location);
+        if (meta->path.pathToGoal.size()>0) {
+            auto nextPoint = meta->path.pathToGoal[0];
+            auto player_direction = perpdot(glm::normalize(
+                glm::vec3(nextPoint->my_x+1.5f, 0, nextPoint->my_z + 1.5f) - ai_location), ai_direction);
+            // check if the point is in front or behind the ai.
+            auto heading = [p = glm::normalize(
+                glm::vec3(nextPoint->my_x + 1.5f, 0, nextPoint->my_z + 1.5f) - ai_location), b = glm::vec3(ai_direction)]() {
+                return glm::dot(p, b);
+            };
 
-        if (ai_is_driving_away) { // turn the ai around...
+            const auto ai_is_driving_away = heading() < 0.0f;
+            const auto player_is_left = player_direction > 0;
 
-            meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-            meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
+            if (ai_is_driving_away) { // turn the ai around...
 
-            if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-            else meta->pxVehicleInputData.setDigitalSteerRight(true);
+                meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+                meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-        } else { // driving towards player
-
-            meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
-
-            const auto pointed_at_player = -0.3f <= player_direction && player_direction <= 0.3f;
-
-            if (pointed_at_player) { /* drive straight */ }
-            else { // steer towards player
                 if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
                 else meta->pxVehicleInputData.setDigitalSteerRight(true);
+
+            }
+            else { // driving towards player
+
+                meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
+
+                const auto pointed_at_player = -0.3f <= player_direction && player_direction <= 0.3f;
+
+                if (pointed_at_player) { /* drive straight */ }
+                else { // steer towards player
+                    if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
+                    else meta->pxVehicleInputData.setDigitalSteerRight(true);
+                }
+
+            }
+            std::cout << "following path\n";
+        } else {
+            auto player_direction = perpdot(glm::normalize(player_location - ai_location), ai_direction);
+            // check if the player is in front or behind the ai.
+            auto heading = [p = glm::normalize(glm::vec3(player_location - ai_location)), b = glm::vec3(ai_direction)]() {
+                return glm::dot(p, b);
+            };
+
+            const auto ai_is_driving_away = heading() < 0.0f;
+            const auto player_is_left = player_direction > 0;
+
+            if (ai_is_driving_away) { // turn the ai around...
+
+                meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+                meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
+
+                if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
+                else meta->pxVehicleInputData.setDigitalSteerRight(true);
+
+            }
+            else { // driving towards player
+
+                meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
+
+                const auto pointed_at_player = -0.3f <= player_direction && player_direction <= 0.3f;
+
+                if (pointed_at_player) { /* drive straight */ }
+                else { // steer towards player
+                    if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
+                    else meta->pxVehicleInputData.setDigitalSteerRight(true);
+                }
+
             }
 
+            std::cout << "following player\n";
         }
+
+        
+        
     };
     Component::ComponentId ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
+    //
+    nodeType** navEnum = new nodeType * [64];
+    for (int i = 0; i < 64; i++) {navEnum[i] = new nodeType[64];}
+    for (int i = 0; i < 64; i++) for(int j = 0; j < 64; j++) {navEnum[i][j] = static_cast<nodeType>(nav[64*j+i]);}
+
     // spawn some ai bois into the world
-    auto dim = 1l;
-    int spacing = 20;
-    for (int x = -dim; x <= dim; x++) {
+    auto dim = 1;
+    int spacing = 60;
+    for (int x = -dim; x <= -dim; x++) {
         for (int y = -dim; y <= dim; y++) {
 
-            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing)));
+            auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
             ai_vehicle->scale = glm::vec3(0.5, 0.5, 0.5);
             ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+            ai_vehicle->path.graphNodes = navEnum;
+            ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
+            ai_vehicle->path.CleanPath();
             ai_vehicle->tickHandler += ticker; // give them brain
 
         }
