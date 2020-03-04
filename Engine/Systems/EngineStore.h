@@ -66,19 +66,22 @@ public:
 		static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
 		// check to see if the store has an available allocation we can reuse
+		int uses;
 		auto it = std::find_if(component_types[typeid(T)].begin(), component_types[typeid(T)].end(),
-			[](std::weak_ptr<ComponentInterface> ptr) {
-			return ptr.use_count() <= 1;
+			[&uses](std::weak_ptr<ComponentInterface> ptr) {
+			return ptr.expired();
 		}
 		);
 
 		if (it != component_types[typeid(T)].end()) {
 			auto shared = it->lock();
-			*shared = T(args...); // copy-construct a new component using existing allocation...
+			
+			shared.reset(new T(args...)); // copy-construct a new component using existing allocation...
+			
 			return std::static_pointer_cast<T>(shared);
 		}
 		// else create and add a new one...
-		return addComponent<T>(std::make_unique<T>(args...));
+		return addComponent(std::make_unique<T>(args...));
 	}
 
 private:
@@ -88,17 +91,9 @@ private:
 		static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
 		std::shared_ptr<T> shared = std::move(component);
-
 		component_types[typeid(T)].emplace_back(shared);
-		if (!root.components[typeid(T)].has_value())
-		{
-			root.components[typeid(T)] = std::vector<std::shared_ptr<T>>();
-		}
 
-		auto& scene = std::any_cast<std::vector<std::shared_ptr<T>>&>(root.components[typeid(T)]);
-		scene.emplace_back(std::move(shared));
-
-		return std::static_pointer_cast<T>(scene.back());;
+		return shared;
 	}
 
 };

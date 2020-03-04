@@ -15,8 +15,13 @@ namespace Component {
      */
     class Scenery : public SceneComponent {
     public:
-    };
+		std::shared_ptr<PhysicsActor> actor;
+		std::shared_ptr<MeshInstance> mesh;
 
+		Scenery(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) :
+			mesh(Engine::createComponent<MeshInstance>(mesh, material)),
+			actor(Engine::createComponent<PhysicsActor>(mesh)) {}
+	};
 }
 
 #endif

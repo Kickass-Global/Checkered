@@ -28,9 +28,9 @@ public:
 	std::shared_ptr<Model> model;
     ComponentId input{};
 	std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
-    EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
+    EventDelegate<Vehicle*> tickHandler = EventDelegate<Vehicle*>("handler");
 
-    glm::vec3 scale;
+	glm::vec3 scale = { 1,1,1 };
     glm::quat rotation;
     glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec3 position;
@@ -38,6 +38,10 @@ public:
     glm::mat4 world_transform() {
         return glm::translate(position) * glm::mat4_cast(rotation) * glm::mat4_cast(local_rotation) * glm::scale(scale);
     }
+
+	glm::mat4 physx_transform() {
+		return glm::translate(position) * glm::mat4_cast(rotation) * glm::scale(scale);
+	}
 
     bool pxIsVehicleInAir;
     physx::PxVehicleDrive4WRawInputData pxVehicleInputData;
@@ -50,7 +54,7 @@ public:
 
     void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
         Engine::log<module, Engine::low>("onTick");
-        tickHandler(id);
+        tickHandler(this);
     }
 
     Vehicle() :
