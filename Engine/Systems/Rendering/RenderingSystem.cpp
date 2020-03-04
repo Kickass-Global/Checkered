@@ -54,6 +54,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 			);
 
 		}
+		instance->instances.clear();
 	}
 
 
