@@ -13,8 +13,8 @@ void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 		const bool is_dirty = model->is_outdated;
 
         if (is_dirty) {
-            Engine::log("Updating dirty model#", model);
-
+            Engine::log<module, Engine::low>("Updating dirty model#", model);
+            model->is_outdated = false;
             for (auto &&part : model->parts) {
 
 				auto &&mesh = part.variations[part.active_variation].mesh;

@@ -92,9 +92,9 @@ int main() {
     auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/plane.obj");
 
 //    // create a mesh isnatnce (binds material with mesh)
-//    auto ground_mesh_instance = Engine::createNamedComponent<Component::MeshInstance>(
-//        "ground_mesh_instance", plane_mesh, ground_material->id()
-//    );
+    auto ground_mesh_instance = Engine::createNamedComponent<Component::MeshInstance>(
+        "ground_mesh_instance", plane_mesh, ground_material
+    );
 //
 //    ground_object->id().attachExistingComponent(ground_mesh_instance->id());
 //    ground_object->id().addTag<Component::Visible>();

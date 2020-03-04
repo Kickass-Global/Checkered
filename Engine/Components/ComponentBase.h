@@ -72,6 +72,11 @@ namespace Component {
 			children.addComponent(component);
 		}
 
+		template <typename T, typename... Args>
+		void emplaceChildComponent(Args& ... args) {
+			children.addComponent(Engine::getStore().create<T>(args...));
+		}
+
 		ComponentBase &operator=(const ComponentBase &other) {
 			return *this;
 		}

@@ -98,15 +98,15 @@ void ::Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int,
 }
 
 void ::Camera::CameraSystem::onKeyPress(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
+    //Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
 }
 
 void ::Camera::CameraSystem::onKeyUp(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::low>("onKeyUp=", std::get<0>(args.values));
-    keys.erase(std::get<int>(args.values));
+    Engine::log<module>("onKeyUp=", std::get<0>(args.values));
+    keys.erase(std::get<0>(args.values));
 }
 
 void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
-    Engine::log<module, Engine::low>("onKeyDown=", std::get<0>(args.values));
-    keys.emplace(std::get<int>(args.values));
+    Engine::log<module>("onKeyDown=", std::get<0>(args.values));
+    keys.emplace(std::get<0>(args.values));
 }
