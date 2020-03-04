@@ -11,9 +11,9 @@
 namespace Component {
 
 
-    class Billboard : public ComponentBase<ClassId::Billboard> {
+    class Billboard : public ComponentBase {
     public:
-        ComponentId mesh_instance;
+		std::shared_ptr<class MeshInstance> mesh_instance;
         struct Rectangle {
             float x;
             float y;

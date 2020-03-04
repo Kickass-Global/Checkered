@@ -13,7 +13,7 @@
 
 namespace Component {
 
-    class Shader : public ComponentBase<ClassId::Shader> {
+    class Shader : public ComponentBase {
     };
 
 }

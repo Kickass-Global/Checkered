@@ -8,7 +8,6 @@
 #include "assimp/postprocess.h"
 #include "ShaderLoader.h"
 #include "../../Components/Mesh.h"
-#include "Library.h"
 #include "Engine.h"
 
 namespace Pipeline {
@@ -16,12 +15,7 @@ namespace Pipeline {
     class MeshLoader {
     public:
 
-        static Component::Mesh *load(std::string filename) {
-
-            if (Library::contains(filename)) {
-                Engine::log<module>("Using resource from library ", filename);
-                return Library::at(filename).data<Component::Mesh>();
-            }
+        static std::shared_ptr<Component::Mesh> load(std::string filename) {
 
             Assimp::Importer importer;
             const aiScene *scene = importer.ReadFile(filename,
@@ -61,8 +55,7 @@ namespace Pipeline {
                 }
             }
 
-            Library::emplace(filename, mesh->id());
-            return mesh;
+			return mesh;
         }
 	};
 
