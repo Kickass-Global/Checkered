@@ -33,10 +33,11 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
 			vehicle->position = physx_data->position;
 
 			if (vehicle->model) {
-				vehicle->model->transform = WorldTransform(vehicle->world_transform());
+				vehicle->model->transform = vehicle->world_transform();
 				vehicle->model->is_outdated = true;
+
 				vehicle->getChildren().eraseComponentsOfType<WorldTransform>();
-				vehicle->emplaceChildComponent<WorldTransform>(vehicle->world_transform()); // todo, eh
+				vehicle->emplaceChildComponent<WorldTransform>(vehicle->physx_transform()); // todo, eh
 			}
 		}
 	}

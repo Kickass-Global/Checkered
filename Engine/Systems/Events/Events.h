@@ -82,12 +82,11 @@ namespace Engine {
 
 		template<typename... Args>
 		static std::shared_ptr<EventHandler<Args...>> createHandler(
-			std::function<void(const Component::EventArgs<Args...> &)>
-			callback) {
+			std::function<void(const Component::EventArgs<Args...> &)> callback) {
 
 			auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
 			handler->callback = callback;
-			return handler->id;
+			return handler;
 
 		}
 	};
