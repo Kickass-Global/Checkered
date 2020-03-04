@@ -32,7 +32,7 @@ namespace Component {
 		glm::mat4 view{1};
 
 		std::shared_ptr<ComponentInterface> target;
-        glm::vec3 offset = { 0,2,-5 };
+        glm::vec3 offset = { 0,4,-10 };
 
 		Camera();
     };

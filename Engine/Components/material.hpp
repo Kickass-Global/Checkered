@@ -30,7 +30,7 @@ namespace Component {
 
 		Material(std::shared_ptr<Program> shader) : shader(shader), textures() {}
 
-        void bind() {
+        virtual void bind() {
             int index = 0;
             for (auto &texture : textures) {
                 glActiveTexture(GL_TEXTURE0 + index++);
@@ -38,7 +38,6 @@ namespace Component {
             }
         }
     };
-
 }
 
 #endif //ENGINE_MATERIAL_HPP

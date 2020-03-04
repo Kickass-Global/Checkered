@@ -38,7 +38,7 @@ namespace Component {
             int active_variation;
         };
 		bool is_outdated = false;
-		WorldTransform transform;
+		glm::mat4 transform;
         int current_damage;
         int max_damage;
         std::vector<Part> parts;

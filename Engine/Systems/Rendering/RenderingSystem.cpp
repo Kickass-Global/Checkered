@@ -11,6 +11,7 @@
 #include "SceneComponent.h"
 #include "Engine.h"
 #include "WorldTransform.h"
+#include "Pipeline/Library.h"
 
 Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
@@ -18,12 +19,14 @@ namespace {
 	const char module[] = "RenderingSystem";
 }
 
-void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
-	std::stringstream ss;
-	ss << "frametime: " << time << "ms" << std::endl;
-	auto title = ss.str();
-	glfwSetWindowTitle(window, title.c_str());
+
+std::shared_ptr<Program> depth_shader;
+const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+unsigned int depthMapFBO;
+unsigned int depthMap;
+
+void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
 	// Find and update any GameObjects with meshes that should be drawn...
 	auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
@@ -37,19 +40,12 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		if (instance->instances.size() > 0)
 		{
 			Engine::log<module, Engine::low>("Updating instances(", instance->instances.size(), ") of component#", instance);
-			std::vector<glm::mat4> transform_data;
-
-			for (auto &&transform : instance->instances) {
-				transform_data.push_back(transform.world_matrix);
-			}
-
-			Engine::assertLog(!transform_data.empty(), "Checking that instance data is not empty.");
 
 			updateInstanceData(
 				instance->mesh,
 				instance->material,
-				static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
-				(float *)transform_data.data(),
+				static_cast<int>(sizeof(glm::mat4) * instance->instances.size()),
+				(float *)instance->instances.data(),
 				sizeof(glm::mat4)
 			);
 
@@ -126,17 +122,72 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 			);
 
 
-			sprite->mesh_instance->instances.push_back(WorldTransform(offset * scale * anchor));
+			sprite->mesh_instance->instances.push_back(offset * scale * anchor);
 		}
 
 		break; // only use the first camera...
 	}
 
-	for (auto &&batch : batches) {
-		if (!batch->details.empty()) {
-			// bind programs, textures, and uniforms needed to render the batch
-			batch->bind(*this);
-			batch->draw(*this);
+	// perform "passes"
+
+
+	for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// 1. first render to depth map
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		float near_plane = 1.0f, far_plane = 7.5f;
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f));
+
+		for (auto &&batch : batches) {
+			if (!batch->details.empty()) {
+
+				// bind programs, textures, and uniforms needed to render the batch
+				depth_shader->bind();
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(
+						depth_shader->programId(),
+						"M_View"
+					),
+					1, false, glm::value_ptr(lightView));
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(
+						depth_shader->programId(),
+						"M_Perspective"
+					),
+					1, false, glm::value_ptr(lightProjection));
+
+				batch->bind(*this);
+				batch->draw(*this);
+			}
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		// 2. then render scene as normal with shadow mapping (using depth map)
+		glViewport(0, 0, camera->viewport.width, camera->viewport.height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		for (auto &&batch : batches) {
+			if (!batch->details.empty()) {
+
+				glBindTexture(GL_TEXTURE_2D, depthMap);
+				// bind programs, textures, and uniforms needed to render the batch
+				batch->bind(*this);
+				batch->draw(*this);
+			}
 		}
 	}
 
@@ -229,9 +280,23 @@ void Rendering::RenderingSystem::initialize() {
 
 	Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "initialize GLAD");
 
+	depth_shader = Pipeline::Library::getAsset<Program>("Assets/Programs/depth.json");
+
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
+
+	glGenFramebuffers(1, &depthMapFBO);
+
+
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 }
 

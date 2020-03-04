@@ -68,8 +68,7 @@ namespace Component {
 		Engine::log<module, Engine::low>("ComponentEvent#", id, " called.");
 
 		for (auto listener : subscribers) {
-			auto eventArgs = Engine::createComponent<Component::EventArgs<Args...>>(args...);
-			listener->addChildComponent(eventArgs);
+			listener->emplaceChildComponent<Component::EventArgs<Args...>>(args...);
 		}
 	}
 
