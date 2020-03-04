@@ -2,7 +2,6 @@
 #define PATHNODE_H
 
 #include <math.h>
-#define SIZE 64
 
 struct PathNode {
 public:
@@ -13,10 +12,10 @@ public:
 
     PathNode() : parent(0) {}
     PathNode(float x, float z, PathNode* _parent = 0) : my_x(x), my_z(z), parent(_parent),
-        my_id(static_cast<int>(x) * SIZE + static_cast<int>(y)), search_id(_parent->search_id) {};
+        my_id((static_cast<int>(x + 192) / 3) * 64 + (static_cast<int>(z + 182) / 3)) {};
 
     float GetF() { return costReach*costReach + distTarget; }
-    float GetDist(Point* nodeEnd)
+    float GetDist(PathNode* nodeEnd)
     {
         float x = (float)(pow(this->my_x - nodeEnd->my_x, 2));
         float z = (float)(pow(this->my_z - nodeEnd->my_z, 2));

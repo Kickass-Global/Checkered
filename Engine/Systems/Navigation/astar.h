@@ -2,10 +2,11 @@
 #define ASTAR_H
 
 #include "pathNode.h"
-#include "..\..\Include\glminclude\glm\vec3.hpp"
+#include "navigationGrid.h"
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <glm\ext\vector_float3.hpp>
 
 enum nodeType {
     roadN, roadW, roadE, roadS, roadI,
@@ -18,8 +19,9 @@ public:
     AStar(void);
     ~AStar(void);
 
-    void FindPath(Vector3 currentPos, Vector3 targetPos);
-    void PrintPath();
+    void FindPath(glm::vec3 currentPos, glm::vec3 targetPos);
+    void ReachedPoint(glm::vec3 cPos);
+    void CleanPath();
     void ClearOpenList() { openList.clear(); };
     void ClearVisitedList() { visitList.clear(); };
     void ClearPathToGoal() { pathToGoal.clear(); };
@@ -31,11 +33,11 @@ public:
 private:
     void SetPosts(PathNode start, PathNode End);
     void PathOpened(float x, float z, float newCost, PathNode* parent);
-    Point* GetNext();
+    PathNode* GetNext();
     void ContinuePath();
 
-    pathNode* startNode;
-    pathNode* endNode;
+    PathNode* startNode;
+    PathNode* endNode;
     std::vector<PathNode*> openList;
     std::vector<PathNode*> visitList;
 };
