@@ -108,22 +108,13 @@ int main() {
 	auto building_mesh = Pipeline::Library::getAsset<Mesh>(
 		"Assets/Meshes/Building_House_01.fbx"
 		);
+	
+	Instance<Scenery> building_instances;
+	building_instances.add_instance_at({ 43,0,-10 }, building_mesh, building_material);
+	building_instances.add_instance_at({ 10,0,-23 }, building_mesh, building_material);
+	building_instances.add_instance_at({ -20,0,-16 }, building_mesh, building_material);
 
-	auto building1 = Engine::createComponent<Component::Scenery>(
-		building_mesh,
-		building_material
-		);
 
-	building1->actor->position = glm::vec3{ 10,0,10 };
-	building1->actor->rotation = glm::quat_cast(glm::rotate(2.0f, glm::vec3{ 0,1,0 }));
-
-	auto building2 = Engine::createComponent<Component::Scenery>(
-		building_mesh,
-		building_material
-		);
-
-	building2->actor->position = glm::vec3{ -20,0,-20 };
-	building2->actor->rotation = glm::quat_cast(glm::rotate(1.0f, glm::vec3{ 0,1,0 }));
 
 	// setup a HUD element...
 
@@ -269,7 +260,7 @@ int main() {
 	std::shared_ptr<EventHandler<Vehicle*>> ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
 	// spawn some ai bois into the world
-	auto dim = 2;
+	auto dim = 1;
 	int spacing = 123;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
