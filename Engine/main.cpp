@@ -107,11 +107,11 @@ int main() {
 	auto building_mesh = Pipeline::Library::getAsset<Mesh>(
 		"Assets/Meshes/Building_House_01.fbx"
 		);
-
-	auto building1 = Engine::createComponent<Component::Scenery>(
-		building_mesh,
-		building_material
-		);
+	
+	Instance<Scenery> building_instances;
+	building_instances.add_instance_at({ 43,0,-10 }, building_mesh, building_material);
+	building_instances.add_instance_at({ 10,0,-23 }, building_mesh, building_material);
+	building_instances.add_instance_at({ -20,0,-16 }, building_mesh, building_material);
 
 
 
@@ -265,8 +265,8 @@ int main() {
 	std::shared_ptr<EventHandler<Vehicle*>> ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
 	// spawn some ai bois into the world
-	auto dim = 7l;
-	int spacing = 20;
+	auto dim = 1;
+	int spacing = 123;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
 
