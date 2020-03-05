@@ -74,6 +74,27 @@ namespace Component {
 			children.addComponent(component);
 		}
 
+		void addChildComponents() { }
+
+		template <typename T>
+		void addChildComponents(std::shared_ptr<T> component) {
+			children.addComponent(component);
+		}
+		
+		template <typename T, typename Ts>
+		void addChildComponents(std::shared_ptr<T> component, std::shared_ptr<T> components) {
+			children.addComponent(component);
+			addChildComponents(components);
+		}
+
+
+		template <typename T>
+		void eraseChildComponentsOfType()
+		{
+			children.eraseComponentsOfType<T>();
+		}
+
+
 		template <typename T, typename... Args>
 		void emplaceChildComponent(Args& ... args) {
 			children.addComponent(Engine::getStore().create<T>(args...));

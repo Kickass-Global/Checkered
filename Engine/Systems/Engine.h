@@ -126,9 +126,10 @@ namespace Engine {
 
 	template<typename T, typename... Args>
 	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
-		createComponent(Args &... args) {
+		createComponent(Args &&... args) {
 		return store.getRoot().addComponent(store.create<T>(args...));
 	}
+
 
 	template<typename T, typename... Args>
 	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>

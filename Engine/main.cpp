@@ -40,7 +40,8 @@ int main() {
 
 	vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
-	Engine::addSystem<Component::SceneComponentSystem>();
+	auto componentSystem = Engine::addSystem<Component::SceneComponentSystem>();
+	componentSystem->onActorCreated += physicsSystem->onActorCreatedHandler;
 	Engine::addSystem<Engine::DamageSystem>();
 	auto cameraSystem = Engine::addSystem<::Camera::CameraSystem>();
 	auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
@@ -79,7 +80,7 @@ int main() {
 
 
 	// create a scene object to hold the ground components to follow.
-	auto ground_object = Engine::createComponent<Component::SceneComponent>();
+	auto ground_object = Engine::createComponent<Component::SceneComponent>(nullptr);
 
 	// make a material component
 	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
@@ -113,7 +114,16 @@ int main() {
 		building_material
 		);
 
+	building1->actor->position = glm::vec3{ 10,0,10 };
+	building1->actor->rotation = glm::quat_cast(glm::rotate(2.0f, glm::vec3{ 0,1,0 }));
 
+	auto building2 = Engine::createComponent<Component::Scenery>(
+		building_mesh,
+		building_material
+		);
+
+	building2->actor->position = glm::vec3{ -20,0,-20 };
+	building2->actor->rotation = glm::quat_cast(glm::rotate(1.0f, glm::vec3{ 0,1,0 }));
 
 	// setup a HUD element...
 
@@ -259,8 +269,8 @@ int main() {
 	std::shared_ptr<EventHandler<Vehicle*>> ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
 	// spawn some ai bois into the world
-	auto dim = 7l;
-	int spacing = 20;
+	auto dim = 2;
+	int spacing = 123;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
 
@@ -291,19 +301,11 @@ int main() {
 		Engine::deltaTime elapsed = static_cast<Engine::deltaTime>(duration_cast<milliseconds>(delta).count());
 		// endregion		
 
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 20,0,0 }));
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 40,0,-20 }));
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 20,0,20 }));
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 0,0, 40 }));
-
 		Engine::EventSystem::onTick(elapsed);
 
 		// todo remove these hacks...
 		// force the ground to render...
 
-		//plane_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
-
-		//ai_vehicle->id().attachExistingComponent(Component::Visible::id());
 		for (const auto &system : Engine::systems()) {
 			system->update(elapsed);
 		}

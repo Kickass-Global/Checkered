@@ -3,15 +3,14 @@
 //
 
 #include "scenerysystem.h"
+#include <scenery.hpp>
 
 void Engine::ScenerySystem::initialize() {
     SystemInterface::initialize();
 }
 
 void Engine::ScenerySystem::update(Engine::deltaTime) {
-//    for (const auto &actor : Component::Index::getComponentsOfType<PhysicsActor>()) {
-//        if (actor->id().hasTag<Component::Dirty>()) {
-//            onActorCreated(actor);
-//        }
-//    }
+    for (const auto &scenery : Engine::getStore().getRoot().getComponentsOfType<Scenery>()) {
+		
+    }
 }

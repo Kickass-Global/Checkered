@@ -41,7 +41,7 @@ namespace Physics {
 		std::shared_ptr<Component::Vehicle> playerVehicle;
 
 		std::shared_ptr<EventHandler<Vehicle*>> onVehicleCreatedHandler;
-		std::shared_ptr<EventHandler<PhysicsActor*, Mesh*>> onActorCreatedHandler;
+		std::shared_ptr<EventHandler<PhysicsActor*>> onActorCreatedHandler;
 		std::shared_ptr<EventHandler<int>> onKeyPressHandler;
 		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
 		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
@@ -77,7 +77,7 @@ namespace Physics {
 
 		void onVehicleCreated(const EventArgs<Vehicle*> &args);
 
-		void onActorCreated(const EventArgs<PhysicsActor *, Mesh *> &args);
+		void onActorCreated(const EventArgs<PhysicsActor *> &args);
 	};
 
 }
