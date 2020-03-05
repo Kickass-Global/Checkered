@@ -255,7 +255,7 @@ int main() {
     auto dim = 1;
     int spacing = 60;
     for (int x = -dim; x <= -dim; x++) {
-        for (int y = -dim; y <= dim; y++) {
+        for (int y = -dim; y <= 0; y++) {
 
             auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
             ai_vehicle->scale = glm::vec3(0.5, 0.5, 0.5);
