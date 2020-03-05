@@ -63,7 +63,7 @@ VehicleDesc initVehicleDescription() {
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
 	const PxF32 chassisMass = 1500.0f;
-	const PxVec3 chassisDims(1.5f, 1.0f, 2.0f);
+	const PxVec3 chassisDims(3.0f, 2.0f, 5.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
 		chassisMass / 12.0f,
@@ -72,7 +72,7 @@ VehicleDesc initVehicleDescription() {
 		(chassisDims.x * chassisDims.x + chassisDims.y * chassisDims.y) *
 		chassisMass / 12.0f
 	);
-	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f + 0.65f, 0.25f);
+	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f + 0.05f, 0.25f);
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.

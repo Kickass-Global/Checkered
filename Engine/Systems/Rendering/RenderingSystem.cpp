@@ -22,7 +22,7 @@ namespace {
 
 
 std::shared_ptr<Program> depth_shader;
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 unsigned int depthMapFBO;
 unsigned int depthMap;
 
@@ -144,11 +144,13 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		float near_plane = 1.0f, far_plane = 7.5f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+		float near_plane = -1.0f, far_plane = 100.0f;
+		glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(glm::vec3(-20.0f, 41.0f, -10.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 lightViewProjection = lightProjection * lightView; 
+		glCullFace(GL_FRONT);
 
 		for (auto &&batch : batches) {
 			if (!batch->details.empty()) {
@@ -175,6 +177,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 			}
 		}
 
+		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		// 2. then render scene as normal with shadow mapping (using depth map)
 		glViewport(0, 0, camera->viewport.width, camera->viewport.height);
@@ -183,9 +186,23 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		for (auto &&batch : batches) {
 			if (!batch->details.empty()) {
 
-				glBindTexture(GL_TEXTURE_2D, depthMap);
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(
+						batch->shader->programId(),
+						"M_LightSpace"
+					),
+					1, false, glm::value_ptr(lightViewProjection));
+
 				// bind programs, textures, and uniforms needed to render the batch
+				batch->shader->bind();
 				batch->bind(*this);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, depthMap);
+				GLint shadow_map_location = glGetUniformLocation(batch->shader->programId(), "tShadow");
+				GLint diffuse_map_locatino = glGetUniformLocation(batch->shader->programId(), "tDiffuse");
+				glUniform1i(shadow_map_location, 0); // Texture unit 0 is for base images.
+				glUniform1i(diffuse_map_locatino, 1); // Texture unit 2 is for normal maps.
 				batch->draw(*this);
 			}
 		}
@@ -295,8 +312,8 @@ void Rendering::RenderingSystem::initialize() {
 		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 }
 

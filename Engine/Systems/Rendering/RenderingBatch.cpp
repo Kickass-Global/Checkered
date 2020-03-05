@@ -27,7 +27,6 @@ namespace Rendering {
     void GeometryBatch::bind(Rendering::RenderingSystem &renderingSystem) {
 
         Engine::log<module, Engine::low>("Binding shader#", shader);
-        shader->bind();
         glBindVertexArray(vao);
     }
 

@@ -83,9 +83,9 @@ int main() {
 
 	// make a material component
 	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
-	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
+	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/white.png"));
 	ground_material->shader = Pipeline::Library::getAsset<Program>(
-		"Assets/Programs/checker.json"
+		"Assets/Programs/basic.json"
 		);
 
 	// load the mesh component
@@ -170,6 +170,7 @@ int main() {
 
 	player_vehicle->model = player_damage_model;
 	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+	player_vehicle->local_position = glm::vec3(0.0f, -1.0f, 0.0f);
 	player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
 
 	physicsSystem->playerVehicle = player_vehicle;
@@ -190,7 +191,8 @@ int main() {
 
 		ai_vehicle->model = ai_damage_model;
 		ai_vehicle->rotation = orientation;
-		ai_vehicle->position = translation;;
+		ai_vehicle->position = translation;
+		ai_vehicle->local_position = glm::vec3(0.0f, -1.45f, 0.0f);
 
 		return ai_vehicle;
 	};
@@ -257,7 +259,7 @@ int main() {
 	std::shared_ptr<EventHandler<Vehicle*>> ticker = Engine::EventSystem::createHandler(ai_tick_callback);
 
 	// spawn some ai bois into the world
-	auto dim = 1l;
+	auto dim = 7l;
 	int spacing = 20;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
