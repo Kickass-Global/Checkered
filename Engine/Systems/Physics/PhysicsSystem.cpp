@@ -166,6 +166,8 @@ void Physics::PhysicsSystem::createScene() {
 
 	PxSceneDesc sceneDesc(cPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.f, GRAVITY, 0.f);
+	sceneDesc.kineKineFilteringMode = PxPairFilteringMode::eKEEP;
+	sceneDesc.staticKineFilteringMode = PxPairFilteringMode::eKEEP;
 
 	PxU32 numWorkers = 1;
 	cDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
@@ -358,13 +360,32 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 	link(vehicleComponent, pxVehicle->getRigidDynamicActor());
 }
 
+void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
+{
+	PxFilterData filterData;
+	filterData.word0 = filterGroup; // word0 = own ID
+	filterData.word1 = filterMask;  // word1 = ID mask to filter pairs that trigger a
+									// contact callback;
+	const PxU32 numShapes = actor->getNbShapes();
+
+	std::vector < PxShape* >shapes;
+	shapes.resize(numShapes);
+
+	actor->getShapes(shapes.data(), numShapes);
+	for (PxU32 i = 0; i < numShapes; i++)
+	{
+		PxShape* shape = shapes[i];
+		shape->setSimulationFilterData(filterData);
+	}
+}
+
 void
-Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor *, Component::Mesh *> &args) {
+Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor *> &args) {
 
 	Engine::log<module>("Running onActorCreated");
 
 	auto &aPhysicsActor = std::get<0>(args.values);
-	auto &aMesh = std::get<1>(args.values);
+	auto &aMesh = aPhysicsActor->mesh;
 
 	std::vector<PxVec3> convexVerts;
 
@@ -377,7 +398,7 @@ Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::Phy
 	);
 
 	PxConvexMeshDesc convexDesc;
-	convexDesc.points.count = 5;
+	convexDesc.points.count = convexVerts.size();
 	convexDesc.points.stride = sizeof(PxVec3);
 	convexDesc.points.data = convexVerts.data();
 	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
@@ -387,15 +408,27 @@ Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::Phy
 	if (!cCooking->cookConvexMesh(convexDesc, buf, &result))
 		return;
 
-	aPhysicsActor->actor = cPhysics->createRigidDynamic(PxTransform());
+	auto position = physx::PxVec3{ aPhysicsActor->position.x, aPhysicsActor->position.y, aPhysicsActor->position.z };
+	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
+
+	auto rigid = cPhysics->createRigidDynamic(PxTransform(position, rotation));
+
 
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	PxConvexMesh *convexMesh = cPhysics->createConvexMesh(input);
+
+	rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	aPhysicsActor->actor = rigid;
+
 
 	PxShape *aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
 		PxConvexMeshGeometry(convexMesh),
 		*cMaterial
 	);
+
+	setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
+
+	cScene->addActor(*aPhysicsActor->actor);
 }
 
 void Physics::PhysicsSystem::link(Vehicle* sceneComponent, physx::PxRigidDynamic *actor) {

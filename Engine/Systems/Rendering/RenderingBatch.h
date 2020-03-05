@@ -64,7 +64,7 @@ namespace Rendering {
 			auto offset = m_fill;
 			m_fill += data.size() * sizeof(T);
 
-			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+			Engine::assertLog<module>(m_fill < m_size, "Checking buffer fill");
 
 			return { offset, static_cast<int>(data.size()), sizeof(T) };
 		}
@@ -75,12 +75,12 @@ namespace Rendering {
 			Engine::log<module>("Pushing data into batch#", id());
 
 			glBindBuffer(m_type, m_id);
-			glBufferSubData(m_type, m_fill, sizeof(T) * size, data);
+			glBufferSubData(m_type, m_fill, stride * size, data);
 
 			auto offset = m_fill;
 			m_fill += size * stride;
 
-			Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
+			Engine::assertLog<module>(m_fill < m_size, "Checking buffer fill");
 
 			return { offset, size, stride };
 		}
@@ -91,7 +91,8 @@ namespace Rendering {
 			glBufferSubData(m_type, details.offset, size, data);
 		}
 
-		GLuint id();
+		GLuint id(); 
+		GLuint type();
 
 		size_t stride();
 

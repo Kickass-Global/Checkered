@@ -10,17 +10,21 @@
 
 namespace Component {
 
-    /**
-     * Scenery components are things that can be placed into the world and have collision properties
-     */
-    class Scenery : public SceneComponent {
-    public:
+	/**
+	 * Scenery components are things that can be placed into the world and have collision properties
+	 */
+	class Scenery : public ComponentBase {
+	public:
+
 		std::shared_ptr<PhysicsActor> actor;
-		std::shared_ptr<MeshInstance> mesh;
+		std::shared_ptr<PaintedMesh> mesh;
 
 		Scenery(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) :
-			mesh(Engine::createComponent<MeshInstance>(mesh, material)),
-			actor(Engine::createComponent<PhysicsActor>(mesh)) {}
+			mesh(Engine::createComponent<PaintedMesh>(mesh, material)),
+			actor(Engine::createComponent<PhysicsActor>(mesh))
+		{
+			actor->node->addChildComponent(Engine::createComponent<SceneComponent>(actor->node, this->mesh));
+		}
 	};
 }
 

@@ -28,10 +28,32 @@ unsigned int depthMap;
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
+	std::map<std::pair<std::shared_ptr<Mesh>, std::shared_ptr<Material>>, std::shared_ptr<MeshInstance>> instancing_map;
+	for (auto mesh : Engine::getStore().getRoot().getComponentsOfType<PaintedMesh>())
+	{
+		auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
+		if (!Ts.empty()) {
+			auto[it, result] = instancing_map.emplace(std::pair{ mesh->mesh, mesh->material }, Engine::createComponent<MeshInstance>(mesh->mesh, mesh->material));
+			if (!result) {
+				//it->second->instances.clear();
+			}
+			it->second->instances.push_back(Ts[0]->world_matrix);
+		}
+	}
+
+	auto is_buffered = [this](auto instance_mesh) {
+		for (auto batch : this->batches)
+		{
+			if (batch->contains(instance_mesh->mesh, instance_mesh->material)) return true;
+		}
+		return false;
+	};
+
+
 	// Find and update any GameObjects with meshes that should be drawn...
 	auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
 	for (const auto& instance : meshes) {
-		if (!instance->is_buffered)
+		if (!is_buffered(instance))
 		{
 			instance->is_buffered = true;
 			Engine::log<module, Engine::high>("Updating batch data of#", instance->getId());

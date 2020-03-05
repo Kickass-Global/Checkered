@@ -62,7 +62,7 @@ public:
 	 * @return returns a shared_ptr to the constructed object.
 	 */
 	template<typename T, typename... Args>
-	std::shared_ptr<T> create(Args&... args) {
+	std::shared_ptr<T> create(Args&&... args) {
 		static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
 		// check to see if the store has an available allocation we can reuse
