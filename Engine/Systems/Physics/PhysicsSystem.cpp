@@ -497,51 +497,53 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 	cScene->addActor(*aPhysicsActor->actor);
 }
 
+#include <scenery.hpp>
 void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger) {
 
-	//activePassenger = createPassenger(PxTransform(passenger.pickupTransform),PxTransform(passenger.dropOffTransform));
-	PxRigidStatic* temp_rigstat_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
-	passenger->pass_actor_pickup = cPhysics->createRigidStatic(passenger->pickupTransform);
-	passenger->pass_actor_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
-	passenger->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
+	auto passengers = Engine::getStore().getRoot().getComponentsOfType<Component::Passenger>();
+	for (auto passenger : passengers) {
+		
+		if (!passenger->pickup_actor->actor->actor || !passenger->dropoff_actor->actor->actor) continue; // todo, not this....
+		
+		PxRigidStatic* temp_rigstat_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
 
-	PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
+		passenger->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
 
-	PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *passenger->pass_material, true, pass_flags);
-	passenger->pass_actor_pickup->attachShape(*pass_shape_pickup);
-	pass_shape_pickup->release();
+		PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
 
-	PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *passenger->pass_material, true, pass_flags);
-	passenger->pass_actor_dropoff->attachShape(*pass_shape_dropoff);
-	pass_shape_dropoff->release();
+		//PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *passenger->pass_material, true, pass_flags);
+		//passenger->pickup_actor->actor->actor->attachShape(*pass_shape_pickup);
+		//pass_shape_pickup->release();
 
-	activePassenger = passenger;
+		//PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *passenger->pass_material, true, pass_flags);
+		//passenger->dropoff_actor->actor->actor->attachShape(*pass_shape_dropoff);
+		//pass_shape_dropoff->release();
+
+		//cScene->addActor(*passenger->pickup_actor->actor->actor);
+		//cScene->addActor(*passenger->dropoff_actor->actor->actor);
+
+		activePassenger = passenger;
+
+		break; // only make one at a time?
+	}
 }
 
 Component::Passenger* Physics::PhysicsSystem::createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans) {
 	//create temp passenger component
 	Component::Passenger* temp_pass = nullptr;
 
-	//create rigid static actor at pickup transformation
-	PxRigidStatic* temp_rigstat_pickup = cPhysics->createRigidStatic(pickupTrans);
-	temp_pass->pass_actor_pickup = temp_rigstat_pickup;
+	////create material for passenger with maximum friction (probably not actually necessary
+	//temp_pass->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
 
-	//create rigid static actor at dropoff location
-	PxRigidStatic* temp_rigstat_dropoff = cPhysics->createRigidStatic(dropOffTrans);
-	temp_pass->pass_actor_dropoff = temp_rigstat_dropoff;
+	//PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
 
-	//create material for passenger with maximum friction (probably not actually necessary
-	temp_pass->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
+	//PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *temp_pass->pass_material, true, pass_flags);
+	//temp_pass->pass_actor_pickup->attachShape(*pass_shape_pickup);
+	//pass_shape_pickup->release();
 
-	PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
-
-	PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *temp_pass->pass_material, true, pass_flags);
-	temp_pass->pass_actor_pickup->attachShape(*pass_shape_pickup);
-	pass_shape_pickup->release();
-
-	PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *temp_pass->pass_material, true, pass_flags);
-	temp_pass->pass_actor_dropoff->attachShape(*pass_shape_dropoff);
-	pass_shape_dropoff->release();
+	//PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *temp_pass->pass_material, true, pass_flags);
+	//temp_pass->pass_actor_dropoff->attachShape(*pass_shape_dropoff);
+	//pass_shape_dropoff->release();
 
 	return(temp_pass);
 

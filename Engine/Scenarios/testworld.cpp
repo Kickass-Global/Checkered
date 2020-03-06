@@ -111,7 +111,6 @@ void TestWorld::load() {
 		Engine::createComponent<Component::Texture>("Assets/Textures/House_03.png")
 	);
 
-
 	auto building_mesh1 = Pipeline::Library::getAsset<Mesh>(
 		"Assets/Meshes/Building_House_01.fbx"
 		);
@@ -123,11 +122,11 @@ void TestWorld::load() {
 		);
 
 	Instance<Scenery> building_instances;
-	building_instances.add_instance_at(glm::vec3{ 43,0,-10 }, building_mesh1, building_material1);
+	/*building_instances.add_instance_at(glm::vec3{ 43,0,-10 }, building_mesh1, building_material1);
 	building_instances.add_instance_at(glm::vec3{ 10,0,-23 }, building_mesh2, building_material2);
 	building_instances.add_instance_at(glm::vec3{ -20,0,-16 }, building_mesh3, building_material3);
 	building_instances.add_instance_at(glm::vec3{ 0,0,0 }, building_mesh3, building_material3);
-
+*/
 
 	// setup a HUD element...
 
@@ -178,6 +177,9 @@ void TestWorld::load() {
 
 	auto player = Engine::createNamedComponent<Component::ControlledVehicle>("player");
 	inputSystem->onGamePadStateChanged += player->onGamePadStateChangedHandler;
+	inputSystem->onKeyUp += player->onKeyUpHandler;
+	inputSystem->onKeyDown += player->onKeyDownHandler;
+
 	auto &player_vehicle = player->vehicle;
 
 	auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
@@ -189,16 +191,24 @@ void TestWorld::load() {
 	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
 	player_vehicle->local_position = glm::vec3(0.0f, -1.0f, 0.0f);
 	player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
+	physicsSystem->playerVehicle = player_vehicle;
 
 	//setup passenger system
 
-	PxTransform temp_pickup(0.f, 0.f, 2.0f);
-	PxTransform temp_dropoff(3.0f, 0.f, 2.0f);
+
+	auto dumpster_material = Engine::createComponent<Component::Material>(basic_shader_program);
+
+	dumpster_material->textures.push_back(
+		Engine::createComponent<Component::Texture>("Assets/Textures/Road_divider.png")
+	);
+	auto dumpster_mesh = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/dumpster_mesh.fbx"
+		);
+	
 	auto passenger = Engine::createComponent<Component::Passenger>();
-	passenger->setPickupTransform(temp_pickup);
-	passenger->setDropoffTransform(temp_dropoff);
-	physicsSystem->onPassengerCreated(passenger.get());
-	physicsSystem->playerVehicle = player_vehicle;
+	passenger->pickup_actor = Engine::createComponent<Scenery>(glm::vec3{ 0.f, 0.f, 2.0f },dumpster_mesh, dumpster_material);
+	passenger->dropoff_actor = Engine::createComponent<Scenery>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, dumpster_material);
+	
 
 	// ai factory method...
 	auto make_ai = [taxi_mesh_instance](glm::mat4 world_transform = glm::mat4{ 1 }) {
@@ -351,6 +361,7 @@ void TestWorld::load() {
 	// make a default camera
 	auto camera = Engine::createComponent<Component::Camera>();
 	camera->target = player_vehicle; // make camera follow player.
+	inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
 
 	// region initialize game-clocks
 	using namespace std::chrono;

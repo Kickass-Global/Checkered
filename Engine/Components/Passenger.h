@@ -10,6 +10,7 @@
 #include "ComponentId.h"
 #include "Component.h"
 #include "Engine.h"
+#include "scenery.hpp"
 
 using namespace physx;
 
@@ -19,9 +20,8 @@ namespace Component {
 
 	public:
 		
-
-		PxRigidStatic* pass_actor_pickup;
-		PxRigidStatic* pass_actor_dropoff;
+		std::shared_ptr<Scenery> pickup_actor;
+		std::shared_ptr<Scenery> dropoff_actor;
 
 		PxPhysics* pass_physics;
 		PxMaterial* pass_material;
