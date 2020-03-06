@@ -9,6 +9,7 @@
 
 #include <systeminterface.hpp>
 #include <ComponentId.h>
+#include <Vehicle.h>
 
 namespace Engine {
     class vehicleSystem : public Engine::SystemInterface {
