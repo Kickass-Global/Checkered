@@ -12,6 +12,8 @@
 #include <iostream>
 #include "soundSystem/sound.h"
 
+#include "soundSystem/SoundSystem.h"
+
 #include <windows.h>
 #include <mmsystem.h>
 #include <GLFW\glfw3.h>
@@ -26,6 +28,8 @@ namespace Horn {
     public:
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
+        
+
 
         Component::ComponentId onKeyPressHandler;
         Component::ComponentId onKeyDownHandler;
@@ -37,6 +41,6 @@ namespace Horn {
         void onKeyDown(const Component::EventArgs<int>& args);
         void onKeyUp(const Component::EventArgs<int>& args);
         void onKeyPress(const Component::EventArgs<int>& args);
-        void sound();
+       // void sound();
     };
 }
