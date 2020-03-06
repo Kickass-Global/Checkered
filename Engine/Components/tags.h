@@ -12,16 +12,6 @@
 
 namespace Component {
 
-    namespace {
-        const char dirty[] = "Dirty";
-        const char visible[] = "Visible";
-    }
-
-    class Dirty : public ComponentTag<dirty> {
-    };
-
-    class Visible : public ComponentTag<visible> {
-    };
 }
 
 #endif //ENGINE_TAGS_H
