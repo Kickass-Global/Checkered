@@ -115,7 +115,6 @@ int main() {
 	building_instances.add_instance_at({ -20,0,-16 }, building_mesh, building_material);
 
 
-
 	// setup a HUD element...
 
 	auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
