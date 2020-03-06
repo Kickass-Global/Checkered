@@ -23,13 +23,13 @@ namespace Rendering {
 
             // look for billboard components and notify when they have been modified
 
-            for (auto &&billboard : Component::Index::entitiesOf<Component::Billboard>()) {
+            /*for (auto &&billboard : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
                 auto billboard_was_modified = billboard.hasTag<Component::Dirty>(true);
                 if (billboard_was_modified) {
                     Engine::log<module>("Billboard was modified ", billboard);
                     onBillboardChanged(billboard);
                 }
-            }
+            }*/
         }
 
     };

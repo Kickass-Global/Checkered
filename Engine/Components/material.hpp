@@ -8,29 +8,36 @@
 #define ENGINE_MATERIAL_HPP
 
 #include <vector>
+#include <memory>
+
 #include "Component.h"
 #include "glad/glad.h"
 #include "texture.hpp"
 
+namespace Rendering {
+	class Program;
+}
+
+using Rendering::Program;
+
 namespace Component {
 
-    class Material : public Component::ComponentBase<Component::ClassId::Material> {
+    class Material : public ComponentBase {
     public:
-        Component::ComponentId shader;
-        std::vector<Component::ComponentId> textures;
+        std::shared_ptr<Program> shader;
+        std::vector<std::shared_ptr<Texture>> textures;
         // maybe some uniforms down here, you know, whatever feels right...
 
-		Material(const ComponentId shader_id) : shader(shader_id), textures() {}
+		Material(std::shared_ptr<Program> shader) : shader(shader), textures() {}
 
-        void bind() {
+        virtual void bind() {
             int index = 0;
-            for (auto &&texture : textures) {
-                glActiveTexture(GL_TEXTURE0 + index++);
-                glBindTexture(GL_TEXTURE_2D, texture.data<Texture>()->m_texture_id);
+            for (auto &texture : textures) {
+                glActiveTexture(GL_TEXTURE1 + index++);
+                glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
             }
         }
     };
-
 }
 
 #endif //ENGINE_MATERIAL_HPP

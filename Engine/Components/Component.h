@@ -12,7 +12,6 @@
 #include "ComponentId.tpp.h"
 #include "EventDelegate.h"
 #include "EventHandler.h"
-#include "Index.h"
 
 namespace Component {
     namespace {

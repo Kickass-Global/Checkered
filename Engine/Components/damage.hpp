@@ -9,13 +9,14 @@
 
 #include <vector>
 #include "ComponentBase.h"
+#include "Mesh.h"
 
 namespace Component {
 
 /**
  * This component communicates damage between entities
  */
-    class Damage : public ComponentBase<ClassId::Damage> {
+    class Damage : public ComponentBase {
     public:
         int damage_amount;
     };
@@ -24,19 +25,20 @@ namespace Component {
  * This component controls how entities change in response to damage and
  * other effects.
  */
-    class Model : public ComponentBase<ClassId::Model> {
+    class Model : public ComponentBase {
 
     public:
         struct Variation {
             int damage_threshold;
-            ComponentId mesh = ComponentId(ClassId::MeshInstance);
+			std::shared_ptr<Component::MeshInstance> mesh;
         };
 
         struct Part {
             std::vector<Variation> variations = {};
             int active_variation;
         };
-
+		bool is_outdated = false;
+		glm::mat4 transform;
         int current_damage;
         int max_damage;
         std::vector<Part> parts;

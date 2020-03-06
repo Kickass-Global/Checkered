@@ -11,15 +11,26 @@
 #include <glm/detail/type_mat4x4.hpp>
 #include "ComponentId.h"
 #include "ComponentBase.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace Component {
 
-    class WorldTransform : public Component::ComponentBase<Component::ClassId::Transform> {
-    public:
-        glm::mat4 world_matrix{1};
-        WorldTransform() : world_matrix(1) {}
-        explicit WorldTransform(glm::mat4 T) : world_matrix(T) {}
-    };
+	class WorldTransform : public ComponentBase {
+	public:
+		glm::vec3 scale;
+		glm::quat rotation;
+		glm::vec3 position;
+
+		glm::mat4 world_matrix{ 1 };
+
+		WorldTransform() : world_matrix(1) {}
+
+		explicit WorldTransform(glm::mat4 T) : world_matrix(T) {
+			glm::vec4 perspective;
+			glm::vec3 skew;
+			glm::decompose(T, scale, rotation, position, skew, perspective);
+		}
+	};
 
 }
 

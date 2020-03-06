@@ -22,6 +22,7 @@
 #include "vehicle/PxVehicleUtil.h"
 #include "../systeminterface.hpp"
 #include "EventDelegate.h"
+#include "PhysicsActor.h"
 #include <Vehicle.h>
 #include "FilterShader.h"
 #include "SimulationCallback.h"
@@ -33,9 +34,9 @@ using namespace physx;
 
 
 namespace Physics {
-    const char module[] = "Physics";
+	const char module[] = "Physics";
 
-    class PhysicsSystem : public Engine::SystemInterface {
+	class PhysicsSystem : public Engine::SystemInterface {
 
     public:
         PxPhysics* cPhysics = NULL;
@@ -46,17 +47,20 @@ namespace Physics {
 
 
         void initialize() override;
-        void update(Engine::deltaTime /*elapsed*/) override;
+
+		void update(Engine::deltaTime /*elapsed*/) override;
 
 
-        Component::Vehicle* playerVehicle = nullptr;
+		std::shared_ptr<Component::Vehicle> playerVehicle;
 
-        Component::ComponentId onVehicleCreatedHandler;
-        Component::ComponentId onKeyPressHandler;
-        Component::ComponentId onKeyDownHandler;
-        Component::ComponentId onKeyUpHandler;
+		std::shared_ptr<EventHandler<Vehicle*>> onVehicleCreatedHandler;
+		std::shared_ptr<EventHandler<PhysicsActor*>> onActorCreatedHandler;
+		std::shared_ptr<EventHandler<int>> onKeyPressHandler;
+		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
+		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
 
-        void link(Component::ComponentId sceneComponent, physx::PxRigidDynamic *actor);
+		void link(Vehicle* sceneComponent, physx::PxRigidDynamic *actor);
+       
         void onPassengerCreated(Component::Passenger *pass);
 
 
@@ -64,34 +68,40 @@ namespace Physics {
         void createFoundation();
         void createPhysicsCallbacks();
         void createPhysicsObject();
-        void createPVD();
-        void createCooking();
-        void createScene();
-        void createGround();
-        void initVehicleSupport();
-        void createDrivablePlayerVehicle();
-        void stepPhysics(Engine::deltaTime);
 
-        
+		void createPVD();
 
-        void onKeyDown(const Component::EventArgs<int> &args);
-        void onKeyUp(const Component::EventArgs<int> &args);
-        void onKeyPress(const Component::EventArgs<int> &args);
-        PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+		void createCooking();
+
+		void createScene();
+
+		void createGround();
+
+		void initVehicleSupport();
+
+		void createDrivablePlayerVehicle();
+
+		void stepPhysics(Engine::deltaTime);
+
+		void onKeyDown(const EventArgs<int> &args);
+
+		void onKeyUp(const EventArgs<int> &args);
+
+		void onKeyPress(const EventArgs<int> &args);
+
+		PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+
+		void onVehicleCreated(const EventArgs<Vehicle*> &args);
         Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
-        void onVehicleCreated(const Component::EventArgs<Component::ComponentId> &args);
-
-
-        
-
-    };
+		void onActorCreated(const EventArgs<Component::PhysicsActor*>& args);
+	};
 
 
 
 }
 
 namespace physx {
-    std::ostream &operator<<(std::ostream &out, const PxTransform &transform);
+	std::ostream &operator<<(std::ostream &out, const PxTransform &transform);
 }
 
 #endif //ENGINE_PHYSICSSYSTEM_H

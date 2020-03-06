@@ -12,7 +12,10 @@
 namespace Component {
     class SceneComponentSystem : public Engine::SystemInterface {
 
+
     public:
+		EventDelegate<PhysicsActor*> onActorCreated{ "onActorCreated" };
+
         void update(Engine::deltaTime /*elapsed*/) override;
         void initialize() override;
 
