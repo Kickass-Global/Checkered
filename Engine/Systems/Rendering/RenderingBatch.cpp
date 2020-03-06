@@ -21,6 +21,8 @@ namespace Rendering {
                                                           detail[2].count, detail[1].offset, detail[2].offset / 64
             );
 
+			glBindVertexArray(0);
+
         }
     }
 
@@ -36,11 +38,12 @@ namespace Rendering {
     )
         : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer), instanceBuffer(instanceBuffer) {
 
+		Engine::log<module>("Creating batch ", arrayBuffer->id(), " ", elementBuffer->id(), " ", instanceBuffer->id());
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
-        glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
+        glBindBuffer(elementBuffer->type(), elementBuffer->id());
 
         glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
 
@@ -100,6 +103,7 @@ namespace Rendering {
     BatchBuffer::BatchBuffer(int bufferMaxSize, int stride, int type)
         : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
 
+		
         glGenBuffers(1, &m_id);
         glBindBuffer(m_type, m_id);
         glBufferData(m_type, m_size, nullptr, GL_DYNAMIC_DRAW);
@@ -109,6 +113,10 @@ namespace Rendering {
     GLuint BatchBuffer::id() {
         return m_id;
     }
+
+	GLuint BatchBuffer::type() {
+		return m_type;
+	}
 
     size_t BatchBuffer::stride() {
         return m_stride;
