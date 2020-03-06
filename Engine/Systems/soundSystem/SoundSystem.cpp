@@ -3,7 +3,7 @@
 //
 
 #include "SoundSystem.h"
-
+#include "Sound.h"
 
 void Engine::SoundSystem::initialize() {
    
@@ -11,7 +11,17 @@ void Engine::SoundSystem::initialize() {
 
 }
 
-void Engine::SoundSystem::update(Engine::deltaTime) {}
+void Engine::SoundSystem::update(Engine::deltaTime) {
+
+    auto sounds = Engine::getStore().getRoot().getComponentsOfType<Component::Sound>();
+    for (auto sound : sounds)
+    {
+        Engine::log<module, Engine::high>("Playing sound ", sound->name);
+        playSound();
+        Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        
+    }
+}
 
 
 
@@ -213,7 +223,7 @@ int Engine::SoundSystem::playSound()
         std::int32_t 	sampleRate;
         std::uint8_t 	bitsPerSample;
         ALsizei			dataSize;
-        char* rawSoundData = load_wav("carHorn.wav", channels, sampleRate, bitsPerSample, dataSize);
+        char* rawSoundData = load_wav("Assets/Sounds/carHorn.wav", channels, sampleRate, bitsPerSample, dataSize);
         if (rawSoundData == nullptr || dataSize == 0)
         {
             std::cerr << "ERROR: Could not load wav" << std::endl;
