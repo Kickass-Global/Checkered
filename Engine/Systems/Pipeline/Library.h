@@ -59,6 +59,17 @@ namespace Pipeline {
 		}
 
 		template<>
+		static std::shared_ptr<MeshCollection> getAsset<MeshCollection>(const std::string& name) {
+			auto exists = assets.count(name) > 0;
+			if (!exists) {
+				auto component = Pipeline::MeshLoader::load_all(name);
+				emplace(name, component);
+				return component;
+			}
+			return std::static_pointer_cast<MeshCollection>(assets[name]);
+		}
+
+		template<>
 		static std::shared_ptr<Program> getAsset<Program>(const std::string& name) {
 			auto exists = assets.count(name) > 0;
 			if (!exists) {
