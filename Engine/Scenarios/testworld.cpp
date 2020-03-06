@@ -81,14 +81,17 @@ void TestWorld::load() {
 
 	// make a material component
 	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
-	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/white.png"));
+	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/20922545.jpg"));
 	ground_material->shader = Pipeline::Library::getAsset<Program>(
 		"Assets/Programs/basic.json"
 		);
 
 	// load the mesh component
 	auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/checkeredMap.fbx");
-	drivable_instances.add_instance_at({ 0,-1,0 }, plane_mesh, ground_material);
+	drivable_instances.add_instance_at(
+		glm::rotate(glm::radians(-90.0f), glm::vec3{ 1,0,0 }) *glm::translate(glm::vec3{ 0,-1,0 }),
+		plane_mesh, ground_material, plane_mesh
+	);
 
 
 	// create some buildings
@@ -120,10 +123,10 @@ void TestWorld::load() {
 		);
 
 	Instance<Scenery> building_instances;
-	building_instances.add_instance_at({ 43,0,-10 }, building_mesh1, building_material1);
-	building_instances.add_instance_at({ 10,0,-23 }, building_mesh2, building_material2);
-	building_instances.add_instance_at({ -20,0,-16 }, building_mesh3, building_material3);
-	building_instances.add_instance_at({ 0,0,0 }, building_mesh3, building_material3);
+	building_instances.add_instance_at(glm::vec3{ 43,0,-10 }, building_mesh1, building_material1);
+	building_instances.add_instance_at(glm::vec3{ 10,0,-23 }, building_mesh2, building_material2);
+	building_instances.add_instance_at(glm::vec3{ -20,0,-16 }, building_mesh3, building_material3);
+	building_instances.add_instance_at(glm::vec3{ 0,0,0 }, building_mesh3, building_material3);
 
 
 	// setup a HUD element...
@@ -278,7 +281,7 @@ void TestWorld::load() {
 				}
 
 			}
-			std::cout << "following path\n";
+			Engine::log("following path");
 		}
 		else {
 			auto player_direction = perpdot(glm::normalize(player_location - ai_location), ai_direction);
@@ -313,7 +316,7 @@ void TestWorld::load() {
 
 			}
 
-			std::cout << "following player\n";
+			Engine::log("following player");
 		}
 
 
