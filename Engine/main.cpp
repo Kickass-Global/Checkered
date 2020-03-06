@@ -37,6 +37,17 @@ int main() {
 	auto running = true; 
 
 	TestWorld::load();
+	
+	auto cb = [](const Component::EventArgs<std::string>& args) {
+		auto filename = std::get<0>(args.values);
+		Engine::log(filename);
+	};
+
+	std::shared_ptr<Component::EventHandler<std::string>> tweakHandler = Engine::EventSystem::createHandler<std::string>(std::function(cb));
+
+	auto debug = Engine::addSystem<Debug::LiveReloadSystem>();
+	debug->watch("tweak.txt");
+	debug->onAssetModified += tweakHandler;
 
 	// region initialize game-clocks
 	using namespace std::chrono;
