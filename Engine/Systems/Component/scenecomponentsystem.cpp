@@ -15,7 +15,7 @@ namespace {
 	const char module[] = "ComponentSystem";
 }
 
-void process_scene_component(std::shared_ptr<SceneComponent> node) {
+void process_scene_component(SceneComponent* node) {
 	auto T = node->getWorldTransform();
 	// foreach thing attached to this scene component, attach this transform to it...
 	for (auto child : node->getChildren().getComponentsOfType<PaintedMesh>())
@@ -40,7 +40,7 @@ void Component::SceneComponentSystem::update(Engine::deltaTime) {
 	{
 		// if actor is not initialized
 		if (!actor->actor)
-			onActorCreated(actor.get());
+			onActorCreated(actor);
 		actor->update();
 	}
 
