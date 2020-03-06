@@ -2,10 +2,7 @@
 // Created by root on 11/1/20.
 //
 
-#include <material.hpp>
-#include "RenderingBatch.h"
 #include "RenderingSystem.h"
-#include "../../Components/ComponentId.h"
 
 namespace Rendering {
 
@@ -15,14 +12,16 @@ namespace Rendering {
         for (auto[key, detail] : details) {
 
             Engine::log<module, Engine::low>("Drawing #", key.first, "#", key.second);
-            // todo pass in the stride somehow
-            auto &&meta = key.first.data<Mesh>();
+
             if (key.second) {
-                key.second.data<Material>()->bind();
+                key.second->bind();
             }
+
             glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0,
                                                           detail[2].count, detail[1].offset, detail[2].offset / 64
             );
+
+			glBindVertexArray(0);
 
         }
     }
@@ -30,7 +29,6 @@ namespace Rendering {
     void GeometryBatch::bind(Rendering::RenderingSystem &renderingSystem) {
 
         Engine::log<module, Engine::low>("Binding shader#", shader);
-        shader.data<Program>()->bind();
         glBindVertexArray(vao);
     }
 
@@ -40,11 +38,12 @@ namespace Rendering {
     )
         : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer), instanceBuffer(instanceBuffer) {
 
+		Engine::log<module>("Creating batch ", arrayBuffer->id(), " ", elementBuffer->id(), " ", instanceBuffer->id());
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
-        glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
+        glBindBuffer(elementBuffer->type(), elementBuffer->id());
 
         glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
 
@@ -84,28 +83,27 @@ namespace Rendering {
         Engine::log<module>("Creating new batch#", vao);
     }
 
-    void GeometryBatch::push_back(const Component::Mesh &mesh, const Component::Material &material) {
+    void GeometryBatch::push_back(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) {
+		
+        const auto key = std::make_pair(mesh, material);
 
-        Engine::log<module>("Pushing mesh#", mesh.id(), " into batch#", vao);
-
-        const auto key = std::make_pair(mesh.id(), material.id());
-
-        details[key][ArrayBuffer] = arrayBuffer->push_back(mesh.vertices);
-        details[key][ElementBuffer] = elementBuffer->push_back(mesh.indices);
+        details[key][ArrayBuffer] = arrayBuffer->push_back(mesh->vertices);
+        details[key][ElementBuffer] = elementBuffer->push_back(mesh->indices);
         details[key][InstanceBuffer] = instanceBuffer->push_back(std::vector<glm::mat4>{glm::mat4(1)});
     }
 
-    bool GeometryBatch::contains(Component::ComponentId mesh_id, Component::ComponentId material_id) const {
-        return details.count(std::make_pair(mesh_id, material_id)) > 0;
+    bool GeometryBatch::contains(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) const {
+        return details.count(std::make_pair(mesh, material)) > 0;
     }
 
-    void GeometryBatch::remove(Component::ComponentId mesh_id, Component::ComponentId material_id) {
-        details.erase(std::make_pair(mesh_id, material_id));
+    void GeometryBatch::remove(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) {
+        details.erase(std::make_pair(mesh, material));
     }
 
     BatchBuffer::BatchBuffer(int bufferMaxSize, int stride, int type)
         : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
 
+		
         glGenBuffers(1, &m_id);
         glBindBuffer(m_type, m_id);
         glBufferData(m_type, m_size, nullptr, GL_DYNAMIC_DRAW);
@@ -115,6 +113,10 @@ namespace Rendering {
     GLuint BatchBuffer::id() {
         return m_id;
     }
+
+	GLuint BatchBuffer::type() {
+		return m_type;
+	}
 
     size_t BatchBuffer::stride() {
         return m_stride;

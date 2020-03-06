@@ -11,6 +11,8 @@
 #include "SceneComponent.h"
 #include "Engine.h"
 #include "WorldTransform.h"
+#include "Pipeline/Library.h"
+#include <Vehicle.h>
 
 Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
@@ -18,98 +20,103 @@ namespace {
 	const char module[] = "RenderingSystem";
 }
 
+
+
+std::shared_ptr<Program> depth_shader;
+const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
+unsigned int depthMapFBO;
+unsigned int depthMap;
+
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
-	std::stringstream ss;
-	ss << "frametime: " << time << "ms" << std::endl;
-	auto title = ss.str();
-	glfwSetWindowTitle(window, title.c_str());
+	std::map<std::pair<Mesh*, Material*>, MeshInstance*> instancing_map;
 
-	// Find and update any GameObjects with meshes that should be drawn...
-	auto meshes = Component::Index::entitiesOf<Component::MeshInstance>();
-	for (const Component::ComponentId &instance : meshes) {
-
-		auto meta = instance.data<Component::MeshInstance>();
-
-		auto is_dirty = instance.hasTag<Component::Dirty>(true);
-		auto is_visible = true || instance.hasTag<Component::Visible>(true);
-
-
-		auto transforms = instance.childComponentsOfClass(Component::ClassId::Transform);
-		auto is_instanced = !transforms.empty();
-
-		if (is_visible && is_dirty) {
-
-			// buffer the objects meshes (assuming that all meshes should be buffered and drawn).
-			Engine::log<module, Engine::high>("Updating batch data of#", instance);
-			buffer(*meta->mesh.data<Mesh>(), *meta->material.data<Material>());
-
-		}
-
-		if (is_instanced) {
-			Engine::log<module, Engine::low>("Updating instances(", transforms.size(), ") of component#", instance);
-			auto classId = instance.classId();
-			std::vector<glm::mat4> transform_data;
-
-			for (auto &&transform : transforms) {
-				if (classId == Component::ClassId::MeshInstance) {
-					Engine::log<module, Engine::low>("Adding instance transform#", transform);
-					transform_data.push_back(transform.data<Component::WorldTransform>()->world_matrix);
-				}
+	for (auto mesh : Engine::getStore().getRoot().getComponentsOfType<PaintedMesh>())
+	{
+		auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
+		if (!Ts.empty()) {
+			auto key = std::make_pair(mesh->mesh.get(), mesh->material.get());
+			auto it = instancing_map.find(key);
+			if (it == instancing_map.end()) {
+				auto instance = Engine::createComponent<MeshInstance>(mesh->mesh, mesh->material);
+				auto& [it2, _] = instancing_map.emplace(key, instance.get());
+				it2->second->instances.push_back(Ts[0]->world_matrix);
 			}
-
-			Engine::assertLog(!transform_data.empty(), "Checking that instance data is not empty.");
-
-			updateInstanceData(
-				meta->mesh,
-				meta->material,
-				static_cast<int>(sizeof(glm::mat4) * transform_data.size()),
-				(float *)transform_data.data(),
-				sizeof(glm::mat4)
-			);
-		}
-
-		for (auto &transform : transforms) {
-			instance.destroyComponent(transform);
+			else {
+				it->second->instances.push_back(Ts[0]->world_matrix);
+			}
 		}
 	}
+
+	auto is_buffered = [this](auto instance_mesh) {
+		for (auto batch : this->batches)
+		{
+			if (batch->contains(instance_mesh->mesh, instance_mesh->material)) return true;
+		}
+		return false;
+	};
+
+
+	// Find and update any GameObjects with meshes that should be drawn...
+	auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
+
+	for (const auto& instance : meshes) {
+		if (!is_buffered(instance))
+		{
+			instance->is_buffered = true;
+			Engine::log<module, Engine::high>("Updating batch data of#", instance->getId());
+			buffer(instance->mesh, instance->material);
+		}
+		if (instance->instances.size() > 0)
+		{
+			Engine::log<module, Engine::low>("Updating instances(", instance->instances.size(), ") of component#", instance);
+
+			updateInstanceData(
+				instance->mesh,
+				instance->material,
+				static_cast<int>(sizeof(glm::mat4) * instance->instances.size()),
+				(float*)instance->instances.data(),
+				sizeof(glm::mat4)
+			);
+
+		}
+		instance->instances.clear();
+	}
+
 
 	glClearColor(0, 0, 0.5f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (auto &&batch : batches) {
-		for (auto &&camera : Component::Index::entitiesOf<Component::Camera>()) {
-			auto camera_is_dirty = camera.hasTag<Component::Dirty>(false);
+	for (auto&& batch : batches) {
+		for (auto& camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
 
-			if (camera_is_dirty) {
-				camera.addTag<Component::Dirty>(); // forward this state to the next batch...
+			if (camera->is_dirty) {
 
-				auto data = camera.data<Component::Camera>();
-				auto view_matrix = data->view;
-				auto world_matrix = glm::translate(data->position);
+				auto view_matrix = camera->view;
+				auto world_matrix = glm::translate(camera->position);
 
 				auto perspective_matrix = glm::perspective(
 					45.0f,
-					static_cast<float>(data->viewport.width) /
-					data->viewport.height,
+					static_cast<float>(camera->viewport.width) /
+					camera->viewport.height,
 					0.1f,
 					1000.0f
 				);
 
-				glViewport(0, 0, data->viewport.width, data->viewport.height);
+				glViewport(0, 0, camera->viewport.width, camera->viewport.height);
 
-				batch->shader.data<Program>()->bind();
+				batch->shader->bind();
 
 				glUniformMatrix4fv(
 					glGetUniformLocation(
-						batch->shader.data<Program>()->programId(),
+						batch->shader->programId(),
 						"M_View"
 					),
 					1, false, glm::value_ptr(view_matrix));
 
 				glUniformMatrix4fv(
 					glGetUniformLocation(
-						batch->shader.data<Program>()->programId(),
+						batch->shader->programId(),
 						"M_Perspective"
 					),
 					1, false, glm::value_ptr(perspective_matrix));
@@ -119,45 +126,124 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		}
 	}
 
-	// this code handles drawing billboards into the world (hud, sprites, etc).
-	for (auto &camera : Component::Index::entitiesOf<Component::Camera>()) {
-		for (const auto &sprite : Component::Index::entitiesOf<Billboard>()) {
+	for (auto instance : instancing_map)
+	{
+		Engine::getStore().getRoot().eraseComponent<MeshInstance>(instance.second->id);
+	}
 
-			const auto &camera_view_matrix = camera.data<Camera>()->view;
-			const auto &viewport = camera.data<Camera>()->viewport;
-			const auto &meta = sprite.data<Billboard>();
+	// this code handles drawing billboards into the world (hud, sprites, etc).
+	for (auto& camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+		for (const auto& sprite : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
+
+			const auto& camera_view_matrix = camera->view;
+			const auto& viewport = camera->viewport;
 
 			auto offset = glm::translate(
 				glm::vec3(
-					meta->plot.x / viewport.width - meta->anchor.x,
-					meta->plot.y / viewport.height - meta->anchor.y,
+					sprite->plot.x / viewport.width - sprite->anchor.x,
+					sprite->plot.y / viewport.height - sprite->anchor.y,
 					0.0f
 				)
 			);
 
-			auto anchor = glm::translate(glm::vec3(meta->anchor.x, meta->anchor.y, 0.0f));
+			auto anchor = glm::translate(glm::vec3(sprite->anchor.x, sprite->anchor.y, 0.0f));
 
 			auto scale = glm::scale(
 				glm::vec3(
-					meta->plot.width / viewport.width,
-					meta->plot.height / viewport.height,
-					meta->plot.height / viewport.height // todo, hack
+					sprite->plot.width / viewport.width,
+					sprite->plot.height / viewport.height,
+					sprite->plot.height / viewport.height // todo, hack
 				)
 			);
 
-			meta->mesh_instance.attachTemporaryComponent(
-				Engine::createComponent<WorldTransform>(offset * scale * anchor)->id(), 1
-			);
+
+			sprite->mesh_instance->instances.push_back(offset * scale * anchor);
 		}
 
 		break; // only use the first camera...
 	}
 
-	for (auto &&batch : batches) {
-		if (!batch->details.empty()) {
-			// bind programs, textures, and uniforms needed to render the batch
-			batch->bind(*this);
-			batch->draw(*this);
+	// perform "passes"
+
+
+	for (auto& camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// 1. first render to depth map
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		float near_plane = -5.0f, far_plane = 100.0f;
+		glm::mat4 lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+		// get player location....
+
+
+		glCullFace(GL_FRONT);
+		auto player = dynamic_cast<Component::Vehicle*>(camera->target.get());
+		glm::mat4 lightView = glm::lookAt(player->position + glm::vec3(-20.0f, 41.0f, -10.0f),
+			player->position,
+			glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 lightViewProjection = lightProjection * lightView;
+
+		for (auto&& batch : batches) {
+			if (!batch->details.empty()) {
+
+				// bind programs, textures, and uniforms needed to render the batch
+				depth_shader->bind();
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(
+						depth_shader->programId(),
+						"M_View"
+					),
+					1, false, glm::value_ptr(lightView));
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(
+						depth_shader->programId(),
+						"M_Perspective"
+					),
+					1, false, glm::value_ptr(lightProjection));
+
+				batch->bind(*this);
+				batch->draw(*this);
+			}
+		}
+
+		glCullFace(GL_BACK);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		// 2. then render scene as normal with shadow mapping (using depth map)
+		glViewport(0, 0, camera->viewport.width, camera->viewport.height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		for (auto&& batch : batches) {
+			if (!batch->details.empty()) {
+
+
+				glUniformMatrix4fv(
+					glGetUniformLocation(
+						batch->shader->programId(),
+						"M_LightSpace"
+					),
+					1, false, glm::value_ptr(lightViewProjection));
+
+				// bind programs, textures, and uniforms needed to render the batch
+				batch->shader->bind();
+				batch->bind(*this);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, depthMap);
+				GLint shadow_map_location = glGetUniformLocation(batch->shader->programId(), "tShadow");
+				GLint diffuse_map_locatino = glGetUniformLocation(batch->shader->programId(), "tDiffuse");
+				glUniform1i(shadow_map_location, 0); // Texture unit 0 is for base images.
+				glUniform1i(diffuse_map_locatino, 1); // Texture unit 2 is for normal maps.
+				batch->draw(*this);
+			}
 		}
 	}
 
@@ -171,57 +257,57 @@ Rendering::RenderingSystem::~RenderingSystem() {
 
 std::shared_ptr<Rendering::GeometryBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
-	const Component::Mesh& data, const Material& material
+	std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material
 ) {
 
 	auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
 		10000000,
-		sizeof(data.vertices[0]),
+		sizeof(mesh->vertices[0]),
 		GL_ARRAY_BUFFER
 		);
 
 	auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-        10000000,
-        sizeof(data.indices[0]),
-        GL_ELEMENT_ARRAY_BUFFER
-    );
+		10000000,
+		sizeof(mesh->indices[0]),
+		GL_ELEMENT_ARRAY_BUFFER
+		);
 
-    auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-        10000000,
-        sizeof(glm::mat4),
-        GL_ARRAY_BUFFER
-    );
+	auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
+		10000000,
+		sizeof(glm::mat4),
+		GL_ARRAY_BUFFER
+		);
 
-    auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer, instanceBuffer);
-    batch->shader = material.shader;
+	auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer, instanceBuffer);
+	batch->shader = material->shader;
 
 
-    return push_back(batch);
+	return push_back(batch);
 }
 
 std::shared_ptr<Rendering::GeometryBatch> Rendering::RenderingSystem::push_back(
-    const std::shared_ptr<Rendering::GeometryBatch> &batch
+	const std::shared_ptr<Rendering::GeometryBatch>& batch
 ) {
-    batches.push_back(batch);
-    return batches.back();
+	batches.push_back(batch);
+	return batches.back();
 }
 
-void Rendering::RenderingSystem::buffer(const Component::Mesh &mesh, const Component::Material & material) {
+void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) {
 
 	// if the data is already buffered we want to update the existing buffer data
-	auto id = mesh.id();
+
 	auto match = std::find_if(
-        batches.begin(), batches.end(),
-        [mesh_id = id, material_id = material.id()](const std::shared_ptr<GeometryBatch> &batch) {
-            return batch->contains(mesh_id, material_id);
-        }
-    );
+		batches.begin(), batches.end(),
+		[mesh, material](const std::shared_ptr<GeometryBatch>& batch) {
+			return batch->contains(mesh, material);
+		}
+	);
 
 	if (match != batches.end()) {
-        // mark/remove buffered data so its not used
-        Engine::log<module>("Removing #", mesh.id(), " from batch#", (*match)->vao);
-        (*match)->remove(id, material.id());
-    }
+		// mark/remove buffered data so its not used
+		Engine::log<module>("Removing #", mesh->id, " from batch#", (*match)->vao);
+		(*match)->remove(mesh, material);
+	}
 
 	// find a batch that can hold the data, or make one
 	auto batch = findSuitableBufferFor(mesh, material);
@@ -230,11 +316,11 @@ void Rendering::RenderingSystem::buffer(const Component::Mesh &mesh, const Compo
 	batch->push_back(mesh, material);
 }
 
-GLFWwindow *Rendering::RenderingSystem::getWindow() {
+GLFWwindow* Rendering::RenderingSystem::getWindow() {
 	return window;
 }
 
-void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow *, int width, int height) {
+void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow*, int width, int height) {
 	onWindowSizeChanged(width, height);
 }
 
@@ -250,27 +336,42 @@ void Rendering::RenderingSystem::initialize() {
 
 	Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "initialize GLAD");
 
+	depth_shader = Pipeline::Library::getAsset<Program>("Assets/Programs/depth.json");
+
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
 
+	glGenFramebuffers(1, &depthMapFBO);
+
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float color[4] = { 1.0,1.0,1.0,1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+
 }
 
-void Rendering::RenderingSystem::updateInstanceData(Component::ComponentId mesh_id, Component::ComponentId material_id, int size, float *data, int stride) {
+void Rendering::RenderingSystem::updateInstanceData(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material, int size, float* data, int stride) {
 
-	Engine::log<module, Engine::low>("Updating instance data of component#", mesh_id);
+	Engine::log<module, Engine::low>("Updating instance data of component#", mesh);
 
 	auto it = std::find_if(
 		batches.begin(), batches.end(),
-		[mesh_id, material_id](const auto batch)
-	{
-		return batch->contains(mesh_id, material_id);
-	}
+		[mesh, material](const auto batch)
+		{
+			return batch->contains(mesh, material);
+		}
 	);
 
 	Engine::assertLog<module>(it != batches.end(), "check for valid batch");
 
-	it->get()->update(mesh_id, material_id, 2, size, data, stride);
+	it->get()->update(mesh, material, 2, size, data, stride);
 }
 
 Rendering::Program::~Program() {
@@ -292,15 +393,15 @@ Rendering::Shader::~Shader() {
 	glDeleteShader(m_id);
 }
 
-Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
+Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string>& lines) {
 
 	m_id = glCreateShader(shader_type);
 	Engine::log<module>("Creating shader ", m_id);
 
-	std::vector<const GLchar *> cstrings;
+	std::vector<const GLchar*> cstrings;
 	std::vector<int> lengths;
 
-	for (auto &&line : lines) {
+	for (auto&& line : lines) {
 		cstrings.push_back(line.c_str());
 		lengths.push_back(line.size());
 	}

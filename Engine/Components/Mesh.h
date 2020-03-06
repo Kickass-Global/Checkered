@@ -20,33 +20,39 @@
 
 namespace Component {
 
-    class Vertex {
+    struct Vertex {
 
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec3 texcoord;
-    
+
     public:
         Vertex(aiVector3D position, aiVector3D normal, aiVector3D texcoord);
     };
 
-    class Mesh : public ComponentBase<ClassId::Mesh> {
+    class Mesh : public ComponentBase {
 
     public:
 
-        [[deprecated]]Component::ComponentId shader;
-		[[deprecated]]Component::ComponentId material;
         std::vector<Vertex> vertices;
         std::vector<int> indices;
 
     };
 
-	class MeshInstance : public ComponentBase<ClassId::MeshInstance> {
+	class PaintedMesh : public ComponentBase {
 	public:
-		ComponentId mesh;
-		ComponentId material;
-		MeshInstance(const Mesh &mesh, const Material& material) : mesh(mesh.id()), material(material.id()) {}
-		MeshInstance(const ComponentId mesh_id, const ComponentId material_id) : mesh(mesh_id), material(material_id) {}
+		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<Material> material;
+		PaintedMesh(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) : mesh(mesh), material(material) {}
+	};
+
+	class MeshInstance : public ComponentBase {
+	public:
+		bool is_buffered = false;
+		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<Material> material;
+		std::vector<glm::mat4> instances{};
+		MeshInstance(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) : mesh(mesh), material(material) {}
 	};
 
 }

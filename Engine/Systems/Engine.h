@@ -24,9 +24,9 @@
 #include "glm/gtx/transform.hpp"
 
 #include "ComponentId.h"
-#include "Index.h"
 #include "tags.h"
 #include "systeminterface.hpp"
+#include "EngineStore.h"
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -38,179 +38,172 @@
 using namespace Component; // import this into anything using the engine header
 
 namespace Component {
-    template<typename... Args>
-    class EventDelegate;
+	template<typename... Args>
+	class EventDelegate;
 
-    template<typename... As>
-    class EventArgs;
-
-    struct ComponentId;
-    enum class ClassId : unsigned int;
+	template<typename... As>
+	class EventArgs;
 }
+
 
 namespace Engine {
 
-    /**
-     * Used to keep track of which systems are currently running in the engine.
-     */
-    extern std::vector<std::unique_ptr<Engine::SystemInterface>> registeredSystems;
+	/**
+	 * Used to keep track of which systems are currently running in the engine.
+	 */
+	extern std::vector<std::unique_ptr<Engine::SystemInterface>> registeredSystems;
+	extern EngineStore store;
 
-    typedef float deltaTime;
+	typedef float deltaTime;
 
-    namespace {
-        const char module[] = "Engine";
-    }
+	namespace {
+		const char module[] = "Engine";
+	}
 
-    /**
-     * Returns collection of systems currently running in the engine.
-     */
-    const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
+	/**
+	 * Returns collection of systems currently running in the engine.
+	 */
+	const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
 
-    /**
-     * Creates a new system to the engine; systems need to be default constructable.
-     * @tparam T the type of system
-     * @return returns a reference to the new system.
-     */
-    template<typename T>
-    T *addSystem() {
-        registeredSystems.push_back(std::make_unique<T>());
-        registeredSystems.back()->initialize();
-        return static_cast<T *>(registeredSystems.back().get());
-    }
+	inline EngineStore& getStore() {
+		return store;
+	}
 
-    void sortSystems();
+	/**
+	 * Creates a new system to the engine; systems need to be default constructable.
+	 * @tparam T the type of system
+	 * @return returns a reference to the new system.
+	 */
+	template<typename T>
+	T *addSystem() {
+		registeredSystems.push_back(std::make_unique<T>());
+		registeredSystems.back()->initialize();
+		return static_cast<T *>(registeredSystems.back().get());
+	}
 
-    /**
-     * Users to keep track of 'human-readable' names for components; mostly for debugging purposes.
-     */
-    extern std::map<Component::ComponentId, std::string> identifier;
+	void sortSystems();
 
-    /**
-     * Gives a name to the component; useful for debugging purposes.
-     * @param componentId the component to name
-     * @param name the name of the component.
-     */
-    void nameComponent(const Component::ComponentId &componentId, std::string name);
+	/**
+	 * Users to keep track of 'human-readable' names for components; mostly for debugging purposes.
+	 */
+	extern std::map<Component::ComponentId, std::string> identifier;
 
-    /**
-     * Adds an existing component to the engine; the component ownership is transferred to the engine.
-     * @tparam T the type of the component
-     * @param data the component data
-     * @return returns a valid pointer to the component in the engine.
-     */
-    template<typename T>
-    T *addComponent(std::unique_ptr<T> data) {
-        static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
+	/**
+	 * Gives a name to the component; useful for debugging purposes.
+	 * @param componentId the component to name
+	 * @param name the name of the component.
+	 */
+	void nameComponent(const Component::ComponentId &componentId, std::string name);
 
-        auto id = data->id();
-        auto classId = data->classId();
+	/**
+	 * Adds an existing component to the engine; the component ownership is transferred to the engine.
+	 * @tparam T the type of the component
+	 * @param data the component data
+	 * @return returns a valid pointer to the component in the engine.
+	 */
+	template<typename T>
+	T *addComponent(std::unique_ptr<T> data) {
+		static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 
-        Component::Index::push_entity(classId, id, std::move(data));
+		auto id = data->id();
+		auto classId = data->classId();
 
-        id.addTag<Component::Dirty>();
+		Component::Index::push_entity(classId, id, std::move(data));
 
-        return id.data<T>();
-    }
+		id.addTag<Component::Dirty>();
 
-    /**
-     * Creates a new component and adds it to the engine.
-     * @tparam T the type of component to create.
-     * @tparam Args the types of arguments to pass to the constructor of the component.
-     * @param args the actual arguments to pass to the constructor of the component
-     * @return returns a pointer to the created component.
-     */
-
-    template<typename T, typename... Args>
-    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createComponent(const Args &... args) {
-
-        auto allocation = Component::Index::allocate<T>();
-        if (allocation) {
-            *allocation = T(args...); // call move assingment operator...
-            allocation->id().addTag<Component::Dirty>();
-            return allocation;
-        } else {
-
-            auto component = std::make_unique<T>(args...);
-            auto id = component->id();
-            auto classId = component->classId();
-
-            Component::Index::push_entity<T>(classId, id, std::move(component));
-            id.addTag<Component::Dirty>();
-            return id.data<T>();
-        }
-    }
-
-    template<typename T, typename... Args>
-    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createNamedComponent(std::string name, Args... args) {
-        auto result = createComponent<T>(args...);
-        Engine::nameComponent(result->id(), name);
-        return result;
-    }
-
-    template<typename T, typename... Args>
-    inline typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type
-    *createComponentWithTTL(int ttl, const Args &... args) {
-        return createComponent<T>(args...);
-    }
+		return id.data<T>();
+	}
 
 
-    struct Name {
-        std::string value;
+	/**
+	 * Creates a new component and adds it to the engine.
+	 * @tparam T the type of component to create.
+	 * @tparam Args the types of arguments to pass to the constructor of the component.
+	 * @param args the actual arguments to pass to the constructor of the component
+	 * @return returns a pointer to the created component.
+	 */
 
-        explicit Name(const char *module_name) : value(module_name) {}
-    };
+	template<typename T, typename... Args>
+	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
+		createComponent(Args &&... args) {
+		return store.getRoot().addComponent(store.create<T>(args...));
+	}
 
-    std::ostream &operator<<(std::ostream &out, Name name);
 
-    /**
-     * Asserts that given condition is successful and logs the given message.
-     * @tparam module name to tag log messages with.
-     * @param test the condition to test.
-     * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
-     */
-    template<char const *m = module, class ... Ts>
-    void assertLog(bool test, Ts...args) {
-        if (!test) {
+	template<typename T, typename... Args>
+	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
+		createNamedComponent(std::string name, Args... args) {
+		auto result = createComponent<T>(args...);
+		Engine::nameComponent(result->getId(), name);
+		return result;
+	}
 
-            std::ostringstream buffer;
+	template<typename T, typename... Args>
+	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
+		createComponentWithTTL(int ttl, const Args &... args) {
+		return createComponent<T>(args...);
+	}
 
-            buffer << Name(m);
-            (buffer << ... << args);
-            buffer << " [FAILURE]\n";
 
-            std::cerr << buffer.str() << std::flush;
-            OutputDebugString(buffer.str().c_str());
+	struct Name {
+		std::string value;
 
-            throw;
-        }
+		explicit Name(const char *module_name) : value(module_name) {}
+	};
 
-    }
+	std::ostream &operator<<(std::ostream &out, const glm::vec3& vector);
+	std::ostream& operator<<(std::ostream&  out, const glm::quat& quat);
+	std::ostream &operator<<(std::ostream &out, Name name);
 
-    enum Importance {
-        low,
-        medium,
-        high
-    };
+	/**
+	 * Asserts that given condition is successful and logs the given message.
+	 * @tparam module name to tag log messages with.
+	 * @param test the condition to test.
+	 * @param msg the message to log. (Should be in the form <msg> <SUCCEEDED>)
+	 */
+	template<char const *m = module, class ... Ts>
+	void assertLog(bool test, Ts...args) {
+		if (!test) {
 
-    constexpr Importance loggingLevel = medium;
+			std::ostringstream buffer;
 
-    template<char const *m = module, Importance importance = medium, class ... Ts>
-    void log(Ts...args) {
-        if (importance >= loggingLevel) {
+			buffer << Name(m);
+			(buffer << ... << args);
+			buffer << " [FAILURE]\n";
 
-            std::ostringstream buffer;
+			std::cerr << buffer.str() << std::flush;
+			OutputDebugString(buffer.str().c_str());
 
-            buffer << Name(m);
-            (buffer << ... << args);
-            buffer << "\n";
+			throw;
+		}
 
-            std::cout << buffer.str() << std::flush;
-            OutputDebugString(buffer.str().c_str());
+	}
 
-        }
-    }
+	enum Importance {
+		low,
+		medium,
+		high
+	};
+
+	constexpr Importance loggingLevel = medium;
+
+
+	template<char const *m = module, Importance importance = medium, class ... Ts>
+	void log(Ts...args) {
+		if (importance >= loggingLevel) {
+
+			std::ostringstream buffer;
+
+			buffer << Name(m);
+			(buffer << ... << args);
+			buffer << "\n";
+
+			std::cout << buffer.str() << std::flush;
+			OutputDebugString(buffer.str().c_str());
+
+		}
+	}
 
 }
 
