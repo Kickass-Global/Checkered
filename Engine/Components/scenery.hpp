@@ -28,7 +28,7 @@ namespace Component {
 	public:
 
 		std::shared_ptr<PhysicsActor> actor;
-		std::shared_ptr<MeshInstance> mesh;
+		std::shared_ptr<PaintedMesh> mesh;
 
 		Scenery(glm::vec3 position, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) :
 			mesh(Engine::createComponent<PaintedMesh>(mesh, material)),

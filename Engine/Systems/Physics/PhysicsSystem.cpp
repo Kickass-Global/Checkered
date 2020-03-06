@@ -32,21 +32,21 @@ namespace {
 	const char module[] = "Physics";
 }
 
-std::vector<PxVehicleDrive4W *> vehicles;
+std::vector<PxVehicleDrive4W*> vehicles;
 
-PxVehicleDrivableSurfaceToTireFrictionPairs *cFrictionPairs = NULL;
+PxVehicleDrivableSurfaceToTireFrictionPairs* cFrictionPairs = NULL;
 
-PxFoundation *cFoundation = NULL;
+PxFoundation* cFoundation = NULL;
 
-PxPvd *cPVD = NULL;
-PxPvdTransport *cTransport = NULL;
-PxCooking *cCooking = NULL;
-PxCpuDispatcher *cDispatcher = NULL;
-PxMaterial *cMaterial = NULL;
-PxRigidStatic *cGroundPlane = NULL;
-PxVehicleDrive4W *cVehicle4w = NULL;
-VehicleSceneQueryData *cVehicleSceneQueryData = NULL;
-PxBatchQuery *cBatchQuery = NULL;
+PxPvd* cPVD = NULL;
+PxPvdTransport* cTransport = NULL;
+PxCooking* cCooking = NULL;
+PxCpuDispatcher* cDispatcher = NULL;
+PxMaterial* cMaterial = NULL;
+PxRigidStatic* cGroundPlane = NULL;
+PxVehicleDrive4W* cVehicle4w = NULL;
+VehicleSceneQueryData* cVehicleSceneQueryData = NULL;
+PxBatchQuery* cBatchQuery = NULL;
 
 std::set<int> keys; // we store key state between frames here...
 
@@ -55,15 +55,15 @@ bool cIsVehicleInAir = true;
 static PxDefaultAllocator cDefaultAllocator;
 static PxDefaultErrorCallback cErrorCallback;
 
-std::map<physx::PxRigidDynamic *, std::shared_ptr<ComponentBase>> trackedComponents;
+std::map<physx::PxRigidDynamic*, std::shared_ptr<ComponentBase>> trackedComponents;
 
 struct FliterGroup {
-    enum Enum
-    {
-        ePlayerVehicle = (1 << 0),
-        eEnemyVehicle = (1 << 1),
-        ePasenger = (1 << 2)
-    };
+	enum Enum
+	{
+		ePlayerVehicle = (1 << 0),
+		eEnemyVehicle = (1 << 1),
+		ePasenger = (1 << 2)
+	};
 };
 
 extern VehicleDesc initVehicleDesc();
@@ -134,15 +134,15 @@ void Physics::PhysicsSystem::initialize() {
 	onVehicleCreatedHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onVehicleCreated);
 	onActorCreatedHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onActorCreated);
 
-    createFoundation();
-    createPVD();
-    createPhysicsObject();
-    createCooking();
-    createScene();
-    createGround();
-    initVehicleSupport();
-    createDrivablePlayerVehicle();
-    createPhysicsCallbacks();
+	createFoundation();
+	createPVD();
+	createPhysicsObject();
+	createCooking();
+	createScene();
+	createGround();
+	initVehicleSupport();
+	createDrivablePlayerVehicle();
+	createPhysicsCallbacks();
 
 	std::cout << "Physics System Successfully Initalized" << std::endl;
 
@@ -150,7 +150,7 @@ void Physics::PhysicsSystem::initialize() {
 
 void Physics::PhysicsSystem::createPhysicsCallbacks() {
 
-    
+
 
 }
 
@@ -232,9 +232,9 @@ void Physics::PhysicsSystem::createDrivablePlayerVehicle() {
 }
 
 //TODO DIFFERENTIATE BETWEEN ENEMY VEHICLE AND PLAYER VEHICLE FOR COLLIDERS
-PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform) {
+PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform) {
 
-	PxVehicleDrive4W *pxVehicle;
+	PxVehicleDrive4W* pxVehicle;
 	VehicleDesc vehicleDesc = initVehicleDescription();
 
 
@@ -253,11 +253,11 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
 
-    FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(),FliterGroup::ePlayerVehicle,FliterGroup::ePasenger);
+	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FliterGroup::ePlayerVehicle, FliterGroup::ePasenger);
 
-    
 
-    return pxVehicle;
+
+	return pxVehicle;
 }
 
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
@@ -268,11 +268,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 	std::copy_if(
 		vehicles.begin(), vehicles.end(), std::back_inserter(active), [](Component::Vehicle* vehicle) {
-		return vehicle->pxVehicle; // vehicles might not be initialized yet...
-	}
+			return vehicle->pxVehicle; // vehicles might not be initialized yet...
+		}
 	);
 
-	for (auto &meta : active) {
+	for (auto& meta : active) {
 
 		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
 			meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
@@ -280,12 +280,12 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 		);
 	}
 
-	std::vector<PxVehicleWheels *> wheels;
+	std::vector<PxVehicleWheels*> wheels;
 	std::transform(active.begin(), active.end(), std::back_inserter(wheels), [](auto meta) { return meta->pxVehicle; });
 
 	if (!wheels.empty()) {
 		//raycasts
-		PxRaycastQueryResult *raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+		PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 		const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
 		PxVehicleSuspensionRaycasts(
 			cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,
@@ -312,11 +312,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 	}
 
 
-    cScene->simulate(0.0001 + timestep / 1000.0f);
-    cScene->fetchResults(true);
+	cScene->simulate(0.0001 + timestep / 1000.0f);
+	cScene->fetchResults(true);
 
 	// replicate physx bodies' world transforms to corresponding components.
-	for (auto&[actor, component] : trackedComponents) {
+	for (auto& [actor, component] : trackedComponents) {
 		auto t = actor->getGlobalPose();
 
 		component->emplaceChildComponent<Component::PhysicsPacket>(
@@ -329,7 +329,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 
-	for (const auto &actor : Engine::getStore().getRoot().getComponentsOfType<Component::PhysicsActor>()) {
+	for (const auto& actor : Engine::getStore().getRoot().getComponentsOfType<Component::PhysicsActor>()) {
 		//
 	}
 
@@ -343,12 +343,12 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 	stepPhysics(deltaTime);
 }
 
-std::ostream &physx::operator<<(std::ostream &out, const physx::PxTransform &transform) {
+std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& transform) {
 	out << transform.p.x << ", " << transform.p.y << ", " << transform.p.z;
 	return out;
 }
 
-void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int> &args) {
+void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int>& args) {
 
 	auto key = std::get<0>(args.values);
 
@@ -357,7 +357,7 @@ void Physics::PhysicsSystem::onKeyDown(const Component::EventArgs<int> &args) {
 	keys.emplace(key);
 }
 
-void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int> &args) {
+void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int>& args) {
 
 	auto key = std::get<0>(args.values);
 
@@ -366,11 +366,11 @@ void Physics::PhysicsSystem::onKeyUp(const Component::EventArgs<int> &args) {
 	keys.erase(key);
 }
 
-void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int> &args) { /* do nothing */ }
+void Physics::PhysicsSystem::onKeyPress(const Component::EventArgs<int>& args) { /* do nothing */ }
 
-void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Component::Vehicle*> &args) {
+void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Component::Vehicle*>& args) {
 
-	const auto &vehicleComponent = std::get<0>(args.values);
+	const auto& vehicleComponent = std::get<0>(args.values);
 
 	// grab the vehicle world position and set the physx actors transform accordingly.
 
@@ -407,22 +407,21 @@ void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 	}
 }
 
-void
-Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor *> &args) {
+void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
 
 	Engine::log<module>("Running onActorCreated");
 
-	auto &aPhysicsActor = std::get<0>(args.values);
-	auto &aMesh = aPhysicsActor->mesh;
+	auto& aPhysicsActor = std::get<0>(args.values);
+	auto& aMesh = aPhysicsActor->mesh;
 
 	std::vector<PxVec3> convexVerts;
 
 	std::transform(aMesh->vertices.begin(),
 		aMesh->vertices.end(),
 		std::back_inserter(convexVerts),
-		[](const Vertex &vertex) {
-		return PxVec3{ vertex.position.x, vertex.position.y, vertex.position.z };
-	}
+		[](const Vertex& vertex) {
+			return PxVec3{ vertex.position.x, vertex.position.y, vertex.position.z };
+		}
 	);
 
 	PxConvexMeshDesc convexDesc;
@@ -443,13 +442,13 @@ Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::Phy
 
 
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-	PxConvexMesh *convexMesh = cPhysics->createConvexMesh(input);
+	PxConvexMesh* convexMesh = cPhysics->createConvexMesh(input);
 
 	//rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	aPhysicsActor->actor = rigid;
 
 
-	PxShape *aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+	PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
 		PxConvexMeshGeometry(convexMesh),
 		*cMaterial
 	);
@@ -459,73 +458,25 @@ Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::Phy
 	cScene->addActor(*aPhysicsActor->actor);
 }
 
-void Physics::PhysicsSystem::link(Vehicle* sceneComponent, physx::PxRigidDynamic *actor) {
-	trackedComponents.emplace(actor, sceneComponent);
-
-
 void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger) {
 
-    //activePassenger = createPassenger(PxTransform(passenger.pickupTransform),PxTransform(passenger.dropOffTransform));
-    PxRigidStatic* temp_rigstat_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
-    passenger->pass_actor_pickup = cPhysics->createRigidStatic(passenger->pickupTransform);
-    passenger->pass_actor_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
-    passenger->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
+	//activePassenger = createPassenger(PxTransform(passenger.pickupTransform),PxTransform(passenger.dropOffTransform));
+	PxRigidStatic* temp_rigstat_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
+	passenger->pass_actor_pickup = cPhysics->createRigidStatic(passenger->pickupTransform);
+	passenger->pass_actor_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
+	passenger->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
 
-    PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
+	PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
 
-    PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *passenger->pass_material, true, pass_flags);
-    passenger->pass_actor_pickup->attachShape(*pass_shape_pickup);
-    pass_shape_pickup->release();
+	PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *passenger->pass_material, true, pass_flags);
+	passenger->pass_actor_pickup->attachShape(*pass_shape_pickup);
+	pass_shape_pickup->release();
 
-    PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *passenger->pass_material, true, pass_flags);
-    passenger->pass_actor_dropoff->attachShape(*pass_shape_dropoff);
-    pass_shape_dropoff->release();
+	PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *passenger->pass_material, true, pass_flags);
+	passenger->pass_actor_dropoff->attachShape(*pass_shape_dropoff);
+	pass_shape_dropoff->release();
 
-    activePassenger = passenger;
-
-	Engine::log<module>("Running onActorCreated");
-
-	auto &aPhysicsActor = std::get<0>(args.values);
-	auto &aMesh = std::get<1>(args.values);
-
-	std::vector<PxVec3> convexVerts;
-
-	std::transform(aMesh->vertices.begin(),
-		aMesh->vertices.end(),
-		std::back_inserter(convexVerts),
-		[](const Vertex &vertex) {
-		return PxVec3{ vertex.position.x, vertex.position.y, vertex.position.z };
-	}
-	);
-
-	PxConvexMeshDesc convexDesc;
-	convexDesc.points.count = 5;
-	convexDesc.points.stride = sizeof(PxVec3);
-	convexDesc.points.data = convexVerts.data();
-	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
-
-	PxDefaultMemoryOutputStream buf;
-	PxConvexMeshCookingResult::Enum result;
-	if (!cCooking->cookConvexMesh(convexDesc, buf, &result))
-		return;
-
-	auto position = physx::PxVec3{ aPhysicsActor->position.x, aPhysicsActor->position.y, aPhysicsActor->position.z };
-	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
-
-	auto rigid = cPhysics->createRigidStatic(PxTransform(position, rotation));
-
-
-	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-	PxConvexMesh *convexMesh = cPhysics->createConvexMesh(input);
-
-	//rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-	aPhysicsActor->actor = rigid;
-
-
-	PxShape *aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
-		PxConvexMeshGeometry(convexMesh),
-		*cMaterial
-	);
+	activePassenger = passenger;
 }
 
 Component::Passenger* Physics::PhysicsSystem::createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans) {
@@ -557,7 +508,7 @@ Component::Passenger* Physics::PhysicsSystem::createPassenger(const PxTransform&
 
 }
 
-void Physics::PhysicsSystem::link(Vehicle* sceneComponent, physx::PxRigidDynamic *actor) {
+void Physics::PhysicsSystem::link(Vehicle* sceneComponent, physx::PxRigidDynamic* actor) {
 	trackedComponents.emplace(actor, sceneComponent);
 }
 
