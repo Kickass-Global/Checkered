@@ -26,7 +26,8 @@ namespace Component {
 		enum Type {
 			Ground,
 			DynamicObject,
-			StaticObject
+			StaticObject,
+			TriggerVolume
 		} type = StaticObject;
 
 		glm::mat4 getWorldTransform();

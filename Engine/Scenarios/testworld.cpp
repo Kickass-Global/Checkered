@@ -206,8 +206,8 @@ void TestWorld::load() {
 		);
 	
 	auto passenger = Engine::createComponent<Component::Passenger>();
-	passenger->pickup_actor = Engine::createComponent<Scenery>(glm::vec3{ 0.f, 0.f, 2.0f },dumpster_mesh, dumpster_material);
-	passenger->dropoff_actor = Engine::createComponent<Scenery>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, dumpster_material);
+	passenger->pickup_actor = Engine::createComponent<Waypoint>(glm::vec3{ 0.f, 0.f, 2.0f },dumpster_mesh, dumpster_material);
+	passenger->dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, dumpster_material);
 	
 
 	// ai factory method...
