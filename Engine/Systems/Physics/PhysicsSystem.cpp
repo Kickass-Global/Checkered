@@ -22,9 +22,9 @@ using namespace physx;
 using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
-const float STATIC_FRICTION = 0.5f;
-const float DYNAMIC_FRICTION = 0.5f;
-const float RESTITUTION = 0.6f;
+const float STATIC_FRICTION = 0.9f;
+const float DYNAMIC_FRICTION = 0.9f;
+const float RESTITUTION = 0.1f;
 
 Component::Passenger* activePassenger;
 
@@ -67,10 +67,6 @@ struct FliterGroup {
 };
 
 extern VehicleDesc initVehicleDesc();
-
-
-
-
 
 
 VehicleDesc initVehicleDescription() {
@@ -188,10 +184,8 @@ void Physics::PhysicsSystem::createScene() {
 
 	PxSceneDesc sceneDesc(cPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.f, GRAVITY, 0.f);
-	sceneDesc.kineKineFilteringMode = PxPairFilteringMode::eKEEP;
-	sceneDesc.staticKineFilteringMode = PxPairFilteringMode::eKEEP;
 
-	PxU32 numWorkers = 1;
+	PxU32 numWorkers = 4;
 	cDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 	sceneDesc.cpuDispatcher = cDispatcher;
 	sceneDesc.filterShader = snippetvehicle::VehicleFilterShader;
@@ -251,6 +245,22 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 	pxVehicle->setToRestState();
 	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
+	
+	PxVehicleEngineData engine;
+	engine.mPeakTorque = 500.0f;
+	engine.mDampingRateFullThrottle = 0.005f;
+	engine.mMaxOmega = 1200.0f;//approx 6000 rpm
+	
+	pxVehicle->mDriveSimData.setEngineData(engine);
+
+	PxVehicleClutchData clutch;
+	clutch.mStrength = 250.0f;
+	pxVehicle->mDriveSimData.setClutchData(clutch);
+
+	PxVehicleGearsData gears;
+	gears.mRatios[PxVehicleGearsData::eFIRST] = 8.0f;
+	pxVehicle->mDriveSimData.setGearsData(gears);
+
 
 	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FliterGroup::ePlayerVehicle, FliterGroup::ePasenger);
 
@@ -273,10 +283,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 	for (auto& meta : active) {
 
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
-			meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
+			meta->pxPadSmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
 			timestep, meta->pxIsVehicleInAir, *meta->pxVehicle
 		);
+
 	}
 
 	std::vector<PxVehicleWheels*> wheels;
@@ -333,11 +344,11 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 	}
 
 	if (playerVehicle) {
-		// using our key states to set input data directly...
-		playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
-		playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
-		playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
-		playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
+		//// using our key states to set input data directly...
+		//playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
+		//playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
+		//playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
+		//playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
 	}
 	stepPhysics(deltaTime);
 }

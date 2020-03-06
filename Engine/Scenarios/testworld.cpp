@@ -176,7 +176,10 @@ void TestWorld::load() {
 
 	// setup the vehicle for the player...
 
-	auto player_vehicle = Engine::createNamedComponent<Component::Vehicle>("player_vehicle");
+	auto player = Engine::createNamedComponent<Component::ControlledVehicle>("player");
+	inputSystem->onGamePadStateChanged += player->onGamePadStateChangedHandler;
+	auto &player_vehicle = player->vehicle;
+
 	auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
 
 	player_damage_model->parts.push_back(Component::Model::Part{});
