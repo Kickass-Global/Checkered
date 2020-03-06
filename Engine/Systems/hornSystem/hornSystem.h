@@ -9,7 +9,7 @@
 #include "Engine.h"
 #include "Events/Events.h"
 #include <iostream>
-#include "soundSystem/sound.h"
+
 
 #include "soundSystem/SoundSystem.h"
 
@@ -20,26 +20,24 @@
 
 namespace Horn {
 
-    const char module[] = "Horn";
+	const char module[] = "Horn";
 
-    class hornSystem : public Engine::SystemInterface {
+	class hornSystem : public Engine::SystemInterface {
 
-    public:
-        void initialize() override;
-        void update(Engine::deltaTime /*elapsed*/) override;
-        
+	public:
+		void initialize() override;
+		void update(Engine::deltaTime /*elapsed*/) override;
 
+		std::shared_ptr<Component::EventHandler<int>> onKeyPressHandler;
+		std::shared_ptr<Component::EventHandler<int>> onKeyDownHandler;
+		std::shared_ptr<Component::EventHandler<int>> onKeyUpHandler;
 
-        Component::ComponentId onKeyPressHandler;
-        Component::ComponentId onKeyDownHandler;
-        Component::ComponentId onKeyUpHandler;
-
-        //std::set<int> keys;
-    private:
-        //std::set<int> keys;
-        void onKeyDown(const Component::EventArgs<int>& args);
-        void onKeyUp(const Component::EventArgs<int>& args);
-        void onKeyPress(const Component::EventArgs<int>& args);
-       // void sound();
-    };
+		//std::set<int> keys;
+	private:
+		//std::set<int> keys;
+		void onKeyDown(const Component::EventArgs<int>& args);
+		void onKeyUp(const Component::EventArgs<int>& args);
+		void onKeyPress(const Component::EventArgs<int>& args);
+		// void sound();
+	};
 }

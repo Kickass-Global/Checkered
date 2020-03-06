@@ -40,6 +40,7 @@ set(SRC main.cpp main.h
         Systems/Rendering/BillboardSystem.cpp Systems/Rendering/BillboardSystem.h
         Components/Billboard.cpp Components/Billboard.h
         Components/Component.h
+        Components/Sound.h Components/Sound.cpp
         Systems/Events/Events.cpp Systems/Events/Events.h
         Systems/Pipeline/Library.cpp Systems/Pipeline/Library.h
         ${PHYSX_SNIPPETS}
@@ -51,8 +52,6 @@ set(SRC main.cpp main.h
         Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp
         Systems/Component/scenecomponentsystem.hpp Components/physicspacket.cpp
         Components/physicspacket.hpp
-        Systems/soundSystem/sound.cpp
-        Systems/soundSystem/sound.h
         Systems/hornSystem/hornSystem.cpp
         Systems/hornSystem/hornSystem.h
         Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp

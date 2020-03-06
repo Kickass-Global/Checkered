@@ -3,14 +3,15 @@
 #include <iostream>
 #include <string>
 #include "hornSystem.h"
+#include "Sound.h"
 //
 //using namespace std;
 //
 void Horn::hornSystem::initialize()
 {
-	//onKeyPressHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyPress);
-	//onKeyDownHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyDown);
-	//onKeyUpHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyUp);
+	onKeyPressHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyPress);
+	onKeyDownHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyDown);
+	onKeyUpHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyUp);
 
 	//cout << "hornSystem initialized" << endl;
 }
@@ -50,7 +51,8 @@ void Horn::hornSystem::onKeyPress(const Component::EventArgs<int>& args) {
      auto key = std::get<0>(args.values);
      if (key == GLFW_KEY_SPACE)
      {
-
+         Engine::createComponent<Component::Sound>();
+     
      }
 
 }

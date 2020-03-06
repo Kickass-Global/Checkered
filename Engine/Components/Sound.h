@@ -2,9 +2,12 @@
 
 #include "ComponentId.h"
 #include "ComponentBase.h"
-
+#include <string>
 namespace Component {
 
-	class Sound : public Component::ComponentBase<Component::ClassId::Sound> {
+	struct Sound : public Component::ComponentBase {
+		std::string name;
+		float volume;
 	
-	}
+	};
+}
