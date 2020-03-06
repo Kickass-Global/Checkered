@@ -36,9 +36,8 @@ void Input::InputSystem::gamepadHandler(int jid, int event) {
 
     int present = glfwJoystickPresent(jid);
     
-
     if (glfwJoystickIsGamepad(jid)) {
-        std::cout << "test" << std::endl;
+		Engine::log<module, Engine::high>("Found input device #", jid);
     }
 
    

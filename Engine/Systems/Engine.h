@@ -186,7 +186,7 @@ namespace Engine {
 		high
 	};
 
-	constexpr Importance loggingLevel = medium;
+	constexpr Importance loggingLevel = high;
 
 
 	template<char const *m = module, Importance importance = medium, class ... Ts>
@@ -201,7 +201,6 @@ namespace Engine {
 
 			std::cout << buffer.str() << std::flush;
 			OutputDebugString(buffer.str().c_str());
-
 		}
 	}
 
