@@ -35,6 +35,7 @@ namespace Input {
         static Component::EventDelegate<int> onKeyPress;
         static Component::EventDelegate<int> onKeyDown;
         static Component::EventDelegate<int> onKeyUp;
+		static Component::EventDelegate<GLFWgamepadstate, GLFWgamepadstate> onGamePadStateChanged;
 
         void initialize(GLFWwindow *window);
 
