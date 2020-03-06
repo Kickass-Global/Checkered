@@ -6,7 +6,6 @@
 #include <iostream>
 #include <functional>
 #include <vector>
-#include <glad/glad.h>
 
 #include "Systems/Rendering/RenderingSystem.h"
 #include "Systems/Pipeline/ShaderLoader.h"
