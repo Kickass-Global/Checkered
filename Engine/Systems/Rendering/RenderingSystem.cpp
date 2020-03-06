@@ -12,6 +12,7 @@
 #include "Engine.h"
 #include "WorldTransform.h"
 #include "Pipeline/Library.h"
+#include <Vehicle.h>
 
 Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 
@@ -28,13 +29,13 @@ unsigned int depthMap;
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
-	std::map<std::pair<Mesh*, Material*>,MeshInstance*> instancing_map;
+	std::map<std::pair<Mesh*, Material*>, MeshInstance*> instancing_map;
 
 	for (auto mesh : Engine::getStore().getRoot().getComponentsOfType<PaintedMesh>())
 	{
 		auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
 		if (!Ts.empty()) {
-			auto key = std::make_pair(mesh->mesh.get(), mesh->material.get() );
+			auto key = std::make_pair(mesh->mesh.get(), mesh->material.get());
 			auto it = instancing_map.find(key);
 			if (it == instancing_map.end()) {
 				auto instance = Engine::createComponent<MeshInstance>(mesh->mesh, mesh->material);
@@ -74,7 +75,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 				instance->mesh,
 				instance->material,
 				static_cast<int>(sizeof(glm::mat4) * instance->instances.size()),
-				(float *)instance->instances.data(),
+				(float*)instance->instances.data(),
 				sizeof(glm::mat4)
 			);
 
@@ -86,8 +87,8 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	glClearColor(0, 0, 0.5f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (auto &&batch : batches) {
-		for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+	for (auto&& batch : batches) {
+		for (auto& camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
 
 			if (camera->is_dirty) {
 
@@ -131,11 +132,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	}
 
 	// this code handles drawing billboards into the world (hud, sprites, etc).
-	for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
-		for (const auto &sprite : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
+	for (auto& camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+		for (const auto& sprite : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
 
-			const auto &camera_view_matrix = camera->view;
-			const auto &viewport = camera->viewport;
+			const auto& camera_view_matrix = camera->view;
+			const auto& viewport = camera->viewport;
 
 			auto offset = glm::translate(
 				glm::vec3(
@@ -165,7 +166,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	// perform "passes"
 
 
-	for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+	for (auto& camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -178,15 +179,19 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		float near_plane = -1.0f, far_plane = 100.0f;
-		glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(glm::vec3(-20.0f, 41.0f, -10.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 lightViewProjection = lightProjection * lightView; 
-		glCullFace(GL_FRONT);
+		float near_plane = -5.0f, far_plane = 100.0f;
+		glm::mat4 lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+		// get player location....
 
-		for (auto &&batch : batches) {
+
+		glCullFace(GL_FRONT);
+		auto player = dynamic_cast<Component::Vehicle*>(camera->target.get());
+		glm::mat4 lightView = glm::lookAt(player->position + glm::vec3(-20.0f, 41.0f, -10.0f),
+			player->position,
+			glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 lightViewProjection = lightProjection * lightView;
+
+		for (auto&& batch : batches) {
 			if (!batch->details.empty()) {
 
 				// bind programs, textures, and uniforms needed to render the batch
@@ -217,7 +222,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		glViewport(0, 0, camera->viewport.width, camera->viewport.height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for (auto &&batch : batches) {
+		for (auto&& batch : batches) {
 			if (!batch->details.empty()) {
 
 
@@ -281,21 +286,21 @@ Rendering::RenderingSystem::findSuitableBufferFor(
 }
 
 std::shared_ptr<Rendering::GeometryBatch> Rendering::RenderingSystem::push_back(
-	const std::shared_ptr<Rendering::GeometryBatch> &batch
+	const std::shared_ptr<Rendering::GeometryBatch>& batch
 ) {
 	batches.push_back(batch);
 	return batches.back();
 }
 
-void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh>&mesh, std::shared_ptr<Material>& material) {
+void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) {
 
 	// if the data is already buffered we want to update the existing buffer data
 
 	auto match = std::find_if(
 		batches.begin(), batches.end(),
-		[mesh, material](const std::shared_ptr<GeometryBatch> &batch) {
-		return batch->contains(mesh, material);
-	}
+		[mesh, material](const std::shared_ptr<GeometryBatch>& batch) {
+			return batch->contains(mesh, material);
+		}
 	);
 
 	if (match != batches.end()) {
@@ -311,11 +316,11 @@ void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh>&mesh, std::shared_
 	batch->push_back(mesh, material);
 }
 
-GLFWwindow *Rendering::RenderingSystem::getWindow() {
+GLFWwindow* Rendering::RenderingSystem::getWindow() {
 	return window;
 }
 
-void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow *, int width, int height) {
+void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow*, int width, int height) {
 	onWindowSizeChanged(width, height);
 }
 
@@ -339,7 +344,6 @@ void Rendering::RenderingSystem::initialize() {
 
 	glGenFramebuffers(1, &depthMapFBO);
 
-
 	glGenTextures(1, &depthMap);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
@@ -348,19 +352,21 @@ void Rendering::RenderingSystem::initialize() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float color[4] = { 1.0,1.0,1.0,1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 
 }
 
-void Rendering::RenderingSystem::updateInstanceData(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material, int size, float *data, int stride) {
+void Rendering::RenderingSystem::updateInstanceData(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material, int size, float* data, int stride) {
 
 	Engine::log<module, Engine::low>("Updating instance data of component#", mesh);
 
 	auto it = std::find_if(
 		batches.begin(), batches.end(),
 		[mesh, material](const auto batch)
-	{
-		return batch->contains(mesh, material);
-	}
+		{
+			return batch->contains(mesh, material);
+		}
 	);
 
 	Engine::assertLog<module>(it != batches.end(), "check for valid batch");
@@ -387,15 +393,15 @@ Rendering::Shader::~Shader() {
 	glDeleteShader(m_id);
 }
 
-Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
+Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string>& lines) {
 
 	m_id = glCreateShader(shader_type);
 	Engine::log<module>("Creating shader ", m_id);
 
-	std::vector<const GLchar *> cstrings;
+	std::vector<const GLchar*> cstrings;
 	std::vector<int> lengths;
 
-	for (auto &&line : lines) {
+	for (auto&& line : lines) {
 		cstrings.push_back(line.c_str());
 		lengths.push_back(line.size());
 	}
