@@ -30,6 +30,7 @@ namespace Component {
         Vertex(aiVector3D position, aiVector3D normal, aiVector3D texcoord);
     };
 
+
     class Mesh : public ComponentBase {
 
     public:
@@ -54,6 +55,12 @@ namespace Component {
 		std::vector<glm::mat4> instances{};
 		MeshInstance(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) : mesh(mesh), material(material) {}
 	};
+
+	class MeshCollection : public ComponentBase {
+	public:
+		std::vector<std::shared_ptr<Mesh>> meshes;
+	};
+
 
 }
 

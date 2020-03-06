@@ -9,6 +9,7 @@ set(GLAD ../Include/glad/src/glad.c)
 file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
 
 set(SRC main.cpp main.h
+	Scenarios/testworld.cpp Scenarios/testworld.hpp
         Systems/Engine.cpp Systems/Engine.h
         Components/tags.cpp Components/tags.h
         Components/Mesh.cpp Components/Mesh.h
@@ -127,6 +128,7 @@ find_package(OpenGL REQUIRED)
 target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
         PRIVATE "Components"
         PRIVATE "Systems"
+        PRIVATE "Scenarios"
         SYSTEM PRIVATE "../3rd-party/OpenAL/include"
         SYSTEM PRIVATE "../Include/PhysX/include"
         SYSTEM PRIVATE "../Include/PhysX/source/foundation/include"

@@ -94,6 +94,9 @@ namespace Physics {
 		void onVehicleCreated(const EventArgs<Vehicle*> &args);
         Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
 		void onActorCreated(const EventArgs<Component::PhysicsActor*>& args);
+
+		PxTriangleMesh* createTriMesh(Mesh* mesh);
+		PxConvexMesh* createConvexMesh(Mesh* mesh);
 	};
 
 
