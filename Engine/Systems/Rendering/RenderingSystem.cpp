@@ -28,8 +28,37 @@ unsigned int depthMap;
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
+	std::map<std::pair<Mesh*, Material*>,MeshInstance*> instancing_map;
+
+	for (auto mesh : Engine::getStore().getRoot().getComponentsOfType<PaintedMesh>())
+	{
+		auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
+		if (!Ts.empty()) {
+			auto key = std::make_pair(mesh->mesh.get(), mesh->material.get() );
+			auto it = instancing_map.find(key);
+			if (it == instancing_map.end()) {
+				auto instance = Engine::createComponent<MeshInstance>(mesh->mesh, mesh->material);
+				auto& [it2, _] = instancing_map.emplace(key, instance.get());
+				it2->second->instances.push_back(Ts[0]->world_matrix);
+			}
+			else {
+				it->second->instances.push_back(Ts[0]->world_matrix);
+			}
+		}
+	}
+
+	auto is_buffered = [this](auto instance_mesh) {
+		for (auto batch : this->batches)
+		{
+			if (batch->contains(instance_mesh->mesh, instance_mesh->material)) return true;
+		}
+		return false;
+	};
+
+
 	// Find and update any GameObjects with meshes that should be drawn...
 	auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
+
 	for (const auto& instance : meshes) {
 		if (!instance->is_buffered)
 		{
@@ -94,6 +123,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
 			}
 		}
+	}
+
+	for (auto instance : instancing_map)
+	{
+		//Engine::getStore().getRoot().eraseComponent<MeshInstance>(instance.second->id);
 	}
 
 	// this code handles drawing billboards into the world (hud, sprites, etc).
