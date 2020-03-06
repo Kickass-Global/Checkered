@@ -98,20 +98,34 @@ int main() {
 
 	// create some buildings
 
-	auto building_material = Engine::createComponent<Component::Material>(basic_shader_program);
+	auto building_material1 = Engine::createComponent<Component::Material>(basic_shader_program);
+	auto building_material2 = Engine::createComponent<Component::Material>(basic_shader_program);
+	auto building_material3 = Engine::createComponent<Component::Material>(basic_shader_program);
 
-	building_material->textures.push_back(
+	building_material1->textures.push_back(
 		Engine::createComponent<Component::Texture>("Assets/Textures/House_01.png")
 	);
+	building_material2->textures.push_back(
+		Engine::createComponent<Component::Texture>("Assets/Textures/House_02.png")
+	);
+	building_material3->textures.push_back(
+		Engine::createComponent<Component::Texture>("Assets/Textures/House_03.png")
+	);
 
-	auto building_mesh = Pipeline::Library::getAsset<Mesh>(
+	auto building_mesh1 = Pipeline::Library::getAsset<Mesh>(
 		"Assets/Meshes/Building_House_01.fbx"
 		);
-	
+	auto building_mesh2 = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/Building_House_013.fbx"
+		);
+	auto building_mesh3 = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/Building_Shop_02.fbx"
+		);
+
 	Instance<Scenery> building_instances;
-	building_instances.add_instance_at({ 43,0,-10 }, building_mesh, building_material);
-	building_instances.add_instance_at({ 10,0,-23 }, building_mesh, building_material);
-	building_instances.add_instance_at({ -20,0,-16 }, building_mesh, building_material);
+	building_instances.add_instance_at({ 43,0,-10 }, building_mesh1, building_material1);
+	building_instances.add_instance_at({ 10,0,-23 }, building_mesh2, building_material2);
+	building_instances.add_instance_at({ -20,0,-16 }, building_mesh3, building_material3);
 
 
 	// setup a HUD element...
@@ -208,8 +222,8 @@ int main() {
 
 	// setup ai "brain"
 
-	std::function<void(const Component::EventArgs<Vehicle*> &)> ai_tick_callback =
-		[player_vehicle](const Component::EventArgs<Vehicle*> &args) {
+	std::function<void(const Component::EventArgs<Vehicle*>&)> ai_tick_callback =
+		[player_vehicle](const Component::EventArgs<Vehicle*>& args) {
 		auto meta = std::get<0>(args.values);
 
 		auto player_location = glm::normalize(player_vehicle->position); // translation vector of mat4
@@ -306,10 +320,7 @@ int main() {
 		// todo remove these hacks...
 		// force the ground to render...
 
-		//plane_mesh.attachTemporaryComponent(Engine::createComponent<Component::WorldTransform>()->id(), 1);
-
-		//ai_vehicle->id().attachExistingComponent(Component::Visible::id());
-		for (const auto &system : Engine::systems()) {
+		for (const auto& system : Engine::systems()) {
 			system->update(elapsed);
 		}
 
