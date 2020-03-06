@@ -13,7 +13,7 @@
 #include <EventHandler.h>
 #include <PxFiltering.h>
 #include <EventDelegate.h>
-
+#include "..\Systems\Navigation\astar.h"
 #include "Model.h"
 #include "ComponentId.h"
 #include "tags.h"
