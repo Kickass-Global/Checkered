@@ -24,25 +24,33 @@ namespace Component {
      */
     class SceneComponent : public ComponentBase {
     public:
-		SceneComponent *m_parent = nullptr;
-        std::vector<SceneComponent *> m_children;
-        glm::mat4 m_localTransform;
+		std::shared_ptr<SceneComponent> m_parent;;
+        std::vector<std::shared_ptr<SceneComponent>> m_children;
+		glm::mat4 m_localTransform = glm::mat4{ 1 };
+
+
+		template <typename... Args>
+		SceneComponent(std::shared_ptr<SceneComponent> parent, std::shared_ptr<Args>... children) :m_parent(parent)
+		{
+			addChildComponents(children...);
+		}
+
 
         /**
          * Returns the world transformation matrix for this scene component.
          * This is done by traversing the SceneComponent hierarchy and multiplying each component's local
          * transformation matrix together in post-order (e.g. from top to bottom).
          */
-        glm::mat4 getWorldTransform() {
+        virtual glm::mat4 getWorldTransform() {
 
-            auto parent = this->m_parent;
+            auto parent = this->m_parent.get();
             auto transform = glm::mat4(1);
 
             // use a stack to reverse the order that we apply transformations in.
             std::stack<SceneComponent *> stack;
             while (parent) {
                 stack.push(parent);
-                parent = parent->m_parent;
+                parent = parent->m_parent.get();
             }
 
             while (!stack.empty()) {

@@ -61,7 +61,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 	auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
 
 	for (const auto& instance : meshes) {
-		if (!instance->is_buffered)
+		if (!is_buffered(instance))
 		{
 			instance->is_buffered = true;
 			Engine::log<module, Engine::high>("Updating batch data of#", instance->getId());

@@ -40,7 +40,8 @@ int main() {
 
 	vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
-	Engine::addSystem<Component::SceneComponentSystem>();
+	auto componentSystem = Engine::addSystem<Component::SceneComponentSystem>();
+	componentSystem->onActorCreated += physicsSystem->onActorCreatedHandler;
 	Engine::addSystem<Engine::DamageSystem>();
 	auto cameraSystem = Engine::addSystem<::Camera::CameraSystem>();
 	auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
@@ -64,9 +65,9 @@ int main() {
 	Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
 	Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-    Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
-    Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
-    Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+	//Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
+	//Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
+	//Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
 
 	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 	//endregion
@@ -79,7 +80,7 @@ int main() {
 
 
 	// create a scene object to hold the ground components to follow.
-	auto ground_object = Engine::createComponent<Component::SceneComponent>();
+	auto ground_object = Engine::createComponent<Component::SceneComponent>(nullptr);
 
 	// make a material component
 	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
@@ -309,11 +310,6 @@ int main() {
 		floatMilliseconds delta = end - start;
 		Engine::deltaTime elapsed = static_cast<Engine::deltaTime>(duration_cast<milliseconds>(delta).count());
 		// endregion		
-
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 20,0,0 }));
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 40,0,-20 }));
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 20,0,20 }));
-		building1->mesh->instances.push_back(glm::translate(glm::vec3{ 0,0, 40 }));
 
 		Engine::EventSystem::onTick(elapsed);
 
