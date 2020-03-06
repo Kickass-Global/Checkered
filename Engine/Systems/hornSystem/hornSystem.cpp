@@ -4,6 +4,7 @@
 #include <string>
 #include "hornSystem.h"
 
+
 using namespace std;
 
 void Horn::hornSystem::initialize()
@@ -49,12 +50,17 @@ void Horn::hornSystem::onKeyPress(const Component::EventArgs<int>& args) {
  
      auto key = std::get<0>(args.values);
      if (key == GLFW_KEY_SPACE)
-         sound();
+     {
+
+     }
 
 }
+/*
 void Horn::hornSystem::sound()
 { 
    PlaySound("Assets/Sounds/carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
    // PlaySound("D:\\carHorn.wav", NULL, SND_ASYNC | SND_FILENAME);
     //system("pause");
 }
+
+*/

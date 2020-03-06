@@ -39,6 +39,7 @@ namespace Component {
         EventHandler,
         Billboard,
         Passenger,
+        Sound,
         None = 0xFFFFFFFF
     };
 
