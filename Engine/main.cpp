@@ -37,17 +37,11 @@ int main() {
 	auto running = true; 
 
 	TestWorld::load();
-	
-	auto cb = [](const Component::EventArgs<std::string>& args) {
-		auto filename = std::get<0>(args.values);
-		Engine::log(filename);
-	};
 
-	std::shared_ptr<Component::EventHandler<std::string>> tweakHandler = Engine::EventSystem::createHandler<std::string>(std::function(cb));
+
 
 	auto debug = Engine::addSystem<Debug::LiveReloadSystem>();
 	debug->watch("tweak.txt");
-	debug->onAssetModified += tweakHandler;
 
 	// region initialize game-clocks
 	using namespace std::chrono;
@@ -56,6 +50,50 @@ int main() {
 	auto end = start + milliseconds(1); // do this so physx doesn't complain about time being 0.
 	// endregion
 
+	auto player = Engine::getStore().getRoot().getComponentsOfType<ControlledVehicle>()[0];
+	auto cb = [player](const Component::EventArgs<std::string>& args) {
+		auto filename = std::get<0>(args.values);
+
+		std::ifstream ifs(filename);
+
+		json j;
+		ifs >> j;		
+
+		Engine::log<::module, Engine::high>("Updating vehicle params");
+
+		auto engine = player->vehicle->pxVehicle->mDriveSimData.getEngineData();
+		auto clutch = player->vehicle->pxVehicle->mDriveSimData.getClutchData();
+		auto gears = player->vehicle->pxVehicle->mDriveSimData.getGearsData();
+
+		for (int i = 0; i < 4; ++i) {
+			auto wheels = player->vehicle->pxVehicle->mWheelsSimData.getTireData(i);
+			wheels.mLongitudinalStiffnessPerUnitGravity = j["tires"]["mLongitudinalStiffnessPerUnitGravity"];
+			wheels.mLatStiffX  = j["tires"]["mLatStiffX"];
+			wheels.mLatStiffY  = j["tires"]["mLatStiffY"];
+			player->vehicle->pxVehicle->mWheelsSimData.setTireData(i, wheels);
+		}
+		engine.mPeakTorque = j["engine"]["mPeakTorque"];
+		engine.mMOI = j["engine"]["mMOI"];
+		engine.mMaxOmega = j["engine"]["mMaxOmega"];
+		engine.mDampingRateFullThrottle = j["engine"]["mDampingRateFullThrottle"];
+		engine.mDampingRateZeroThrottleClutchEngaged = j["engine"]["mDampingRateZeroThrottleClutchEngaged"];
+		engine.mDampingRateZeroThrottleClutchDisengaged = j["engine"]["mDampingRateZeroThrottleClutchDisengaged"];
+
+		clutch.mStrength = j["clutch"]["mStrength"];
+		clutch.mAccuracyMode = j["clutch"]["mAccuracyMode"];
+		clutch.mEstimateIterations = j["clutch"]["mEstimateIterations"];
+
+		for (auto&[key, value] : j["engine"]["gears"].items()) {
+			gears.mRatios[value["index"]] = value["ratio"];
+		}
+
+		player->vehicle->pxVehicle->mDriveSimData.setEngineData(engine);
+		player->vehicle->pxVehicle->mDriveSimData.setClutchData(clutch);
+		player->vehicle->pxVehicle->mDriveSimData.setGearsData(gears);
+	};
+	std::shared_ptr<Component::EventHandler<std::string>> tweakHandler = Engine::EventSystem::createHandler<std::string>(std::function(cb));
+	debug->onAssetModified += tweakHandler;
+	 
 	Engine::sortSystems();
 
 	while (running) {

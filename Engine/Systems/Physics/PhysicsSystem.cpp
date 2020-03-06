@@ -22,8 +22,8 @@ using namespace physx;
 using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
-const float STATIC_FRICTION = 0.9f;
-const float DYNAMIC_FRICTION = 0.9f;
+const float STATIC_FRICTION = 1.9f;
+const float DYNAMIC_FRICTION = 2.9f;
 const float RESTITUTION = 0.1f;
 
 Component::Passenger* activePassenger;
@@ -240,6 +240,7 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
 
+
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
 	pxVehicle->setToRestState();
@@ -247,19 +248,15 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
 	
 	PxVehicleEngineData engine;
-	engine.mPeakTorque = 500.0f;
-	engine.mDampingRateFullThrottle = 0.005f;
-	engine.mMaxOmega = 1200.0f;//approx 6000 rpm
 	
 	pxVehicle->mDriveSimData.setEngineData(engine);
 
 	PxVehicleClutchData clutch;
-	clutch.mStrength = 250.0f;
 	pxVehicle->mDriveSimData.setClutchData(clutch);
 
 	PxVehicleGearsData gears;
-	gears.mRatios[PxVehicleGearsData::eFIRST] = 8.0f;
 	pxVehicle->mDriveSimData.setGearsData(gears);
+
 
 
 	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FliterGroup::ePlayerVehicle, FliterGroup::ePasenger);
@@ -350,7 +347,7 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 		//playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
 		//playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
 	}
-	stepPhysics(deltaTime);
+	stepPhysics(std::min(deltaTime, 32.0f));
 }
 
 std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& transform) {
