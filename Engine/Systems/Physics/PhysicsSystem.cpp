@@ -265,10 +265,10 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 	// update all vehicles in the scene.
 	auto vehicles = Engine::getStore().getRoot().getComponentsOfType<Component::Vehicle>();
-	std::vector<std::shared_ptr<Component::Vehicle>> active;
+	std::vector<Component::Vehicle*> active;
 
 	std::copy_if(
-		vehicles.begin(), vehicles.end(), std::back_inserter(active), [](std::shared_ptr<Component::Vehicle> vehicle) {
+		vehicles.begin(), vehicles.end(), std::back_inserter(active), [](Component::Vehicle* vehicle) {
 		return vehicle->pxVehicle; // vehicles might not be initialized yet...
 	}
 	);
@@ -437,10 +437,18 @@ void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger)
 	if (!cCooking->cookConvexMesh(convexDesc, buf, &result))
 		return;
 
-	aPhysicsActor->actor = cPhysics->createRigidDynamic(PxTransform());
+	auto position = physx::PxVec3{ aPhysicsActor->position.x, aPhysicsActor->position.y, aPhysicsActor->position.z };
+	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
+
+	auto rigid = cPhysics->createRigidStatic(PxTransform(position, rotation));
+
 
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	PxConvexMesh *convexMesh = cPhysics->createConvexMesh(input);
+
+	//rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	aPhysicsActor->actor = rigid;
+
 
 	PxShape *aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
 		PxConvexMeshGeometry(convexMesh),

@@ -16,11 +16,11 @@ void Engine::vehicleSystem::initialize() {
 }
 void Engine::vehicleSystem::update(Engine::deltaTime) {
 
-	const auto vehicles = Engine::getStore().getRoot().getComponentsOfType<Component::Vehicle>();
-	for (const auto &vehicle : vehicles) {
+	auto vehicles = Engine::getStore().getRoot().getComponentsOfType<Component::Vehicle>();
+	for (auto &vehicle : vehicles) {
 
 		if (!vehicle->pxVehicle) {
-			onVehicleCreated(vehicle.get());
+			onVehicleCreated(vehicle);
 		}
 
 		auto physicsUpdates = vehicle->getChildren().getComponentsOfType<Component::PhysicsPacket>();
