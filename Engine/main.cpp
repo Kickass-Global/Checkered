@@ -192,7 +192,7 @@ int main() {
 	auto passenger = Engine::createComponent<Component::Passenger>();
 	passenger->setPickupTransform(temp_pickup);
 	passenger->setDropoffTransform(temp_dropoff);
-	physicsSystem->onPassengerCreated(passenger);
+	physicsSystem->onPassengerCreated(passenger.get());
 	physicsSystem->playerVehicle = player_vehicle;
 
 	// ai factory method...
