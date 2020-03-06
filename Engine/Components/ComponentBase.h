@@ -40,7 +40,8 @@ namespace Component {
 
 			for (auto ref : it->second)
 			{
-				result.emplace_back(dynamic_cast<T*>(ref.get()));
+				auto ptr = std::static_pointer_cast<T>(ref).get();
+				result.push_back(ptr);
 			}
 
 			return result;
