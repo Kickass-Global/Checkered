@@ -5,7 +5,6 @@
 #include "ComponentId.h"
 #include "Camera.h"
 #include "systeminterface.hpp"
-#include "Index.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"

@@ -3,17 +3,16 @@
 #include <iostream>
 #include <string>
 #include "hornSystem.h"
-
-
-using namespace std;
-
+//
+//using namespace std;
+//
 void Horn::hornSystem::initialize()
 {
-	onKeyPressHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyPress);
-	onKeyDownHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyDown);
-	onKeyUpHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyUp);
+	//onKeyPressHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyPress);
+	//onKeyDownHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyDown);
+	//onKeyUpHandler = Engine::EventSystem::createHandler(this, &Horn::hornSystem::onKeyUp);
 
-	cout << "hornSystem initialized" << endl;
+	//cout << "hornSystem initialized" << endl;
 }
 
 

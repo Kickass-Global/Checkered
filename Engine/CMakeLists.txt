@@ -10,7 +10,6 @@ file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
 
 set(SRC main.cpp main.h
         Systems/Engine.cpp Systems/Engine.h
-        Systems/Index.cpp Systems/Index.h
         Components/tags.cpp Components/tags.h
         Components/Mesh.cpp Components/Mesh.h
         Components/SceneComponent.cpp Components/SceneComponent.h
@@ -23,11 +22,13 @@ set(SRC main.cpp main.h
         Systems/Camera/CameraSystem.cpp Systems/Camera/CameraSystem.h
         Systems/Input/InputSystem.cpp Systems/Input/InputSystem.h
         Systems/Pipeline/MeshLoader.h
+        Systems/Physics/SimulationCallback.h Systems/Physics/SimulationCallback.cpp
         Components/Shader.cpp Components/Shader.h
         Components/ComponentId.cpp Components/ComponentId.h
         Components/ComponentId.tpp.h
         Components/Camera.cpp Components/Camera.h
         Systems/Rendering/Rendering.h
+        Systems/Physics/FilterShader.cpp Systems/Physics/FilterShader.h
         Components/Plane.cpp Components/Plane.h
         Systems/Pipeline/EntityLoader.cpp Systems/Pipeline/EntityLoader.h
         Components/Model.cpp Components/Model.h
@@ -57,7 +58,7 @@ set(SRC main.cpp main.h
         Systems/soundSystem/SoundSystem.cpp Systems/soundSystem/SoundSystem.h
         Components/WorldTransform.h Components/WorldTransform.cpp
         Components/texture.cpp Components/texture.hpp
-        Components/material.cpp Components/material.hpp)
+        Components/material.cpp Components/material.hpp Components/PhysicsActor.cpp Components/PhysicsActor.h Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h Systems/EngineStore.cpp Systems/EngineStore.h)
 
 # Add source to this project's executable.
 add_executable(Engine
@@ -88,7 +89,7 @@ endif ()
 # copy assets into build directory
 
 set(PHYSX_HOME PATH "")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
