@@ -22,9 +22,9 @@ using namespace physx;
 using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
-const float STATIC_FRICTION = 0.5f;
-const float DYNAMIC_FRICTION = 0.5f;
-const float RESTITUTION = 0.6f;
+const float STATIC_FRICTION = 1.9f;
+const float DYNAMIC_FRICTION = 2.9f;
+const float RESTITUTION = 0.1f;
 
 Component::Passenger* activePassenger;
 
@@ -67,10 +67,6 @@ struct FliterGroup {
 };
 
 extern VehicleDesc initVehicleDesc();
-
-
-
-
 
 
 VehicleDesc initVehicleDescription() {
@@ -188,10 +184,8 @@ void Physics::PhysicsSystem::createScene() {
 
 	PxSceneDesc sceneDesc(cPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.f, GRAVITY, 0.f);
-	sceneDesc.kineKineFilteringMode = PxPairFilteringMode::eKEEP;
-	sceneDesc.staticKineFilteringMode = PxPairFilteringMode::eKEEP;
 
-	PxU32 numWorkers = 1;
+	PxU32 numWorkers = 4;
 	cDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 	sceneDesc.cpuDispatcher = cDispatcher;
 	sceneDesc.filterShader = snippetvehicle::VehicleFilterShader;
@@ -206,8 +200,7 @@ void Physics::PhysicsSystem::createGround() {
 	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
 	cGroundPlane = createDrivablePlane(groundPlaneSimFilterData, cMaterial, cPhysics);
 
-	cScene->addActor(*cGroundPlane);
-
+	//cScene->addActor(*cGroundPlane);
 }
 
 void Physics::PhysicsSystem::initVehicleSupport() {
@@ -247,11 +240,24 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
 
+
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
 	pxVehicle->setToRestState();
 	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
+	
+	PxVehicleEngineData engine;
+	
+	pxVehicle->mDriveSimData.setEngineData(engine);
+
+	PxVehicleClutchData clutch;
+	pxVehicle->mDriveSimData.setClutchData(clutch);
+
+	PxVehicleGearsData gears;
+	pxVehicle->mDriveSimData.setGearsData(gears);
+
+
 
 	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FliterGroup::ePlayerVehicle, FliterGroup::ePasenger);
 
@@ -268,16 +274,17 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 	std::copy_if(
 		vehicles.begin(), vehicles.end(), std::back_inserter(active), [](Component::Vehicle* vehicle) {
-			return vehicle->pxVehicle; // vehicles might not be initialized yet...
-		}
+		return vehicle->pxVehicle; // vehicles might not be initialized yet...
+	}
 	);
 
 	for (auto& meta : active) {
 
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(
-			meta->pxKeySmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(
+			meta->pxPadSmoothingData, meta->pxSteerVsForwardSpeedTable, meta->pxVehicleInputData,
 			timestep, meta->pxIsVehicleInAir, *meta->pxVehicle
 		);
+
 	}
 
 	std::vector<PxVehicleWheels*> wheels;
@@ -316,7 +323,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 	cScene->fetchResults(true);
 
 	// replicate physx bodies' world transforms to corresponding components.
-	for (auto& [actor, component] : trackedComponents) {
+	for (auto&[actor, component] : trackedComponents) {
 		auto t = actor->getGlobalPose();
 
 		component->emplaceChildComponent<Component::PhysicsPacket>(
@@ -334,13 +341,13 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 	}
 
 	if (playerVehicle) {
-		// using our key states to set input data directly...
-		playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
-		playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
-		playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
-		playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
+		//// using our key states to set input data directly...
+		//playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
+		//playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
+		//playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
+		//playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
 	}
-	stepPhysics(deltaTime);
+	stepPhysics(std::min(deltaTime, 32.0f));
 }
 
 std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& transform) {
@@ -400,61 +407,93 @@ void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 	shapes.resize(numShapes);
 
 	actor->getShapes(shapes.data(), numShapes);
+	PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
 	for (PxU32 i = 0; i < numShapes; i++)
 	{
 		PxShape* shape = shapes[i];
+		shape->setQueryFilterData(qryFilterData);
 		shape->setSimulationFilterData(filterData);
 	}
 }
 
-void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
+PxTriangleMesh* Physics::PhysicsSystem::createTriMesh(Mesh* mesh) {
+	
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = mesh->vertices.size();
+	meshDesc.points.stride = sizeof(Vertex);
+	meshDesc.points.data = mesh->vertices.data();
 
+	meshDesc.triangles.count = mesh->indices.size() / 3; // assumption tri-mesh
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+	meshDesc.triangles.data = mesh->indices.data();
+
+	PxDefaultMemoryOutputStream writeBuffer;
+	PxTriangleMeshCookingResult::Enum result;
+	bool status = cCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
+	
+	Engine::assertLog(status, "Cooking triangle mesh");
+
+	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+
+	return cPhysics->createTriangleMesh(readBuffer);
+}
+
+PxConvexMesh* Physics::PhysicsSystem::createConvexMesh(Mesh* mesh) {
+
+	PxConvexMeshDesc convexDesc;
+	convexDesc.points.count = mesh->vertices.size();
+	convexDesc.points.stride = sizeof(Vertex);
+	convexDesc.points.data = mesh->vertices.data();
+	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
+
+	PxDefaultMemoryOutputStream buf;
+	PxConvexMeshCookingResult::Enum result;
+	auto status = cCooking->cookConvexMesh(convexDesc, buf, &result);
+
+	Engine::assertLog(status, "Cooking convex mesh");
+
+	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+	return cPhysics->createConvexMesh(input);
+}
+
+void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
+		
 	Engine::log<module>("Running onActorCreated");
 
 	auto& aPhysicsActor = std::get<0>(args.values);
 	auto& aMesh = aPhysicsActor->mesh;
 
-	std::vector<PxVec3> convexVerts;
-
-	std::transform(aMesh->vertices.begin(),
-		aMesh->vertices.end(),
-		std::back_inserter(convexVerts),
-		[](const Vertex& vertex) {
-			return PxVec3{ vertex.position.x, vertex.position.y, vertex.position.z };
-		}
-	);
-
-	PxConvexMeshDesc convexDesc;
-	convexDesc.points.count = convexVerts.size();
-	convexDesc.points.stride = sizeof(PxVec3);
-	convexDesc.points.data = convexVerts.data();
-	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
-
-	PxDefaultMemoryOutputStream buf;
-	PxConvexMeshCookingResult::Enum result;
-	if (!cCooking->cookConvexMesh(convexDesc, buf, &result))
-		return;
-
 	auto position = physx::PxVec3{ aPhysicsActor->position.x, aPhysicsActor->position.y, aPhysicsActor->position.z };
 	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
 
-	auto rigid = cPhysics->createRigidStatic(PxTransform(position, rotation));
+	aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
 
+	if (aPhysicsActor->type == PhysicsActor::Type::StaticObject) {
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxConvexMeshGeometry(createConvexMesh(aMesh.get())),
+			*cMaterial
+		);
+	}
+	if (aPhysicsActor->type == PhysicsActor::Type::Ground) {
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxTriangleMeshGeometry(createTriMesh(aMesh.get())),
+			*cMaterial
+		);
+	}
 
-	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-	PxConvexMesh* convexMesh = cPhysics->createConvexMesh(input);
-
-	//rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-	aPhysicsActor->actor = rigid;
-
-
-	PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
-		PxConvexMeshGeometry(convexMesh),
-		*cMaterial
-	);
-
-	setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
-
+	switch (aPhysicsActor->type)
+	{
+	case PhysicsActor::Type::StaticObject:
+		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
+		break;
+	case PhysicsActor::Type::DynamicObject:
+		// todo
+		break;
+	case PhysicsActor::Type::Ground:
+		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST);
+		break;
+	}
 	cScene->addActor(*aPhysicsActor->actor);
 }
 
