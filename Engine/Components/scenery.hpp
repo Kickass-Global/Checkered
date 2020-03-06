@@ -21,6 +21,30 @@ namespace Component {
 		}
 	};
 
+	class DrivableScenery : public ComponentBase {
+	public:
+		std::shared_ptr<PhysicsActor> actor;
+		std::shared_ptr<PaintedMesh> mesh;
+
+		DrivableScenery(glm::vec3 position, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) :
+			mesh(Engine::createComponent<PaintedMesh>(mesh, material)),
+			actor(Engine::createComponent<PhysicsActor>(mesh))
+		{
+			actor->type = PhysicsActor::Type::Ground;
+			actor->position = position;
+			actor->node->addChildComponent(Engine::createComponent<SceneComponent>(actor->node, this->mesh));
+		}
+
+		DrivableScenery(glm::vec3 position, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, std::shared_ptr<Mesh> collision_mesh) :
+			mesh(Engine::createComponent<PaintedMesh>(mesh, material)),
+			actor(Engine::createComponent<PhysicsActor>(collision_mesh))
+		{
+			actor->type = PhysicsActor::Type::Ground;
+			actor->position = position;
+			actor->node->addChildComponent(Engine::createComponent<SceneComponent>(actor->node, this->mesh));
+		}
+	};
+
 	/**
 	 * Scenery components are things that can be placed into the world and have collision properties
 	 */

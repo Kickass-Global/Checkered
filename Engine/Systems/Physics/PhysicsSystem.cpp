@@ -206,8 +206,7 @@ void Physics::PhysicsSystem::createGround() {
 	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
 	cGroundPlane = createDrivablePlane(groundPlaneSimFilterData, cMaterial, cPhysics);
 
-	cScene->addActor(*cGroundPlane);
-
+	//cScene->addActor(*cGroundPlane);
 }
 
 void Physics::PhysicsSystem::initVehicleSupport() {
@@ -268,8 +267,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 	std::copy_if(
 		vehicles.begin(), vehicles.end(), std::back_inserter(active), [](Component::Vehicle* vehicle) {
-			return vehicle->pxVehicle; // vehicles might not be initialized yet...
-		}
+		return vehicle->pxVehicle; // vehicles might not be initialized yet...
+	}
 	);
 
 	for (auto& meta : active) {
@@ -316,7 +315,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 	cScene->fetchResults(true);
 
 	// replicate physx bodies' world transforms to corresponding components.
-	for (auto& [actor, component] : trackedComponents) {
+	for (auto&[actor, component] : trackedComponents) {
 		auto t = actor->getGlobalPose();
 
 		component->emplaceChildComponent<Component::PhysicsPacket>(
@@ -400,61 +399,93 @@ void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 	shapes.resize(numShapes);
 
 	actor->getShapes(shapes.data(), numShapes);
+	PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
 	for (PxU32 i = 0; i < numShapes; i++)
 	{
 		PxShape* shape = shapes[i];
+		shape->setQueryFilterData(qryFilterData);
 		shape->setSimulationFilterData(filterData);
 	}
 }
 
-void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
+PxTriangleMesh* Physics::PhysicsSystem::createTriMesh(Mesh* mesh) {
+	
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = mesh->vertices.size();
+	meshDesc.points.stride = sizeof(Vertex);
+	meshDesc.points.data = mesh->vertices.data();
 
+	meshDesc.triangles.count = mesh->indices.size() / 3; // assumption tri-mesh
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+	meshDesc.triangles.data = mesh->indices.data();
+
+	PxDefaultMemoryOutputStream writeBuffer;
+	PxTriangleMeshCookingResult::Enum result;
+	bool status = cCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
+	
+	Engine::assertLog(status, "Cooking triangle mesh");
+
+	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+
+	return cPhysics->createTriangleMesh(readBuffer);
+}
+
+PxConvexMesh* Physics::PhysicsSystem::createConvexMesh(Mesh* mesh) {
+
+	PxConvexMeshDesc convexDesc;
+	convexDesc.points.count = mesh->vertices.size();
+	convexDesc.points.stride = sizeof(Vertex);
+	convexDesc.points.data = mesh->vertices.data();
+	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
+
+	PxDefaultMemoryOutputStream buf;
+	PxConvexMeshCookingResult::Enum result;
+	auto status = cCooking->cookConvexMesh(convexDesc, buf, &result);
+
+	Engine::assertLog(status, "Cooking convex mesh");
+
+	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+	return cPhysics->createConvexMesh(input);
+}
+
+void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
+		
 	Engine::log<module>("Running onActorCreated");
 
 	auto& aPhysicsActor = std::get<0>(args.values);
 	auto& aMesh = aPhysicsActor->mesh;
 
-	std::vector<PxVec3> convexVerts;
-
-	std::transform(aMesh->vertices.begin(),
-		aMesh->vertices.end(),
-		std::back_inserter(convexVerts),
-		[](const Vertex& vertex) {
-			return PxVec3{ vertex.position.x, vertex.position.y, vertex.position.z };
-		}
-	);
-
-	PxConvexMeshDesc convexDesc;
-	convexDesc.points.count = convexVerts.size();
-	convexDesc.points.stride = sizeof(PxVec3);
-	convexDesc.points.data = convexVerts.data();
-	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
-
-	PxDefaultMemoryOutputStream buf;
-	PxConvexMeshCookingResult::Enum result;
-	if (!cCooking->cookConvexMesh(convexDesc, buf, &result))
-		return;
-
 	auto position = physx::PxVec3{ aPhysicsActor->position.x, aPhysicsActor->position.y, aPhysicsActor->position.z };
 	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
 
-	auto rigid = cPhysics->createRigidStatic(PxTransform(position, rotation));
+	aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
 
+	if (aPhysicsActor->type == PhysicsActor::Type::StaticObject) {
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxConvexMeshGeometry(createConvexMesh(aMesh.get())),
+			*cMaterial
+		);
+	}
+	if (aPhysicsActor->type == PhysicsActor::Type::Ground) {
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxTriangleMeshGeometry(createTriMesh(aMesh.get())),
+			*cMaterial
+		);
+	}
 
-	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
-	PxConvexMesh* convexMesh = cPhysics->createConvexMesh(input);
-
-	//rigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-	aPhysicsActor->actor = rigid;
-
-
-	PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
-		PxConvexMeshGeometry(convexMesh),
-		*cMaterial
-	);
-
-	setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
-
+	switch (aPhysicsActor->type)
+	{
+	case PhysicsActor::Type::StaticObject:
+		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
+		break;
+	case PhysicsActor::Type::DynamicObject:
+		// todo
+		break;
+	case PhysicsActor::Type::Ground:
+		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST);
+		break;
+	}
 	cScene->addActor(*aPhysicsActor->actor);
 }
 

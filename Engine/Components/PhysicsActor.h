@@ -22,6 +22,12 @@ namespace Component {
 		physx::PxRigidActor* actor;
 		glm::vec3 position = { 0,0,0 };
 		glm::quat rotation = glm::quat(1, 0, 0, 0);
+		
+		enum Type {
+			Ground,
+			DynamicObject,
+			StaticObject
+		} type = StaticObject;
 
 		glm::mat4 getWorldTransform();
 
