@@ -127,7 +127,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
 	for (auto instance : instancing_map)
 	{
-		//Engine::getStore().getRoot().eraseComponent<MeshInstance>(instance.second->id);
+		Engine::getStore().getRoot().eraseComponent<MeshInstance>(instance.second->id);
 	}
 
 	// this code handles drawing billboards into the world (hud, sprites, etc).

@@ -24,7 +24,6 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
 		}
 
 		auto physicsUpdates = vehicle->getChildren().getComponentsOfType<Component::PhysicsPacket>();
-		vehicle->getChildren().eraseComponentsOfType<Component::PhysicsPacket>();
 
 		if (!physicsUpdates.empty()) {
 
@@ -40,5 +39,7 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
 				vehicle->emplaceChildComponent<WorldTransform>(vehicle->physx_transform()); // todo, eh
 			}
 		}
+
+		vehicle->getChildren().eraseComponentsOfType<Component::PhysicsPacket>();
 	}
 }
