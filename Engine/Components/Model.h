@@ -2,6 +2,8 @@
 // Created by root on 17/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_MODEL_H
 #define ENGINE_MODEL_H
 

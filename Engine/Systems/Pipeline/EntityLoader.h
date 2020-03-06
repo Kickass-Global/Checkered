@@ -2,6 +2,8 @@
 // Created by root on 17/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_ENTITYLOADER_H
 #define ENGINE_ENTITYLOADER_H
 
@@ -23,7 +25,7 @@ using json = nlohmann::json;
 
 namespace Pipeline {
 
-    template<typename T = Component::ComponentBase<Component::ClassId::GameObject>>
+    template<typename T = Component::ComponentBase>
     std::shared_ptr<T> load(std::string filename) {
         static_assert(std::is_base_of<Component::ComponentInterface, T>::value);
 

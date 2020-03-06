@@ -21,7 +21,6 @@
 #include "ComponentId.h"
 #include "Camera.h"
 #include "systeminterface.hpp"
-#include "Index.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"
@@ -29,40 +28,40 @@
 
 namespace Camera {
 
-    namespace {
-        char module[] = "Camera";
-    }
+	namespace {
+		char module[] = "Camera";
+	}
 
-    class CameraSystem : public Engine::SystemInterface {
+	class CameraSystem : public Engine::SystemInterface {
 
-    public:
+	public:
 
-        static Component::ComponentId id();
+		static Component::ComponentId id();
 
-        Component::ComponentId onKeyPressHandler;
-        Component::ComponentId onKeyDownHandler;
-        Component::ComponentId onKeyUpHandler;
-        Component::ComponentId onWindowSizeHandler;
+		std::shared_ptr<EventHandler<int>> onKeyPressHandler;
+		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
+		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
+		std::shared_ptr<EventHandler<int, int>> onWindowSizeHandler;
 
-        CameraSystem() {
+		CameraSystem() {
 
-            // create event handlers
+			// create event handlers
 
-            onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
-            onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
-            onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
-            onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
+			onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
+			onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
+			onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
+			onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
 
-        }
+		}
 
-        float x = 0;
-        float y = 0;
-        float u = 0;
+		float x = 0;
+		float y = 0;
+		float u = 0;
 
-        float sensitivity = 100.0f;
-        float increment = static_cast<float>(M_PI) / 180.0f;
+		float sensitivity = 100.0f;
+		float increment = static_cast<float>(M_PI) / 180.0f;
 
-        std::set<int> keys;
+		std::set<int> keys;
 
 		void update(Engine::deltaTime elapsed) override;
 
@@ -74,7 +73,7 @@ namespace Camera {
 
 		void onKeyPress(const Component::EventArgs<int> &args);
 
-    };
+	};
 
 }
 
