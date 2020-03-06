@@ -10,46 +10,53 @@
 #include <Events/Events.h>
 #include <EventHandler.h>
 #include <EventDelegate.h>
-
+#include "..\Systems\Navigation\astar.h"
 #include "Model.h"
 #include "ComponentId.h"
 #include "tags.h"
+#include "damage.hpp"
 
 #include <glm/glm.hpp>
 
 namespace Component {
 
-class Vehicle : public Component::ComponentBase<Component::ClassId::Vehicle> {
-public:
-    ComponentId model{};
-    ComponentId input{};
-    ComponentId onTickHandler;
-    EventDelegate<ComponentId> tickHandler = EventDelegate<ComponentId>("handler");
+    class Vehicle : public ComponentBase {
+    public:
+        bool is_outdated = true;
+        std::shared_ptr<Model> model;
+        ComponentId input{};
+        std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
+        EventDelegate<Vehicle*> tickHandler = EventDelegate<Vehicle*>("handler");
 
-    glm::vec3 scale;
-    glm::quat rotation;
-    glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::vec3 position;
+        AStar path;
+        glm::vec3 scale = { 1,1,1 };
+        glm::quat rotation;
+        glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec3 position;
+        glm::vec3 local_position = { 0,0,0 };
 
-    glm::mat4 world_transform() {
-        return glm::translate(position) * glm::mat4_cast(rotation) * glm::mat4_cast(local_rotation) * glm::scale(scale);
-    }
+        glm::mat4 world_transform() {
+            return glm::translate(position) * glm::translate(local_position) * glm::mat4_cast(rotation) * glm::mat4_cast(local_rotation) * glm::scale(scale);
+        }
 
-    bool pxIsVehicleInAir;
-    physx::PxVehicleDrive4WRawInputData pxVehicleInputData;
-    physx::PxVehicleDrive4W *pxVehicle = nullptr;
-    physx::PxVehicleDrivableSurfaceToTireFrictionPairs *pxFrictionPairs = nullptr;
-    physx::PxReal pxSteerVsForwardSpeedData[16];
-    physx::PxFixedSizeLookupTable<8> pxSteerVsForwardSpeedTable;
-    physx::PxVehicleKeySmoothingData pxKeySmoothingData;
-    physx::PxVehiclePadSmoothingData pxPadSmoothingData;
+        glm::mat4 physx_transform() {
+            return glm::translate(position) * glm::mat4_cast(rotation) * glm::scale(scale);
+        }
 
-    void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
-        Engine::log<module>("onTick");
-        tickHandler(id());
-    }
+        bool pxIsVehicleInAir;
+        physx::PxVehicleDrive4WRawInputData pxVehicleInputData;
+        physx::PxVehicleDrive4W* pxVehicle = nullptr;
+        physx::PxVehicleDrivableSurfaceToTireFrictionPairs* pxFrictionPairs = nullptr;
+        physx::PxReal pxSteerVsForwardSpeedData[16];
+        physx::PxFixedSizeLookupTable<8> pxSteerVsForwardSpeedTable;
+        physx::PxVehicleKeySmoothingData pxKeySmoothingData;
+        physx::PxVehiclePadSmoothingData pxPadSmoothingData;
 
-    Vehicle() :
+        void onTick(const Component::EventArgs<Engine::deltaTime>& args) {
+            tickHandler(this);
+        }
+
+        Vehicle() :
             pxSteerVsForwardSpeedData{
                     0.0f, 0.75f,
                     5.0f, 0.75f,
@@ -59,7 +66,7 @@ public:
                     PX_MAX_F32, PX_MAX_F32,
                     PX_MAX_F32, PX_MAX_F32,
                     PX_MAX_F32, PX_MAX_F32
-            },
+        },
             pxKeySmoothingData{
                     {
                             6.0f,    //rise rate eANALOG_INPUT_ACCEL
@@ -75,7 +82,7 @@ public:
                             5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
                             5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
                     }
-            },
+        },
             pxPadSmoothingData{
                     {
                             6.0f,    //rise rate eANALOG_INPUT_ACCEL
@@ -91,12 +98,12 @@ public:
                             5.0f,    //fall rate eANALOG_INPUT_STEER_LEFT
                             5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
                     }
-            } {
-        pxSteerVsForwardSpeedTable = physx::PxFixedSizeLookupTable<8>(pxSteerVsForwardSpeedData, 4);
-        onTickHandler = Engine::EventSystem::createTickHandler(this, &Vehicle::onTick);
-    }
+        } {
+            pxSteerVsForwardSpeedTable = physx::PxFixedSizeLookupTable<8>(pxSteerVsForwardSpeedData, 4);
+            onTickHandler = Engine::EventSystem::createTickHandler(this, &Vehicle::onTick);
+        }
 
-};
+    };
 
 }
 

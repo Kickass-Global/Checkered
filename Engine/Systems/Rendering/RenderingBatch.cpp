@@ -2,50 +2,51 @@
 // Created by root on 11/1/20.
 //
 
-#include <material.hpp>
-#include "RenderingBatch.h"
 #include "RenderingSystem.h"
-#include "../../Components/ComponentId.h"
 
 namespace Rendering {
 
-    void RenderBatch::draw(Rendering::RenderingSystem &renderingSystem) {
 
-        for(auto [key, detail] : details) {
+    void GeometryBatch::draw(Rendering::RenderingSystem &renderingSystem) {
 
-            Engine::log<module>("Drawing #", key);
-            // todo pass in the stride somehow
-            auto &&meta = key.data<Mesh>();
-            if (meta->material) {
-                meta->material.data<Material>()->bind();
+        for (auto[key, detail] : details) {
+
+            Engine::log<module, Engine::low>("Drawing #", key.first, "#", key.second);
+
+            if (key.second) {
+                key.second->bind();
             }
+
             glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, detail[1].count, GL_UNSIGNED_INT, 0,
-                                                          detail[2].count, detail[1].offset, detail[2].offset / 64);
+                                                          detail[2].count, detail[1].offset, detail[2].offset / 64
+            );
+
+			glBindVertexArray(0);
 
         }
     }
 
-    void RenderBatch::bind(Rendering::RenderingSystem &renderingSystem) {
+    void GeometryBatch::bind(Rendering::RenderingSystem &renderingSystem) {
 
-        Engine::log<module>("Binding shader#", shader);
-        shader.data<Program>()->bind();
+        Engine::log<module, Engine::low>("Binding shader#", shader);
         glBindVertexArray(vao);
     }
 
-
-    RenderBatch::RenderBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
-                             std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
-                             std::shared_ptr<Rendering::BatchBuffer> instanceBuffer)
+    GeometryBatch::GeometryBatch(std::shared_ptr<Rendering::BatchBuffer> arrayBuffer,
+                                 std::shared_ptr<Rendering::BatchBuffer> elementBuffer,
+                                 std::shared_ptr<Rendering::BatchBuffer> instanceBuffer
+    )
         : arrayBuffer(arrayBuffer), elementBuffer(elementBuffer), instanceBuffer(instanceBuffer) {
+
+		Engine::log<module>("Creating batch ", arrayBuffer->id(), " ", elementBuffer->id(), " ", instanceBuffer->id());
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer->id());
-        glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer->id());
+        glBindBuffer(elementBuffer->type(), elementBuffer->id());
 
         glBindVertexBuffer(0, arrayBuffer->id(), 0, arrayBuffer->stride());
-        
+
         glEnableVertexAttribArray(0);
         glVertexAttribFormat(0, 3, GL_FLOAT, false, 0);
         glVertexAttribBinding(0, 0);
@@ -79,25 +80,30 @@ namespace Rendering {
         glVertexAttribBinding(7, 1);
 
         glBindVertexArray(0);
+        Engine::log<module>("Creating new batch#", vao);
     }
 
-    void RenderBatch::push_back(const Component::Mesh &mesh) {
-        details[mesh.id()][0] = arrayBuffer->push_back(mesh.vertices);
-        details[mesh.id()][1] = elementBuffer->push_back(mesh.indices);
-        details[mesh.id()][2] = instanceBuffer->push_back(std::vector<glm::mat4>{glm::mat4(1)});
+    void GeometryBatch::push_back(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) {
+		
+        const auto key = std::make_pair(mesh, material);
+
+        details[key][ArrayBuffer] = arrayBuffer->push_back(mesh->vertices);
+        details[key][ElementBuffer] = elementBuffer->push_back(mesh->indices);
+        details[key][InstanceBuffer] = instanceBuffer->push_back(std::vector<glm::mat4>{glm::mat4(1)});
     }
 
-    bool RenderBatch::contains(Component::ComponentId id) const {
-        return details.count(id) > 0;
+    bool GeometryBatch::contains(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) const {
+        return details.count(std::make_pair(mesh, material)) > 0;
     }
 
-    void RenderBatch::remove(Component::ComponentId id) {
-        details.erase(id);
+    void GeometryBatch::remove(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) {
+        details.erase(std::make_pair(mesh, material));
     }
 
     BatchBuffer::BatchBuffer(int bufferMaxSize, int stride, int type)
-    : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
+        : m_size(bufferMaxSize), m_fill(0), m_stride(stride), m_type(type) {
 
+		
         glGenBuffers(1, &m_id);
         glBindBuffer(m_type, m_id);
         glBufferData(m_type, m_size, nullptr, GL_DYNAMIC_DRAW);
@@ -107,6 +113,10 @@ namespace Rendering {
     GLuint BatchBuffer::id() {
         return m_id;
     }
+
+	GLuint BatchBuffer::type() {
+		return m_type;
+	}
 
     size_t BatchBuffer::stride() {
         return m_stride;

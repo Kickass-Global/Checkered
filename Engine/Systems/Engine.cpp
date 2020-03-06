@@ -10,27 +10,25 @@
 
 std::vector<std::unique_ptr<Engine::SystemInterface>> Engine::registeredSystems;
 
-void Engine::nameComponent(const Component::ComponentId& componentId,
-	std::string name) {
-	identifier[componentId] = name;
+EngineStore Engine::store;
+
+void Engine::nameComponent(const Component::ComponentId &componentId,
+                           std::string name) {
+    identifier[componentId] = name;
 }
 
-const std::vector<std::unique_ptr<Engine::SystemInterface>>& Engine::systems() {
-	return registeredSystems;
+const std::vector<std::unique_ptr<Engine::SystemInterface>> &Engine::systems() {
+    return registeredSystems;
 }
 
-std::ostream& operator<<(std::ostream& out, Engine::Name name) {
-	const unsigned int width = 20;
-
-	std::ostringstream buff;
-	buff << "[";
-	std::copy_n(name.value.begin(),
-		std::min(name.value.size(), static_cast<size_t>(width - 3)),
-		std::ostreambuf_iterator(buff));
-	buff << "] ";
-
-	return out << std::setw(width) << buff.str();
+std::ostream& Engine::operator<<(std::ostream&  out, const glm::vec3& vector) {
+	return out << "<" << vector.x << ", " << vector.y << ", " << vector.z << ">";
 }
+
+std::ostream& Engine::operator<<(std::ostream&  out, const glm::quat& quat) {
+	return out << "<" << quat.x << ", " << quat.y << ", " << quat.z <<  ", " << quat.w << ">";
+}
+
 void Engine::sortSystems() {
     std::sort(registeredSystems.begin(), registeredSystems.end(), [](auto& a, auto& b) {return a->order > b->order; });
 }

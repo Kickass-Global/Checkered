@@ -2,6 +2,8 @@
 // Created by root on 29/2/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_SOUNDSYSTEM_H
 #define ENGINE_SOUNDSYSTEM_H
 
