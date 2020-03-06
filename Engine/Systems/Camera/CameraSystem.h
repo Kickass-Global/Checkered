@@ -42,6 +42,7 @@ namespace Camera {
 		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
 		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
 		std::shared_ptr<EventHandler<int, int>> onWindowSizeHandler;
+		std::shared_ptr<EventHandler<GLFWgamepadstate, GLFWgamepadstate>> onGamepadStateChangedHandler;
 
 		CameraSystem() {
 
@@ -51,6 +52,7 @@ namespace Camera {
 			onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
 			onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
 			onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
+			onGamepadStateChangedHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onGamepadStateChanged);
 
 		}
 
@@ -72,6 +74,7 @@ namespace Camera {
 		void onKeyUp(const Component::EventArgs<int> &args);
 
 		void onKeyPress(const Component::EventArgs<int> &args);
+		void onGamepadStateChanged(const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args);
 
 	};
 
