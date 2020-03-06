@@ -20,8 +20,8 @@ namespace Component {
 
 	public:
 		
-		std::shared_ptr<Scenery> pickup_actor;
-		std::shared_ptr<Scenery> dropoff_actor;
+		std::shared_ptr<Waypoint> pickup_actor;
+		std::shared_ptr<Waypoint> dropoff_actor;
 
 		PxPhysics* pass_physics;
 		PxMaterial* pass_material;

@@ -107,4 +107,28 @@ namespace physx {
 	std::ostream &operator<<(std::ostream &out, const PxTransform &transform);
 }
 
+
+
+
+enum FilterGroup : PxU32
+{
+	ePlayerVehicle = (1 << 0),
+	eEnemyVehicle = (1 << 1),
+	ePasenger = (1 << 2)
+};
+
+template <class T>
+constexpr int operator| (T a, enum FilterGroup b) {
+	using G = std::underlying_type_t<enum FilterGroup>;
+	return static_cast<PxU32>(static_cast<G>(a) | static_cast<G>(b));
+}
+
+enum FilterMask : PxU32 {
+	EVERYTHING = FilterGroup::eEnemyVehicle | FilterGroup::ePasenger,
+};
+
+
+
+
 #endif //ENGINE_PHYSICSSYSTEM_H
+

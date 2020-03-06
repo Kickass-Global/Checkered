@@ -57,14 +57,7 @@ static PxDefaultErrorCallback cErrorCallback;
 
 std::map<physx::PxRigidDynamic*, std::shared_ptr<ComponentBase>> trackedComponents;
 
-struct FliterGroup {
-	enum Enum
-	{
-		ePlayerVehicle = (1 << 0),
-		eEnemyVehicle = (1 << 1),
-		ePasenger = (1 << 2)
-	};
-};
+
 
 extern VehicleDesc initVehicleDesc();
 
@@ -257,9 +250,7 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 	PxVehicleGearsData gears;
 	pxVehicle->mDriveSimData.setGearsData(gears);
 
-
-
-	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FliterGroup::ePlayerVehicle, FliterGroup::ePasenger);
+	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::ePlayerVehicle, FilterMask::EVERYTHING );
 
 
 
@@ -482,6 +473,13 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 		);
 	}
 
+	if (aPhysicsActor->type == PhysicsActor::Type::TriggerVolume) {
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxTriangleMeshGeometry(createTriMesh(aMesh.get())),
+			*cMaterial, (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION)
+		);
+	}
+
 	switch (aPhysicsActor->type)
 	{
 	case PhysicsActor::Type::StaticObject:
@@ -492,6 +490,9 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 		break;
 	case PhysicsActor::Type::Ground:
 		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST);
+		break;
+	case PhysicsActor::Type::TriggerVolume:
+		setupFiltering(aPhysicsActor->actor, 0, 0);
 		break;
 	}
 	cScene->addActor(*aPhysicsActor->actor);
