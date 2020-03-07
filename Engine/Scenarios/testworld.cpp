@@ -224,7 +224,7 @@ void TestWorld::load() {
 
 	using namespace Engine;
 	auto overlap = [](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
-		log<high>("Overlap detected");
+		log<high>("Overlap detected between #", args.get<0>(), " and #", args.get<0>());
 	};
 	auto overlap_handler = Engine::EventSystem::createHandler< Component::PhysicsActor*, Component::PhysicsActor*>(std::function(overlap));
 	passenger->pickup_actor->actor->onOverlap += overlap_handler;

@@ -215,6 +215,11 @@ namespace Engine {
 		log<module, importance>(args...);
 	}
 
+	template<Importance importance = medium, class ... Ts>
+	void log(const Ts&&...args) {
+		log<module, importance>(args...);
+	}
+
 
 
 }
