@@ -2,6 +2,7 @@
 // Created by root on 19/1/20.
 //
 
+#pragma once
 #ifndef ENGINE_BILLBOARD_H
 #define ENGINE_BILLBOARD_H
 
@@ -9,16 +10,17 @@
 
 namespace Component {
 
-    class Billboard : public ComponentBase<ClassId::Billboard> {
+
+    class Billboard : public ComponentBase {
     public:
-        ComponentId bitmap;
-        ComponentId shader;
+		std::shared_ptr<class MeshInstance> mesh_instance;
         struct Rectangle {
-            int x;
-            int y;
-            int width;
-            int height;
+            float x;
+            float y;
+            float width;
+            float height;
         } plot;
+        glm::vec2 anchor = {1, 1};
     };
 
 }

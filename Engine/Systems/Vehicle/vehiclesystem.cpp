@@ -12,37 +12,34 @@
 #include "glm/gtx/matrix_decompose.hpp"
 
 void Engine::vehicleSystem::initialize() {
-    SystemInterface::initialize();
+	SystemInterface::initialize();
 }
 void Engine::vehicleSystem::update(Engine::deltaTime) {
 
-    auto vehicles = Component::Index::entitiesOf<Component::Vehicle>();
-    for (const auto &vehicle : vehicles) {
+	auto vehicles = Engine::getStore().getRoot().getComponentsOfType<Component::Vehicle>();
+	for (auto &vehicle : vehicles) {
 
-        // check to see if we need to create a new phyx vehicle...
-        auto is_dirty = vehicle.hasTag<Component::Dirty>(true);
-        if (is_dirty && !vehicle.data<Component::Vehicle>()->pxVehicle) {
-            onVehicleCreated(vehicle);
-        }
+		if (!vehicle->pxVehicle) {
+			onVehicleCreated(vehicle);
+		}
 
-        auto physicsUpdates = vehicle.childComponentsOfClass(Component::ClassId::PhysicsPacket);
-        auto has_physics_update = !physicsUpdates.empty();
+		auto physicsUpdates = vehicle->getChildren().getComponentsOfType<Component::PhysicsPacket>();
 
-        auto meta = vehicle.data<Component::Vehicle>();
+		if (!physicsUpdates.empty()) {
 
-        if (has_physics_update) {
+			auto physx_data = physicsUpdates[0];
+			vehicle->rotation = physx_data->rotation;
+			vehicle->position = physx_data->position;
 
-            auto physx_data = physicsUpdates.begin()->data<Component::PhysicsPacket>();
+			if (vehicle->model) {
+				vehicle->model->transform = vehicle->world_transform();
+				vehicle->model->is_outdated = true;
 
-            meta->rotation = physx_data->rotation;
-            meta->position = physx_data->position;
+				vehicle->getChildren().eraseComponentsOfType<WorldTransform>();
+				vehicle->emplaceChildComponent<WorldTransform>(vehicle->physx_transform()); // todo, eh
+			}
+		}
 
-            if (vehicle.data<Component::Vehicle>()->model) {
-                vehicle.data<Component::Vehicle>()->model.attachExistingComponent(
-                        Engine::createComponent<Component::WorldTransform>(meta->world_transform())->id());
-            }
-        }
-
-        vehicle.destroyComponentsOfType(Component::ClassId::PhysicsPacket);
-    }
+		vehicle->getChildren().eraseComponentsOfType<Component::PhysicsPacket>();
+	}
 }

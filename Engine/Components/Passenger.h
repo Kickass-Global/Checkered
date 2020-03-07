@@ -1,4 +1,6 @@
 
+#ifndef PASSENGER_H
+#define PASSENGER_H
 
 #include <PxPhysicsAPI.h>
 #include <PxPhysics.h>
@@ -8,34 +10,40 @@
 #include "ComponentId.h"
 #include "Component.h"
 #include "Engine.h"
+#include "scenery.hpp"
 
 using namespace physx;
 
 namespace Component {
 
-	class Passenger : public Component::ComponentBase<Component::ClassId::Passenger> {
+	class Passenger : public ComponentBase {
 
 	public:
 		
-		void initPassenger();
+		std::shared_ptr<Waypoint> pickup_actor;
+		std::shared_ptr<Waypoint> dropoff_actor;
 
+		PxPhysics* pass_physics;
+		PxMaterial* pass_material;
+
+		PxTransform pickupTransform;
+		PxTransform dropOffTransform;
+
+		void setPickupTransform(PxTransform pickupTrans);
+		void setDropoffTransform(PxTransform dropoffTrans);
 
 	private:
 
-		float PASS_STATIC_FRICTION = 100.0F;
-		float PASS_DYNAMIC_FRICTION = 100.0f;
-		float PASS_RESTITUTION = 100.0f;
+		
 
-
-		PxShape* pass_shape;
-		PxRigidActor* pass_actor;
-		PxPhysics* pass_physics;
-		PxMaterial* pass_material;
 
 
 
 	};
 
 
-}
+	
 
+
+}
+#endif

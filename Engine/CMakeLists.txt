@@ -9,8 +9,8 @@ set(GLAD ../Include/glad/src/glad.c)
 file(GLOB_RECURSE PHYSX_SNIPPETS ../Engine/Systems/Physics/snippet** *.h *.cpp)
 
 set(SRC main.cpp main.h
+	Scenarios/testworld.cpp Scenarios/testworld.hpp
         Systems/Engine.cpp Systems/Engine.h
-        Systems/Index.cpp Systems/Index.h
         Components/tags.cpp Components/tags.h
         Components/Mesh.cpp Components/Mesh.h
         Components/SceneComponent.cpp Components/SceneComponent.h
@@ -23,11 +23,13 @@ set(SRC main.cpp main.h
         Systems/Camera/CameraSystem.cpp Systems/Camera/CameraSystem.h
         Systems/Input/InputSystem.cpp Systems/Input/InputSystem.h
         Systems/Pipeline/MeshLoader.h
+        Systems/Physics/SimulationCallback.h Systems/Physics/SimulationCallback.cpp
         Components/Shader.cpp Components/Shader.h
         Components/ComponentId.cpp Components/ComponentId.h
         Components/ComponentId.tpp.h
         Components/Camera.cpp Components/Camera.h
         Systems/Rendering/Rendering.h
+        Systems/Physics/FilterShader.cpp Systems/Physics/FilterShader.h
         Components/Plane.cpp Components/Plane.h
         Systems/Pipeline/EntityLoader.cpp Systems/Pipeline/EntityLoader.h
         Components/Model.cpp Components/Model.h
@@ -54,7 +56,10 @@ set(SRC main.cpp main.h
         Systems/hornSystem/hornSystem.cpp
         Systems/hornSystem/hornSystem.h
         Systems/Vehicle/vehiclesystem.cpp Systems/Vehicle/vehiclesystem.hpp
-        Components/WorldTransform.h Components/WorldTransform.cpp Components/ComponentId.tpp.h Components/texture.cpp Components/texture.hpp Components/material.cpp Components/material.hpp)
+        Systems/soundSystem/SoundSystem.cpp Systems/soundSystem/SoundSystem.h
+        Components/WorldTransform.h Components/WorldTransform.cpp
+        Components/texture.cpp Components/texture.hpp
+        Components/material.cpp Components/material.hpp Components/PhysicsActor.cpp Components/PhysicsActor.h Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h Systems/EngineStore.cpp Systems/EngineStore.h)
 
 # Add source to this project's executable.
 add_executable(Engine
@@ -85,7 +90,7 @@ endif ()
 # copy assets into build directory
 
 set(PHYSX_HOME PATH "")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -97,6 +102,7 @@ target_link_libraries(Engine
         PRIVATE glfw
         PRIVATE SOIL
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/OpenAL/libs/Win64/OpenAL32.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCommon_64.lib
@@ -122,6 +128,8 @@ find_package(OpenGL REQUIRED)
 target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
         PRIVATE "Components"
         PRIVATE "Systems"
+        PRIVATE "Scenarios"
+        SYSTEM PRIVATE "../3rd-party/OpenAL/include"
         SYSTEM PRIVATE "../Include/PhysX/include"
         SYSTEM PRIVATE "../Include/PhysX/source/foundation/include"
         SYSTEM PRIVATE "../Include/PxShared/include"
