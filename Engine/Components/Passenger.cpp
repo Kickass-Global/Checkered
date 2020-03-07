@@ -5,22 +5,11 @@
 using namespace physx;
 
 
-void Component::Passenger::initPassenger() {
 
-	// you may want to farm this out to the physics system to do all the heavy lifting here...
+void Component::Passenger::setPickupTransform(PxTransform trans) {
+	pickupTransform = trans;
+}
 
-	//create material for passenger
-	//pass_material = pass_physics->createMaterial(PASS_STATIC_FRICTION, PASS_DYNAMIC_FRICTION, PASS_RESTITUTION);
-	//if (!pass_material)
-	//	Engine::assertLog<module>(false, "Passenger Material failed to create");
-
-
-
-	////create physics shape and bind to physics actor
-	//PxShapeFlags shapeFlags = (PxShapeFlag::eTRIGGER_SHAPE | PxShapeFlag::eVISUALIZATION);
-	//pass_shape = pass_physics->createShape(PxSphereGeometry(1.0f), &pass_material, true,
-	//	shapeFlags);
-	//pass_actor->attachShape(*pass_shape);
-	//pass_shape->release();
-
+void Component::Passenger::setDropoffTransform(PxTransform trans) {
+	dropOffTransform = trans;
 }

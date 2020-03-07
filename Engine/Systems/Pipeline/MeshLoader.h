@@ -8,7 +8,6 @@
 #include "assimp/postprocess.h"
 #include "ShaderLoader.h"
 #include "../../Components/Mesh.h"
-#include "Library.h"
 #include "Engine.h"
 
 namespace Pipeline {
@@ -16,12 +15,7 @@ namespace Pipeline {
     class MeshLoader {
     public:
 
-        static Component::Mesh *load(std::string filename) {
-
-            if (Library::contains(filename)) {
-                Engine::log<module>("Using resource from library ", filename);
-                return Library::at(filename).data<Component::Mesh>();
-            }
+        static std::shared_ptr<Component::Mesh> load(std::string filename) {
 
             Assimp::Importer importer;
             const aiScene *scene = importer.ReadFile(filename,
@@ -36,39 +30,87 @@ namespace Pipeline {
 			Engine::assertLog<module>(scene, "Loading resource " + filename);
 
             auto&& data = scene->mMeshes[0];
+			
 			Engine::assertLog<module>(data, "Loading mesh data");
 
-            Component::Mesh mesh = Component::Mesh();
+            auto mesh = Engine::createComponent<Component::Mesh>();
 
             // todo: error checking & sanity
 
-            for (auto i = 0u; i < data->mNumVertices; ++i)
-            {
-                mesh.vertices.emplace_back(
-                    data->mVertices[i],
-                    data->mNormals[i],
-                    data->mTextureCoords[0][i]
-                );
-            }
 
-            for (auto i = 0u; i < data->mNumFaces; ++i) {
-                int x = 000;
-                auto &&face = data->mFaces[i];
-                Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
+				for (auto i = 0u; i < data->mNumVertices; ++i)
+				{
+					mesh->vertices.emplace_back(
+						data->mVertices[i],
+						data->mNormals[i],
+						data->mTextureCoords[0][i]
+					);
+				}
 
-                for (auto j = 0u; j < face.mNumIndices; ++j) {
-                    mesh.indices.push_back(face.mIndices[j]);
-                }
-            }
+				for (auto i = 0u; i < data->mNumFaces; ++i) {
+					int x = 000;
+					auto &&face = data->mFaces[i];
+					Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
 
-            auto shaders = Component::Index::entitiesOf<Rendering::Shader>();
-            if (!shaders.empty()) {
-                mesh.shader = *(shaders.begin());
-            }
+					for (auto j = 0u; j < face.mNumIndices; ++j) {
+						mesh->indices.push_back(face.mIndices[j]);
+					}
+				}
+			
 
-            Library::emplace(filename, mesh.id());
-            return Engine::addComponent(std::make_unique<Component::Mesh>(mesh));
+			return mesh;
         }
+
+		static std::shared_ptr<Component::MeshCollection> load_all(std::string filename) {
+
+			Assimp::Importer importer;
+			const aiScene *scene = importer.ReadFile(filename,
+				aiProcess_CalcTangentSpace |
+				aiProcess_Triangulate |
+				aiProcess_JoinIdenticalVertices |
+				aiProcess_SortByPType);
+
+			if (!scene) {
+				Engine::log<module, Engine::high>(importer.GetErrorString());
+			}
+
+			Engine::assertLog<module>(scene, "Loading resource " + filename);
+
+			auto collection = Engine::createComponent<Component::MeshCollection>();
+
+			for (int i = 0; i < scene->mNumMeshes; ++i) {
+				auto mesh = Engine::createComponent<Component::Mesh>();
+				auto&& data = scene->mMeshes[0];
+				Engine::assertLog<module>(data, "Loading mesh data");
+
+				// todo: error checking & sanity
+
+
+				for (auto i = 0u; i < data->mNumVertices; ++i)
+				{
+					mesh->vertices.emplace_back(
+						data->mVertices[i],
+						data->mNormals[i],
+						data->mTextureCoords[0][i]
+					);
+				}
+
+				for (auto i = 0u; i < data->mNumFaces; ++i) {
+					int x = 000;
+					auto &&face = data->mFaces[i];
+					Engine::assertLog<module>(face.mNumIndices == 3, "Mesh face is triangulated");
+
+					for (auto j = 0u; j < face.mNumIndices; ++j) {
+						mesh->indices.push_back(face.mIndices[j]);
+					}
+				}
+
+				collection->meshes.emplace_back(std::move(mesh));
+
+			}
+
+			return collection;
+		}
 	};
 
 }

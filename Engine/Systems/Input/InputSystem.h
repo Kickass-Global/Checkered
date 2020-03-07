@@ -2,6 +2,8 @@
 // Created by root on 11/1/20.
 //
 
+#pragma once
+
 #ifndef ENGINE_INPUTSYSTEM_H
 #define ENGINE_INPUTSYSTEM_H
 
@@ -33,6 +35,7 @@ namespace Input {
         static Component::EventDelegate<int> onKeyPress;
         static Component::EventDelegate<int> onKeyDown;
         static Component::EventDelegate<int> onKeyUp;
+		static Component::EventDelegate<GLFWgamepadstate, GLFWgamepadstate> onGamePadStateChanged;
 
         void initialize(GLFWwindow *window);
 

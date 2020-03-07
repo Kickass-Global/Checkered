@@ -5,7 +5,6 @@
 #include "ComponentId.h"
 #include "Camera.h"
 #include "systeminterface.hpp"
-#include "Index.h"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"
@@ -27,16 +26,16 @@ namespace Horn {
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
 
-        Component::ComponentId onKeyPressHandler;
-        Component::ComponentId onKeyDownHandler;
-        Component::ComponentId onKeyUpHandler;
+    //    Component::ComponentId onKeyPressHandler;
+    //    Component::ComponentId onKeyDownHandler;
+    //    Component::ComponentId onKeyUpHandler;
 
-        //std::set<int> keys;
-    private:
-        //std::set<int> keys;
-        void onKeyDown(const Component::EventArgs<int>& args);
-        void onKeyUp(const Component::EventArgs<int>& args);
-        void onKeyPress(const Component::EventArgs<int>& args);
-        void sound();
+    //    //std::set<int> keys;
+    //private:
+    //    //std::set<int> keys;
+    //    void onKeyDown(const Component::EventArgs<int>& args);
+    //    void onKeyUp(const Component::EventArgs<int>& args);
+    //    void onKeyPress(const Component::EventArgs<int>& args);
+    //    void sound();
     };
 }
