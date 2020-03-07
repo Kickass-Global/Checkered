@@ -204,7 +204,6 @@ int main() {
                 }
 
             }
-            std::cout << "following path\n";
         } else {
             auto player_direction = perpdot(glm::normalize(player_location - ai_location), ai_direction);
             // check if the player is in front or behind the ai.
@@ -237,8 +236,6 @@ int main() {
                 }
 
             }
-
-            std::cout << "following player\n";
         }
 
         
@@ -254,7 +251,7 @@ int main() {
     // spawn some ai bois into the world
     auto dim = 1;
     int spacing = 60;
-    for (int x = -dim; x <= -dim; x++) {
+    for (int x = -dim; x <= dim; x++) {
         for (int y = -dim; y <= 0; y++) {
 
             auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
@@ -263,6 +260,7 @@ int main() {
             ai_vehicle->path.graphNodes = navEnum;
             ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
             ai_vehicle->path.CleanPath();
+            ai_vehicle->path.PrintPath();
             ai_vehicle->tickHandler += ticker; // give them brain
 
         }
