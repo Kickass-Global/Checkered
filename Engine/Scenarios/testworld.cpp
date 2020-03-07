@@ -215,12 +215,15 @@ void TestWorld::load() {
 
 	glm::vec3 origin = { 10,0,20 };
 	for (int i = 1; i < 50; i++) {
-		obstacle_instances.add_instance_at(i / 50.0f * 14.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } - glm::vec3{0,5,0} + origin, hydrant_mesh, hydrant_material);
+		obstacle_instances.add_instance_at(i / 50.0f * 14.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } -glm::vec3{ 0,5,0 } +origin, hydrant_mesh, hydrant_material);
 	}
 
-	auto passenger = Engine::createComponent<Component::Passenger>();
-	passenger->pickup_actor = Engine::createComponent<Waypoint>(glm::vec3{ 0.f, 0.f, 2.0f }, dumpster_mesh, car_material);
-	passenger->dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, hydrant_material);
+	auto passenger = Engine::createComponent<Component::Passenger>(
+		glm::vec3{ 0.f, 0.f, 2.0f },
+		glm::vec3{ 13.0f, 0.f, 2.0f },
+		dumpster_mesh,
+		hydrant_material
+		);
 
 	using namespace Engine;
 	auto overlap = [player, taxi_mesh_instance](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
