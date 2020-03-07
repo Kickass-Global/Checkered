@@ -40,10 +40,15 @@ namespace snippetvehicle {
              PxFilterObjectAttributes attributes1, PxFilterData filterData1,
              PxPairFlags &pairFlags, const void *constantBlock,
              PxU32 constantBlockSize) {
-        PX_UNUSED(attributes0);
-        PX_UNUSED(attributes1);
         PX_UNUSED(constantBlock);
         PX_UNUSED(constantBlockSize);
+
+		if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+		{
+			pairFlags = PxPairFlag::eTRIGGER_DEFAULT; 
+			return PxFilterFlag::eDEFAULT;
+		}
+		// generate contacts for all that were not filtered above
 
         if ((0 == (filterData0.word0 & filterData1.word1)) &&
             (0 == (filterData1.word0 & filterData0.word1)))
