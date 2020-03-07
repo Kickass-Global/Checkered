@@ -62,9 +62,9 @@ void TestWorld::load() {
 	Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
 	Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-	//Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
-	//Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
-	//Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+	Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
+	Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
+	Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
 
 	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 	//endregion
@@ -128,7 +128,7 @@ void TestWorld::load() {
 	building_instances.add_instance_at(glm::vec3{ 0,0,-80 }, building_mesh3, building_material3);
 
 
-// setup a HUD element...
+	// setup a HUD element...
 
 	auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
 	billboard_mesh->emplaceChildComponent<WorldTransform>();
@@ -158,20 +158,21 @@ void TestWorld::load() {
 	auto car_material = Engine::createComponent<Component::Material>(basic_shader_program);
 	car_material->textures.push_back(
 		Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
+	auto car_mesh = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/cop_mesh.fbx"
+		);
 
 	auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
-		Pipeline::Library::getAsset<Mesh>(
-			"Assets/Meshes/cop_mesh.fbx"
-			), car_material);
+		car_mesh, car_material);
 
 	auto taxi_material = Engine::createComponent<Component::Material>(basic_shader_program);
 	taxi_material->textures.push_back(
 		Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Taxi.png"));
 
-	auto taxi_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
-		Pipeline::Library::getAsset<Mesh>(
-			"Assets/Meshes/taxi_mesh.fbx"
-			), taxi_material);
+	auto taxi_mesh = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/taxi_mesh.fbx"
+		);
+
 
 	// setup the vehicle for the player...
 
@@ -185,7 +186,7 @@ void TestWorld::load() {
 	auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
 
 	player_damage_model->parts.push_back(Component::Model::Part{});
-	player_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, car_mesh_instance });
+	player_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, Engine::createComponent<PaintedMesh>(car_mesh, car_material) });
 
 	player_vehicle->model = player_damage_model;
 	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
@@ -215,30 +216,26 @@ void TestWorld::load() {
 
 	glm::vec3 origin = { 10,0,20 };
 	for (int i = 1; i < 50; i++) {
-		obstacle_instances.add_instance_at(i / 50.0f * 14.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } - glm::vec3{0,5,0} + origin, hydrant_mesh, hydrant_material);
+		obstacle_instances.add_instance_at(i / 50.0f * 14.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } -glm::vec3{ 0,5,0 } +origin, hydrant_mesh, hydrant_material);
 	}
 
-	auto passenger = Engine::createComponent<Component::Passenger>();
-	passenger->pickup_actor = Engine::createComponent<Waypoint>(glm::vec3{ 0.f, 0.f, 2.0f }, dumpster_mesh, car_material);
-	passenger->dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, hydrant_material);
+	auto passenger = Engine::createComponent<Component::Passenger>(
+		glm::vec3{ 0.f, 0.f, 2.0f },
+		glm::vec3{ 13.0f, 0.f, 2.0f },
+		dumpster_mesh,
+		hydrant_material
+		);
 
 	using namespace Engine;
-	auto overlap = [](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
-		log<high>("Overlap detected between #", args.get<0>(), " and #", args.get<0>());
-	};
-	auto overlap_handler = Engine::EventSystem::createHandler< Component::PhysicsActor*, Component::PhysicsActor*>(std::function(overlap));
-	passenger->pickup_actor->actor->onOverlap += overlap_handler;
-	passenger->dropoff_actor->actor->onOverlap += overlap_handler;
-
 
 	// ai factory method...
-	auto make_ai = [taxi_mesh_instance](glm::mat4 world_transform = glm::mat4{ 1 }) {
+	auto make_ai = [&taxi_mesh, &taxi_material](glm::mat4 world_transform = glm::mat4{ 1 }) {
 
 		auto ai_vehicle = Engine::createNamedComponent<Component::Vehicle>("ai_vehicle");
 		auto ai_damage_model = Engine::createNamedComponent<Component::Model>("ai_vehicle_model");
 
 		ai_damage_model->parts.push_back(Component::Model::Part{});
-		ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, taxi_mesh_instance });
+		ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{ 2000000, Engine::createComponent<PaintedMesh>(taxi_mesh, taxi_material) });
 
 		glm::quat orientation;
 		glm::vec3 scale, translation, skew;
@@ -361,10 +358,10 @@ void TestWorld::load() {
 
 	// spawn some ai bois into the world
 	auto dim = 1;
-	int spacing = 120;
+	int spacing = 150;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
-			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
+			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
 			ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
 			ai_vehicle->path.graphNodes = navEnum;
 			ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);

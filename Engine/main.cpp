@@ -38,8 +38,6 @@ int main() {
 
 	TestWorld::load();
 
-
-
 	auto debug = Engine::addSystem<Debug::LiveReloadSystem>();
 	//debug->watch("tweak.txt");
 

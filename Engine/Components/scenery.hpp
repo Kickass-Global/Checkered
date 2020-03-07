@@ -7,6 +7,7 @@
 #include <Mesh.h>
 #include <SceneComponent.h>
 #include <PhysicsActor.h>
+#include <Events/Events.h>
 
 namespace Component {
 
@@ -86,6 +87,12 @@ namespace Component {
 		std::shared_ptr<PhysicsActor> actor;
 		std::shared_ptr<PaintedMesh> mesh;
 
+		EventDelegate<PhysicsActor*> onEntered{ "onEntered" };
+		EventDelegate<PhysicsActor*> onExited{ "onExited" };
+
+		std::shared_ptr<EventHandler<PhysicsActor*, PhysicsActor*>> onActorOverlapBeginHandler;
+		std::shared_ptr<EventHandler<PhysicsActor*, PhysicsActor*>> onActorOverlapEndHandler;
+
 		Waypoint(glm::vec3 position, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) :
 			mesh(Engine::createComponent<PaintedMesh>(mesh, material)),
 			actor(Engine::createComponent<PhysicsActor>(mesh))
@@ -93,7 +100,23 @@ namespace Component {
 			actor->type = PhysicsActor::Type::TriggerVolume;
 			actor->position = position;
 			actor->node->addChildComponent(Engine::createComponent<SceneComponent>(actor->node, this->mesh));
+
+			onActorOverlapBeginHandler = Engine::EventSystem::createHandler(this, &Waypoint::onActorOverlapBegin);
+			onActorOverlapEndHandler = Engine::EventSystem::createHandler(this, &Waypoint::onActorOverlapEnd);
+			actor->onBeginOverlap += onActorOverlapBeginHandler;
+			actor->onEndOverlap += onActorOverlapEndHandler;
 		}
+
+		void onActorOverlapBegin(const EventArgs<PhysicsActor*, PhysicsActor*>& args)
+		{
+			onEntered(args.get<1>());
+		}
+
+		void onActorOverlapEnd(const EventArgs<PhysicsActor*, PhysicsActor*>& args)
+		{
+			onExited(args.get<1>());
+		}
+
 	};
 
 	/**
