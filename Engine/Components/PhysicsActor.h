@@ -16,6 +16,9 @@ namespace Component {
 
 	public:
 
+		EventDelegate<PhysicsActor*, PhysicsActor*> onBeginOverlap{ "onBeginOverlap" };
+		EventDelegate<PhysicsActor*, PhysicsActor*> onEndOverlap{ "onEndOverlap" };
+
 		std::shared_ptr<SceneComponent> node = Engine::createComponent<SceneComponent>(nullptr);
 		// this will be used to generate the collision bounds, may be different than the visual mesh.
 		std::shared_ptr<Mesh> mesh;
@@ -26,7 +29,8 @@ namespace Component {
 		enum Type {
 			Ground,
 			DynamicObject,
-			StaticObject
+			StaticObject,
+			TriggerVolume
 		} type = StaticObject;
 
 		glm::mat4 getWorldTransform();

@@ -189,7 +189,8 @@ namespace Engine {
 	constexpr Importance loggingLevel = high;
 
 
-	template<char const *m = module, Importance importance = medium, class ... Ts>
+
+	template<char const *m, Importance importance, class ... Ts>
 	void log(Ts...args) {
 		if (importance >= loggingLevel) {
 
@@ -203,6 +204,23 @@ namespace Engine {
 			OutputDebugString(buffer.str().c_str());
 		}
 	}
+
+	template<char const *m, class ... Ts>
+	void log(Ts...args) {
+		log<module, medium>(args...);
+	}
+
+	template<Importance importance = medium, class ... Ts>
+	void log(Ts...args) {
+		log<module, importance>(args...);
+	}
+
+	template<Importance importance = medium, class ... Ts>
+	void log(const Ts&&...args) {
+		log<module, importance>(args...);
+	}
+
+
 
 }
 

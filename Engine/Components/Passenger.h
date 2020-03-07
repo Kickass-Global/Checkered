@@ -9,6 +9,7 @@
 #include <PxRigidBody.h>
 #include "ComponentId.h"
 #include "Component.h"
+#include "scenery.hpp"
 #include "Engine.h"
 
 using namespace physx;
@@ -19,9 +20,8 @@ namespace Component {
 
 	public:
 		
-
-		PxRigidStatic* pass_actor_pickup;
-		PxRigidStatic* pass_actor_dropoff;
+		std::shared_ptr<Waypoint> pickup_actor;
+		std::shared_ptr<Waypoint> dropoff_actor;
 
 		PxPhysics* pass_physics;
 		PxMaterial* pass_material;
@@ -32,9 +32,16 @@ namespace Component {
 		void setPickupTransform(PxTransform pickupTrans);
 		void setDropoffTransform(PxTransform dropoffTrans);
 
+		Passenger() {
+			//pickup_actor->onEntered += std::bind(&Passenger::onPassengerPickedUp, this, std::placeholders::_1);
+		}
+
 	private:
 
-		
+		void onPassengerPickedUp(PhysicsActor*) {
+			using namespace Engine;
+			log<high>("Passenger picked up");
+		}
 
 
 

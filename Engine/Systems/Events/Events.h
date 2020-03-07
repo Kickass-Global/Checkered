@@ -71,9 +71,7 @@ namespace Engine {
 			void (T::* callback)(const Component::EventArgs<Engine::deltaTime> &)) {
 
 			auto handler = Engine::createComponent<Component::EventHandler<Engine::deltaTime>>();
-			handler->callback = std::bind(callback, instance,
-				std::placeholders::_1
-			);
+			handler->callback = std::bind(callback, instance, std::placeholders::_1);
 
 			onTick += handler;
 			return handler;

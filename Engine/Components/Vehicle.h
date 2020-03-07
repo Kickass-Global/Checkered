@@ -30,6 +30,11 @@ namespace Component {
 		std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
 		EventDelegate<Vehicle*> tickHandler = EventDelegate<Vehicle*>("handler");
 
+		enum Type {
+			Player,
+			Taxi
+		} type = Taxi;
+
 		AStar path;
 		glm::vec3 scale = { 1,1,1 };
 		glm::quat rotation;
@@ -109,15 +114,23 @@ namespace Component {
 
 
 	struct ControlledVehicle : public ComponentBase {
+
 		std::shared_ptr<Vehicle> vehicle;
 		std::shared_ptr<EventHandler< GLFWgamepadstate, GLFWgamepadstate>> onGamePadStateChangedHandler;
+		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
+		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
+
 		ControlledVehicle() : vehicle(Engine::createComponent<Vehicle>())
 		{
 			onGamePadStateChangedHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onGamePadStateChanged);
+			onKeyDownHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onKeyDown);
+			onKeyUpHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onKeyUp);
 		}
+
 		template <typename T> int sgn(T val) {
 			return (T(0) < val) - (val < T(0));
 		}
+		
 		float filter_axis_data(const float input)
 		{
 			auto normalize = [](auto value, auto min, auto max) {
@@ -125,6 +138,50 @@ namespace Component {
 			};
 			if(input >= 0) return std::clamp(input, 0.2f, 1.0f);
 			else return std::clamp(input, -1.0f, -0.2f);
+		}
+
+
+		void onKeyDown(const EventArgs<int>& args) {
+			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
+			auto key = std::get<0>(args.values);
+			if (key == GLFW_KEY_W) {
+
+				if (v.z < 0.0) {
+					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
+				}
+				vehicle->pxVehicleInputData.setAnalogAccel(1);
+			}
+			if (key == GLFW_KEY_A) {
+				vehicle->pxVehicleInputData.setAnalogSteer(1);
+			}
+			if (key == GLFW_KEY_D) {
+				vehicle->pxVehicleInputData.setAnalogSteer(-1);
+			}
+			if (key == GLFW_KEY_S) {
+				if (v.z > 0.1) {
+					vehicle->pxVehicleInputData.setAnalogBrake(1);
+				}
+				else {
+					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eREVERSE);
+					vehicle->pxVehicleInputData.setAnalogAccel(1);
+				}
+			}
+		}
+
+		void onKeyUp(const EventArgs<int>& args) {
+			auto key = std::get<0>(args.values);
+			if (key == GLFW_KEY_W) {
+				vehicle->pxVehicleInputData.setAnalogAccel(0);
+			}
+			if (key == GLFW_KEY_A) {
+				vehicle->pxVehicleInputData.setAnalogSteer(0);
+			}
+			if (key == GLFW_KEY_D) {
+				vehicle->pxVehicleInputData.setAnalogSteer(0);
+			}
+			if (key == GLFW_KEY_S) {
+				vehicle->pxVehicleInputData.setAnalogBrake(0);
+			}
 		}
 
 		void onGamePadStateChanged(const EventArgs<GLFWgamepadstate, GLFWgamepadstate>& args)

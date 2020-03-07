@@ -104,11 +104,18 @@ void ::Camera::CameraSystem::onKeyPress(const Component::EventArgs<int> &args) {
 }
 
 void ::Camera::CameraSystem::onKeyUp(const Component::EventArgs<int> &args) {
-    Engine::log<module>("onKeyUp=", std::get<0>(args.values));
+    //Engine::log<module>("onKeyUp=", std::get<0>(args.values));
     keys.erase(std::get<0>(args.values));
 }
 
 void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
-    Engine::log<module>("onKeyDown=", std::get<0>(args.values));
+    //Engine::log<module>("onKeyDown=", std::get<0>(args.values));
     keys.emplace(std::get<0>(args.values));
+}
+
+void ::Camera::CameraSystem::onGamepadStateChanged(const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args) {
+	//Engine::log<module>("onGamepadStateChanged=", std::get<0>(args.values));
+
+	auto input = std::get<1>(args.values);
+	x += input.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
 }
