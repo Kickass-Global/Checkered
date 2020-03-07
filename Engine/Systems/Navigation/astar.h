@@ -22,6 +22,7 @@ public:
     void FindPath(glm::vec3 currentPos, glm::vec3 targetPos);
     void ReachedPoint(glm::vec3 cPos);
     void CleanPath();
+    void PrintPath();
     void ClearOpenList() { openList.clear(); };
     void ClearVisitedList() { visitList.clear(); };
     void ClearPathToGoal() { pathToGoal.clear(); };
