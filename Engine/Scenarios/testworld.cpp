@@ -128,7 +128,7 @@ void TestWorld::load() {
 	building_instances.add_instance_at(glm::vec3{ 0,0,0 }, building_mesh3, building_material3);
 */
 
-	// setup a HUD element...
+// setup a HUD element...
 
 	auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
 	billboard_mesh->emplaceChildComponent<WorldTransform>();
@@ -204,14 +204,22 @@ void TestWorld::load() {
 	auto dumpster_mesh = Pipeline::Library::getAsset<Mesh>(
 		"Assets/Meshes/dumpster_mesh.fbx"
 		);
-	
-	auto passenger = Engine::createComponent<Component::Passenger>();
-	passenger->pickup_actor = Engine::createComponent<Scenery>(glm::vec3{ 0.f, 0.f, 2.0f },dumpster_mesh, dumpster_material);
-	passenger->dropoff_actor = Engine::createComponent<Scenery>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, dumpster_material);
-	
 
-	// ai factory method...
-	auto make_ai = [taxi_mesh_instance](glm::mat4 world_transform = glm::mat4{ 1 }) {
+	auto passenger = Engine::createComponent<Component::Passenger>();
+	passenger->pickup_actor = Engine::createComponent<Waypoint>(glm::vec3{ 0.f, 0.f, 2.0f }, dumpster_mesh, dumpster_material);
+	passenger->dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, dumpster_material);
+	
+	using namespace Engine;
+	auto overlap = [](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
+		log<high>("Overlap detected");
+	};
+	auto overlap_handler = Engine::EventSystem::createHandler< Component::PhysicsActor*, Component::PhysicsActor*>(std::function(overlap));
+	passenger->pickup_actor->actor->onOverlap += overlap_handler;
+	passenger->dropoff_actor->actor->onOverlap += overlap_handler;
+
+
+		// ai factory method...
+		auto make_ai = [taxi_mesh_instance](glm::mat4 world_transform = glm::mat4{ 1 }) {
 
 		auto ai_vehicle = Engine::createNamedComponent<Component::Vehicle>("ai_vehicle");
 		auto ai_damage_model = Engine::createNamedComponent<Component::Model>("ai_vehicle_model");

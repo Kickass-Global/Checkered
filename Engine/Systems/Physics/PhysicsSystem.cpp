@@ -57,14 +57,7 @@ static PxDefaultErrorCallback cErrorCallback;
 
 std::map<physx::PxRigidDynamic*, std::shared_ptr<ComponentBase>> trackedComponents;
 
-struct FliterGroup {
-	enum Enum
-	{
-		ePlayerVehicle = (1 << 0),
-		eEnemyVehicle = (1 << 1),
-		ePasenger = (1 << 2)
-	};
-};
+
 
 extern VehicleDesc initVehicleDesc();
 
@@ -101,8 +94,8 @@ VehicleDesc initVehicleDescription() {
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = cMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(
-		COLLISION_FLAG_CHASSIS,
-		COLLISION_FLAG_CHASSIS_AGAINST,
+		FilterMask::eVehicle,
+		FilterMask::eVehicleColliders,
 		0, 0
 	);
 
@@ -112,9 +105,9 @@ VehicleDesc initVehicleDescription() {
 	vehicleDesc.wheelMOI = wheelMOI;
 	vehicleDesc.numWheels = nbWheels;
 	vehicleDesc.wheelMaterial = cMaterial;
-	vehicleDesc.chassisSimFilterData = PxFilterData(
-		COLLISION_FLAG_WHEEL,
-		COLLISION_FLAG_WHEEL_AGAINST,
+	vehicleDesc.wheelSimFilterData = PxFilterData(
+		FilterGroup::eWheel,
+		FilterMask::eWheelColliders,
 		0, 0
 	);
 
@@ -144,9 +137,64 @@ void Physics::PhysicsSystem::initialize() {
 
 }
 
+using namespace Engine;
+
+class SimulationCallback : public PxSimulationEventCallback {
+	void onContact(const PxContactPairHeader& pairHeader,
+		const PxContactPair* pairs, PxU32 nbPairs) override {
+
+		log<high>("onContact detected");
+		for (PxU32 i = 0; i < nbPairs; i++)
+		{
+			const PxContactPair& cp = pairs[i];
+
+			if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+			{
+				log<high>("Collision detected");
+			}
+		}
+	}
+
+	// Inherited via PxSimulationEventCallback
+	virtual void onConstraintBreak(PxConstraintInfo * constraints, PxU32 count) override
+	{
+		log<high>("onConstraintBreak detected");
+	}
+	virtual void onWake(PxActor ** actors, PxU32 count) override
+	{
+		log<high>("onWake detected");
+	}
+	virtual void onSleep(PxActor ** actors, PxU32 count) override
+	{
+		log<high>("onSleep detected");
+	}
+	virtual void onTrigger(PxTriggerPair * pairs, PxU32 count) override
+	{
+		for (PxU32 i = 0; i < count; i++)
+		{
+			log<high>("onTrigger detected");
+			// ignore pairs when shapes have been deleted
+			if (pairs[i].flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER |
+				PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
+				continue;
+			auto a = reinterpret_cast<PhysicsActor*>(pairs[i].triggerActor->userData);
+			auto b = reinterpret_cast<PhysicsActor*>(pairs[i].otherActor->userData);
+
+			if (a)a->onOverlap(a, b);
+			if (b)b->onOverlap(b, a);
+
+		}
+	}
+	virtual void onAdvance(const PxRigidBody * const * bodyBuffer, const PxTransform * poseBuffer, const PxU32 count) override
+	{
+		log<high>("onAdvance detected");
+	}
+};
+
+SimulationCallback scb;
 void Physics::PhysicsSystem::createPhysicsCallbacks() {
-
-
+	log<high>("Creating simulation callbacks");
+	cScene->setSimulationEventCallback(&scb);
 
 }
 
@@ -190,6 +238,8 @@ void Physics::PhysicsSystem::createScene() {
 	sceneDesc.cpuDispatcher = cDispatcher;
 	sceneDesc.filterShader = snippetvehicle::VehicleFilterShader;
 
+
+
 	cScene = cPhysics->createScene(sceneDesc);
 
 }
@@ -197,8 +247,8 @@ void Physics::PhysicsSystem::createScene() {
 void Physics::PhysicsSystem::createGround() {
 
 	cMaterial = cPhysics->createMaterial(STATIC_FRICTION, DYNAMIC_FRICTION, RESTITUTION);
-	PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	cGroundPlane = createDrivablePlane(groundPlaneSimFilterData, cMaterial, cPhysics);
+	//PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	//cGroundPlane = createDrivablePlane(groundPlaneSimFilterData, cMaterial, cPhysics);
 
 	//cScene->addActor(*cGroundPlane);
 }
@@ -240,15 +290,13 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
 
-
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
 	pxVehicle->setToRestState();
 	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
-	
+
 	PxVehicleEngineData engine;
-	
 	pxVehicle->mDriveSimData.setEngineData(engine);
 
 	PxVehicleClutchData clutch;
@@ -256,12 +304,6 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	PxVehicleGearsData gears;
 	pxVehicle->mDriveSimData.setGearsData(gears);
-
-
-
-	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FliterGroup::ePlayerVehicle, FliterGroup::ePasenger);
-
-
 
 	return pxVehicle;
 }
@@ -295,8 +337,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 		PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 		const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
 		PxVehicleSuspensionRaycasts(
-			cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,
-			raycastResults
+			cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize, raycastResults
 		);
 
 		//vehicle update
@@ -335,18 +376,6 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
-
-	for (const auto& actor : Engine::getStore().getRoot().getComponentsOfType<Component::PhysicsActor>()) {
-		//
-	}
-
-	if (playerVehicle) {
-		//// using our key states to set input data directly...
-		//playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
-		//playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
-		//playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
-		//playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
-	}
 	stepPhysics(std::min(deltaTime, 32.0f));
 }
 
@@ -386,7 +415,19 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 		vehicleComponent->position.y,
 		vehicleComponent->position.z
 	);
+
+
 	auto pxVehicle = createDrivableVehicle(T);
+
+	if (vehicleComponent->type == Vehicle::Type::Player)
+	{
+		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::ePlayerVehicle, FilterGroup::eTrigger);
+		//FilterShader::setupQueryFiltering(pxVehicle->getRigidDynamicActor(), 0, QueryFilterMask::eDrivable);
+	}
+	else {
+		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::eEnemyVehicle, FilterGroup::ePlayerVehicle);
+		//FilterShader::setupQueryFiltering(pxVehicle->getRigidDynamicActor(), 0, QueryFilterMask::eDrivable);
+	}
 
 	Engine::log<module, Engine::high>("onVehicleCreated #", vehicleComponent);
 
@@ -395,30 +436,8 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 	link(vehicleComponent, pxVehicle->getRigidDynamicActor());
 }
 
-void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
-{
-	PxFilterData filterData;
-	filterData.word0 = filterGroup; // word0 = own ID
-	filterData.word1 = filterMask;  // word1 = ID mask to filter pairs that trigger a
-									// contact callback;
-	const PxU32 numShapes = actor->getNbShapes();
-
-	std::vector < PxShape* >shapes;
-	shapes.resize(numShapes);
-
-	actor->getShapes(shapes.data(), numShapes);
-	PxFilterData qryFilterData;
-	setupDrivableSurface(qryFilterData);
-	for (PxU32 i = 0; i < numShapes; i++)
-	{
-		PxShape* shape = shapes[i];
-		shape->setQueryFilterData(qryFilterData);
-		shape->setSimulationFilterData(filterData);
-	}
-}
-
 PxTriangleMesh* Physics::PhysicsSystem::createTriMesh(Mesh* mesh) {
-	
+
 	PxTriangleMeshDesc meshDesc;
 	meshDesc.points.count = mesh->vertices.size();
 	meshDesc.points.stride = sizeof(Vertex);
@@ -431,7 +450,7 @@ PxTriangleMesh* Physics::PhysicsSystem::createTriMesh(Mesh* mesh) {
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
 	bool status = cCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
-	
+
 	Engine::assertLog(status, "Cooking triangle mesh");
 
 	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
@@ -458,7 +477,7 @@ PxConvexMesh* Physics::PhysicsSystem::createConvexMesh(Mesh* mesh) {
 }
 
 void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
-		
+
 	Engine::log<module>("Running onActorCreated");
 
 	auto& aPhysicsActor = std::get<0>(args.values);
@@ -468,6 +487,7 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
 
 	aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
+	aPhysicsActor->actor->userData = aPhysicsActor;
 
 	if (aPhysicsActor->type == PhysicsActor::Type::StaticObject) {
 		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
@@ -482,16 +502,29 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 		);
 	}
 
+	if (aPhysicsActor->type == PhysicsActor::Type::TriggerVolume) {
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxConvexMeshGeometry(createConvexMesh(aMesh.get())),
+			*cMaterial, (PxShapeFlag::eTRIGGER_SHAPE | PxShapeFlag::eVISUALIZATION)
+		);
+	}
+
 	switch (aPhysicsActor->type)
 	{
 	case PhysicsActor::Type::StaticObject:
-		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, 0);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, FilterGroup::eScenery, QueryFilterMask::eDrivable);
 		break;
 	case PhysicsActor::Type::DynamicObject:
 		// todo
 		break;
 	case PhysicsActor::Type::Ground:
-		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, 0);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
+		break;
+	case PhysicsActor::Type::TriggerVolume:
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, 0);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
 		break;
 	}
 	cScene->addActor(*aPhysicsActor->actor);
@@ -502,9 +535,9 @@ void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger)
 
 	auto passengers = Engine::getStore().getRoot().getComponentsOfType<Component::Passenger>();
 	for (auto passenger : passengers) {
-		
+
 		if (!passenger->pickup_actor->actor->actor || !passenger->dropoff_actor->actor->actor) continue; // todo, not this....
-		
+
 		PxRigidStatic* temp_rigstat_dropoff = cPhysics->createRigidStatic(passenger->dropOffTransform);
 
 		passenger->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
