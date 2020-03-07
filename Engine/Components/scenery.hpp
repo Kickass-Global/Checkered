@@ -66,6 +66,21 @@ namespace Component {
 
 	};
 
+	class Obstacle : public ComponentBase {
+	public:
+		std::shared_ptr<PhysicsActor> actor;
+		std::shared_ptr<PaintedMesh> mesh;
+
+		Obstacle(glm::vec3 position, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) :
+			mesh(Engine::createComponent<PaintedMesh>(mesh, material)),
+			actor(Engine::createComponent<PhysicsActor>(mesh))
+		{
+			actor->type = PhysicsActor::Type::DynamicObject;
+			actor->position = position;
+			actor->node->addChildComponent(Engine::createComponent<SceneComponent>(actor->node, this->mesh));
+		}
+	};
+
 	class Waypoint : public ComponentBase {
 	public:
 		std::shared_ptr<PhysicsActor> actor;

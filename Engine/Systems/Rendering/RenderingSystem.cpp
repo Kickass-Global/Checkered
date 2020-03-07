@@ -220,6 +220,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		// 2. then render scene as normal with shadow mapping (using depth map)
 		glViewport(0, 0, camera->viewport.width, camera->viewport.height);
+		glClearColor(0.529, 0.808, 0.922, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		for (auto&& batch : batches) {

@@ -142,8 +142,13 @@ namespace Component {
 
 
 		void onKeyDown(const EventArgs<int>& args) {
+			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
 			auto key = std::get<0>(args.values);
 			if (key == GLFW_KEY_W) {
+
+				if (v.z < 0.0) {
+					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
+				}
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
 			}
 			if (key == GLFW_KEY_A) {
@@ -153,7 +158,13 @@ namespace Component {
 				vehicle->pxVehicleInputData.setAnalogSteer(-1);
 			}
 			if (key == GLFW_KEY_S) {
-				vehicle->pxVehicleInputData.setAnalogBrake(1);
+				if (v.z > 0.1) {
+					vehicle->pxVehicleInputData.setAnalogBrake(1);
+				}
+				else {
+					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eREVERSE);
+					vehicle->pxVehicleInputData.setAnalogAccel(1);
+				}
 			}
 		}
 
