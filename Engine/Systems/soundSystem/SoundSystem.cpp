@@ -7,7 +7,24 @@
 
 void Engine::SoundSystem::initialize() {
    
+    ALCdevice* openALDevice = alcOpenDevice(nullptr);
+    if (!openALDevice)
+        std::cerr << "Error could not open device";
+
     
+    
+    if (!alcCall(alcCreateContext, openALContext, openALDevice, openALDevice, nullptr) || !openALContext)
+    {
+        std::cerr << "ERROR: Could not create audio context" << std::endl;
+        
+    }
+    ALCboolean contextMadeCurrent = false;
+    if (!alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, openALContext)
+        || contextMadeCurrent != ALC_TRUE)
+    {
+        std::cerr << "ERROR: Could not make audio context current" << std::endl;
+        
+    }
 
 }
 
@@ -198,36 +215,18 @@ char* Engine::SoundSystem::load_wav(const std::string& filename,
     return data;
 }
 
-int Engine::SoundSystem::playSound()
+void Engine::SoundSystem::load_sound()
 {
-    {
-        ALCdevice* openALDevice = alcOpenDevice(nullptr);
-        if (!openALDevice)
-            return 0;
-
-        ALCcontext* openALContext;
-        if (!alcCall(alcCreateContext, openALContext, openALDevice, openALDevice, nullptr) || !openALContext)
-        {
-            std::cerr << "ERROR: Could not create audio context" << std::endl;
-            return 0;
-        }
-        ALCboolean contextMadeCurrent = false;
-        if (!alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, openALContext)
-            || contextMadeCurrent != ALC_TRUE)
-        {
-            std::cerr << "ERROR: Could not make audio context current" << std::endl;
-            return 0;
-        }
-
+    
         std::uint8_t 	channels;
         std::int32_t 	sampleRate;
         std::uint8_t 	bitsPerSample;
         ALsizei			dataSize;
-        char* rawSoundData = load_wav("Assets/Sounds/carHorn.wav", channels, sampleRate, bitsPerSample, dataSize);
+        char* rawSoundData = load_wav("Assets/Sounds/CARHORN4.wav", channels, sampleRate, bitsPerSample, dataSize);
         if (rawSoundData == nullptr || dataSize == 0)
         {
             std::cerr << "ERROR: Could not load wav" << std::endl;
-            return 0;
+            
         }
         std::vector<char> soundData(rawSoundData, rawSoundData + dataSize);
 
@@ -249,13 +248,13 @@ int Engine::SoundSystem::playSound()
                 << "ERROR: unrecognised wave format: "
                 << channels << " channels, "
                 << bitsPerSample << " bps" << std::endl;
-            return 0;
+            
         }
-
+        
         alCall(alBufferData, buffer, format, soundData.data(), soundData.size(), sampleRate);
         soundData.clear(); // erase the sound in RAM
 
-        ALuint source;
+        
         alCall(alGenSources, 1, &source);
         alCall(alSourcef, source, AL_PITCH, 1);
         alCall(alSourcef, source, AL_GAIN, 1.0f);
@@ -263,16 +262,22 @@ int Engine::SoundSystem::playSound()
         alCall(alSource3f, source, AL_VELOCITY, 0, 0, 0);
         alCall(alSourcei, source, AL_LOOPING, AL_FALSE);
         alCall(alSourcei, source, AL_BUFFER, buffer);
+}
 
+int Engine::SoundSystem::playSound()
+{
+    
+        load_sound();
         alCall(alSourcePlay, source);
 
+        /*
         ALint state = AL_PLAYING;
-
+        
         while (state == AL_PLAYING)
         {
             alCall(alGetSourcei, source, AL_SOURCE_STATE, &state);
         }
-
+        
         alCall(alDeleteSources, 1, &source);
         alCall(alDeleteBuffers, 1, &buffer);
 
@@ -281,7 +286,7 @@ int Engine::SoundSystem::playSound()
 
         ALCboolean closed;
         alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
-
+        */
         return 0;
-    }
+       
 }

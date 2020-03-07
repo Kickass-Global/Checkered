@@ -19,7 +19,12 @@
 
 namespace Engine {
     class SoundSystem : public Engine::SystemInterface {
-        ALCdevice *device;
+        
+        ALCdevice* device;
+        ALCcontext* openALContext;
+        ALuint source;
+        
+
     public:
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
@@ -153,6 +158,7 @@ namespace Engine {
             std::int32_t& sampleRate,
             std::uint8_t& bitsPerSample,
             ALsizei& size);
+        void load_sound();
         int playSound();
     
     };
