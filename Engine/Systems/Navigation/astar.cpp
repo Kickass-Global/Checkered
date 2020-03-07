@@ -82,6 +82,8 @@ PathNode* AStar::GetNext() {
 		nextNode = openList[0];
 		visitList.push_back(nextNode);
 		openList.erase(openList.begin());
+		//std::cout << "next node to explore is at: " << nextNode->my_x << ", " << nextNode->my_z 
+		//<< "  with cost: " << nextNode->GetF() << std::endl;
 	}
 	return nextNode;
 }
@@ -97,11 +99,11 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 	else if (row > 63) row = 63;
 
         //TODO: lower priority on buildings, sidewalks, and wrong direction roads
-    if ((int)graphNodes[col][row] == 9) { newCost += 20;}
-    else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 6; }
-    else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 6; }
-    else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 6; }
-    else if ((int)graphNodes[col][row] == 3 && parent->my_z < z) { newCost += 6; }
+    if ((int)graphNodes[col][row] == 9) { newCost += 13*ASTAR_STEPSIZE;}
+    else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 3*ASTAR_STEPSIZE; }
+    else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 3*ASTAR_STEPSIZE; }
+    else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 3*ASTAR_STEPSIZE; }
+    else if ((int)graphNodes[col][row] == 3 && parent->my_z < z) { newCost += 3*ASTAR_STEPSIZE; }
 
 	int id = (static_cast<int>(x + 192) / 3) * 64 + (static_cast<int>(z + 182) / 3);
 	for (auto node : visitList) {
