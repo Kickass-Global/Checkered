@@ -111,7 +111,6 @@ void TestWorld::load() {
 		Engine::createComponent<Component::Texture>("Assets/Textures/House_03.png")
 	);
 
-
 	auto building_mesh1 = Pipeline::Library::getAsset<Mesh>(
 		"Assets/Meshes/Building_House_01.fbx"
 		);
@@ -123,10 +122,10 @@ void TestWorld::load() {
 		);
 
 	Instance<Scenery> building_instances;
-	building_instances.add_instance_at(glm::vec3{ 43,0,-10 }, building_mesh1, building_material1);
-	building_instances.add_instance_at(glm::vec3{ 10,0,-23 }, building_mesh2, building_material2);
-	building_instances.add_instance_at(glm::vec3{ -20,0,-16 }, building_mesh3, building_material3);
-	building_instances.add_instance_at(glm::vec3{ 0,0,0 }, building_mesh3, building_material3);
+	building_instances.add_instance_at(glm::vec3{ 43,0,-60 }, building_mesh1, building_material1);
+	building_instances.add_instance_at(glm::vec3{ 10,0,-83 }, building_mesh2, building_material2);
+	building_instances.add_instance_at(glm::vec3{ -20,0,-86 }, building_mesh3, building_material3);
+	building_instances.add_instance_at(glm::vec3{ 0,0,-80 }, building_mesh3, building_material3);
 
 
 	// setup a HUD element...
@@ -162,7 +161,7 @@ void TestWorld::load() {
 
 	auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
 		Pipeline::Library::getAsset<Mesh>(
-			"Assets/Meshes/car_mesh.fbx"
+			"Assets/Meshes/cop_mesh.fbx"
 			), car_material);
 
 	auto taxi_material = Engine::createComponent<Component::Material>(basic_shader_program);
@@ -178,6 +177,9 @@ void TestWorld::load() {
 
 	auto player = Engine::createNamedComponent<Component::ControlledVehicle>("player");
 	inputSystem->onGamePadStateChanged += player->onGamePadStateChangedHandler;
+	inputSystem->onKeyUp += player->onKeyUpHandler;
+	inputSystem->onKeyDown += player->onKeyDownHandler;
+
 	auto &player_vehicle = player->vehicle;
 
 	auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
@@ -189,16 +191,48 @@ void TestWorld::load() {
 	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
 	player_vehicle->local_position = glm::vec3(0.0f, -1.0f, 0.0f);
 	player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
+	physicsSystem->playerVehicle = player_vehicle;
 
 	//setup passenger system
 
-	PxTransform temp_pickup(0.f, 0.f, 2.0f);
-	PxTransform temp_dropoff(3.0f, 0.f, 2.0f);
+	Instance<Obstacle> obstacle_instances;
+	auto dumpster_material = Engine::createComponent<Component::Material>(basic_shader_program);
+
+	dumpster_material->textures.push_back(
+		Engine::createComponent<Component::Texture>("Assets/Textures/Road_divider.png")
+	);
+	auto dumpster_mesh = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/dumpster_mesh.fbx"
+		);
+
+	auto hydrant_material = Engine::createComponent<Component::Material>(basic_shader_program);
+	hydrant_material->textures.push_back(
+		Engine::createComponent<Component::Texture>("Assets/Textures/Props.png")
+	);
+	auto hydrant_mesh = Pipeline::Library::getAsset<Mesh>(
+		"Assets/Meshes/hydrant_mesh.fbx"
+		);
+
+	glm::vec3 origin = { 10,0,20 };
+	for (int i = 1; i < 50; i++) {
+		obstacle_instances.add_instance_at(i / 50.0f * 14.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } - glm::vec3{0,5,0} + origin, hydrant_mesh, hydrant_material);
+	}
+
 	auto passenger = Engine::createComponent<Component::Passenger>();
-	passenger->setPickupTransform(temp_pickup);
-	passenger->setDropoffTransform(temp_dropoff);
-	physicsSystem->onPassengerCreated(passenger.get());
-	physicsSystem->playerVehicle = player_vehicle;
+	passenger->pickup_actor = Engine::createComponent<Waypoint>(glm::vec3{ 0.f, 0.f, 2.0f }, dumpster_mesh, car_material);
+	passenger->dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, hydrant_material);
+
+	using namespace Engine;
+	auto overlap = [player, taxi_mesh_instance](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
+		log<high>("Overlap detected between #", args.get<0>(), " and #", args.get<1>());
+		// if the player collides with a passenger (pickup point) we want to pick them up.
+		// simulate this by changing the material of the player...
+		player->vehicle->model->parts[0].variations[0].mesh = taxi_mesh_instance;
+	};
+	auto overlap_handler = Engine::EventSystem::createHandler< Component::PhysicsActor*, Component::PhysicsActor*>(std::function(overlap));
+	passenger->pickup_actor->actor->onBeginOverlap += overlap_handler;
+	passenger->dropoff_actor->actor->onBeginOverlap += overlap_handler;
+
 
 	// ai factory method...
 	auto make_ai = [taxi_mesh_instance](glm::mat4 world_transform = glm::mat4{ 1 }) {
@@ -242,11 +276,10 @@ void TestWorld::load() {
 			return v1.z * v2.x - v1.x * v2.z;
 		};
 
-		meta->pxVehicleInputData.setDigitalSteerLeft(false);
-		meta->pxVehicleInputData.setDigitalSteerRight(false);
+		meta->pxVehicleInputData.setAnalogSteer(0);
 
 		// todo control throttle better...
-		meta->pxVehicleInputData.setDigitalAccel(true);
+		meta->pxVehicleInputData.setAnalogAccel(1);
 
 		meta->path.ReachedPoint(ai_location);
 		if (meta->path.pathToGoal.size() > 0) {
@@ -267,8 +300,8 @@ void TestWorld::load() {
 				meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 				meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-				if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-				else meta->pxVehicleInputData.setDigitalSteerRight(true);
+				if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
+				else meta->pxVehicleInputData.setAnalogSteer(1);
 
 			}
 			else { // driving towards player
@@ -279,12 +312,12 @@ void TestWorld::load() {
 
 				if (pointed_at_player) { /* drive straight */ }
 				else { // steer towards player
-					if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-					else meta->pxVehicleInputData.setDigitalSteerRight(true);
+					if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
+					else meta->pxVehicleInputData.setAnalogSteer(1);
 				}
 
 			}
-			Engine::log("following path");
+			log<high>("following path");
 		}
 		else {
 			auto player_direction = perpdot(glm::normalize(player_location - ai_location), ai_direction);
@@ -301,8 +334,8 @@ void TestWorld::load() {
 				meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 				meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-				if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-				else meta->pxVehicleInputData.setDigitalSteerRight(true);
+				if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
+				else meta->pxVehicleInputData.setAnalogSteer(1);
 
 			}
 			else { // driving towards player
@@ -313,13 +346,13 @@ void TestWorld::load() {
 
 				if (pointed_at_player) { /* drive straight */ }
 				else { // steer towards player
-					if (player_is_left) meta->pxVehicleInputData.setDigitalSteerLeft(true);
-					else meta->pxVehicleInputData.setDigitalSteerRight(true);
+					if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
+					else meta->pxVehicleInputData.setAnalogSteer(1);
 				}
 
 			}
 
-			Engine::log("following player");
+			log<high>("following player");
 		}
 
 
@@ -333,24 +366,25 @@ void TestWorld::load() {
 	for (int i = 0; i < 64; i++) for (int j = 0; j < 64; j++) { navEnum[i][j] = static_cast<nodeType>(nav[64 * j + i]); }
 
 	// spawn some ai bois into the world
-	auto dim = 1;
-	int spacing = 60;
-	for (int x = -dim; x <= -dim; x++) {
-		for (int y = -dim; y <= 0; y++) {
+	//auto dim = 0;
+	//int spacing = 60;
+	//for (int x = -dim; x <= -dim; x++) {
+	//	for (int y = -dim; y <= 0; y++) {
 
-			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
-			ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-			ai_vehicle->path.graphNodes = navEnum;
-			ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
-			ai_vehicle->path.CleanPath();
-			ai_vehicle->tickHandler += ticker; // give them brain
+	//		auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
+	//		ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+	//		ai_vehicle->path.graphNodes = navEnum;
+	//		ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
+	//		ai_vehicle->path.CleanPath();
+	//		ai_vehicle->tickHandler += ticker; // give them brain
 
-		}
-	}
+	//	}
+	//}
 
 	// make a default camera
 	auto camera = Engine::createComponent<Component::Camera>();
 	camera->target = player_vehicle; // make camera follow player.
+	inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
 
 	// region initialize game-clocks
 	using namespace std::chrono;
