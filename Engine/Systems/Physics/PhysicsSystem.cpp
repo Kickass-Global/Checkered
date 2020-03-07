@@ -94,8 +94,8 @@ VehicleDesc initVehicleDescription() {
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = cMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(
-		COLLISION_FLAG_CHASSIS,
-		COLLISION_FLAG_CHASSIS_AGAINST,
+		FilterMask::eVehicle,
+		FilterMask::eVehicleColliders,
 		0, 0
 	);
 
@@ -105,9 +105,9 @@ VehicleDesc initVehicleDescription() {
 	vehicleDesc.wheelMOI = wheelMOI;
 	vehicleDesc.numWheels = nbWheels;
 	vehicleDesc.wheelMaterial = cMaterial;
-	vehicleDesc.chassisSimFilterData = PxFilterData(
-		COLLISION_FLAG_WHEEL,
-		COLLISION_FLAG_WHEEL_AGAINST,
+	vehicleDesc.wheelSimFilterData = PxFilterData(
+		FilterGroup::eWheel,
+		FilterMask::eWheelColliders,
 		0, 0
 	);
 
@@ -233,15 +233,13 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
 
-
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
 	pxVehicle->setToRestState();
 	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
 	
-	PxVehicleEngineData engine;
-	
+	PxVehicleEngineData engine;	
 	pxVehicle->mDriveSimData.setEngineData(engine);
 
 	PxVehicleClutchData clutch;
@@ -249,10 +247,6 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	PxVehicleGearsData gears;
 	pxVehicle->mDriveSimData.setGearsData(gears);
-
-	FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::ePlayerVehicle, FilterMask::EVERYTHING );
-
-
 
 	return pxVehicle;
 }
@@ -286,8 +280,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 		PxRaycastQueryResult* raycastResults = cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 		const PxU32 raycastResultsSize = cVehicleSceneQueryData->getQueryResultBufferSize();
 		PxVehicleSuspensionRaycasts(
-			cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,
-			raycastResults
+			cBatchQuery, wheels.size(), wheels.data(), raycastResultsSize,raycastResults
 		);
 
 		//vehicle update
@@ -326,18 +319,6 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
-
-	for (const auto& actor : Engine::getStore().getRoot().getComponentsOfType<Component::PhysicsActor>()) {
-		//
-	}
-
-	if (playerVehicle) {
-		//// using our key states to set input data directly...
-		//playerVehicle->pxVehicleInputData.setDigitalAccel(keys.count(GLFW_KEY_W));
-		//playerVehicle->pxVehicleInputData.setDigitalBrake(keys.count(GLFW_KEY_S));
-		//playerVehicle->pxVehicleInputData.setDigitalSteerRight(keys.count(GLFW_KEY_A));
-		//playerVehicle->pxVehicleInputData.setDigitalSteerLeft(keys.count(GLFW_KEY_D));
-	}
 	stepPhysics(std::min(deltaTime, 32.0f));
 }
 
@@ -377,35 +358,25 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 		vehicleComponent->position.y,
 		vehicleComponent->position.z
 	);
+
+
 	auto pxVehicle = createDrivableVehicle(T);
+
+	if (vehicleComponent->type == Vehicle::Type::Player)
+	{
+		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::ePlayerVehicle, FilterGroup::eEnemyVehicle);
+		//FilterShader::setupQueryFiltering(pxVehicle->getRigidDynamicActor(), 0, QueryFilterMask::eDrivable);
+	}
+	else {
+		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::eEnemyVehicle, FilterGroup::ePlayerVehicle);
+		//FilterShader::setupQueryFiltering(pxVehicle->getRigidDynamicActor(), 0, QueryFilterMask::eDrivable);
+	}
 
 	Engine::log<module, Engine::high>("onVehicleCreated #", vehicleComponent);
 
 	// link the component with the physx actor so we can replicate updates.
 	vehicleComponent->pxVehicle = pxVehicle;
 	link(vehicleComponent, pxVehicle->getRigidDynamicActor());
-}
-
-void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
-{
-	PxFilterData filterData;
-	filterData.word0 = filterGroup; // word0 = own ID
-	filterData.word1 = filterMask;  // word1 = ID mask to filter pairs that trigger a
-									// contact callback;
-	const PxU32 numShapes = actor->getNbShapes();
-
-	std::vector < PxShape* >shapes;
-	shapes.resize(numShapes);
-
-	actor->getShapes(shapes.data(), numShapes);
-	PxFilterData qryFilterData;
-	setupDrivableSurface(qryFilterData);
-	for (PxU32 i = 0; i < numShapes; i++)
-	{
-		PxShape* shape = shapes[i];
-		shape->setQueryFilterData(qryFilterData);
-		shape->setSimulationFilterData(filterData);
-	}
 }
 
 PxTriangleMesh* Physics::PhysicsSystem::createTriMesh(Mesh* mesh) {
@@ -483,16 +454,19 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 	switch (aPhysicsActor->type)
 	{
 	case PhysicsActor::Type::StaticObject:
-		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, FilterMask::eSceneryColliders);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, FilterGroup::eScenery, QueryFilterMask::eDrivable);
 		break;
 	case PhysicsActor::Type::DynamicObject:
 		// todo
 		break;
 	case PhysicsActor::Type::Ground:
-		setupFiltering(aPhysicsActor->actor, COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, FilterMask::eGroundColliders);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
 		break;
 	case PhysicsActor::Type::TriggerVolume:
-		setupFiltering(aPhysicsActor->actor, 0, 0);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, FilterMask::eNone);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, 0);
 		break;
 	}
 	cScene->addActor(*aPhysicsActor->actor);

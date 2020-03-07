@@ -350,6 +350,7 @@ void initPhysics() {
     //Create a plane to drive on.
     PxFilterData groundPlaneSimFilterData(COLLISION_FLAG_GROUND,
                                           COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+
     gGroundPlane = createDrivablePlane(groundPlaneSimFilterData, gMaterial,
                                        gPhysics);
     gScene->addActor(*gGroundPlane);
