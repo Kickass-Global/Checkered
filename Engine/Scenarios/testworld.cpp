@@ -128,7 +128,7 @@ void TestWorld::load() {
 	building_instances.add_instance_at(glm::vec3{ 0,0,-80 }, building_mesh3, building_material3);
 
 
-// setup a HUD element...
+	// setup a HUD element...
 
 	auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
 	billboard_mesh->emplaceChildComponent<WorldTransform>();
@@ -223,12 +223,15 @@ void TestWorld::load() {
 	passenger->dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, dumpster_mesh, hydrant_material);
 
 	using namespace Engine;
-	auto overlap = [](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
-		log<high>("Overlap detected between #", args.get<0>(), " and #", args.get<0>());
+	auto overlap = [player, taxi_mesh_instance](const Component::EventArgs<  Component::PhysicsActor*, Component::PhysicsActor*>& args) {
+		log<high>("Overlap detected between #", args.get<0>(), " and #", args.get<1>());
+		// if the player collides with a passenger (pickup point) we want to pick them up.
+		// simulate this by changing the material of the player...
+		player->vehicle->model->parts[0].variations[0].mesh = taxi_mesh_instance;
 	};
 	auto overlap_handler = Engine::EventSystem::createHandler< Component::PhysicsActor*, Component::PhysicsActor*>(std::function(overlap));
-	passenger->pickup_actor->actor->onOverlap += overlap_handler;
-	passenger->dropoff_actor->actor->onOverlap += overlap_handler;
+	passenger->pickup_actor->actor->onBeginOverlap += overlap_handler;
+	passenger->dropoff_actor->actor->onBeginOverlap += overlap_handler;
 
 
 	// ai factory method...

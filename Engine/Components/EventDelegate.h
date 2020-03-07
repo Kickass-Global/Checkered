@@ -43,7 +43,8 @@ namespace Component {
 	template<typename... Args>
 	class EventDelegate : public ComponentBase {
 
-		std::vector<std::shared_ptr<EventHandler<Args...>>> subscribers;
+		std::vector<std::shared_ptr<EventHandler<Args...>>> subscribers{};
+		std::vector<std::shared_ptr<std::function<void(Args...)>>> direct_subscribers{};
 
 	public:
 
@@ -60,6 +61,7 @@ namespace Component {
 		 * @param subscriber the component to notify when this event occurs.
 		 */
 		void operator+=(std::shared_ptr<EventHandler<Args...>> subscriber);
+		void operator+=(std::function<void(Args...)> subscriber);
 	};
 
 	/**
@@ -75,6 +77,9 @@ namespace Component {
 		for (auto listener : subscribers) {
 			listener->emplaceChildComponent<Component::EventArgs<Args...>>(args...);
 		}
+		for (auto listener : direct_subscribers) {
+			(*listener)(args...);
+		}
 	}
 
 	/**
@@ -89,6 +94,15 @@ namespace Component {
 		subscribers.push_back(subscriber);
 		Engine::EventSystem::registerHandler<Args...>(subscriber);
 
+	}
+
+	/**
+ * Adds a new subscriber to this event.
+ * @param subscriber the subscribing component.
+ */
+	template<typename... Args>
+	void EventDelegate<Args...>::operator+=(std::function<void(Args...)>  subscriber) {
+		direct_subscribers.push_back(std::make_shared<std::function<void(Args...)>>(subscriber));
 	}
 
 	/**

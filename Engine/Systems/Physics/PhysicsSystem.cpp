@@ -141,6 +141,10 @@ void Physics::PhysicsSystem::initialize() {
 using namespace Engine;
 
 class SimulationCallback : public PxSimulationEventCallback {
+
+	// manually track which objects are currently overlapping.
+	std::map<std::pair<size_t, size_t>, int> overlapping_actors;
+
 	void onContact(const PxContactPairHeader& pairHeader,
 		const PxContactPair* pairs, PxU32 nbPairs) override {
 
@@ -171,20 +175,43 @@ class SimulationCallback : public PxSimulationEventCallback {
 	}
 	virtual void onTrigger(PxTriggerPair * pairs, PxU32 count) override
 	{
-		for (PxU32 i = 0; i < count; i++){
+		for (PxU32 i = 0; i < count; i++) {
 			// ignore pairs when shapes have been deleted
 			if (pairs[i].flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER |
 				PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
 				continue;
 
 			if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-				log<high>("onTrigger detected");
 
 				auto a = reinterpret_cast<PhysicsActor*>(pairs[i].triggerActor->userData);
 				auto b = reinterpret_cast<PhysicsActor*>(pairs[i].otherActor->userData);
 
-				if (a)a->onOverlap(a, b);
-				if (b)b->onOverlap(b, a);
+				auto[it, first_contact] = overlapping_actors.emplace(std::make_pair(reinterpret_cast<size_t>(a), reinterpret_cast<size_t>(b)), 1);
+				if (first_contact) {
+					if (a) a->onBeginOverlap(a, b);
+					if (b) b->onBeginOverlap(b, a);
+				}
+				else
+				{
+					it->second++;
+				}
+			}
+
+			if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_LOST) {
+
+				auto a = reinterpret_cast<PhysicsActor*>(pairs[i].triggerActor->userData);
+				auto b = reinterpret_cast<PhysicsActor*>(pairs[i].otherActor->userData);
+
+				auto[it, not_overlapping] = overlapping_actors.emplace(std::make_pair(reinterpret_cast<size_t>(a), reinterpret_cast<size_t>(b)), 0);
+				if (it->second <= 1) {
+					if (a) a->onEndOverlap(a, b);
+					if (b) b->onEndOverlap(b, a);
+					overlapping_actors.erase(std::make_pair(reinterpret_cast<size_t>(a), reinterpret_cast<size_t>(b)));
+				}
+				else {
+					it->second--;
+				}
+
 			}
 
 		}
@@ -241,10 +268,6 @@ void Physics::PhysicsSystem::createScene() {
 	cDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 	sceneDesc.cpuDispatcher = cDispatcher;
 	sceneDesc.filterShader = FilterShader::setupFilterShader;
-
-	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
-
-
 	cScene = cPhysics->createScene(sceneDesc);
 
 }
@@ -495,6 +518,7 @@ PxConvexMesh* Physics::PhysicsSystem::createConvexMesh(Mesh* mesh) {
 	PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 	return cPhysics->createConvexMesh(input);
 }
+
 
 void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component::PhysicsActor*>& args) {
 
