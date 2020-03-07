@@ -22,6 +22,8 @@ namespace Physics {
 			PxFilterObjectAttributes attributes1, PxFilterData filterData1, PxPairFlags& pairFlags,
 			const void* constantBlock, PxU32 constantBlockSize);
 
+		static void setupQueryFiltering(PxRigidActor * actor, PxU32 filterGroup, PxU32 filterMask);
+
 		static void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask);
 	};
 

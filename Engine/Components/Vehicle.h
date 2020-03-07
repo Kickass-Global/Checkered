@@ -30,6 +30,11 @@ namespace Component {
 		std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
 		EventDelegate<Vehicle*> tickHandler = EventDelegate<Vehicle*>("handler");
 
+		enum Type {
+			Player,
+			Taxi
+		} type = Taxi;
+
 		AStar path;
 		glm::vec3 scale = { 1,1,1 };
 		glm::quat rotation;
