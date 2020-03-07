@@ -168,9 +168,9 @@ int main() {
         // todo control throttle better...
         meta->pxVehicleInputData.setDigitalAccel(true);
 
-        meta->path.ReachedPoint(ai_location);
-        if (meta->path.pathToGoal.size()>0) {
-            auto nextPoint = meta->path.pathToGoal[0];
+        meta->path->ReachedPoint(ai_location);
+        if (meta->path->pathToGoal.size()>0) {
+            auto nextPoint = meta->path->pathToGoal[0];
             auto player_direction = perpdot(glm::normalize(
                 glm::vec3(nextPoint->my_x+1.5f, 0, nextPoint->my_z + 1.5f) - ai_location), ai_direction);
             // check if the point is in front or behind the ai.
@@ -204,7 +204,6 @@ int main() {
                 }
 
             }
-            std::cout << "following path\n";
         } else {
             auto player_direction = perpdot(glm::normalize(player_location - ai_location), ai_direction);
             // check if the player is in front or behind the ai.
@@ -238,7 +237,6 @@ int main() {
 
             }
 
-            std::cout << "following player\n";
         }
 
         
@@ -254,15 +252,16 @@ int main() {
     // spawn some ai bois into the world
     auto dim = 1;
     int spacing = 60;
-    for (int x = -dim; x <= -dim; x++) {
+    for (int x = -dim; x <= 0; x++) {
         for (int y = -dim; y <= 0; y++) {
 
             auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
             ai_vehicle->scale = glm::vec3(0.5, 0.5, 0.5);
             ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-            ai_vehicle->path.graphNodes = navEnum;
-            ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
-            ai_vehicle->path.CleanPath();
+            ai_vehicle->path->graphNodes = navEnum;
+            ai_vehicle->path->FindPath(player_vehicle->position, ai_vehicle->position);
+            ai_vehicle->path->CleanPath();
+            ai_vehicle->path->PrintPath();
             ai_vehicle->tickHandler += ticker; // give them brain
 
         }
