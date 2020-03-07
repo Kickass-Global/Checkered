@@ -127,11 +127,12 @@ constexpr int operator| (T a, enum FilterGroup b) {
 enum FilterMask : PxU32 {
 	eVehicle = FilterGroup::ePlayerVehicle | FilterGroup::eEnemyVehicle,
 
-	eVehicleColliders = eVehicle | eObstacle | eScenery | eGround,
+	eVehicleColliders = eVehicle | eObstacle | eScenery | eGround | eTrigger,
 	eGroundColliders = eObstacle,
 	eObstacleColliders = eVehicle | eObstacle | eScenery | eGround,
 	eSceneryColliders = eVehicle | eObstacle,
-	eWheelColliders = eWheel | eObstacle,
+	eWheelColliders = eWheel | eObstacle | eTrigger,
+	eTriggerColliders = eVehicle | eWheel,
 
 	eEverything = 0xFFFFFFFF,
 	eNone = 0,

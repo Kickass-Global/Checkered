@@ -16,6 +16,7 @@ namespace Component {
 
 	public:
 
+		EventDelegate<PhysicsActor*, PhysicsActor*> onOverlap{"onOverlap"};
 		std::shared_ptr<SceneComponent> node = Engine::createComponent<SceneComponent>(nullptr);
 		// this will be used to generate the collision bounds, may be different than the visual mesh.
 		std::shared_ptr<Mesh> mesh;
