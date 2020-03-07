@@ -13,12 +13,15 @@ void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 		const bool is_dirty = model->is_outdated;
 
         if (is_dirty) {
-            Engine::log<module, Engine::low>("Updating dirty model#", model);
+            log<medium>("Updating dirty model#", model);
             model->is_outdated = false;
             for (auto &&part : model->parts) {
 
 				auto &&mesh = part.variations[part.active_variation].mesh;
-				if (mesh) mesh->instances.push_back(model->transform);
+				if (mesh) {
+					mesh->eraseChildComponentsOfType<WorldTransform>();
+					mesh->emplaceChildComponent<WorldTransform>(model->transform);
+				}
             }
         }
 
