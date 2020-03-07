@@ -22,9 +22,9 @@ using namespace physx;
 using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
-const float STATIC_FRICTION = 1.9f;
-const float DYNAMIC_FRICTION = 2.9f;
-const float RESTITUTION = 0.1f;
+const float STATIC_FRICTION = 0.9f;
+const float DYNAMIC_FRICTION = 0.9f;
+const float RESTITUTION = 0.3f;
 
 Component::Passenger* activePassenger;
 
@@ -81,8 +81,8 @@ VehicleDesc initVehicleDescription() {
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
 	const PxF32 wheelMass = 20.0f;
-	const PxF32 wheelRadius = 0.25f;
-	const PxF32 wheelWidth = 0.24f;
+	const PxF32 wheelRadius = 0.35f;
+	const PxF32 wheelWidth = 0.34f;
 	const PxF32 wheelMOI = 0.5f * wheelMass * wheelRadius * wheelRadius;
 	const PxU32 nbWheels = 6;
 
@@ -95,7 +95,7 @@ VehicleDesc initVehicleDescription() {
 	vehicleDesc.chassisMaterial = cMaterial;
 	vehicleDesc.chassisSimFilterData = PxFilterData(
 		FilterMask::eVehicle,
-		FilterMask::eVehicleColliders,
+		FilterMask::eEverything,
 		0, 0
 	);
 
@@ -193,9 +193,9 @@ class SimulationCallback : public PxSimulationEventCallback {
 
 SimulationCallback scb;
 void Physics::PhysicsSystem::createPhysicsCallbacks() {
+
 	log<high>("Creating simulation callbacks");
 	cScene->setSimulationEventCallback(&scb);
-
 }
 
 
@@ -236,8 +236,9 @@ void Physics::PhysicsSystem::createScene() {
 	PxU32 numWorkers = 4;
 	cDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 	sceneDesc.cpuDispatcher = cDispatcher;
-	sceneDesc.filterShader = snippetvehicle::VehicleFilterShader;
+	sceneDesc.filterShader = FilterShader::setupFilterShader;
 
+	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
 
 
 	cScene = cPhysics->createScene(sceneDesc);
@@ -297,9 +298,22 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
 
 	PxVehicleEngineData engine;
+
+	engine.mMOI = 0.40;
+	engine.mPeakTorque = 1800.0;
+	engine.mMaxOmega = 3600.0;
+	engine.mDampingRateFullThrottle = 0.0095;
+	engine.mDampingRateZeroThrottleClutchEngaged = 0.0040;
+	engine.mDampingRateZeroThrottleClutchDisengaged = 0.0035;
+
 	pxVehicle->mDriveSimData.setEngineData(engine);
 
 	PxVehicleClutchData clutch;
+
+	clutch.mStrength = 40.0;
+	clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eESTIMATE;
+	clutch.mEstimateIterations = 5.0;
+
 	pxVehicle->mDriveSimData.setClutchData(clutch);
 
 	PxVehicleGearsData gears;
@@ -376,7 +390,14 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
-	stepPhysics(std::min(deltaTime, 32.0f));
+	deltaTime = std::min(deltaTime, 32.0f);
+	const auto step_target = 8.0;
+	int steps = std::floor(deltaTime / step_target);
+	float step_delta = deltaTime / steps;
+	for (auto step = 0; step < steps; ++step)
+	{
+		stepPhysics(step_delta);
+	}
 }
 
 std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& transform) {
@@ -421,11 +442,11 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 
 	if (vehicleComponent->type == Vehicle::Type::Player)
 	{
-		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::ePlayerVehicle, FilterGroup::eTrigger);
+		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::ePlayerVehicle, FilterMask::eVehicleColliders );
 		//FilterShader::setupQueryFiltering(pxVehicle->getRigidDynamicActor(), 0, QueryFilterMask::eDrivable);
 	}
 	else {
-		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::eEnemyVehicle, FilterGroup::ePlayerVehicle);
+		//FilterShader::setupFiltering(pxVehicle->getRigidDynamicActor(), FilterGroup::eEnemyVehicle, FilterMask::eVehicleColliders);
 		//FilterShader::setupQueryFiltering(pxVehicle->getRigidDynamicActor(), 0, QueryFilterMask::eDrivable);
 	}
 
@@ -486,16 +507,16 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 	auto position = physx::PxVec3{ aPhysicsActor->position.x, aPhysicsActor->position.y, aPhysicsActor->position.z };
 	auto rotation = physx::PxQuat{ aPhysicsActor->rotation.x, aPhysicsActor->rotation.y, aPhysicsActor->rotation.z, aPhysicsActor->rotation.w };
 
-	aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
-	aPhysicsActor->actor->userData = aPhysicsActor;
 
 	if (aPhysicsActor->type == PhysicsActor::Type::StaticObject) {
+		aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
 		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
 			PxConvexMeshGeometry(createConvexMesh(aMesh.get())),
 			*cMaterial
 		);
 	}
 	if (aPhysicsActor->type == PhysicsActor::Type::Ground) {
+		aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
 		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
 			PxTriangleMeshGeometry(createTriMesh(aMesh.get())),
 			*cMaterial
@@ -503,28 +524,39 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 	}
 
 	if (aPhysicsActor->type == PhysicsActor::Type::TriggerVolume) {
+		aPhysicsActor->actor = cPhysics->createRigidStatic(PxTransform(position, rotation));
 		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
 			PxConvexMeshGeometry(createConvexMesh(aMesh.get())),
 			*cMaterial, (PxShapeFlag::eTRIGGER_SHAPE | PxShapeFlag::eVISUALIZATION)
 		);
 	}
 
+	if (aPhysicsActor->type == PhysicsActor::Type::DynamicObject) {
+		auto rigid = cPhysics->createRigidDynamic(PxTransform(position, rotation));
+		rigid->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+		aPhysicsActor->actor = rigid;
+		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*aPhysicsActor->actor,
+			PxConvexMeshGeometry(createConvexMesh(aMesh.get())),
+			*cMaterial
+		);
+	}
+
+	aPhysicsActor->actor->userData = aPhysicsActor;
+
 	switch (aPhysicsActor->type)
 	{
 	case PhysicsActor::Type::StaticObject:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, 0);
-		FilterShader::setupQueryFiltering(aPhysicsActor->actor, FilterGroup::eScenery, QueryFilterMask::eDrivable);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, FilterMask::eEverything);
 		break;
 	case PhysicsActor::Type::DynamicObject:
-		// todo
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eObstacle, FilterMask::eEverything);
 		break;
 	case PhysicsActor::Type::Ground:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, 0);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, FilterMask::eGroundColliders);
 		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
 		break;
 	case PhysicsActor::Type::TriggerVolume:
 		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, 0);
-		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
 		break;
 	}
 	cScene->addActor(*aPhysicsActor->actor);
