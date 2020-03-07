@@ -1,0 +1,52 @@
+{
+	"engine": {
+		"torque": 500.0,
+		"mMOI": 0.40,
+		"mPeakTorque": 1800.0,
+		"mMaxOmega": 3600.0,
+		"mDampingRateFullThrottle": 0.0095,
+		"mDampingRateZeroThrottleClutchEngaged": 0.0040,
+		"mDampingRateZeroThrottleClutchDisengaged": 0.0035
+	},
+	"clutch": {
+		"mStrength": 40.0,
+		"mAccuracyMode": 2.0,
+		"mEstimateIterations": 5.0
+	},
+	"tires": {
+		"mLongitudinalStiffnessPerUnitGravity": 10000000.0,
+ 		"mLatStiffX": 2,
+		"mLatStiffY": 50
+	},
+	"gears": [{
+			"gear": {
+				"index": 0.0,
+				"ratio": -14.0
+			}
+		},
+		{
+			"gear": {
+				"index": 1.0,
+				"ratio": 0.0
+			}
+		},
+		{
+			"gear": {
+				"index": 2.0,
+				"ratio": 4.0
+			}
+		},
+		{
+			"gear": {
+				"index": 3.0,
+				"ratio": 2.0
+			}
+		},
+		{
+			"gear": {
+				"index": 4.0,
+				"ratio": 1.0
+			}
+		}
+	]
+}

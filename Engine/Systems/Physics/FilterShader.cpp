@@ -14,11 +14,15 @@ PxFilterFlags Physics::FilterShader::setupFilterShader(PxFilterObjectAttributes 
         return PxFilterFlag::eDEFAULT;
 
     }
+	if ((0 == (filterData0.word0 & filterData1.word1)) &&
+		(0 == (filterData1.word0 & filterData0.word1)))
+		return PxFilterFlag::eSUPPRESS;
+
     //generate contacts for all that were not filtered
     pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 
     if ((filterData0.word0 & filterData1.word1) && (filterData0.word1 & filterData1.word0)) {
-        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
     }
 
     return PxFilterFlag::eDEFAULT;
