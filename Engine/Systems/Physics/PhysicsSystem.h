@@ -128,10 +128,10 @@ enum FilterMask : PxU32 {
 	eVehicle = FilterGroup::ePlayerVehicle | FilterGroup::eEnemyVehicle,
 
 	eVehicleColliders = eVehicle | eObstacle | eScenery | eGround | eTrigger,
-	eGroundColliders = eObstacle,
+	eGroundColliders = eObstacle | eScenery | eGround | eVehicle,
 	eObstacleColliders = eVehicle | eObstacle | eScenery | eGround,
-	eSceneryColliders = eVehicle | eObstacle,
-	eWheelColliders = eWheel | eObstacle | eTrigger,
+	eSceneryColliders = eVehicle | eObstacle | eScenery,
+	eWheelColliders = eWheel,
 	eTriggerColliders = eVehicle | eWheel,
 
 	eEverything = 0xFFFFFFFF,

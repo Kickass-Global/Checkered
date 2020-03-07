@@ -12,11 +12,7 @@ namespace Physics {
 
 	class FilterShader : public PxSimulationFilterCallback{
 
-
-
-
 	public:
-		
 
 		static PxFilterFlags setupFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
 			PxFilterObjectAttributes attributes1, PxFilterData filterData1, PxPairFlags& pairFlags,
