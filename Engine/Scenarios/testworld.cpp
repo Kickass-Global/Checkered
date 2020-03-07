@@ -81,13 +81,13 @@ void TestWorld::load() {
 
 	// make a material component
 	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
-	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/20922545.jpg"));
+	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/checkeredMap2.jpg"));
 	ground_material->shader = Pipeline::Library::getAsset<Program>(
 		"Assets/Programs/basic.json"
 		);
 
 	// load the mesh component
-	auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/checkeredMap.fbx");
+	auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/checkeredMap2.fbx");
 	drivable_instances.add_instance_at(
 		glm::rotate(glm::radians(-90.0f), glm::vec3{ 1,0,0 }) *glm::translate(glm::vec3{ 0,-1,0 }),
 		plane_mesh, ground_material, plane_mesh
@@ -314,7 +314,6 @@ void TestWorld::load() {
 				}
 
 			}
-			log<high>("following path");
 		}
 		else {
 			auto player_direction = perpdot(glm::normalize(player_location - ai_location), ai_direction);
@@ -348,8 +347,6 @@ void TestWorld::load() {
 				}
 
 			}
-
-			log<high>("following player");
 		}
 
 
@@ -363,20 +360,20 @@ void TestWorld::load() {
 	for (int i = 0; i < 64; i++) for (int j = 0; j < 64; j++) { navEnum[i][j] = static_cast<nodeType>(nav[64 * j + i]); }
 
 	// spawn some ai bois into the world
-	//auto dim = 0;
-	//int spacing = 60;
-	//for (int x = -dim; x <= -dim; x++) {
-	//	for (int y = -dim; y <= 0; y++) {
+	auto dim = 1;
+	int spacing = 120;
+	for (int x = -dim; x <= dim; x++) {
+		for (int y = -dim; y <= dim; y++) {
+			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
+			ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+			ai_vehicle->path.graphNodes = navEnum;
+			ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
+			ai_vehicle->path.CleanPath();
+			ai_vehicle->path.PrintPath();
+			ai_vehicle->tickHandler += ticker; // give them brain
 
-	//		auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 0, y * spacing + 10)));
-	//		ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-	//		ai_vehicle->path.graphNodes = navEnum;
-	//		ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
-	//		ai_vehicle->path.CleanPath();
-	//		ai_vehicle->tickHandler += ticker; // give them brain
-
-	//	}
-	//}
+		}
+	}
 
 	// make a default camera
 	auto camera = Engine::createComponent<Component::Camera>();
