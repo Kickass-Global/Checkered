@@ -41,7 +41,7 @@ int main() {
 
 
 	auto debug = Engine::addSystem<Debug::LiveReloadSystem>();
-	debug->watch("tweak.txt");
+	//debug->watch("tweak.txt");
 
 	// region initialize game-clocks
 	using namespace std::chrono;

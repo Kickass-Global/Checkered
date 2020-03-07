@@ -132,7 +132,7 @@ enum FilterMask : PxU32 {
 	eObstacleColliders = eVehicle | eObstacle | eScenery | eGround,
 	eSceneryColliders = eVehicle | eObstacle | eScenery,
 	eWheelColliders = eWheel,
-	eTriggerColliders = eVehicle | eWheel,
+	eTriggerColliders = eVehicle,
 
 	eEverything = 0xFFFFFFFF,
 	eNone = 0,

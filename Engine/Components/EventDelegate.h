@@ -29,6 +29,11 @@ namespace Component {
 	public:
 		std::tuple<Args...> values;
 		explicit EventArgs(Args... args) : values(args...) {}
+
+		template <std::size_t I>
+		typename  std::tuple_element<I, std::tuple<Args...> >::type get() const {
+			return std::get<I>(values);
+		}
 	};
 
 	/**

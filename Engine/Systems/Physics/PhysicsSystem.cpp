@@ -17,6 +17,7 @@
 #include "snippetvehiclecommon/SnippetVehicleTireFriction.h"
 #include "tags.h"
 #include "Engine.h"
+#include "scenery.hpp"
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -143,14 +144,14 @@ class SimulationCallback : public PxSimulationEventCallback {
 	void onContact(const PxContactPairHeader& pairHeader,
 		const PxContactPair* pairs, PxU32 nbPairs) override {
 
-		log<high>("onContact detected");
+		//log<high>("onContact detected");
 		for (PxU32 i = 0; i < nbPairs; i++)
 		{
 			const PxContactPair& cp = pairs[i];
 
 			if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 			{
-				log<high>("Collision detected");
+				//log<high>("Collision detected");
 			}
 		}
 	}
@@ -170,18 +171,21 @@ class SimulationCallback : public PxSimulationEventCallback {
 	}
 	virtual void onTrigger(PxTriggerPair * pairs, PxU32 count) override
 	{
-		for (PxU32 i = 0; i < count; i++)
-		{
-			log<high>("onTrigger detected");
+		for (PxU32 i = 0; i < count; i++){
 			// ignore pairs when shapes have been deleted
 			if (pairs[i].flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER |
 				PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
 				continue;
-			auto a = reinterpret_cast<PhysicsActor*>(pairs[i].triggerActor->userData);
-			auto b = reinterpret_cast<PhysicsActor*>(pairs[i].otherActor->userData);
 
-			if (a)a->onOverlap(a, b);
-			if (b)b->onOverlap(b, a);
+			if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+				log<high>("onTrigger detected");
+
+				auto a = reinterpret_cast<PhysicsActor*>(pairs[i].triggerActor->userData);
+				auto b = reinterpret_cast<PhysicsActor*>(pairs[i].otherActor->userData);
+
+				if (a)a->onOverlap(a, b);
+				if (b)b->onOverlap(b, a);
+			}
 
 		}
 	}
@@ -366,11 +370,6 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 		PxVehicleUpdates(
 			0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, wheels.size(), wheels.data(),
 			vehicleQueryResults.data());
-
-		//workout if vehicle is in air
-		//cIsVehicleInAir = meta->pxVehicle->getRigidDynamicActor()->isSleeping()
-		//	? false
-		//	: PxVehicleIsInAir(vehicleQueryResults[0]);
 	}
 
 
@@ -562,7 +561,6 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 	cScene->addActor(*aPhysicsActor->actor);
 }
 
-#include <scenery.hpp>
 void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger) {
 
 	auto passengers = Engine::getStore().getRoot().getComponentsOfType<Component::Passenger>();
@@ -576,17 +574,6 @@ void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger)
 
 		PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
 
-		//PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *passenger->pass_material, true, pass_flags);
-		//passenger->pickup_actor->actor->actor->attachShape(*pass_shape_pickup);
-		//pass_shape_pickup->release();
-
-		//PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *passenger->pass_material, true, pass_flags);
-		//passenger->dropoff_actor->actor->actor->attachShape(*pass_shape_dropoff);
-		//pass_shape_dropoff->release();
-
-		//cScene->addActor(*passenger->pickup_actor->actor->actor);
-		//cScene->addActor(*passenger->dropoff_actor->actor->actor);
-
 		activePassenger = passenger;
 
 		break; // only make one at a time?
@@ -596,19 +583,6 @@ void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger* passenger)
 Component::Passenger* Physics::PhysicsSystem::createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans) {
 	//create temp passenger component
 	Component::Passenger* temp_pass = nullptr;
-
-	////create material for passenger with maximum friction (probably not actually necessary
-	//temp_pass->pass_material = cPhysics->createMaterial(100.0f, 100.f, 100.f);
-
-	//PxShapeFlags pass_flags = (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eVISUALIZATION);
-
-	//PxShape* pass_shape_pickup = cPhysics->createShape(PxSphereGeometry(1.0f), *temp_pass->pass_material, true, pass_flags);
-	//temp_pass->pass_actor_pickup->attachShape(*pass_shape_pickup);
-	//pass_shape_pickup->release();
-
-	//PxShape* pass_shape_dropoff = cPhysics->createShape(PxSphereGeometry(1.f), *temp_pass->pass_material, true, pass_flags);
-	//temp_pass->pass_actor_dropoff->attachShape(*pass_shape_dropoff);
-	//pass_shape_dropoff->release();
 
 	return(temp_pass);
 
