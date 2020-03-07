@@ -189,9 +189,26 @@ namespace Component {
 			auto previous = std::get<0>(args.values);
 			auto current = std::get<1>(args.values);
 
+			float control_deadzone = 0.3f;
+
+
 			vehicle->pxVehicleInputData.setAnalogAccel(current.buttons[GLFW_GAMEPAD_BUTTON_A]);
 			vehicle->pxVehicleInputData.setAnalogBrake(current.buttons[GLFW_GAMEPAD_BUTTON_X]);
-			vehicle->pxVehicleInputData.setAnalogSteer(-current.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
+
+			if (current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -control_deadzone || current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] >= control_deadzone) {
+				vehicle->pxVehicleInputData.setAnalogSteer(-current.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
+				std::cout << "outside deadzone" << std::endl;
+
+			}
+
+			else {
+				vehicle->pxVehicleInputData.setAnalogSteer(0);
+				std::cout << "inside deadzone" << std::endl;
+			}
+			
+
+
+
 
 		}
 

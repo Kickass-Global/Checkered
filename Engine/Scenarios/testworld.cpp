@@ -62,9 +62,9 @@ void TestWorld::load() {
 	Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
 	Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
 
-	//Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
-	//Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
-	//Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+	Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
+	Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
+	Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
 
 	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 	//endregion
