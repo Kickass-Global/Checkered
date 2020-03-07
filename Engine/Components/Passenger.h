@@ -23,7 +23,7 @@ namespace Component {
 		std::shared_ptr<Waypoint> pickup_actor;
 		std::shared_ptr<Waypoint> dropoff_actor;
 		EventDelegate<int> onPassengerPickedUpDelegate{""};
-		EventDelegate<int> onPassengerDroppedUpDelegate{""};
+		EventDelegate<int> onPassengerDroppedOffDelegate{""};
 
 		PxPhysics* pass_physics;
 		PxMaterial* pass_material;
@@ -38,18 +38,29 @@ namespace Component {
 
 			pickup_actor = Engine::createComponent<Waypoint>(glm::vec3{ 0.f, 0.f, 2.0f }, mesh, material);
 			dropoff_actor = Engine::createComponent<Waypoint>(glm::vec3{ 13.0f, 0.f, 2.0f }, mesh, material);
-			//pickup_actor->onEntered += std::bind(&Passenger::onPassengerPickedUp, this, std::placeholders::_1);
+			pickup_actor->onEntered += std::bind(&Passenger::onPassengerPickedUp, this, std::placeholders::_1);
+			dropoff_actor->onEntered += std::bind(&Passenger::onPassengerDroppedOff, this, std::placeholders::_1);
+			dropoff_actor->mesh->enabled = false;
 		}
 
 	private:
 
 		void onPassengerPickedUp(PhysicsActor*) {
 			using namespace Engine;
-			log<high>("Passenger picked up");
+			log<high>("Passenger picked up"); 
+			dropoff_actor->mesh->enabled = true;
+			pickup_actor->mesh->enabled = false;
+			onPassengerPickedUpDelegate(0);
 		}
 
 
-
+		void onPassengerDroppedOff(PhysicsActor*) {
+			using namespace Engine;
+			log<high>("Passenger dropped off");
+			pickup_actor->mesh->enabled = false;
+			dropoff_actor->mesh->enabled = false;
+			onPassengerDroppedOffDelegate(0);
+		}
 
 	};
 
