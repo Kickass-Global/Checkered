@@ -116,6 +116,6 @@ void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
 void ::Camera::CameraSystem::onGamepadStateChanged(const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args) {
 	//Engine::log<module>("onGamepadStateChanged=", std::get<0>(args.values));
 
-	auto input = std::get<1>(args.values);
-	x += input.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+	//auto input = std::get<1>(args.values);
+	//x += input.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
 }
