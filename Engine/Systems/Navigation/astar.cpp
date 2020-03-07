@@ -1,7 +1,7 @@
 #include "astar.h"
 #include "Windows.h"
 #include <string>
-#define ASTAR_STEPSIZE 12
+#define ASTAR_STEPSIZE 3
 using namespace std;
 
 bool sortingPathNodes(PathNode* p1, PathNode* p2) { return p1->GetF() < p2->GetF(); }
@@ -97,7 +97,7 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
     else if (row > 63) row = 63;
 
         //TODO: lower priority on buildings, sidewalks, and wrong direction roads
-    if ((int)graphNodes[col][row] == 9) { newCost += 20; OutputDebugStringW(L"off the path\n");}
+    if ((int)graphNodes[col][row] == 9) { newCost += 20;}
     else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 6; }
     else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 6; }
     else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 6; }
@@ -119,7 +119,7 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 void AStar::ContinuePath() {
     while (!openList.empty()) {
         PathNode* current = GetNext();
-        std::cout << "Exploring at x: " << current->my_x << "Exploring at z: " << current->my_z << endl;
+
         if (current->GetDist(endNode) < (ASTAR_STEPSIZE*ASTAR_STEPSIZE)+1) {
             endNode->parent = current->parent;
             for (PathNode* getPath = endNode; getPath != NULL; getPath = getPath->parent)
@@ -154,14 +154,18 @@ void AStar::ContinuePath() {
 void AStar::CleanPath() {
     if (CheckFound)
         for (auto i = 2; i < pathToGoal.size(); i++) { 
-            if (samef(pathToGoal[i - 2]->my_x, pathToGoal[i]->my_x) || samef(pathToGoal[i - 2]->my_z, pathToGoal[i]->my_z)) {
+            if (samef(pathToGoal[i-2]->my_x, pathToGoal[i]->my_x) || samef(pathToGoal[i-2]->my_z, pathToGoal[i]->my_z)) {
                 i--;
+                cout << "Node removed at: " << pathToGoal[i]->my_x << ", " << pathToGoal[i]->my_z << std::endl;
                 pathToGoal.erase(pathToGoal.begin() + i);
-            }
-            OutputDebugStringW(L"Node on End path\n");
+            }          
         }
     else
-        OutputDebugStringW(L"No Path Found\n");
+        std::cout << "No Path Found\n";
     return;
 }
 
+void AStar::PrintPath() {
+    for (auto node : pathToGoal)
+        std::cout << node->my_x << ", " << node->my_z << std::endl;
+}
