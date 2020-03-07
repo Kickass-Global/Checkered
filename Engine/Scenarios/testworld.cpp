@@ -361,7 +361,7 @@ void TestWorld::load() {
 	int spacing = 150;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
-			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 50, y * spacing + 10)));
+			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
 			ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
 			ai_vehicle->path.graphNodes = navEnum;
 			ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
