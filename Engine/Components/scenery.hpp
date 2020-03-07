@@ -89,6 +89,7 @@ namespace Component {
 
 		EventDelegate<PhysicsActor*> onEntered{ "onEntered" };
 		EventDelegate<PhysicsActor*> onExited{ "onExited" };
+
 		std::shared_ptr<EventHandler<PhysicsActor*, PhysicsActor*>> onActorOverlapBeginHandler;
 		std::shared_ptr<EventHandler<PhysicsActor*, PhysicsActor*>> onActorOverlapEndHandler;
 

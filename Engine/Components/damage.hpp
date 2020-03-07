@@ -30,7 +30,7 @@ namespace Component {
     public:
         struct Variation {
             int damage_threshold;
-			std::shared_ptr<Component::MeshInstance> mesh;
+			std::shared_ptr<Component::PaintedMesh> mesh;
         };
 
         struct Part {

@@ -21,7 +21,9 @@ void process_scene_component(SceneComponent* node) {
 	for (auto child : node->getChildren().getComponentsOfType<PaintedMesh>())
 	{
 		child->eraseChildComponentsOfType<WorldTransform>();
-		child->emplaceChildComponent<WorldTransform>(T);
+		if (child->enabled) {
+			child->emplaceChildComponent<WorldTransform>(T);
+		}
 	}
 
 	for (auto child : node->getChildren().getComponentsOfType<SceneComponent>())

@@ -42,6 +42,7 @@ namespace Component {
 
 	class PaintedMesh : public ComponentBase {
 	public:
+		bool enabled = true;
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Material> material;
 		PaintedMesh(std::shared_ptr<Mesh>& mesh, std::shared_ptr<Material>& material) : mesh(mesh), material(material) {}
