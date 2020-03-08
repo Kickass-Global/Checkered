@@ -34,9 +34,8 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
 			if (vehicle->model) {
 				vehicle->model->transform = vehicle->world_transform();
 				vehicle->model->is_outdated = true;
-
-				vehicle->getChildren().eraseComponentsOfType<WorldTransform>();
-				vehicle->emplaceChildComponent<WorldTransform>(vehicle->physx_transform()); // todo, eh
+				vehicle->eraseChildComponentsOfType<WorldTransform>();
+				vehicle->emplaceChildComponent<WorldTransform>(vehicle->physx_transform()); // FOR CAMERA
 			}
 		}
 
