@@ -22,8 +22,9 @@ namespace Engine {
         
         ALCdevice* device;
         ALCcontext* openALContext;
-        ALuint source;
-        
+        ALuint sourceHorn;
+        ALuint sourceAcceleration;
+        ALuint sourceBreaking;
 
     public:
         void initialize() override;
@@ -159,7 +160,7 @@ namespace Engine {
             std::uint8_t& bitsPerSample,
             ALsizei& size);
         ALuint load_sound(std::string s);
-        int playSound(std::string s);
+        int playSound(ALuint s);
     
     };
 }

@@ -25,6 +25,9 @@ void Engine::SoundSystem::initialize() {
         std::cerr << "ERROR: Could not make audio context current" << std::endl;
         
     }
+    sourceHorn = load_sound("Assets/Sounds/CARHORN4.wav");
+    sourceAcceleration = load_sound("Assets/Sounds/car+geardown.wav");
+    sourceBreaking = load_sound("Assets/Sounds/TIRE+SKID.wav");
 
 }
 
@@ -36,19 +39,19 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
         if (sound->name == "horn")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
-            playSound("Assets/Sounds/CARHORN4.wav");
+            playSound(sourceHorn);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
         else if (sound->name == "acceleration")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
-            playSound("Assets/Sounds/car+geardown.wav");
+            playSound(sourceAcceleration);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
         else if (sound->name == "breaking")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
-            playSound("Assets/Sounds/TIRE+SKID.wav");
+            playSound(sourceBreaking);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
     }
@@ -267,6 +270,8 @@ ALuint Engine::SoundSystem::load_sound(std::string filePath)
         alCall(alBufferData, buffer, format, soundData.data(), soundData.size(), sampleRate);
         soundData.clear(); // erase the sound in RAM
 
+
+        ALuint source;
         
         alCall(alGenSources, 1, &source);
         alCall(alSourcef, source, AL_PITCH, 1);
@@ -279,11 +284,9 @@ ALuint Engine::SoundSystem::load_sound(std::string filePath)
         return source;
 }
 
-int Engine::SoundSystem::playSound(std::string s)
+int Engine::SoundSystem::playSound(ALuint s)
 {
-    
-        auto source = load_sound(s);
-        alCall(alSourcePlay, source);
+        alCall(alSourcePlay, s);
 
         /*
         ALint state = AL_PLAYING;
