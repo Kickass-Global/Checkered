@@ -67,12 +67,9 @@ namespace Component {
 			pxSteerVsForwardSpeedData{
 					0.0f, 0.75f,
 					5.0f, 0.75f,
-					30.0f, 0.125f,
+					30.0f, 0.1f,
 					120.0f, 0.1f,
-					PX_MAX_F32, PX_MAX_F32,
-					PX_MAX_F32, PX_MAX_F32,
-					PX_MAX_F32, PX_MAX_F32,
-					PX_MAX_F32, PX_MAX_F32
+
 		},
 			pxKeySmoothingData{
 					{
@@ -191,6 +188,7 @@ namespace Component {
 			auto current = std::get<1>(args.values);
 
 			float control_deadzone = 0.3f;
+			
 
 
 			vehicle->pxVehicleInputData.setAnalogAccel(current.buttons[GLFW_GAMEPAD_BUTTON_A]);
@@ -198,13 +196,12 @@ namespace Component {
 
 			if (current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -control_deadzone || current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] >= control_deadzone) {
 				vehicle->pxVehicleInputData.setAnalogSteer(-current.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
-				std::cout << "outside deadzone" << std::endl;
+				
 
 			}
 
 			else {
 				vehicle->pxVehicleInputData.setAnalogSteer(0);
-				std::cout << "inside deadzone" << std::endl;
 			}
 			
 
