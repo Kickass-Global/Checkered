@@ -158,8 +158,8 @@ namespace Engine {
             std::int32_t& sampleRate,
             std::uint8_t& bitsPerSample,
             ALsizei& size);
-        void load_sound();
-        int playSound();
+        ALuint load_sound(std::string s);
+        int playSound(std::string s);
     
     };
 }
