@@ -24,7 +24,7 @@ using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
 const float STATIC_FRICTION = 0.9f;
-const float DYNAMIC_FRICTION = 0.9f;
+const float DYNAMIC_FRICTION = 0.5f;
 const float RESTITUTION = 0.3f;
 
 Component::Passenger* activePassenger;
@@ -68,8 +68,8 @@ VehicleDesc initVehicleDescription() {
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 3000.0f;
-	const PxVec3 chassisDims(3.0f, 2.0f, 5.0f);
+	const PxF32 chassisMass = 1500.0f;
+	const PxVec3 chassisDims(2.0f, 3.0f, 4.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
 		chassisMass / 12.0f,
@@ -85,8 +85,8 @@ VehicleDesc initVehicleDescription() {
 	const PxF32 wheelMass = 20.0f;
 	const PxF32 wheelRadius = 0.35f;
 	const PxF32 wheelWidth = 0.34f;
-	const PxF32 wheelMOI = 0.5f * wheelMass * wheelRadius * wheelRadius;
-	const PxU32 nbWheels = 6;
+	const PxF32 wheelMOI = .8f * wheelMass * wheelRadius * wheelRadius;
+	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
 
@@ -101,6 +101,7 @@ VehicleDesc initVehicleDescription() {
 		0, 0
 	);
 
+	
 	vehicleDesc.wheelMass = wheelMass;
 	vehicleDesc.wheelRadius = wheelRadius;
 	vehicleDesc.wheelWidth = wheelWidth;
@@ -327,14 +328,38 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	PxVehicleEngineData engine;
 
-	engine.mMOI = 0.40;
-	engine.mPeakTorque = 1800.0;
+	engine.mMOI = 1;
+	engine.mPeakTorque = 10000.0;
 	engine.mMaxOmega = 3600.0;
 	engine.mDampingRateFullThrottle = 0.0095;
 	engine.mDampingRateZeroThrottleClutchEngaged = 0.0040;
 	engine.mDampingRateZeroThrottleClutchDisengaged = 0.0035;
+	
 
 	pxVehicle->mDriveSimData.setEngineData(engine);
+
+	PxVehicleTireData tireData;
+	tireData.mFrictionVsSlipGraph[0][0] = 0.f;
+	tireData.mFrictionVsSlipGraph[0][1] = 1.f;
+	tireData.mFrictionVsSlipGraph[1][0] = 0.5f;
+	tireData.mFrictionVsSlipGraph[1][1] = 1.0f;
+	tireData.mFrictionVsSlipGraph[2][0] = 1.f;
+	tireData.mFrictionVsSlipGraph[2][1] = 1.f;
+	tireData.mLongitudinalStiffnessPerUnitGravity = 110.f;
+	tireData.mLatStiffX = 3;
+	tireData.mLatStiffY = 19;
+
+	for (int i = 0; i < 3; i++) {
+		pxVehicle->mWheelsSimData.setTireData(0, tireData);
+
+	}
+
+	PxVehicleAckermannGeometryData acker;
+	acker.mAccuracy = 1.0f;
+	acker.mFrontWidth = 1.0f;
+	acker.mRearWidth = 1.0f;
+	acker.mAxleSeparation = 1.0f;
+	pxVehicle->mDriveSimData.setAckermannGeometryData(acker);
 
 	PxVehicleClutchData clutch;
 
@@ -344,8 +369,12 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 
 	pxVehicle->mDriveSimData.setClutchData(clutch);
 
+
+	
+
 	PxVehicleGearsData gears;
 	pxVehicle->mDriveSimData.setGearsData(gears);
+
 
 	return pxVehicle;
 }
@@ -396,7 +425,6 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 			vehicleQueryResults.data());
 	}
 
-
 	cScene->simulate(0.0001 + timestep / 1000.0f);
 	cScene->fetchResults(true);
 
@@ -420,7 +448,9 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 	for (auto step = 0; step < steps; ++step)
 	{
 		stepPhysics(step_delta);
+		
 	}
+	
 }
 
 std::ostream& physx::operator<<(std::ostream& out, const physx::PxTransform& transform) {
