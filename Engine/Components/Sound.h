@@ -7,7 +7,9 @@ namespace Component {
 
 	struct Sound : public Component::ComponentBase {
 		std::string name;
-		float volume;
+		
+		Sound(std::string s);
+		std::string getSoundName();
 	
 	};
 }

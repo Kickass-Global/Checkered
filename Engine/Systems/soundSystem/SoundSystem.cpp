@@ -33,10 +33,24 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
     auto sounds = Engine::getStore().getRoot().getComponentsOfType<Component::Sound>();
     for (auto sound : sounds)
     {
-        Engine::log<module, Engine::high>("Playing sound ", sound->name);
-        playSound();
-        Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
-        
+        if (sound->name == "horn")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound("Assets/Sounds/CARHORN4.wav");
+            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        }
+        else if (sound->name == "acceleration")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound("Assets/Sounds/car+geardown.wav");
+            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        }
+        else if (sound->name == "breaking")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound("Assets/Sounds/TIRE+SKID.wav");
+            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        }
     }
 }
 
@@ -214,15 +228,14 @@ char* Engine::SoundSystem::load_wav(const std::string& filename,
 
     return data;
 }
-
-void Engine::SoundSystem::load_sound()
+ALuint Engine::SoundSystem::load_sound(std::string filePath)
 {
     
         std::uint8_t 	channels;
         std::int32_t 	sampleRate;
         std::uint8_t 	bitsPerSample;
         ALsizei			dataSize;
-        char* rawSoundData = load_wav("Assets/Sounds/CARHORN4.wav", channels, sampleRate, bitsPerSample, dataSize);
+        char* rawSoundData = load_wav(filePath, channels, sampleRate, bitsPerSample, dataSize);
         if (rawSoundData == nullptr || dataSize == 0)
         {
             std::cerr << "ERROR: Could not load wav" << std::endl;
@@ -262,12 +275,14 @@ void Engine::SoundSystem::load_sound()
         alCall(alSource3f, source, AL_VELOCITY, 0, 0, 0);
         alCall(alSourcei, source, AL_LOOPING, AL_FALSE);
         alCall(alSourcei, source, AL_BUFFER, buffer);
+        
+        return source;
 }
 
-int Engine::SoundSystem::playSound()
+int Engine::SoundSystem::playSound(std::string s)
 {
     
-        load_sound();
+        auto source = load_sound(s);
         alCall(alSourcePlay, source);
 
         /*
