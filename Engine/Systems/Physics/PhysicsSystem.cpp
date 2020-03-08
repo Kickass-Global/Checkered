@@ -64,7 +64,7 @@ std::map<physx::PxRigidDynamic*, std::shared_ptr<ComponentBase>> trackedComponen
 extern VehicleDesc initVehicleDesc();
 
 
-VehicleDesc initVehicleDescription() {
+VehicleDesc initVehicleDescription(bool is_player) {
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
@@ -95,11 +95,21 @@ VehicleDesc initVehicleDescription() {
 	vehicleDesc.chassisMOI = chassisMOI;
 	vehicleDesc.chassisCMOffset = chassisCMOffset;
 	vehicleDesc.chassisMaterial = cMaterial;
-	vehicleDesc.chassisSimFilterData = PxFilterData(
-		FilterMask::eVehicle,
-		FilterMask::eEverything,
-		0, 0
-	);
+	if (is_player) {
+		vehicleDesc.chassisSimFilterData = PxFilterData(
+			FilterGroup::ePlayerVehicle,
+			FilterMask::ePlayerColliders,
+			0, 0
+		);
+	}
+	else
+	{
+		vehicleDesc.chassisSimFilterData = PxFilterData(
+			FilterGroup::eEnemyVehicle,
+			FilterMask::eEnemyColliders,
+			0, 0
+		);
+	}
 
 	vehicleDesc.wheelMass = wheelMass;
 	vehicleDesc.wheelRadius = wheelRadius;
@@ -310,10 +320,10 @@ void Physics::PhysicsSystem::createDrivablePlayerVehicle() {
 }
 
 //TODO DIFFERENTIATE BETWEEN ENEMY VEHICLE AND PLAYER VEHICLE FOR COLLIDERS
-PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform) {
+PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform, bool is_player) {
 
 	PxVehicleDrive4W* pxVehicle;
-	VehicleDesc vehicleDesc = initVehicleDescription();
+	VehicleDesc vehicleDesc = initVehicleDescription(is_player);
 
 
 	vehicles.push_back(createVehicle4W(vehicleDesc, cPhysics, cCooking));
@@ -467,7 +477,7 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 	);
 
 
-	auto pxVehicle = createDrivableVehicle(T);
+	auto pxVehicle = createDrivableVehicle(T, vehicleComponent->type == Vehicle::Type::Player);
 
 	if (vehicleComponent->type == Vehicle::Type::Player)
 	{
@@ -586,7 +596,7 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
 		break;
 	case PhysicsActor::Type::TriggerVolume:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, 0);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, FilterMask::eTriggerColliders);
 		break;
 	}
 	cScene->addActor(*aPhysicsActor->actor);

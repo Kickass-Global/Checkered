@@ -125,6 +125,7 @@ namespace Component {
 			onGamePadStateChangedHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onGamePadStateChanged);
 			onKeyDownHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onKeyDown);
 			onKeyUpHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onKeyUp);
+			vehicle->type = Vehicle::Type::Player;
 		}
 
 		template <typename T> int sgn(T val) {

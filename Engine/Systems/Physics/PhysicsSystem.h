@@ -88,7 +88,7 @@ namespace Physics {
 
 		void onKeyPress(const EventArgs<int> &args);
 
-		PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform);
+		PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform, bool is_player);
 
 		void onVehicleCreated(const EventArgs<Vehicle*> &args);
 		Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
@@ -127,12 +127,15 @@ constexpr int operator| (T a, enum FilterGroup b) {
 enum FilterMask : PxU32 {
 	eVehicle = FilterGroup::ePlayerVehicle | FilterGroup::eEnemyVehicle,
 
-	eVehicleColliders = eVehicle | eObstacle | eScenery | eGround | eTrigger,
+	ePlayerColliders = eVehicle | eObstacle | eScenery | eGround | eTrigger,
+	eEnemyColliders = eVehicle | eObstacle | eScenery | eGround,
+	
 	eGroundColliders = eObstacle | eScenery | eGround | eVehicle,
 	eObstacleColliders = eVehicle | eObstacle | eScenery | eGround,
 	eSceneryColliders = eVehicle | eObstacle | eScenery,
+	
 	eWheelColliders = eWheel,
-	eTriggerColliders = eVehicle,
+	eTriggerColliders = ePlayerVehicle,
 
 	eEverything = 0xFFFFFFFF,
 	eNone = 0,
