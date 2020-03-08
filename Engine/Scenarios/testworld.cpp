@@ -211,20 +211,56 @@ void TestWorld::load() {
 		Engine::createComponent<Component::Texture>("Assets/Textures/Props.png")
 	);
 	auto hydrant_mesh = Pipeline::Library::getAsset<Mesh>(
-		"Assets/Meshes/hydrant_mesh.fbx"
+		"Assets/Meshes/Props_Buoy_02.fbx"
+		);	
+	
+
+	auto tree_material = Engine::createComponent<Component::Material>(basic_shader_program);
+	tree_material->textures.push_back(
+		Engine::createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png")
+	);
+
+	auto tree_mesh = Pipeline::Library::getAsset<Mesh>(
+			"Assets/Meshes/Prop_Tree_02.fbx"
 		);
 
 	glm::vec3 origin = { 10,0,20 };
 	for (int i = 1; i < 50; i++) {
-		obstacle_instances.add_instance_at(i / 50.0f * 14.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } -glm::vec3{ 0,5,0 } +origin, hydrant_mesh, hydrant_material);
+		obstacle_instances.add_instance_at(i / 50.0f * 200.0f * glm::vec3{ std::cos(i), std::acos(i / 200.0), std::sin(i) } -glm::vec3{ 0,5,0 } +origin, hydrant_mesh, hydrant_material);
 	}
 
 	auto passenger = Engine::createComponent<Component::Passenger>(
-		glm::vec3{ 0.f, 0.f, 2.0f },
-		glm::vec3{ 13.0f, 0.f, 2.0f },
-		dumpster_mesh,
-		hydrant_material
+		glm::vec3{ 0.0f, 0.0f, -20.0f },
+		glm::vec3{ 0.0f, 0.0f, 20.0f },
+		tree_mesh,
+		tree_material
 		);
+
+	passenger->onPassengerDroppedOffDelegate += [](int id) {
+
+		auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
+		billboard_mesh->emplaceChildComponent<WorldTransform>();
+
+
+		auto sprite = Engine::createComponent<Component::Billboard>();
+		sprite->plot = { 10, 10, 630, 470 };
+		{
+			auto material = Engine::createComponent<Component::Material>(
+				Pipeline::Library::getAsset<Program>(
+					"Assets/Programs/billboard.json"
+					)
+				);
+
+			material->textures.push_back(
+				Engine::createComponent<Component::Texture>("Assets/Textures/win.jpg"));
+
+			sprite->mesh_instance = Engine::createNamedComponent<MeshInstance>(
+				"billboard_mesh_instance",
+				billboard_mesh,
+				material
+				);
+		}
+	};
 
 	using namespace Engine;
 
@@ -250,11 +286,6 @@ void TestWorld::load() {
 		return ai_vehicle;
 	};
 
-	//setup passenger
-	//auto passenger_entity = Engine::createComponent<Component::Passenger>();
-	//passenger_entity->initPassenger();
-
-	// setup ai "brain"
 
 	// setup ai "brain"
 	std::function<void(const Component::EventArgs<Vehicle*>&)> ai_tick_callback = [player_vehicle](
