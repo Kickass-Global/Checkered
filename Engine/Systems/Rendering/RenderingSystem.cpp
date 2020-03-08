@@ -28,18 +28,36 @@ unsigned int depthMapFBO;
 unsigned int depthMap;
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
-
+	using namespace Engine;
 	std::map<std::pair<Mesh*, Material*>, MeshInstance*> instancing_map;
+
+	// cleanup unused batches...
+
+	//auto materials = Engine::getStore().getRoot().getComponentsOfType<Material>();
+	//for (auto batch : batches)
+	//{
+	//	auto dit = batch->details.begin();
+	//	while (dit != batch->details.end())
+	//	{
+	//		auto it = std::find_if(materials.begin(), materials.end(), [dit](auto material) {return material == dit->first.second.get(); });
+	//		if (it == materials.end()) {
+	//			log<high>("Erasing batch details");
+	//			dit = batch->details.erase(dit);
+	//		}
+	//	}
+	//}
+
 
 	for (auto mesh : Engine::getStore().getRoot().getComponentsOfType<PaintedMesh>())
 	{
+		if (!mesh->enabled) continue;
 		auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
 		if (!Ts.empty()) {
 			auto key = std::make_pair(mesh->mesh.get(), mesh->material.get());
 			auto it = instancing_map.find(key);
 			if (it == instancing_map.end()) {
 				auto instance = Engine::createComponent<MeshInstance>(mesh->mesh, mesh->material);
-				auto& [it2, _] = instancing_map.emplace(key, instance.get());
+				auto&[it2, _] = instancing_map.emplace(key, instance.get());
 				it2->second->instances.push_back(Ts[0]->world_matrix);
 			}
 			else {
@@ -67,7 +85,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 			Engine::log<module, Engine::high>("Updating batch data of#", instance->getId());
 			buffer(instance->mesh, instance->material);
 		}
-		if (instance->instances.size() > 0)
+		if (!instance->instances.empty())
 		{
 			Engine::log<module, Engine::low>("Updating instances(", instance->instances.size(), ") of component#", instance);
 
@@ -300,8 +318,8 @@ void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh>& mesh, std::shared
 	auto match = std::find_if(
 		batches.begin(), batches.end(),
 		[mesh, material](const std::shared_ptr<GeometryBatch>& batch) {
-			return batch->contains(mesh, material);
-		}
+		return batch->contains(mesh, material);
+	}
 	);
 
 	if (match != batches.end()) {
@@ -365,9 +383,9 @@ void Rendering::RenderingSystem::updateInstanceData(std::shared_ptr<Mesh>& mesh,
 	auto it = std::find_if(
 		batches.begin(), batches.end(),
 		[mesh, material](const auto batch)
-		{
-			return batch->contains(mesh, material);
-		}
+	{
+		return batch->contains(mesh, material);
+	}
 	);
 
 	Engine::assertLog<module>(it != batches.end(), "check for valid batch");

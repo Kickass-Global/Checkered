@@ -1,8 +1,7 @@
 #include "astar.h"
 #include "Windows.h"
 #include <string>
-#include <Engine.h>
-#define ASTAR_STEPSIZE 12
+#define ASTAR_STEPSIZE 3
 using namespace std;
 
 bool sortingPathNodes(PathNode* p1, PathNode* p2) { return p1->GetF() < p2->GetF(); }
@@ -83,6 +82,8 @@ PathNode* AStar::GetNext() {
 		nextNode = openList[0];
 		visitList.push_back(nextNode);
 		openList.erase(openList.begin());
+		//std::cout << "next node to explore is at: " << nextNode->my_x << ", " << nextNode->my_z 
+		//<< "  with cost: " << nextNode->GetF() << std::endl;
 	}
 	return nextNode;
 }
@@ -97,12 +98,12 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 	if (row < 0) row = 0;
 	else if (row > 63) row = 63;
 
-	//TODO: lower priority on buildings, sidewalks, and wrong direction roads
-	if ((int)graphNodes[col][row] == 9) { newCost += 20; Engine::log("Off the path"); }
-	else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 6; }
-	else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 6; }
-	else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 6; }
-	else if ((int)graphNodes[col][row] == 3 && parent->my_z < z) { newCost += 6; }
+        //TODO: lower priority on buildings, sidewalks, and wrong direction roads
+    if ((int)graphNodes[col][row] == 9) { newCost += 13*ASTAR_STEPSIZE;}
+    else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 3*ASTAR_STEPSIZE; }
+    else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 3*ASTAR_STEPSIZE; }
+    else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 3*ASTAR_STEPSIZE; }
+    else if ((int)graphNodes[col][row] == 3 && parent->my_z < z) { newCost += 3*ASTAR_STEPSIZE; }
 
 	int id = (static_cast<int>(x + 192) / 3) * 64 + (static_cast<int>(z + 182) / 3);
 	for (auto node : visitList) {
@@ -118,29 +119,28 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 }
 
 void AStar::ContinuePath() {
-	while (!openList.empty()) {
-		PathNode* current = GetNext();
-		Engine::log("Exploring at x: ", current->my_x, "Exploring at z: ", current->my_z);
-		if (current->GetDist(endNode) < (ASTAR_STEPSIZE*ASTAR_STEPSIZE) + 1) {
-			endNode->parent = current->parent;
-			for (PathNode* getPath = endNode; getPath != NULL; getPath = getPath->parent)
-				pathToGoal.push_back(getPath);
-			CheckFound = true;
-			return;
-		}
-		else {
-			PathOpened(current->my_x - ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x + ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x, current->my_z - ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x, current->my_z + ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x - (0.70711 * ASTAR_STEPSIZE), current->my_z - (0.70711* ASTAR_STEPSIZE),
-				current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x + (0.70711 * ASTAR_STEPSIZE), current->my_z - (0.70711* ASTAR_STEPSIZE),
-				current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x - (0.70711 * ASTAR_STEPSIZE), current->my_z + (0.70711* ASTAR_STEPSIZE),
-				current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-			PathOpened(current->my_x + (0.70711 * ASTAR_STEPSIZE), current->my_z + (0.70711* ASTAR_STEPSIZE),
-				current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+    while (!openList.empty()) {
+        PathNode* current = GetNext();
+        if (current->GetDist(endNode) < (ASTAR_STEPSIZE*ASTAR_STEPSIZE)+1) {
+            endNode->parent = current->parent;
+            for (PathNode* getPath = endNode; getPath != NULL; getPath = getPath->parent)
+                pathToGoal.push_back(getPath);
+            CheckFound = true;
+            return;
+        }
+        else {
+                PathOpened(current->my_x - ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x + ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x, current->my_z - ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x, current->my_z + ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x - (0.70711 * ASTAR_STEPSIZE), current->my_z - (0.70711* ASTAR_STEPSIZE),
+                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x + (0.70711 * ASTAR_STEPSIZE), current->my_z - (0.70711* ASTAR_STEPSIZE),
+                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x - (0.70711 * ASTAR_STEPSIZE), current->my_z + (0.70711* ASTAR_STEPSIZE),
+                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x + (0.70711 * ASTAR_STEPSIZE), current->my_z + (0.70711* ASTAR_STEPSIZE),
+                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
 
 			for (int i = 0; i < openList.size(); i++) {
 				if (openList[i]->my_id == current->my_id) {
@@ -153,16 +153,20 @@ void AStar::ContinuePath() {
 }
 
 void AStar::CleanPath() {
-	if (CheckFound)
-		for (auto i = 2; i < pathToGoal.size(); i++) {
-			if (samef(pathToGoal[i - 2]->my_x, pathToGoal[i]->my_x) || samef(pathToGoal[i - 2]->my_z, pathToGoal[i]->my_z)) {
-				i--;
-				pathToGoal.erase(pathToGoal.begin() + i);
-			}
-			Engine::log("Node on End path");
-		}
-	else
-		Engine::log("No path found");
-	return;
+    if (CheckFound)
+        for (auto i = 2; i < pathToGoal.size(); i++) { 
+            if (samef(pathToGoal[i-2]->my_x, pathToGoal[i]->my_x) || samef(pathToGoal[i-2]->my_z, pathToGoal[i]->my_z)) {
+                i--;
+                pathToGoal.erase(pathToGoal.begin() + i);
+            }
+        }
+    return;
 }
 
+void AStar::PrintPath() {
+    if (CheckFound)
+        for (auto node : pathToGoal)
+            cout << node->my_x << ", " << node->my_z << std::endl;
+    else
+        std::cout << "No Path Found\n";
+}

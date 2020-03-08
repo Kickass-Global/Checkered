@@ -133,7 +133,7 @@ namespace Engine {
 
 	template<typename T, typename... Args>
 	inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
-		createNamedComponent(std::string name, Args... args) {
+		createNamedComponent(std::string name, Args&... args) {
 		auto result = createComponent<T>(args...);
 		Engine::nameComponent(result->getId(), name);
 		return result;

@@ -148,17 +148,23 @@ class SimulationCallback : public PxSimulationEventCallback {
 	std::map<std::pair<size_t, size_t>, int> overlapping_actors;
 
 	void onContact(const PxContactPairHeader& pairHeader,
-		const PxContactPair* pairs, PxU32 nbPairs) override {
+		const PxContactPair* pairs, PxU32 count) override {
 
-		//log<high>("onContact detected");
-		for (PxU32 i = 0; i < nbPairs; i++)
-		{
-			const PxContactPair& cp = pairs[i];
+		for (PxU32 i = 0; i < count; i++) {
+			// ignore pairs when shapes have been deleted
+			if (pairs[i].flags & (PxContactPairFlag::eREMOVED_SHAPE_0 |
+				PxContactPairFlag::eREMOVED_SHAPE_1))
+				continue;
 
-			if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
-			{
-				//log<high>("Collision detected");
-			}
+			//if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+			//{
+			//	//log<high>("Collision detected");
+			//	// detect when collisions occur between objects and invoke actors events....
+
+			//	auto a = reinterpret_cast<PhysicsActor*>(pairs[i].shapes->userData);
+			//	auto b = reinterpret_cast<PhysicsActor*>(pairs[i].otherActor->userData);
+			//}
+
 		}
 	}
 
