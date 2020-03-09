@@ -358,7 +358,7 @@ void TestWorld::load() {
 
 	// spawn some ai bois into the world
 	auto dim = 1;
-	int spacing = 150;
+	int spacing = 90;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
 			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
