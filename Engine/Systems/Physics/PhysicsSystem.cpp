@@ -24,7 +24,7 @@ using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
 const float STATIC_FRICTION = 0.9f;
-const float DYNAMIC_FRICTION = 0.5f;
+const float DYNAMIC_FRICTION = 1.9f;
 const float RESTITUTION = 0.3f;
 
 Component::Passenger* activePassenger;
@@ -82,7 +82,7 @@ VehicleDesc initVehicleDescription(bool is_player) {
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 20.0f;
+	const PxF32 wheelMass = 50.0f;
 	const PxF32 wheelRadius = 0.35f;
 	const PxF32 wheelWidth = 0.34f;
 	const PxF32 wheelMOI = .8f * wheelMass * wheelRadius * wheelRadius;
@@ -345,29 +345,28 @@ PxVehicleDrive4W* Physics::PhysicsSystem::createDrivableVehicle(const PxTransfor
 	PxVehicleEngineData engine;
 
 	engine.mMOI = 1;
-	engine.mPeakTorque = 10000.0;
-	engine.mMaxOmega = 3600.0;
-	engine.mDampingRateFullThrottle = 0.0095;
-	engine.mDampingRateZeroThrottleClutchEngaged = 0.0040;
-	engine.mDampingRateZeroThrottleClutchDisengaged = 0.0035;
+	engine.mPeakTorque = 4000.0;
+	engine.mMaxOmega = 1600.0;
+	engine.mDampingRateFullThrottle = 0.15;
+	engine.mDampingRateZeroThrottleClutchEngaged = 0.60;
+	engine.mDampingRateZeroThrottleClutchDisengaged = 0.35;
 	
 
 	pxVehicle->mDriveSimData.setEngineData(engine);
 
 	PxVehicleTireData tireData;
-	tireData.mFrictionVsSlipGraph[0][0] = 0.f;
+	tireData.mFrictionVsSlipGraph[0][0] = 0.0f;
 	tireData.mFrictionVsSlipGraph[0][1] = 1.f;
 	tireData.mFrictionVsSlipGraph[1][0] = 0.5f;
 	tireData.mFrictionVsSlipGraph[1][1] = 1.0f;
 	tireData.mFrictionVsSlipGraph[2][0] = 1.f;
-	tireData.mFrictionVsSlipGraph[2][1] = 1.f;
-	tireData.mLongitudinalStiffnessPerUnitGravity = 110.f;
+	tireData.mFrictionVsSlipGraph[2][1] = 1.0f;
+	tireData.mLongitudinalStiffnessPerUnitGravity = 1000.0f;
 	tireData.mLatStiffX = 3;
 	tireData.mLatStiffY = 19;
 
 	for (int i = 0; i < 3; i++) {
 		pxVehicle->mWheelsSimData.setTireData(0, tireData);
-
 	}
 
 	PxVehicleAckermannGeometryData acker;

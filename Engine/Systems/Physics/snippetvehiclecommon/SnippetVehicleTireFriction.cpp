@@ -39,7 +39,7 @@ namespace snippetvehicle {
     static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
             {
                     //NORMAL,	WORN
-                    {1.00f, 0.1f}//TARMAC
+                    {2.00f, 2.0f}//TARMAC
             };
 
     PxVehicleDrivableSurfaceToTireFrictionPairs *
