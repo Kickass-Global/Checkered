@@ -55,7 +55,9 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 }
 
 void AStar::ReachedPoint(glm::vec3 cPos) {
-	if (pathToGoal.size() && samef(cPos.x - 1.5f, pathToGoal[0]->my_x, 9.0f) && samef(cPos.z - 1.5f, pathToGoal[0]->my_z, 9.0f)) {
+	if (pathToGoal.size() && samef(cPos.x - 1.5f, pathToGoal[0]->my_x, (float)pow(ASTAR_STEPSIZE, 2))
+			&& samef(cPos.z - 1.5f, pathToGoal[0]->my_z, (float)pow(ASTAR_STEPSIZE, 2))) {
+		//std::cout << "reached point " << pathToGoal[0]->my_x << ", " << pathToGoal[0]->my_z << std::endl;
 		pathToGoal.erase(pathToGoal.begin());
 	}
 	return;
@@ -99,7 +101,7 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 	else if (row > 63) row = 63;
 
         //TODO: lower priority on buildings, sidewalks, and wrong direction roads
-    if ((int)graphNodes[col][row] == 9) { newCost += 13*ASTAR_STEPSIZE;}
+    if ((int)graphNodes[col][row] == 9) { newCost += 200*ASTAR_STEPSIZE;}
     else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 3*ASTAR_STEPSIZE; }
     else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 3*ASTAR_STEPSIZE; }
     else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 3*ASTAR_STEPSIZE; }
@@ -168,5 +170,5 @@ void AStar::PrintPath() {
         for (auto node : pathToGoal)
             cout << node->my_x << ", " << node->my_z << std::endl;
     else
-        std::cout << "No Path Found\n";
+        cout << "No Path Found\n";
 }

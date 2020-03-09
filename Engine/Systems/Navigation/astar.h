@@ -30,6 +30,7 @@ public:
     bool CheckFound;
     nodeType** graphNodes;
     std::vector<PathNode*> pathToGoal;
+    //void UpdatePath(glm::vec3 currentPos, glm::vec3 targetPos);
 
 private:
     void SetPosts(PathNode start, PathNode End);
