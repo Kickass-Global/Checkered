@@ -51,7 +51,7 @@ void Horn::hornSystem::onKeyPress(const Component::EventArgs<int>& args) {
      auto key = std::get<0>(args.values);
      if (key == GLFW_KEY_SPACE)
      {
-         Engine::createComponent<Component::Sound>();
+         Engine::createComponent<Component::Sound>("horn");
      
      }
 
