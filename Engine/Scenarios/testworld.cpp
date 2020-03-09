@@ -159,7 +159,7 @@ void TestWorld::load() {
 	car_material->textures.push_back(
 		Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
 	auto car_mesh = Pipeline::Library::getAsset<Mesh>(
-		"Assets/Meshes/cop_mesh.fbx"
+		"Assets/Meshes/car_mesh.fbx"
 		);
 
 	auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>("car_mesh_instance",
