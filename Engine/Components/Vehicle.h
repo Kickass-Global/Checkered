@@ -17,7 +17,10 @@
 #include "damage.hpp"
 #include <GLFW/glfw3.h>
 
+#include "Engine.h" 
+
 #include <glm/glm.hpp>
+#include <Sound.h>
 
 namespace Component {
 
@@ -148,6 +151,8 @@ namespace Component {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
 				}
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
+				Engine::createComponent<Component::Sound>("acceleration");
+			    
 			}
 			if (key == GLFW_KEY_A) {
 				vehicle->pxVehicleInputData.setAnalogSteer(1);
@@ -163,6 +168,7 @@ namespace Component {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eREVERSE);
 					vehicle->pxVehicleInputData.setAnalogAccel(1);
 				}
+				Engine::createComponent<Component::Sound>("breaking");
 			}
 		}
 
