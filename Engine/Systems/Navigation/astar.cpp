@@ -57,7 +57,7 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 void AStar::ReachedPoint(glm::vec3 cPos) {
 	if (pathToGoal.size() && samef(cPos.x - 1.5f, pathToGoal[0]->my_x, (float)pow(ASTAR_STEPSIZE, 2))
 			&& samef(cPos.z - 1.5f, pathToGoal[0]->my_z, (float)pow(ASTAR_STEPSIZE, 2))) {
-		std::cout << "reached point " << pathToGoal[0]->my_x << ", " << pathToGoal[0]->my_z << std::endl;
+		//std::cout << "reached point " << pathToGoal[0]->my_x << ", " << pathToGoal[0]->my_z << std::endl;
 		pathToGoal.erase(pathToGoal.begin());
 	}
 	return;
