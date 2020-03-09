@@ -81,13 +81,13 @@ void TestWorld::load() {
 
 	// make a material component
 	auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
-	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/checkeredMap2.jpg"));
+	ground_material->textures.push_back(Engine::createComponent<Component::Texture>("Assets/Textures/checkeredBowl.png"));
 	ground_material->shader = Pipeline::Library::getAsset<Program>(
 		"Assets/Programs/basic.json"
 		);
 
 	// load the mesh component
-	auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/checkeredMap2.fbx");
+	auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/checkeredBowl.fbx");
 	drivable_instances.add_instance_at(
 		glm::rotate(glm::radians(-90.0f), glm::vec3{ 1,0,0 }) *glm::translate(glm::vec3{ 0,-1,0 }),
 		plane_mesh, ground_material, plane_mesh
@@ -389,7 +389,7 @@ void TestWorld::load() {
 
 	// spawn some ai bois into the world
 	auto dim = 1;
-	int spacing = 150;
+	int spacing = 90;
 	for (int x = -dim; x <= dim; x++) {
 		for (int y = -dim; y <= dim; y++) {
 			auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
@@ -397,7 +397,7 @@ void TestWorld::load() {
 			ai_vehicle->path.graphNodes = navEnum;
 			ai_vehicle->path.FindPath(player_vehicle->position, ai_vehicle->position);
 			ai_vehicle->path.CleanPath();
-			ai_vehicle->path.PrintPath();
+			//ai_vehicle->path.PrintPath();
 			ai_vehicle->tickHandler += ticker; // give them brain
 
 		}
