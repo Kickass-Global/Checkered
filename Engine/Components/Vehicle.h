@@ -69,8 +69,8 @@ namespace Component {
 		Vehicle() :
 			pxSteerVsForwardSpeedData{
 					0.0f, 0.75f,
-					5.0f, 0.75f,
-					30.0f, 0.1f,
+					35.0f, 0.75f,
+					60.0f, 0.1f,
 					120.0f, 0.1f,
 
 		},

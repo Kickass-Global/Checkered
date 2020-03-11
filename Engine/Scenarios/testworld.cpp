@@ -252,7 +252,7 @@ void TestWorld::load() {
 				);
 
 			material->textures.push_back(
-				Engine::createComponent<Component::Texture>("Assets/Textures/win.jpg"));
+				Engine::createComponent<Component::Texture>("Assets/Textures/win.png"));
 
 			sprite->mesh_instance = Engine::createNamedComponent<MeshInstance>(
 				"billboard_mesh_instance",
