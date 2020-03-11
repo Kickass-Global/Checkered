@@ -142,7 +142,7 @@ enum FilterMask : PxU32 {
 };
 
 enum QueryFilterMask : PxU32 {
-	eDrivable = 0xFFFF0000,
+	eDrivable = 0xffff0000
 };
 
 

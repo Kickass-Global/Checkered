@@ -19,6 +19,7 @@ PxFilterFlags Physics::FilterShader::setupFilterShader(PxFilterObjectAttributes 
 
 	//generate contacts for all that were not filtered
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+	pairFlags |= PxPairFlags(PxU16(filterData0.word2 | filterData1.word2));
 
 	if ((filterData0.word0 & filterData1.word1) && (filterData0.word1 & filterData1.word0)) {
 
@@ -26,8 +27,6 @@ PxFilterFlags Physics::FilterShader::setupFilterShader(PxFilterObjectAttributes 
 	}
 
 	return PxFilterFlag::eDEFAULT;
-
-
 }
 
 enum {
@@ -42,7 +41,6 @@ void setupDrivableSurface(PxFilterData &filterData) {
 void Physics::FilterShader::setupQueryFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask) {
 
 	PxFilterData filterData;
-	filterData.word2 = filterGroup;
 	filterData.word3 = filterMask;
 
 	const PxU32 numShapes = actor->getNbShapes();
@@ -53,8 +51,6 @@ void Physics::FilterShader::setupQueryFiltering(PxRigidActor* actor, PxU32 filte
 		shape->setQueryFilterData(filterData);
 	}
 	free(shapes);
-
-
 }
 
 void Physics::FilterShader::setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask) {

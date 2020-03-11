@@ -190,7 +190,7 @@ void TestWorld::load() {
 
 	player_vehicle->model = player_damage_model;
 	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-	player_vehicle->local_position = glm::vec3(0.0f, -1.0f, 0.0f);
+	player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
 	player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
 	physicsSystem->playerVehicle = player_vehicle;
 
@@ -404,9 +404,9 @@ void TestWorld::load() {
 	}
 
 	// make a default camera
-	auto camera = Engine::createComponent<Component::Camera>();
-	camera->target = player_vehicle; // make camera follow player.
-	inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
+	//auto camera = Engine::createComponent<Component::Camera>();
+	//camera->target = player_vehicle; // make camera follow player.
+	//inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
 
 	// region initialize game-clocks
 	using namespace std::chrono;
