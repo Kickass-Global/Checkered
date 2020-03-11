@@ -107,9 +107,9 @@ namespace snippetvehicle {
                 wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 14000.0f;
                 //Enable steering for the front wheels only.
                 wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer =
-                        PxPi * 0.3333f;
+                        PxPi * 0.2333f;
                 wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer =
-                        PxPi * 0.3333f;
+                        PxPi * 0.2333f;
             }
 
             //Set up the tires.
@@ -132,9 +132,9 @@ namespace snippetvehicle {
 
                 //Set the suspension data.
                 for (PxU32 i = 0; i < numWheels; i++) {
-                    suspensions[i].mMaxCompression = 0.5f;
+                    suspensions[i].mMaxCompression = 0.3f;
                     suspensions[i].mMaxDroop = 0.1f;
-                    suspensions[i].mSpringStrength = 35000.0f;
+                    suspensions[i].mSpringStrength = 55000.0f;
                     suspensions[i].mSpringDamperRate = 4500.0f;
                     suspensions[i].mSprungMass = suspSprungMasses[i];
                 }

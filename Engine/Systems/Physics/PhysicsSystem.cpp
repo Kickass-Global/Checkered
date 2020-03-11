@@ -68,7 +68,7 @@ VehicleDesc initVehicleDescription(bool is_player) {
 	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
 	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
 	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 1500.0f;
+	const PxF32 chassisMass = 2500.0f;
 	const PxVec3 chassisDims(2.0f, 3.0f, 4.0f);
 	const PxVec3 chassisMOI
 	((chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
