@@ -16,6 +16,7 @@
 #include "tags.h"
 #include "damage.hpp"
 #include <GLFW/glfw3.h>
+#include <Camera.h>
 
 #include "Engine.h" 
 
@@ -69,8 +70,8 @@ namespace Component {
 		Vehicle() :
 			pxSteerVsForwardSpeedData{
 					0.0f, 0.75f,
-					5.0f, 0.75f,
-					30.0f, 0.1f,
+					35.0f, 0.75f,
+					60.0f, 0.1f,
 					120.0f, 0.1f,
 
 		},
@@ -116,16 +117,18 @@ namespace Component {
 	struct ControlledVehicle : public ComponentBase {
 
 		std::shared_ptr<Vehicle> vehicle;
+		std::shared_ptr<Camera> camera;
 		std::shared_ptr<EventHandler< GLFWgamepadstate, GLFWgamepadstate>> onGamePadStateChangedHandler;
 		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
 		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
 
-		ControlledVehicle() : vehicle(Engine::createComponent<Vehicle>())
+		ControlledVehicle() : vehicle(Engine::createComponent<Vehicle>()), camera(Engine::createComponent<Camera>())
 		{
 			onGamePadStateChangedHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onGamePadStateChanged);
 			onKeyDownHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onKeyDown);
 			onKeyUpHandler = Engine::EventSystem::createHandler(this, &ControlledVehicle::onKeyUp);
 			vehicle->type = Vehicle::Type::Player;
+			camera->target = vehicle;
 		}
 
 		template <typename T> int sgn(T val) {
@@ -208,9 +211,12 @@ namespace Component {
 				vehicle->pxVehicleInputData.setAnalogSteer(0);
 			}
 			
-
-
-
+			const auto rotation_scale = static_cast<float>(3.14157) / 180.0f;
+			auto camera_yaw = current.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] * rotation_scale;
+			auto delta = glm::quat(glm::vec3(0, glm::degrees(camera_yaw), 0)); 
+			using namespace Engine;
+			log<high>(delta);
+			camera->local_rotation = delta;
 
 		}
 

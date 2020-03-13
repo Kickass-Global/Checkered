@@ -127,9 +127,9 @@ namespace snippetvehicle {
 
                 //Set the suspension data.
                 for (PxU32 i = 0; i < numWheels; i++) {
-                    suspensions[i].mMaxCompression = 0.5f;
+                    suspensions[i].mMaxCompression = 0.3f;
                     suspensions[i].mMaxDroop = 0.1f;
-                    suspensions[i].mSpringStrength = 35000.0f;
+                    suspensions[i].mSpringStrength = 55000.0f;
                     suspensions[i].mSpringDamperRate = 4500.0f;
                     suspensions[i].mSprungMass = suspSprungMasses[i];
                 }

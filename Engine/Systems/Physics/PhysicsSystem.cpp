@@ -597,30 +597,24 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 
     aPhysicsActor->actor->userData = aPhysicsActor;
 
-    switch (aPhysicsActor->type) {
-        case PhysicsActor::Type::StaticObject:
-            FilterShader::setupFiltering(
-                aPhysicsActor->actor, FilterGroup::eScenery, FilterMask::eEverything
-            );
-            break;
-        case PhysicsActor::Type::DynamicObject:
-            FilterShader::setupFiltering(
-                aPhysicsActor->actor, FilterGroup::eObstacle, FilterMask::eEverything
-            );
-            break;
-        case PhysicsActor::Type::Ground:
-            FilterShader::setupFiltering(
-                aPhysicsActor->actor, FilterGroup::eGround, FilterMask::eGroundColliders
-            );
-            FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
-            break;
-        case PhysicsActor::Type::TriggerVolume:
-            FilterShader::setupFiltering(
-                aPhysicsActor->actor, FilterGroup::eTrigger, FilterMask::eTriggerColliders
-            );
-            break;
-    }
-    cScene->addActor(*aPhysicsActor->actor);
+	switch (aPhysicsActor->type)
+	{
+	case PhysicsActor::Type::StaticObject:
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, FilterMask::eEverything);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
+		break;
+	case PhysicsActor::Type::DynamicObject:
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eObstacle, FilterMask::eEverything);
+		break;
+	case PhysicsActor::Type::Ground:
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, FilterMask::eGroundColliders);
+		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
+		break;
+	case PhysicsActor::Type::TriggerVolume:
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, FilterMask::eTriggerColliders);
+		break;
+	}
+	cScene->addActor(*aPhysicsActor->actor);
 }
 
 void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger *passenger) {
