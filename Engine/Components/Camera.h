@@ -28,14 +28,15 @@ namespace Component {
 		} viewport;
 
 		glm::vec3 position;
-        glm::quat rotation;
-		glm::mat4 view{1};
+		glm::quat rotation;
+		glm::quat local_rotation{ 1,0,0,0 };
+		glm::mat4 view{ 1 };
 
 		std::shared_ptr<ComponentInterface> target;
-        glm::vec3 offset = { 0,4,-10 };
+		glm::vec3 offset = { 0,4,-10 };
 
 		Camera();
-    };
+	};
 
 }
 

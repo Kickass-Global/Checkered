@@ -5,43 +5,43 @@
 #include "CameraSystem.h"
 
 void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
-    for (auto &&key : keys) {
-        if (!keys.count(key)) continue;
+    //for (auto &&key : keys) {
+    //    if (!keys.count(key)) continue;
 
-        switch (key) {
-            case GLFW_KEY_RIGHT:
-                x += increment;
-                break;
-            case GLFW_KEY_DOWN:
-                y -= increment;
-                break;
-            case GLFW_KEY_LEFT:
-                x -= increment;
-                break;
-            case GLFW_KEY_UP:
-                y += increment;
-                break;
-            case GLFW_KEY_PAGE_UP:
-                u += increment;
-                break;
-            case GLFW_KEY_PAGE_DOWN:
-                u -= increment;
-                break;
-        }
-    }
+    //    switch (key) {
+    //        case GLFW_KEY_RIGHT:
+    //            x += increment;
+    //            break;
+    //        case GLFW_KEY_DOWN:
+    //            y -= increment;
+    //            break;
+    //        case GLFW_KEY_LEFT:
+    //            x -= increment;
+    //            break;
+    //        case GLFW_KEY_UP:
+    //            y += increment;
+    //            break;
+    //        case GLFW_KEY_PAGE_UP:
+    //            u += increment;
+    //            break;
+    //        case GLFW_KEY_PAGE_DOWN:
+    //            u -= increment;
+    //            break;
+    //    }
+    //}
 
-    float x_rotation = x / sensitivity * elapsed;
-    float y_rotation = y / sensitivity * elapsed;
-    float zoom = u / sensitivity * elapsed;
+    //float x_rotation = x / sensitivity * elapsed;
+    //float y_rotation = y / sensitivity * elapsed;
+    //float zoom = u / sensitivity * elapsed;
 
 
     for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
         //if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
 		
-        auto delta = glm::quat(glm::vec3(0, glm::degrees(x_rotation), 0));
+        //auto delta = glm::quat(glm::vec3(0, glm::degrees(x_rotation), 0));
 
-        camera->rotation *= delta;
-        camera->position.z += u;
+        //camera->rotation *= delta;
+        //camera->position.z += u;
 
 
         // check if the camera is attached to a component, get that components
@@ -55,7 +55,7 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 			if (!transforms.empty())
 			{
 				auto transform = transforms[0];
-				auto offset = glm::toMat4(camera->rotation) * glm::vec4(camera->offset, 1);
+				auto offset = glm::toMat4(camera->rotation) * glm::toMat4(camera->local_rotation) * glm::vec4(camera->offset, 1);
 
 				// this line of code controls the camera returning to 'neutral' position behind the target...
 				camera->rotation = glm::slerp(camera->rotation, transform->rotation, 0.3f); // todo, scale this with speed
@@ -77,9 +77,9 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 
 		camera->is_dirty = true;
         // reset deltas
-        x = 0;
-        y = 0;
-        u = 0;
+        //x = 0;
+        //y = 0;
+        //u = 0;
     }
 
 }

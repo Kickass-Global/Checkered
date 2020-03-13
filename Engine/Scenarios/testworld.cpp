@@ -190,10 +190,11 @@ void TestWorld::load() {
         Component::Model::Variation{2000000, Engine::createComponent<PaintedMesh>(car_mesh, car_material)}
     );
 
-    player_vehicle->model = player_damage_model;
-    player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-    player_vehicle->local_position = glm::vec3(0.0f, -1.0f, 0.0f);
-    player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
+	player_vehicle->model = player_damage_model;
+	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+	player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
+	player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
+	physicsSystem->playerVehicle = player_vehicle;
 
     //setup passenger system
 
@@ -248,8 +249,8 @@ void TestWorld::load() {
                     "Assets/Programs/billboard.json"
                 ));
 
-            material->textures.push_back(
-                Engine::createComponent<Component::Texture>("Assets/Textures/win.jpg"));
+			material->textures.push_back(
+				Engine::createComponent<Component::Texture>("Assets/Textures/win.png"));
 
             sprite->mesh_instance = Engine::createNamedComponent<MeshInstance>(
                 "billboard_mesh_instance", billboard_mesh, material
@@ -406,10 +407,10 @@ void TestWorld::load() {
         }
     }
 
-    // make a default camera
-    auto camera = Engine::createComponent<Component::Camera>();
-    camera->target = player_vehicle; // make camera follow player.
-    inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
+	// make a default camera
+	//auto camera = Engine::createComponent<Component::Camera>();
+	//camera->target = player_vehicle; // make camera follow player.
+	//inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
 
     // region initialize game-clocks
     using namespace std::chrono;
