@@ -60,39 +60,41 @@ namespace Engine {
 		const char module[] = "Engine";
 	}
 
-	/**
-	 * Returns collection of systems currently running in the engine.
-	 */
-	const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
+    /**
+     * Returns collection of systems currently running in the engine.
+     */
+    const std::vector<std::unique_ptr<Engine::SystemInterface>> &systems();
 
-	inline EngineStore& getStore() {
-		return store;
-	}
+    inline EngineStore &getStore() {
 
-	/**
-	 * Creates a new system to the engine; systems need to be default constructable.
-	 * @tparam T the type of system
-	 * @return returns a reference to the new system.
-	 */
-	template<typename T>
-	T *addSystem() {
-		registeredSystems.push_back(std::make_unique<T>());
-		registeredSystems.back()->initialize();
-		return static_cast<T *>(registeredSystems.back().get());
-	}
+        return store;
+    }
 
-	void sortSystems();
+    /**
+     * Creates a new system to the engine; systems need to be default constructable.
+     * @tparam T the type of system
+     * @return returns a reference to the new system.
+     */
+    template<typename T>
+    T *addSystem() {
 
-	/**
-	 * Users to keep track of 'human-readable' names for components; mostly for debugging purposes.
-	 */
-	extern std::map<Component::ComponentId, std::string> identifier;
+        registeredSystems.push_back(std::make_unique<T>());
+        registeredSystems.back()->initialize();
+        return static_cast<T *>(registeredSystems.back().get());
+    }
 
-	/**
-	 * Gives a name to the component; useful for debugging purposes.
-	 * @param componentId the component to name
-	 * @param name the name of the component.
-	 */
+    void sortSystems();
+
+    /**
+     * Users to keep track of 'human-readable' names for components; mostly for debugging purposes.
+     */
+    extern std::map<Component::ComponentId, std::string> identifier;
+
+    /**
+     * Gives a name to the component; useful for debugging purposes.
+     * @param componentId the component to name
+     * @param name the name of the component.
+     */
 	void nameComponent(const Component::ComponentId &componentId, std::string name);
 
 	/**

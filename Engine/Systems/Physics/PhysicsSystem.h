@@ -28,75 +28,71 @@
 #include "SimulationCallback.h"
 #include "Passenger.h"
 
-
-
 using namespace physx;
 
-
 namespace Physics {
-	const char module[] = "Physics";
+    const char module[] = "Physics";
 
-	class PhysicsSystem : public Engine::SystemInterface {
+    struct PhysicsSystem : public Engine::SystemInterface {
 
-	public:
+        PxPhysics *cPhysics = NULL;
+        PxScene *cScene = NULL;
+        PxTriggerPair *playPassTriggerPair;
 
-		PxPhysics* cPhysics = NULL;
-		PxScene* cScene = NULL;
-		PxTriggerPair* playPassTriggerPair;
+        void initialize() override;
 
+        void update(Engine::deltaTime /*elapsed*/) override;
 
-		void initialize() override;
+        std::shared_ptr<EventHandler<Vehicle *>> onVehicleCreatedHandler;
+        std::shared_ptr<EventHandler<PhysicsActor *>> onActorCreatedHandler;
+        std::shared_ptr<EventHandler<int>> onKeyPressHandler;
+        std::shared_ptr<EventHandler<int>> onKeyDownHandler;
+        std::shared_ptr<EventHandler<int>> onKeyUpHandler;
 
-		void update(Engine::deltaTime /*elapsed*/) override;
-
-
-		std::shared_ptr<Component::Vehicle> playerVehicle;
-
-		std::shared_ptr<EventHandler<Vehicle*>> onVehicleCreatedHandler;
-		std::shared_ptr<EventHandler<PhysicsActor*>> onActorCreatedHandler;
-		std::shared_ptr<EventHandler<int>> onKeyPressHandler;
-		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
-		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
-
-		void link(Vehicle* sceneComponent, physx::PxRigidDynamic *actor);
-
-		void onPassengerCreated(Component::Passenger *pass);
+        void link(Vehicle *sceneComponent, physx::PxRigidDynamic *actor);
 
 
-	private:
-		void createFoundation();
-		void createPhysicsCallbacks();
-		void createPhysicsObject();
+    private:
+        void createFoundation();
 
-		void createPVD();
+        void createPhysicsCallbacks();
 
-		void createCooking();
+        void createPhysicsObject();
 
-		void createScene();
+        void createPVD();
 
-		void createGround();
+        void createCooking();
 
-		void initVehicleSupport();
+        void createScene();
 
-		void createDrivablePlayerVehicle();
+        void createGround();
 
-		void stepPhysics(Engine::deltaTime);
+        void initVehicleSupport();
+
+        void createDrivablePlayerVehicle();
+
+        void stepPhysics(Engine::deltaTime);
 
 		void onKeyDown(const EventArgs<int> &args);
 
-		void onKeyUp(const EventArgs<int> &args);
+        void onKeyUp(const EventArgs<int> &args);
 
-		void onKeyPress(const EventArgs<int> &args);
+        void onKeyPress(const EventArgs<int> &args);
 
-		PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform, bool is_player);
+        PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform, bool is_player);
 
-		void onVehicleCreated(const EventArgs<Vehicle*> &args);
-		Component::Passenger* createPassenger(const PxTransform& pickupTrans, const PxTransform& dropOffTrans);
-		void onActorCreated(const EventArgs<Component::PhysicsActor*>& args);
+        void onVehicleCreated(const EventArgs<Vehicle *> &args);
 
-		PxTriangleMesh* createTriMesh(Mesh* mesh);
-		PxConvexMesh* createConvexMesh(Mesh* mesh);
-	};
+        Component::Passenger *createPassenger(const PxTransform &pickupTrans, const PxTransform &dropOffTrans);
+
+        void onActorCreated(const EventArgs<Component::PhysicsActor *> &args);
+
+        PxTriangleMesh *createTriMesh(Mesh *mesh);
+
+        PxConvexMesh *createConvexMesh(Mesh *mesh);
+
+        void onPassengerCreated(Passenger *passenger);
+    };
 
 
 
@@ -105,47 +101,6 @@ namespace Physics {
 namespace physx {
 	std::ostream &operator<<(std::ostream &out, const PxTransform &transform);
 }
-
-enum FilterGroup : PxU32
-{
-	ePlayerVehicle = (1 << 0),
-	eEnemyVehicle = (1 << 1),
-	ePasenger = (1 << 2),
-	eScenery = (1 << 3),
-	eObstacle = (1 << 4),
-	eGround = (1 << 5),
-	eTrigger = (1 << 6),
-	eWheel = (1 << 7),
-};
-
-template <class T>
-constexpr int operator| (T a, enum FilterGroup b) {
-	using G = std::underlying_type_t<enum FilterGroup>;
-	return static_cast<PxU32>(static_cast<G>(a) | static_cast<G>(b));
-}
-
-enum FilterMask : PxU32 {
-	eVehicle = FilterGroup::ePlayerVehicle | FilterGroup::eEnemyVehicle,
-
-	ePlayerColliders = eVehicle | eObstacle | eScenery | eGround | eTrigger,
-	eEnemyColliders = eVehicle | eObstacle | eScenery | eGround,
-	
-	eGroundColliders = eObstacle | eScenery | eGround | eVehicle,
-	eObstacleColliders = eVehicle | eObstacle | eScenery | eGround,
-	eSceneryColliders = eVehicle | eObstacle | eScenery,
-	
-	eWheelColliders = eWheel,
-	eTriggerColliders = ePlayerVehicle,
-
-	eEverything = 0xFFFFFFFF,
-	eNone = 0,
-};
-
-enum QueryFilterMask : PxU32 {
-	eDrivable = 0xFFFF0000,
-};
-
-
 
 
 #endif //ENGINE_PHYSICSSYSTEM_H

@@ -1,0 +1,18 @@
+{
+  "entity": {
+    "shaders": [
+      {
+        "shader": [
+          0,
+          "Assets/Shaders/font.vert"
+        ]
+      },
+      {
+        "shader": [
+          1,
+          "Assets/Shaders/font.frag"
+        ]
+      }
+    ]
+  }
+}
