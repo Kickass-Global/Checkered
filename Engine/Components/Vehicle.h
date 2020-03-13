@@ -202,8 +202,6 @@ namespace Component {
 
 			if (current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -control_deadzone || current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] >= control_deadzone) {
 				vehicle->pxVehicleInputData.setAnalogSteer(-current.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
-				
-
 			}
 
 			else {

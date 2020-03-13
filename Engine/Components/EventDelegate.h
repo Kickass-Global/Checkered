@@ -54,7 +54,7 @@ namespace Component {
 		 * Invokes the event args to all listeners
 		 * @param args the event args data
 		 */
-		void operator()(Args ... args);
+        void operator()(Args ... args);
 
 		/**
 		 * Adds a new subscriber to this event
