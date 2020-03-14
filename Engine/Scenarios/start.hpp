@@ -48,9 +48,9 @@ namespace Engine {
             getEngine()->createComponent<Component::Camera>();
         }
 
-        void update() {
+        void update(deltaTime d) {
 
-            getEngine()->createMomentaryComponent<Component::Text>("FPS:", 1, glm::vec3{1, 0, 0});
+            getEngine()->createMomentaryComponent<Component::Text>("FPS " + std::to_string(d), 1, glm::vec3{1, 0, 0});
         }
     };
 }

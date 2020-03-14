@@ -2013,7 +2013,8 @@ static FT_Error compute_glyph_metrics(
     /* unless FT_LOAD_COMPUTE_METRICS is set or backward compatibility */
     /* mode of the v40 interpreter is active.  See `ttinterp.h' for    */
     /* details on backward compatibility mode.                         */
-    if (#ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+    if (
+        #ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
         !(driver->interpreter_version == TT_INTERPRETER_VERSION_40 &&
           (loader->exec && loader->exec->backward_compatibility)) &&
         #endif
