@@ -3,14 +3,17 @@
 //
 
 #include "damagesystem.hpp"
+#include <WorldTransform.h>
+#include <EngineStore.h>
 
 void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 
-	auto models = Engine::getStore().getRoot().getComponentsOfType<Component::Model>();
+
+    auto models = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Model>();
 
     for (auto &model : models) {
 
-		const bool is_dirty = model->is_outdated;
+        const bool is_dirty = model->is_outdated;
 
         if (is_dirty) {
             log<medium>("Updating dirty model#", model);
@@ -19,9 +22,9 @@ void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 
 				auto &&mesh = part.variations[part.active_variation].mesh;
 				if (mesh) {
-					mesh->eraseChildComponentsOfType<WorldTransform>();
-					mesh->emplaceChildComponent<WorldTransform>(model->transform);
-				}
+                    mesh->eraseChildComponentsOfType<Component::WorldTransform>();
+                    mesh->emplaceChildComponent<Component::WorldTransform>(model->transform);
+                }
             }
         }
 

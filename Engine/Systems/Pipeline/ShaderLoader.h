@@ -10,9 +10,11 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include "../Rendering/RenderingSystem.h"
 #include "nlohmann/json.hpp"
-#include "Engine.h"
+#include <Rendering/RenderingSystem.h>
+
+#include <EngineDebug.hpp>
+
 
 namespace Pipeline {
 
@@ -20,11 +22,11 @@ namespace Pipeline {
         char module[] = "Pipeline";
     }
 
-    class ShaderLoader {
+    class ShaderLoader : public SystemInterface {
     public:
 
         template<int type>
-        std::unique_ptr<Rendering::Shader> load(std::string filename) {
+        std::unique_ptr<Rendering::Shader> load(const std::string &filename) {
 
             std::ifstream ifs(filename);
             Engine::assertLog<module>(ifs.is_open(), "load shader file " + filename);
@@ -39,36 +41,10 @@ namespace Pipeline {
         }
     };
 
-    class ProgramLoader {
+    class ProgramLoader : public SystemInterface {
     public:
-        static std::shared_ptr<Rendering::Program> load(std::string filename) {
-
-            std::ifstream ifs(filename);
-            Engine::assertLog<module>(ifs.is_open(), "load program description file " + filename);
-
-            nlohmann::json json;
-            ifs >> json;
-
-            Pipeline::ShaderLoader loader;
-            std::vector<std::shared_ptr<Rendering::Shader>> shaders;
-
-        for (auto shader : json["entity"]["shaders"]) {
-            auto type_id = shader["shader"][0].get<int>();
-            auto shader_filename = shader["shader"][1].get<std::string>();
-
-            Engine::log<module>("loading shader: ", shader_filename);
-
-            shaders.push_back(std::move(type_id == 0 ?
-                                        loader.load<GL_VERTEX_SHADER>(
-                                                shader_filename) :
-                                        loader.load<GL_FRAGMENT_SHADER>(
-                                                shader_filename))
-            );
-        }
-
-		return Engine::createComponent<Rendering::Program>(shaders);
-    }
-};
+        std::shared_ptr<Rendering::Program> load(const std::string &filename);
+    };
 }
 
 #endif //ENGINE_SHADERLOADER_H

@@ -6,44 +6,50 @@
 #include <sstream>
 #include "Engine.h"
 #include "EventHandler.h"
-#include "Events/Events.h"
+#include <glm/glm.hpp>
+#include <iomanip>
+#include <Pipeline/Library.h>
+#include <glm/gtc/quaternion.hpp>
+#include <Events/Events.h>
 
-std::vector<std::unique_ptr<Engine::SystemInterface>> Engine::registeredSystems;
 
-EngineStore Engine::store;
+std::ostream &Engine::operator<<(std::ostream &out, const glm::vec3 &vector) {
 
-void Engine::nameComponent(const Component::ComponentId &componentId,
-                           std::string name) {
-    identifier[componentId] = name;
+    return out << "<" << vector.x << ", " << vector.y << ", " << vector.z << ">";
 }
 
-const std::vector<std::unique_ptr<Engine::SystemInterface>> &Engine::systems() {
-    return registeredSystems;
+std::ostream &Engine::operator<<(std::ostream &out, const glm::quat &quat) {
+
+    return out << "<" << quat.x << ", " << quat.y << ", " << quat.z << ", " << quat.w << ">";
 }
 
-std::ostream& Engine::operator<<(std::ostream&  out, const glm::vec3& vector) {
-	return out << "<" << vector.x << ", " << vector.y << ", " << vector.z << ">";
+std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
+
+    const unsigned int width = 20;
+
+    std::ostringstream buff;
+    buff << "[";
+    std::copy_n(
+        name.value.begin(), std::min(name.value.size(), static_cast<size_t>(width - 3)),
+        std::ostreambuf_iterator(buff));
+    buff << "] ";
+
+    return out << std::setw(width) << buff.str();
 }
 
-std::ostream& Engine::operator<<(std::ostream&  out, const glm::quat& quat) {
-	return out << "<" << quat.x << ", " << quat.y << ", " << quat.z <<  ", " << quat.w << ">";
+void Engine::EngineSystem::update(deltaTime time) {
+
+    SystemInterface::update(time);
 }
 
-void Engine::sortSystems() {
-    std::sort(registeredSystems.begin(), registeredSystems.end(), [](auto& a, auto& b) {return a->order > b->order; });
-}
+void Engine::EngineSystem::initialize() {
 
-std::map<Component::ComponentId, std::string> Engine::identifier;
-
-std::ostream& Engine::operator<<(std::ostream& out, Engine::Name name) {
-	const unsigned int width = 20;
-
-	std::ostringstream buff;
-	buff << "[";
-	std::copy_n(name.value.begin(),
-		std::min(name.value.size(), static_cast<size_t>(width - 3)),
-		std::ostreambuf_iterator(buff));
-	buff << "] ";
-
-	return out << std::setw(width) << buff.str();
+    enginePtr = this;
+    store = addSubSystem<EngineStore>();
+    addSubSystem<EventSystem>();
+    addSubSystem<Pipeline::Library>();
+    addSubSystem<Pipeline::MeshLoader>();
+    addSubSystem<Pipeline::ProgramLoader>();
+    addSubSystem<Pipeline::ShaderLoader>();
+    SystemInterface::initialize();
 }

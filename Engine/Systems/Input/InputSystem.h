@@ -11,7 +11,7 @@
 #include "GLFW/glfw3.h"
 #include "../../main.h"
 #include "EventDelegate.h"
-#include "../../Systems/systeminterface.hpp"
+#include "SystemInterface.hpp"
 #include <memory>
 #include <functional>
 
