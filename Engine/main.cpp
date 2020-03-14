@@ -32,7 +32,7 @@ int main() {
         Engine::deltaTime elapsed = static_cast<Engine::deltaTime>(duration_cast<milliseconds>(delta).count());
         // endregion
 
-        s.update();
+        s.update(elapsed);
 
         engine.getSubSystem<EventSystem>()->onTick(elapsed);
         engine.update(elapsed);
