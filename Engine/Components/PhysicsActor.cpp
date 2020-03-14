@@ -3,6 +3,8 @@
 //
 
 #include "PhysicsActor.h"
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 glm::mat4 Component::PhysicsActor::getWorldTransform() {
 

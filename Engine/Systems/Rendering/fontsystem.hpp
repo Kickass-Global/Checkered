@@ -10,6 +10,9 @@
 #include FT_FREETYPE_H
 #include "RenderingSystem.h"
 #include "text.hpp"
+#include <Engine.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
 
 using Rendering::Program;
 namespace Engine {
@@ -19,7 +22,6 @@ namespace Engine {
     class FontSystem : public SystemInterface {
     public:
         std::shared_ptr<Program> program;
-
 
         void initialize() override {
             // FreeType
@@ -33,11 +35,9 @@ namespace Engine {
             if (FT_New_Face(ft, "Assets/Fonts/Troutbeck DEMO.otf", 0, &face))
                 std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 
-            program = Pipeline::Library::getAsset<Program>(
+            program = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
                 "Assets/Programs/font.json"
             );
-
-            Engine::createComponent<Text>("This is just a test", 1, glm::vec3{0, 1, 0});
 
             glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(640), 0.0f, static_cast<GLfloat>(480));
             program->bind();
@@ -95,7 +95,7 @@ namespace Engine {
 
         void update(Engine::deltaTime time) override {
             // find all text that needs to be rendered during this frame
-            for (auto text : Engine::getStore().getRoot().getComponentsOfType<Text>()) {
+            for (auto text :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Text>()) {
                 RenderText(*program, text->text, 0, 0, 1, {0, 1, 0});
             }
         }

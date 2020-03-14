@@ -7,21 +7,23 @@
 #ifndef ENGINE_RENDERINGSYSTEM_H
 #define ENGINE_RENDERINGSYSTEM_H
 
-#include "glad/glad.h"
-#include "RenderingBatch.h"
-#include "Engine.h"
-
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include "RenderingBatch.h"
+
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
+#include <SystemInterface.hpp>
+
 
 namespace Rendering {
 
     class RenderingSystem;
 
-    class Shader : public ComponentBase {
+    class Shader : public Component::ComponentBase {
         GLuint m_id;
 
     public:
@@ -35,7 +37,7 @@ namespace Rendering {
         ~Shader();
     };
 
-    class Program : public ComponentBase {
+    class Program : public Component::ComponentBase {
 
         GLuint m_id;
 

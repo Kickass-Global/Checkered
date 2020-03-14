@@ -14,6 +14,7 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
 #include "ComponentBase.h"
+#include "ComponentInterface.h"
 
 namespace Component {
 

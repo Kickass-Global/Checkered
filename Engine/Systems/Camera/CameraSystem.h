@@ -20,63 +20,55 @@
 
 #include "ComponentId.h"
 #include "Camera.h"
-#include "systeminterface.hpp"
+#include "SystemInterface.hpp"
 #include "EventHandler.h"
 #include "Engine.h"
 #include "Events/Events.h"
 #include "SceneComponent.h"
+#include "ComponentInterface.h"
 
 namespace Camera {
 
-	namespace {
-		char module[] = "Camera";
-	}
+    namespace {
+        char module[] = "Camera";
+    }
 
-	class CameraSystem : public Engine::SystemInterface {
+    class CameraSystem : public Engine::SystemInterface {
 
-	public:
+    public:
 
-		static Component::ComponentId id();
+        static ComponentId id();
 
-		std::shared_ptr<EventHandler<int>> onKeyPressHandler;
-		std::shared_ptr<EventHandler<int>> onKeyDownHandler;
-		std::shared_ptr<EventHandler<int>> onKeyUpHandler;
-		std::shared_ptr<EventHandler<int, int>> onWindowSizeHandler;
-		std::shared_ptr<EventHandler<GLFWgamepadstate, GLFWgamepadstate>> onGamepadStateChangedHandler;
+        std::shared_ptr<Component::EventHandler<int>> onKeyPressHandler;
+        std::shared_ptr<Component::EventHandler<int>> onKeyDownHandler;
+        std::shared_ptr<Component::EventHandler<int>> onKeyUpHandler;
+        std::shared_ptr<Component::EventHandler<int, int>> onWindowSizeHandler;
+        std::shared_ptr<Component::EventHandler<GLFWgamepadstate, GLFWgamepadstate>> onGamepadStateChangedHandler;
 
-		CameraSystem() {
+        void initialize() override;
 
-			// create event handlers
+        float x = 0;
+        float y = 0;
+        float u = 0;
 
-			onKeyPressHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyPress);
-			onKeyDownHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyDown);
-			onKeyUpHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onKeyUp);
-			onWindowSizeHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onWindowSizeChanged);
-			onGamepadStateChangedHandler = Engine::EventSystem::createHandler(this, &CameraSystem::onGamepadStateChanged);
+        float sensitivity = 100.0f;
+        float increment = static_cast<float>(M_PI) / 180.0f;
 
-		}
+        std::set<int> keys;
 
-		float x = 0;
-		float y = 0;
-		float u = 0;
+        void update(Engine::deltaTime elapsed) override;
 
-		float sensitivity = 100.0f;
-		float increment = static_cast<float>(M_PI) / 180.0f;
+        void onWindowSizeChanged(const Component::EventArgs<int, int> &args);
 
-		std::set<int> keys;
+        void onKeyDown(const Component::EventArgs<int> &args);
 
-		void update(Engine::deltaTime elapsed) override;
+        void onKeyUp(const Component::EventArgs<int> &args);
 
-		void onWindowSizeChanged(const Component::EventArgs<int, int> &args);
+        void onKeyPress(const Component::EventArgs<int> &args);
 
-		void onKeyDown(const Component::EventArgs<int> &args);
+        void onGamepadStateChanged(const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args);
 
-		void onKeyUp(const Component::EventArgs<int> &args);
-
-		void onKeyPress(const Component::EventArgs<int> &args);
-		void onGamepadStateChanged(const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args);
-
-	};
+    };
 
 }
 

@@ -4,6 +4,7 @@
 
 #include "EntityLoader.h"
 #include "../../Components/SceneComponent.h"
+#include "ComponentInterface.h"
 
 template<>
 void Pipeline::load_meta_data<Component::Mesh>(const json &config, Component::Mesh &data) {
@@ -30,7 +31,7 @@ void Pipeline::load_meta_data<Component::SceneComponent>(const json &config,
     //}
 }
 
-void Pipeline::load_components(const json &config, Component::ComponentId entity) {
+void Pipeline::load_components(const json &config, ComponentId entity) {
 
     //for (auto[key, value] : config["entity"]["components"].items()) {
     //    auto classId = parse(value["entity"]["class-id"]);

@@ -3,8 +3,6 @@
 #
 cmake_minimum_required(VERSION 3.12)
 
-set(MSVC_COMPILE_FLAGS "/MP")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILE_FLAGS}")
 
 project("Engine")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,8 +24,6 @@ target_link_libraries(SOIL
         PRIVATE ${OPENGL_gl_LIBRARY}
         )
 
-
-# Include sub-projects.
 add_subdirectory("Engine")
 
 

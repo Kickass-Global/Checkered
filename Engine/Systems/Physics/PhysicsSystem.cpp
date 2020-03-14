@@ -20,6 +20,7 @@
 #include "scenery.hpp"
 #include "VehicleFactory.hpp"
 #include "FilterShader.h"
+#include <WorldTransform.h>
 
 using namespace physx;
 using namespace snippetvehicle;
@@ -119,15 +120,17 @@ VehicleDesc initVehicleDescription(bool is_player) {
 
 void Physics::PhysicsSystem::initialize() {
 
-    onKeyPressHandler = Engine::EventSystem::createHandler(
+    onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
         this, &Physics::PhysicsSystem::onKeyPress
     );
-    onKeyDownHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyDown);
-    onKeyUpHandler = Engine::EventSystem::createHandler(this, &Physics::PhysicsSystem::onKeyUp);
-    onVehicleCreatedHandler = Engine::EventSystem::createHandler(
+    onKeyDownHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
+        this, &Physics::PhysicsSystem::onKeyDown
+    );
+    onKeyUpHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &Physics::PhysicsSystem::onKeyUp);
+    onVehicleCreatedHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
         this, &Physics::PhysicsSystem::onVehicleCreated
     );
-    onActorCreatedHandler = Engine::EventSystem::createHandler(
+    onActorCreatedHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
         this, &Physics::PhysicsSystem::onActorCreated
     );
 
@@ -242,6 +245,7 @@ class SimulationCallback : public PxSimulationEventCallback {
 };
 
 Engine::SimulationCallback scb;
+
 void Physics::PhysicsSystem::createPhysicsCallbacks() {
 
     log<high>("Creating simulation callbacks");
@@ -287,6 +291,7 @@ void Physics::PhysicsSystem::createScene() {
     cDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
     sceneDesc.cpuDispatcher = cDispatcher;
     sceneDesc.filterShader = FilterShader::setupFilterShader;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     cScene = cPhysics->createScene(sceneDesc);
 
 }
@@ -398,7 +403,7 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(
 void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
     // update all vehicles in the scene.
-    auto vehicles = Engine::getStore().getRoot().getComponentsOfType<Component::Vehicle>();
+    auto vehicles = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Vehicle>();
     std::vector<Component::Vehicle *> active;
 
     std::copy_if(
@@ -447,6 +452,24 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
     cScene->simulate(0.0001 + timestep / 1000.0f);
     cScene->fetchResults(true);
+
+    PxU32 nbActors;
+    nbActors = cScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC);
+    std::vector<PxActor *> actors(nbActors);
+    cScene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC, actors.data(), nbActors);
+
+    // update each render object with the new transform
+    for (auto &actor : actors) {
+        auto *component = static_cast<ComponentBase *>(actor->userData);
+        if (component && actor->getType() == PxActorType::eRIGID_DYNAMIC) {
+            auto A = dynamic_cast<PxRigidActor *>(actor);
+            if (A) {
+                auto T = A->getGlobalPose();
+                component->eraseChildComponentsOfType<WorldTransform>();
+                component->emplaceChildComponent<WorldTransform>(T);
+            }
+        }
+    }
 }
 
 
@@ -458,7 +481,6 @@ void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
     float step_delta = deltaTime / steps;
     for (auto step = 0; step < steps; ++step) {
         stepPhysics(step_delta);
-
     }
 
 }
@@ -506,7 +528,7 @@ void Physics::PhysicsSystem::onVehicleCreated(const Component::EventArgs<Compone
 
     // link the component with the physx actor so we can replicate updates.
     vehicleComponent->pxVehicle = pxVehicle;
-    link(vehicleComponent, pxVehicle->getRigidDynamicActor());
+    pxVehicle->getRigidDynamicActor()->userData = vehicleComponent;
 }
 
 PxTriangleMesh *Physics::PhysicsSystem::createTriMesh(Mesh *mesh) {
@@ -597,29 +619,28 @@ void Physics::PhysicsSystem::onActorCreated(const Component::EventArgs<Component
 
     aPhysicsActor->actor->userData = aPhysicsActor;
 
-	switch (aPhysicsActor->type)
-	{
-	case PhysicsActor::Type::StaticObject:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, FilterMask::eEverything);
-		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
-		break;
-	case PhysicsActor::Type::DynamicObject:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eObstacle, FilterMask::eEverything);
-		break;
-	case PhysicsActor::Type::Ground:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, FilterMask::eGroundColliders);
-		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
-		break;
-	case PhysicsActor::Type::TriggerVolume:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, FilterMask::eTriggerColliders);
-		break;
-	}
-	cScene->addActor(*aPhysicsActor->actor);
+    switch (aPhysicsActor->type) {
+        case PhysicsActor::Type::StaticObject:
+            FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery, FilterMask::eEverything);
+            FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
+            break;
+        case PhysicsActor::Type::DynamicObject:
+            FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eObstacle, FilterMask::eEverything);
+            break;
+        case PhysicsActor::Type::Ground:
+            FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround, FilterMask::eGroundColliders);
+            FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0, QueryFilterMask::eDrivable);
+            break;
+        case PhysicsActor::Type::TriggerVolume:
+            FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eTrigger, FilterMask::eTriggerColliders);
+            break;
+    }
+    cScene->addActor(*aPhysicsActor->actor);
 }
 
 void Physics::PhysicsSystem::onPassengerCreated(Component::Passenger *passenger) {
 
-    auto passengers = Engine::getStore().getRoot().getComponentsOfType<Component::Passenger>();
+    auto passengers = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Passenger>();
     for (auto passenger : passengers) {
 
         if (!passenger->pickup_actor->actor->actor || !passenger->dropoff_actor->actor->actor)

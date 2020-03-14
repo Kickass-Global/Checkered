@@ -1,10 +1,12 @@
 #ifndef SCENARIOS_TESTWORLD_H
 #define SCENARIOS_TESTWORLD_H
 
-class TestWorld
-{
+#include "scenariointerface.hpp"
+
+class TestWorld : Engine::ScenarioInterface {
 public:
-	static void load();
+private:
+    void load() override;
 };
 
 #endif //SCENARIOS_TESTWORLD_H

@@ -3,6 +3,7 @@
 //
 
 #include "CameraSystem.h"
+#include "WorldTransform.h"
 
 void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
     //for (auto &&key : keys) {
@@ -35,9 +36,9 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
     //float zoom = u / sensitivity * elapsed;
 
 
-    for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+    for (auto &camera :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
         //if (std::abs(zoom) < 0.0001 && std::abs(x_rotation) < 0.0001 && std::abs(y_rotation) < 0.0001) continue;
-		
+
         //auto delta = glm::quat(glm::vec3(0, glm::degrees(x_rotation), 0));
 
         //camera->rotation *= delta;
@@ -49,33 +50,33 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 
         if (camera->target) {
 
-			Engine::log<module, Engine::low>("Updating camera to look at #", camera->target->getId());
+            Engine::log<module, Engine::low>("Updating camera to look at #", camera->target->getId());
 
-			const auto transforms = camera->target->getChildren().getComponentsOfType<WorldTransform>();
-			if (!transforms.empty())
-			{
-				auto transform = transforms[0];
-				auto offset = glm::toMat4(camera->rotation) * glm::toMat4(camera->local_rotation) * glm::vec4(camera->offset, 1);
+            const auto transforms = camera->target->getChildren().getComponentsOfType<WorldTransform>();
+            if (!transforms.empty()) {
+                auto transform = transforms[0];
+                auto offset =
+                    glm::toMat4(camera->rotation) * glm::toMat4(camera->local_rotation) * glm::vec4(camera->offset, 1);
 
-				// this line of code controls the camera returning to 'neutral' position behind the target...
-				camera->rotation = glm::slerp(camera->rotation, transform->rotation, 0.3f); // todo, scale this with speed
-				camera->position = transform->position + glm::vec3(offset);
+                // this line of code controls the camera returning to 'neutral' position behind the target...
+                camera->rotation = glm::slerp(
+                    camera->rotation, transform->rotation, 0.3f
+                ); // todo, scale this with speed
+                camera->position = transform->position + glm::vec3(offset);
 
-				//Engine::log<module>(transform->rotation);
+                //Engine::log<module>(transform->rotation);
 
-				glm::vec3 eye = camera->position;
-				glm::vec3 target = transform->position;
-				glm::vec3 world_up = { 0, 1, 0 };
+                glm::vec3 eye = camera->position;
+                glm::vec3 target = transform->position;
+                glm::vec3 world_up = {0, 1, 0};
 
-				camera->view = glm::lookAt(eye, target, world_up);
-			}
+                camera->view = glm::lookAt(eye, target, world_up);
+            }
+        } else {
+            camera->view = glm::translate(camera->position);
         }
-		else
-		{
-			camera->view = glm::translate(camera->position);
-		}
 
-		camera->is_dirty = true;
+        camera->is_dirty = true;
         // reset deltas
         //x = 0;
         //y = 0;
@@ -87,15 +88,15 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 void ::Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int, int> &args) {
 
     Engine::log<module, Engine::low>(
-            "onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
+        "onWindowSizeChanged=", std::get<0>(args.values), ", ", std::get<0>(args.values));
 
     auto &&width = std::get<0>(args.values);
     auto &&height = std::get<1>(args.values);
 
-    for (auto &&camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
-		camera->viewport.width = width;
-		camera->viewport.height = height;
-		camera->is_dirty = true;
+    for (auto &&camera :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
+        camera->viewport.width = width;
+        camera->viewport.height = height;
+        camera->is_dirty = true;
     }
 }
 
@@ -113,9 +114,29 @@ void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
     keys.emplace(std::get<0>(args.values));
 }
 
-void ::Camera::CameraSystem::onGamepadStateChanged(const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args) {
-	//Engine::log<module>("onGamepadStateChanged=", std::get<0>(args.values));
+void ::Camera::CameraSystem::onGamepadStateChanged(
+    const Component::EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args
+) {
+    //Engine::log<module>("onGamepadStateChanged=", std::get<0>(args.values));
 
-	//auto input = std::get<1>(args.values);
-	//x += input.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+    //auto input = std::get<1>(args.values);
+    //x += input.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+}
+
+void ::Camera::CameraSystem::initialize() {
+
+    SystemInterface::initialize();
+
+    // create event handlers
+
+    onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyPress);
+    onKeyDownHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyDown);
+    onKeyUpHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyUp);
+    onWindowSizeHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
+        this, &CameraSystem::onWindowSizeChanged
+    );
+    onGamepadStateChangedHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
+        this, &CameraSystem::onGamepadStateChanged
+    );
+
 }

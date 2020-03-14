@@ -11,6 +11,7 @@
 #include "TransformData.hpp"
 #include <memory>
 #include <SceneComponent.h>
+#include <Engine.h>
 
 namespace Component {
     class PhysicsActor : public ComponentBase {
@@ -21,7 +22,7 @@ namespace Component {
         EventDelegate<PhysicsActor *, PhysicsActor *> onEndOverlap{"onEndOverlap"};
         EventDelegate<PhysicsActor *, PhysicsActor *> onCollision{"onCollision"};
 
-        std::shared_ptr<SceneComponent> node = Engine::createComponent<SceneComponent>(nullptr);
+        std::shared_ptr<SceneComponent> node = getEngine()->createComponent<SceneComponent>(nullptr);
 
         // this will be used to generate the collision bounds, may be different than the visual mesh.
         std::shared_ptr<Mesh> mesh;

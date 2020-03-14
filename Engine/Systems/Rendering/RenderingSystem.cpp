@@ -13,6 +13,7 @@
 #include "WorldTransform.h"
 #include "Pipeline/Library.h"
 #include <Vehicle.h>
+#include <glm/gtc/type_ptr.hpp>
 
 Component::EventDelegate<int, int> Rendering::RenderingSystem::onWindowSizeChanged("onWindowSizeChanged");
 Component::EventDelegate<Engine::deltaTime> Rendering::RenderingSystem::onRender("onRender");
@@ -28,12 +29,13 @@ unsigned int depthMapFBO;
 unsigned int depthMap;
 
 void Rendering::RenderingSystem::update(Engine::deltaTime time) {
+
     using namespace Engine;
     std::map<std::pair<Mesh *, Material *>, MeshInstance *> instancing_map;
 
     // cleanup unused batches...
 
-    //auto materials = Engine::getStore().getRoot().getComponentsOfType<Material>();
+    //auto materials =   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Material>();
     //for (auto batch : batches)
     //{
     //	auto dit = batch->details.begin();
@@ -48,15 +50,15 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     //}
 
 
-    for (auto mesh : Engine::getStore().getRoot().getComponentsOfType<PaintedMesh>()) {
+    for (auto mesh :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<PaintedMesh>()) {
         if (!mesh->enabled) continue;
         auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
         if (!Ts.empty()) {
             auto key = std::make_pair(mesh->mesh.get(), mesh->material.get());
             auto it = instancing_map.find(key);
             if (it == instancing_map.end()) {
-                auto instance = Engine::createComponent<MeshInstance>(mesh->mesh, mesh->material);
-                auto&[it2, _] = instancing_map.emplace(key, instance.get());
+                auto instance = getEngine()->createComponent<MeshInstance>(mesh->mesh, mesh->material);
+                auto[it2, _] = instancing_map.emplace(key, instance.get());
                 it2->second->instances.push_back(Ts[0]->world_matrix);
             } else {
                 it->second->instances.push_back(Ts[0]->world_matrix);
@@ -65,7 +67,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     }
 
     auto is_buffered = [this](auto instance_mesh) {
-        for (auto batch : this->batches) {
+        for (const auto &batch : this->batches) {
             if (batch->contains(instance_mesh->mesh, instance_mesh->material)) return true;
         }
         return false;
@@ -73,7 +75,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
 
     // Find and update any GameObjects with meshes that should be drawn...
-    auto meshes = Engine::getStore().getRoot().getComponentsOfType<MeshInstance>();
+    auto meshes = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<MeshInstance>();
 
     for (const auto &instance : meshes) {
         if (!is_buffered(instance)) {
@@ -99,7 +101,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto &&batch : batches) {
-        for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+        for (auto &camera :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
 
             if (camera->is_dirty) {
 
@@ -130,41 +132,41 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     }
 
     for (auto instance : instancing_map) {
-        Engine::getStore().getRoot().eraseComponent<MeshInstance>(instance.second->id);
+        getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<MeshInstance>(instance.second->id);
     }
 
-    // this code handles drawing billboards into the world (hud, sprites, etc).
-    for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
-        for (const auto &sprite : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
-
-            const auto &camera_view_matrix = camera->view;
-            const auto &viewport = camera->viewport;
-
-            auto offset = glm::translate(
-                glm::vec3(
-                    sprite->plot.x / viewport.width - sprite->anchor.x,
-                    sprite->plot.y / viewport.height - sprite->anchor.y, 0.0f
-                ));
-
-            auto anchor = glm::translate(glm::vec3(sprite->anchor.x, sprite->anchor.y, 0.0f));
-
-            auto scale = glm::scale(
-                glm::vec3(
-                    sprite->plot.width / viewport.width, sprite->plot.height / viewport.height,
-                    sprite->plot.height / viewport.height // todo, hack
-                ));
-
-
-            sprite->mesh_instance->instances.push_back(offset * scale * anchor);
-        }
-
-        break; // only use the first camera...
-    }
+    //    // this code handles drawing billboards into the world (hud, sprites, etc).
+    //    for (auto &camera :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
+    //        for (const auto &sprite :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Billboard>()) {
+    //
+    //            const auto &camera_view_matrix = camera->view;
+    //            const auto &viewport = camera->viewport;
+    //
+    //            auto offset = glm::translate(
+    //                glm::vec3(
+    //                    sprite->plot.x / viewport.width - sprite->anchor.x,
+    //                    sprite->plot.y / viewport.height - sprite->anchor.y, 0.0f
+    //                ));
+    //
+    //            auto anchor = glm::translate(glm::vec3(sprite->anchor.x, sprite->anchor.y, 0.0f));
+    //
+    //            auto scale = glm::scale(
+    //                glm::vec3(
+    //                    sprite->plot.width / viewport.width, sprite->plot.height / viewport.height,
+    //                    sprite->plot.height / viewport.height // todo, hack
+    //                ));
+    //
+    //
+    //            sprite->mesh_instance->instances.push_back(offset * scale * anchor);
+    //        }
+    //
+    //        break; // only use the first camera...
+    //    }
 
     // perform "passes"
 
 
-    for (auto &camera : Engine::getStore().getRoot().getComponentsOfType<Component::Camera>()) {
+    for (auto &camera :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
 
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -184,31 +186,33 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
         glCullFace(GL_FRONT);
         auto player = dynamic_cast<Component::Vehicle *>(camera->target.get());
-        glm::mat4 lightView = glm::lookAt(
-            player->position + glm::vec3(-20.0f, 41.0f, -10.0f), player->position, glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 lightViewProjection = lightProjection * lightView;
+        glm::mat4 lightViewProjection{1};
+        if (player) {
+            glm::mat4 lightView = glm::lookAt(
+                player->position + glm::vec3(-20.0f, 41.0f, -10.0f), player->position, glm::vec3(0.0f, 1.0f, 0.0f));
+            lightViewProjection = lightProjection * lightView;
 
-        for (auto &&batch : batches) {
-            if (!batch->details.empty()) {
+            for (auto &&batch : batches) {
+                if (!batch->details.empty()) {
 
-                // bind programs, textures, and uniforms needed to render the batch
-                depth_shader->bind();
+                    // bind programs, textures, and uniforms needed to render the batch
+                    depth_shader->bind();
 
-                glUniformMatrix4fv(
-                    glGetUniformLocation(
-                        depth_shader->programId(), "M_View"
-                    ), 1, false, glm::value_ptr(lightView));
+                    glUniformMatrix4fv(
+                        glGetUniformLocation(
+                            depth_shader->programId(), "M_View"
+                        ), 1, false, glm::value_ptr(lightView));
 
-                glUniformMatrix4fv(
-                    glGetUniformLocation(
-                        depth_shader->programId(), "M_Perspective"
-                    ), 1, false, glm::value_ptr(lightProjection));
+                    glUniformMatrix4fv(
+                        glGetUniformLocation(
+                            depth_shader->programId(), "M_Perspective"
+                        ), 1, false, glm::value_ptr(lightProjection));
 
-                batch->bind(*this);
-                batch->draw(*this);
+                    batch->bind(*this);
+                    batch->draw(*this);
+                }
             }
         }
-
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // 2. then render scene as normal with shadow mapping (using depth map)
@@ -218,7 +222,6 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 
         for (auto &&batch : batches) {
             if (!batch->details.empty()) {
-
 
                 glUniformMatrix4fv(
                     glGetUniformLocation(
@@ -248,6 +251,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
 }
 
 Rendering::RenderingSystem::~RenderingSystem() {
+
     glfwDestroyWindow(window);
 }
 
@@ -277,6 +281,7 @@ std::shared_ptr<Rendering::GeometryBatch> Rendering::RenderingSystem::findSuitab
 std::shared_ptr<Rendering::GeometryBatch> Rendering::RenderingSystem::push_back(
     const std::shared_ptr<Rendering::GeometryBatch> &batch
 ) {
+
     batches.push_back(batch);
     return batches.back();
 }
@@ -305,10 +310,12 @@ void Rendering::RenderingSystem::buffer(std::shared_ptr<Mesh> &mesh, std::shared
 }
 
 GLFWwindow *Rendering::RenderingSystem::getWindow() {
+
     return window;
 }
 
 void Rendering::RenderingSystem::windowSizeHandler(GLFWwindow *, int width, int height) {
+
     onWindowSizeChanged(width, height);
 }
 
@@ -324,7 +331,7 @@ void Rendering::RenderingSystem::initialize() {
 
     Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
 
-    depth_shader = Pipeline::Library::getAsset<Program>("Assets/Programs/depth.json");
+    depth_shader = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>("Assets/Programs/depth.json");
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -367,20 +374,24 @@ void Rendering::RenderingSystem::updateInstanceData(
 }
 
 Rendering::Program::~Program() {
+
     Engine::log<module>("Deleting program ", m_id);
     glDeleteProgram(m_id);
 }
 
 void Rendering::Program::bind() {
+
     Engine::log<module, Engine::low>("Binding program ", m_id);
     glUseProgram(m_id);
 }
 
 GLuint Rendering::Program::programId() {
+
     return m_id;
 }
 
 Rendering::Shader::~Shader() {
+
     Engine::log<module>("Deleting shader ", m_id);
     glDeleteShader(m_id);
 }

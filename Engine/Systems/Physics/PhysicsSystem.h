@@ -20,7 +20,7 @@
 #include "vehicle/PxVehicleUpdate.h"
 #include "Engine.h"
 #include "vehicle/PxVehicleUtil.h"
-#include "../systeminterface.hpp"
+#include "SystemInterface.hpp"
 #include "EventDelegate.h"
 #include "PhysicsActor.h"
 #include <Vehicle.h>

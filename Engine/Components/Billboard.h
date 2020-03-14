@@ -7,13 +7,14 @@
 #define ENGINE_BILLBOARD_H
 
 #include "Component.h"
+#include "glm/vec2.hpp"
 
 namespace Component {
 
 
     class Billboard : public ComponentBase {
     public:
-		std::shared_ptr<class MeshInstance> mesh_instance;
+        std::shared_ptr<class PaintedMesh> mesh_instance;
         struct Rectangle {
             float x;
             float y;

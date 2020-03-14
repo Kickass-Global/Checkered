@@ -9,52 +9,48 @@
 #include "Physics/PhysicsSystem.h"
 #include "Camera/CameraSystem.h"
 #include "Input/InputSystem.h"
-#include "Debug/LiveReloadSystem.h"
 #include "Passenger.h"
 
 #include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 
 #include "Component/scenecomponentsystem.hpp"
-#include "Navigation/astar.h"
-#include "systeminterface.hpp"
 #include "Engine.h"
 #include "WorldTransform.h"
-#include <Events/Events.h>
-#include "soundSystem/SoundSystem.h"
 #include <texture.hpp>
-#include <fstream>
 #include <material.hpp>
 #include <Billboard.h>
 #include <Rendering/fontsystem.hpp>
+#include <soundSystem/SoundSystem.h>
 #include "scenery.hpp"
 
 void TestWorld::load() {
 
-    auto physicsSystem = Engine::addSystem<Physics::PhysicsSystem>();
-    auto vehicleSystem = Engine::addSystem<Engine::vehicleSystem>();
-    //auto openALSoundSystem = Engine::addSystem<Engine::SoundSystem>();
+    auto physicsSystem = getEngine()->addSubSystem<Physics::PhysicsSystem>();
+    auto vehicleSystem = getEngine()->addSubSystem<Engine::vehicleSystem>();
+    //auto openALSoundSystem =
+    getEngine()->addSubSystem<Engine::SoundSystem>();
 
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
-    auto componentSystem = Engine::addSystem<Component::SceneComponentSystem>();
+    auto componentSystem = getEngine()->addSubSystem<Component::SceneComponentSystem>();
     componentSystem->onActorCreated += physicsSystem->onActorCreatedHandler;
-    Engine::addSystem<Engine::DamageSystem>();
-    auto cameraSystem = Engine::addSystem<::Camera::CameraSystem>();
-    auto renderingSystem = Engine::addSystem<Rendering::RenderingSystem>();
-    auto liveReloadSystem = Engine::addSystem<Debug::LiveReloadSystem>();
-    auto inputSystem = Engine::addSystem<Input::InputSystem>();
+
+    getEngine()->addSubSystem<Engine::DamageSystem>();
+    auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
+    auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
+    auto liveReloadSystem = getEngine()->addSubSystem<Debug::LiveReloadSystem>();
+    auto inputSystem = getEngine()->addSubSystem<Input::InputSystem>();
 
     //renderingSystem->addSubSystem<Engine::FontSystem>(); // yo dawg, I heard you like systems in your systems.
 
-    auto hornSystem = Engine::addSystem<Horn::hornSystem>();
+    auto hornSystem = getEngine()->addSubSystem<Horn::hornSystem>();
 
     // hookup inputs from current window
     inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
-    auto eventSystem = Engine::addSystem<Engine::EventSystem>();
+    auto eventSystem = getEngine()->addSubSystem<Engine::EventSystem>();
     eventSystem->order = 0;
     renderingSystem->order = 2;
 
@@ -75,7 +71,7 @@ void TestWorld::load() {
 
     // setup the ground mesh
 
-    auto basic_shader_program = Pipeline::Library::getAsset<Program>(
+    auto basic_shader_program = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
         "Assets/Programs/basic.json"
     );
 
@@ -84,15 +80,15 @@ void TestWorld::load() {
     Instance<DrivableScenery> drivable_instances;
 
     // make a material component
-    auto ground_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto ground_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
     ground_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/checkeredBowl.png"));
-    ground_material->shader = Pipeline::Library::getAsset<Program>(
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/checkeredBowl.png"));
+    ground_material->shader = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
         "Assets/Programs/basic.json"
     );
 
     // load the mesh component
-    auto plane_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/checkeredBowl.fbx");
+    auto plane_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/checkeredBowl.fbx");
     drivable_instances.add_instance_at(
         glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) * glm::translate(glm::vec3{0, -1, 0}), plane_mesh,
         ground_material, plane_mesh
@@ -101,25 +97,25 @@ void TestWorld::load() {
 
     // create some buildings
 
-    auto building_material1 = Engine::createComponent<Component::Material>(basic_shader_program);
-    auto building_material2 = Engine::createComponent<Component::Material>(basic_shader_program);
-    auto building_material3 = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto building_material1 = getEngine()->createComponent<Component::Material>(basic_shader_program);
+    auto building_material2 = getEngine()->createComponent<Component::Material>(basic_shader_program);
+    auto building_material3 = getEngine()->createComponent<Component::Material>(basic_shader_program);
 
 
     building_material1->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/House_01.png"));
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/House_01.png"));
     building_material2->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/House_02.png"));
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/House_02.png"));
     building_material3->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/House_03.png"));
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/House_03.png"));
 
-    auto building_mesh1 = Pipeline::Library::getAsset<Mesh>(
+    auto building_mesh1 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/Building_House_01.fbx"
     );
-    auto building_mesh2 = Pipeline::Library::getAsset<Mesh>(
+    auto building_mesh2 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/Building_House_013.fbx"
     );
-    auto building_mesh3 = Pipeline::Library::getAsset<Mesh>(
+    auto building_mesh3 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/Building_Shop_02.fbx"
     );
 
@@ -132,94 +128,95 @@ void TestWorld::load() {
 
     // setup a HUD element...
 
-    auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
+    auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+        "Assets/Meshes/billboard_quad.obj"
+    );
     billboard_mesh->emplaceChildComponent<WorldTransform>();
 
 
-    auto sprite = Engine::createComponent<Component::Billboard>();
+    auto sprite = getEngine()->createComponent<Component::Billboard>();
     sprite->plot = {10, 10, 100, 100};
     {
-        auto material = Engine::createComponent<Component::Material>(
-            Pipeline::Library::getAsset<Program>(
+        auto material = getEngine()->createComponent<Component::Material>(
+            getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
                 "Assets/Programs/billboard.json"
             ));
 
         material->textures.push_back(
-            Engine::createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
+            getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
 
-        sprite->mesh_instance = Engine::createNamedComponent<MeshInstance>(
+        sprite->mesh_instance = getEngine()->createNamedComponent<PaintedMesh>(
             "billboard_mesh_instance", billboard_mesh, material
         );
     }
 
     // setup the mesh used for the cars...
 
-    auto car_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto car_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
     car_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
-    auto car_mesh = Pipeline::Library::getAsset<Mesh>(
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
+    auto car_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/car_mesh.fbx"
     );
 
-    auto car_mesh_instance = Engine::createNamedComponent<MeshInstance>(
+    auto car_mesh_instance = getEngine()->createNamedComponent<MeshInstance>(
         "car_mesh_instance", car_mesh, car_material
     );
 
-    auto taxi_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto taxi_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
     taxi_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Vehicle_Taxi.png"));
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Vehicle_Taxi.png"));
 
-    auto taxi_mesh = Pipeline::Library::getAsset<Mesh>(
+    auto taxi_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/taxi_mesh.fbx"
     );
 
 
     // setup the vehicle for the player...
 
-    auto player = Engine::createNamedComponent<Component::ControlledVehicle>("player");
+    auto player = getEngine()->createNamedComponent<Component::ControlledVehicle>("player");
     inputSystem->onGamePadStateChanged += player->onGamePadStateChangedHandler;
     inputSystem->onKeyUp += player->onKeyUpHandler;
     inputSystem->onKeyDown += player->onKeyDownHandler;
 
     auto &player_vehicle = player->vehicle;
 
-    auto player_damage_model = Engine::createNamedComponent<Component::Model>("player_damage_model");
+    auto player_damage_model = getEngine()->createNamedComponent<Component::Model>("player_damage_model");
 
     player_damage_model->parts.push_back(Component::Model::Part{});
     player_damage_model->parts[0].variations.push_back(
-        Component::Model::Variation{2000000, Engine::createComponent<PaintedMesh>(car_mesh, car_material)}
+        Component::Model::Variation{2000000, getEngine()->createComponent<PaintedMesh>(car_mesh, car_material)}
     );
 
-	player_vehicle->model = player_damage_model;
-	player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-	player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
-	player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
-	physicsSystem->playerVehicle = player_vehicle;
+    player_vehicle->model = player_damage_model;
+    //player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    //player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
+    player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
 
     //setup passenger system
 
     Instance<Obstacle> obstacle_instances;
-    auto dumpster_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto dumpster_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
 
     dumpster_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Road_divider.png"));
-    auto dumpster_mesh = Pipeline::Library::getAsset<Mesh>(
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Road_divider.png"));
+    auto dumpster_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/dumpster_mesh.fbx"
     );
 
-    auto hydrant_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto hydrant_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
     hydrant_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Props.png"));
-    auto hydrant_mesh = Pipeline::Library::getAsset<Mesh>(
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Props.png"));
+    auto hydrant_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/Props_Buoy_02.fbx"
     );
 
 
-    auto tree_material = Engine::createComponent<Component::Material>(basic_shader_program);
+    auto tree_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
     tree_material->textures.push_back(
-        Engine::createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
 
-    auto tree_mesh = Pipeline::Library::getAsset<Mesh>(
+    auto tree_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/Prop_Tree_02.fbx"
     );
 
@@ -231,28 +228,30 @@ void TestWorld::load() {
         );
     }
 
-    auto passenger = Engine::createComponent<Component::Passenger>(
+    auto passenger = getEngine()->createComponent<Component::Passenger>(
         glm::vec3{0.0f, 0.0f, -20.0f}, glm::vec3{0.0f, 0.0f, 20.0f}, tree_mesh, tree_material
     );
 
-    passenger->onPassengerDroppedOffDelegate += [](int id) {
+    passenger->onPassengerDroppedOffDelegate += [this](int id) {
 
-        auto billboard_mesh = Pipeline::Library::getAsset<Mesh>("Assets/Meshes/billboard_quad.obj");
+        auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+            "Assets/Meshes/billboard_quad.obj"
+        );
         billboard_mesh->emplaceChildComponent<WorldTransform>();
 
 
-        auto sprite = Engine::createComponent<Component::Billboard>();
+        auto sprite = getEngine()->createComponent<Component::Billboard>();
         sprite->plot = {10, 10, 630, 470};
         {
-            auto material = Engine::createComponent<Component::Material>(
-                Pipeline::Library::getAsset<Program>(
+            auto material = getEngine()->createComponent<Component::Material>(
+                getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
                     "Assets/Programs/billboard.json"
                 ));
 
-			material->textures.push_back(
-				Engine::createComponent<Component::Texture>("Assets/Textures/win.png"));
+            material->textures.push_back(
+                getEngine()->createComponent<Component::Texture>("Assets/Textures/win.png"));
 
-            sprite->mesh_instance = Engine::createNamedComponent<MeshInstance>(
+            sprite->mesh_instance = getEngine()->createNamedComponent<PaintedMesh>(
                 "billboard_mesh_instance", billboard_mesh, material
             );
         }
@@ -261,14 +260,14 @@ void TestWorld::load() {
     using namespace Engine;
 
     // ai factory method...
-    auto make_ai = [&taxi_mesh, &taxi_material](glm::mat4 world_transform = glm::mat4{1}) {
+    auto make_ai = [this, &taxi_mesh, &taxi_material](glm::mat4 world_transform = glm::mat4{1}) {
 
-        auto ai_vehicle = Engine::createNamedComponent<Component::Vehicle>("ai_vehicle");
-        auto ai_damage_model = Engine::createNamedComponent<Component::Model>("ai_vehicle_model");
+        auto ai_vehicle = getEngine()->createNamedComponent<Component::Vehicle>("ai_vehicle");
+        auto ai_damage_model = getEngine()->createNamedComponent<Component::Model>("ai_vehicle_model");
 
         ai_damage_model->parts.push_back(Component::Model::Part{});
         ai_damage_model->parts[0].variations.push_back(
-            Component::Model::Variation{2000000, Engine::createComponent<PaintedMesh>(taxi_mesh, taxi_material)}
+            Component::Model::Variation{2000000, getEngine()->createComponent<PaintedMesh>(taxi_mesh, taxi_material)}
         );
 
         glm::quat orientation;
@@ -381,7 +380,9 @@ void TestWorld::load() {
 
 
     };
-    std::shared_ptr<EventHandler<Vehicle *>> ticker = Engine::EventSystem::createHandler(ai_tick_callback);
+    std::shared_ptr<EventHandler<Vehicle *>> ticker = getEngine()->getSubSystem<EventSystem>()->createHandler(
+        ai_tick_callback
+    );
 
     //
     nodeType **navEnum = new nodeType *[64];
@@ -407,10 +408,10 @@ void TestWorld::load() {
         }
     }
 
-	// make a default camera
-	//auto camera = Engine::createComponent<Component::Camera>();
-	//camera->target = player_vehicle; // make camera follow player.
-	//inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
+    // make a default camera
+    //auto camera =  getEngine()->createComponent<Component::Camera>();
+    //camera->target = player_vehicle; // make camera follow player.
+    //inputSystem->onGamePadStateChanged += cameraSystem->onGamepadStateChangedHandler;
 
     // region initialize game-clocks
     using namespace std::chrono;

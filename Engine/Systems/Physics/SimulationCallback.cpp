@@ -1,4 +1,5 @@
 #include "SimulationCallback.h"
+#include "PhysicsActor.h"
 
 void Engine::SimulationCallback::onContact(
     const PxContactPairHeader &pairHeader, const PxContactPair *pairs, PxU32 count
@@ -45,12 +46,11 @@ void Engine::SimulationCallback::onTrigger(PxTriggerPair *pairs, PxU32 count) {
 
         if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_FOUND) {
 
-            auto a = reinterpret_cast<PhysicsActor *>(pairs[i].triggerActor->userData);
-            auto b = reinterpret_cast<PhysicsActor *>(pairs[i].otherActor->userData);
+            auto a = dynamic_cast<PhysicsActor *>(static_cast<ComponentBase *>(pairs[i].triggerActor->userData));
+            auto b = dynamic_cast<PhysicsActor *>(static_cast<ComponentBase *>(pairs[i].otherActor->userData));
 
             auto[it, first_contact] = overlapping_actors.emplace(
-                std::make_pair(
-                    reinterpret_cast<size_t>(a), reinterpret_cast<size_t>(b)), 1
+                std::make_pair(reinterpret_cast<size_t>(a), reinterpret_cast<size_t>(b)), 1
             );
             if (first_contact) {
                 if (a) a->onBeginOverlap(a, b);
@@ -62,8 +62,8 @@ void Engine::SimulationCallback::onTrigger(PxTriggerPair *pairs, PxU32 count) {
 
         if (pairs[i].status == PxPairFlag::eNOTIFY_TOUCH_LOST) {
 
-            auto a = reinterpret_cast<PhysicsActor *>(pairs[i].triggerActor->userData);
-            auto b = reinterpret_cast<PhysicsActor *>(pairs[i].otherActor->userData);
+            auto a = dynamic_cast<PhysicsActor *>(static_cast<ComponentBase *>(pairs[i].triggerActor->userData));
+            auto b = dynamic_cast<PhysicsActor *>(static_cast<ComponentBase *>(pairs[i].otherActor->userData));
 
             auto[it, not_overlapping] = overlapping_actors.emplace(
                 std::make_pair(
