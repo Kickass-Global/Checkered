@@ -7,14 +7,30 @@
 
 #include <ComponentBase.h>
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 namespace Component {
+
+    enum class eAlign {
+        right = -2,
+        left = 0,
+        center = -1
+    };
+
+    template <typename T>
+    T operator*(eAlign a, T b) { return static_cast<int>(a)* b; }
+    template <typename T>
+    T operator/(eAlign a, T b) { return static_cast<int>(a)/ b; }
+
     struct Text : public ComponentBase {
         std::string text = "";
         float font_size = 12;
         glm::vec3 color = {0, 0, 0};
+        glm::vec2 anchor = {0, 0};
+        glm::vec3 offset = {0, 0, 0};
+        eAlign align = eAlign::center;
 
-        Text(std::string text, float fontSize, const glm::vec3 &color);
+        explicit Text(std::string text);
 
     };
 }

@@ -77,10 +77,11 @@ namespace Engine {
 
         template<typename T, typename... Args>
         inline std::shared_ptr<typename std::enable_if<std::is_base_of<Component::ComponentInterface, T>::value, T>::type>
-        createMomentaryComponent(const Args &... args) {
+            createMomentaryComponent(Args &&... args) {
 
             return store->getRoot().addMomentaryComponent(store->create<T>(args...));
         }
+
     };
 
     typedef float deltaTime;

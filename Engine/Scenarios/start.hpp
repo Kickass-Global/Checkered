@@ -26,31 +26,40 @@ namespace Engine {
 
             auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
             auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
+            renderingSystem->onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
             auto inputSystem = getEngine()->addSubSystem<Input::InputSystem>();
             renderingSystem->addSubSystem<Engine::BillboardSystem>();
             renderingSystem->addSubSystem<Engine::FontSystem>();
 
-            auto sprite = getEngine()->createComponent<Component::Billboard>();
-            sprite->plot = {10, 10, 100, 100};
+            getEngine()->createComponent<Component::Camera>();
 
-            auto material = getEngine()->createComponent<Component::Material>(
+            auto sprite = getEngine()->createMomentaryComponent<Component::Billboard>();
+            sprite->plot = {0, 0, 640, 480};
+            sprite->anchor = {0, 0};
+
+            auto material = getEngine()->createMomentaryComponent<Component::Material>(
                 getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>("Assets/Programs/billboard.json"));
 
             material->textures.push_back(
-                getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
+                getEngine()->createMomentaryComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
 
-            sprite->mesh_instance = getEngine()->createNamedComponent<PaintedMesh>(
-                "billboard_mesh_instance",
+            sprite->mesh_instance = getEngine()->createMomentaryComponent<PaintedMesh>(
                 getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/billboard_quad.obj"),
                 material
             );
 
-            getEngine()->createComponent<Component::Camera>();
         }
 
         void update(deltaTime d) {
 
-            getEngine()->createMomentaryComponent<Component::Text>("FPS " + std::to_string(d), 1, glm::vec3{1, 0, 0});
+            auto fps = getEngine()->createMomentaryComponent<Component::Text>("Frametime: " + std::to_string(d));
+            fps->font_size = 4;
+            fps->anchor = { -1, 1 };
+            fps->align = eAlign::left;
+
+            auto prompt = getEngine()->createMomentaryComponent<Component::Text>("Press Start to Continue...");
+            prompt->font_size = 12;
+            prompt->anchor = {0, 0.2};
         }
     };
 }

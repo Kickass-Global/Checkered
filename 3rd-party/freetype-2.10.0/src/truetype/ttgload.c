@@ -2014,10 +2014,10 @@ static FT_Error compute_glyph_metrics(
     /* mode of the v40 interpreter is active.  See `ttinterp.h' for    */
     /* details on backward compatibility mode.                         */
     if (
-        #ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+#ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
         !(driver->interpreter_version == TT_INTERPRETER_VERSION_40 &&
           (loader->exec && loader->exec->backward_compatibility)) &&
-        #endif
+#endif
         !face->postscript.isFixedPitch && IS_HINTED(loader->load_flags) &&
         !(loader->load_flags & FT_LOAD_COMPUTE_METRICS)) {
         FT_Byte *widthp;

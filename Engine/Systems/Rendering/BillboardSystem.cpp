@@ -34,6 +34,7 @@ void Engine::BillboardSystem::update(Engine::deltaTime time) {
                     sprite->plot.height / viewport.height // todo, hack
                 ));
 
+            sprite->mesh_instance->eraseChildComponentsOfType<WorldTransform>();
             sprite->mesh_instance->emplaceChildComponent<WorldTransform>(offset * scale * anchor);
         }
 
