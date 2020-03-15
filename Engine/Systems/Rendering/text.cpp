@@ -6,5 +6,6 @@
 
 #include <utility>
 
-Component::Text::Text(std::string text, float fontSize, const glm::vec3 &color) : text(std::move(text)),
-                                                                                  font_size(fontSize), color(color) {}
+Text::Text(std::string text) : text(std::move(text)) {
+
+}

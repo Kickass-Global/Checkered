@@ -323,11 +323,11 @@ void Rendering::RenderingSystem::initialize() {
 
     Engine::assertLog<module>(glfwInit(), "initialize GLFW");
 
-    window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    window = glfwCreateWindow(640, 480,"", NULL, NULL);
 
     glfwSetWindowSizeCallback(window, windowSizeHandler);
-
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
 
     Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc) glfwGetProcAddress), "initialize GLAD");
 

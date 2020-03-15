@@ -29,7 +29,8 @@ int main() {
 
         // region before update
         floatMilliseconds delta = end - start;
-        Engine::deltaTime elapsed = static_cast<Engine::deltaTime>(duration_cast<milliseconds>(delta).count());
+        Engine::deltaTime elapsed =
+            static_cast<Engine::deltaTime>(duration_cast<microseconds>(delta).count()) / 1000.0f;
         // endregion
 
         s.update(elapsed);

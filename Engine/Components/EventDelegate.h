@@ -92,7 +92,7 @@ namespace Component {
         log<module>("Adding subscriber#", subscriber, " to ComponentEvent#", id);
 
         subscribers.push_back(subscriber);
-        getEngine()->getSubSystem<EventSystem>()->registerHandler<Args...>(subscriber);
+		subscriber->getEngine()->getSubSystem<EventSystem>()->registerHandler<Args...>(subscriber);
 
     }
 

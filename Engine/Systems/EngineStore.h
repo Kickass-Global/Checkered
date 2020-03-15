@@ -75,7 +75,7 @@ public:
 
         // check to see if the store has an available allocation we can reuse
         int uses = 0;
-        auto it = std::find_if(
+        auto it = std::find_if(  // O(n) #todo
             component_types[typeid(T)].begin(), component_types[typeid(T)].end(),
             [&uses](std::weak_ptr<ComponentInterface> ptr) {
                 return ptr.expired();
