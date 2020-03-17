@@ -22,8 +22,8 @@ void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 
 				auto &&mesh = part.variations[part.active_variation].mesh;
 				if (mesh) {
-                    mesh->eraseChildComponentsOfType<Component::WorldTransform>();
-                    mesh->emplaceChildComponent<Component::WorldTransform>(model->transform);
+                    mesh->getStore().eraseComponentsOfType<Component::WorldTransform>();
+                    mesh->getStore().emplaceComponent<Component::WorldTransform>(model->transform);
                 }
             }
         }

@@ -58,7 +58,19 @@ set(SRC main.cpp main.h
         Systems/soundSystem/SoundSystem.cpp Systems/soundSystem/SoundSystem.h
         Components/WorldTransform.h Components/WorldTransform.cpp
         Components/texture.cpp Components/texture.hpp
-        Components/material.cpp Components/material.hpp Components/PhysicsActor.cpp Components/PhysicsActor.h Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h Systems/EngineStore.cpp Systems/EngineStore.h Systems/Physics/VehicleFactory.cpp Systems/Physics/VehicleFactory.hpp Systems/Physics/VehicleFactoryFunctions.cpp Systems/Physics/VehicleFactoryFunctions.hpp Components/TransformData.cpp Components/TransformData.hpp Components/bitmap.cpp Components/bitmap.hpp Systems/Rendering/fontsystem.cpp Systems/Rendering/fontsystem.hpp Systems/Rendering/text.cpp Systems/Rendering/text.hpp Scenarios/start.cpp Scenarios/start.hpp Scenarios/scenariointerface.cpp Scenarios/scenariointerface.hpp Systems/EngineDebug.cpp Systems/EngineDebug.hpp)
+        Components/material.cpp Components/material.hpp 
+        Components/PhysicsActor.cpp Components/PhysicsActor.h 
+        Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h
+        Systems/EngineStore.cpp Systems/EngineStore.h
+        Systems/Physics/VehicleFactory.cpp Systems/Physics/VehicleFactory.hpp 
+        Systems/Physics/VehicleFactoryFunctions.cpp Systems/Physics/VehicleFactoryFunctions.hpp 
+        Components/TransformData.cpp Components/TransformData.hpp 
+        Components/bitmap.cpp Components/bitmap.hpp 
+        Systems/Rendering/fontsystem.cpp Systems/Rendering/fontsystem.hpp 
+        Systems/Rendering/text.cpp Systems/Rendering/text.hpp 
+        Scenarios/start.cpp Scenarios/start.hpp 
+        Scenarios/scenariointerface.cpp Scenarios/scenariointerface.hpp 
+        Systems/EngineDebug.cpp Systems/EngineDebug.hpp Components/Node.cpp Components/Node.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine

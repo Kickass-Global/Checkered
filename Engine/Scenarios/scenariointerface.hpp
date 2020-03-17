@@ -5,20 +5,22 @@
 #ifndef ENGINE_SCENARIOINTERFACE_HPP
 #define ENGINE_SCENARIOINTERFACE_HPP
 
-#include <Engine.h>
-
 namespace Engine {
-    class ScenarioInterface {
-    protected:
-        EngineSystem *enginePtr;
-    public:
+	class ScenarioInterface {
+	protected:
+		friend class EngineSystem;
+		EngineSystem* enginePtr;
+	public:
 
-        explicit ScenarioInterface(EngineSystem *enginePtr) : enginePtr(enginePtr) {}
+		explicit ScenarioInterface(EngineSystem* enginePtr) : enginePtr(enginePtr) {}
 
-        EngineSystem *getEngine() { return enginePtr; }
+		virtual void update(float time) {};
 
-        virtual void load() = 0;
-    };
+		EngineSystem* getEngine() { return enginePtr; }
+
+		virtual void load() {};
+		virtual void unload() {};
+	};
 }
 
 

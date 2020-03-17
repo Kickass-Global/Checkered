@@ -20,9 +20,9 @@ void process_scene_component(SceneComponent* node) {
 	// foreach thing attached to this scene component, attach this transform to it...
 	for (auto child : node->getChildren().getComponentsOfType<PaintedMesh>())
 	{
-		child->eraseChildComponentsOfType<WorldTransform>();
+		child->getStore().eraseComponentsOfType<WorldTransform>();
 		if (child->enabled) {
-			child->emplaceChildComponent<WorldTransform>(T);
+			child->getStore().emplaceComponent<WorldTransform>(T);
 		}
 	}
 

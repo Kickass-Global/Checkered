@@ -12,6 +12,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <Events/Events.h>
 
+EngineSystem *Engine::current = nullptr;
 
 std::ostream &Engine::operator<<(std::ostream &out, const glm::vec3 &vector) {
 
@@ -38,7 +39,7 @@ std::ostream &Engine::operator<<(std::ostream &out, Engine::Name name) {
 }
 
 void Engine::EngineSystem::update(deltaTime time) {
-
+    scenario->update(time);
     SystemInterface::update(time);
 }
 

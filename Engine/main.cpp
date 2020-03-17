@@ -14,8 +14,7 @@ int main() {
     auto running = true;
     EngineSystem engine;
     engine.initialize();
-    Start s(&engine);
-    s.load();
+    engine.load_scenario<Start>();
     //TestWorld::load();
 
     // region initialize game-clocks
@@ -32,8 +31,6 @@ int main() {
         Engine::deltaTime elapsed =
             static_cast<Engine::deltaTime>(duration_cast<microseconds>(delta).count()) / 1000.0f;
         // endregion
-
-        s.update(elapsed);
 
         engine.getSubSystem<EventSystem>()->onTick(elapsed);
         engine.update(elapsed);

@@ -2,9 +2,13 @@
 #define SCENARIOS_TESTWORLD_H
 
 #include "scenariointerface.hpp"
+#include <Engine.h>
 
-class TestWorld : Engine::ScenarioInterface {
+class TestWorld : public Engine::ScenarioInterface {
 public:
+private:
+public:
+    TestWorld(Engine::EngineSystem *enginePtr);
 private:
     void load() override;
 };
