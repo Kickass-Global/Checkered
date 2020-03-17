@@ -8,6 +8,8 @@
 
 #include "Component.h"
 #include "glm/vec2.hpp"
+#include "texture.hpp"
+#include <Types.hpp>
 
 namespace Component {
 
@@ -15,13 +17,11 @@ namespace Component {
     class Billboard : public ComponentBase {
     public:
         std::shared_ptr<class PaintedMesh> mesh_instance;
-        struct Rectangle {
-            float x;
-            float y;
-            float width;
-            float height;
-        } plot;
+        Engine::Rectangle plot;
         glm::vec2 anchor = {1, 1};
+
+        Billboard() = default;
+        explicit Billboard(std::shared_ptr<Texture> sprite);
     };
 
 }

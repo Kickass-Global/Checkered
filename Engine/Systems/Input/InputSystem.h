@@ -17,31 +17,28 @@
 
 namespace Input {
 
-    namespace {
-        char module[] = "Input";
-    }
+	namespace {
+		char module[] = "Input";
+	}
 
-    class InputSystem : public Engine::SystemInterface {
+	class InputSystem : public Engine::SystemInterface {
 
-        static void
-        keyHandler(GLFWwindow * /*window*/, int key, int /*scancode*/,
-                   int action, int /*mods*/);
+		static void        keyHandler(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/);
 
-        static void
-            gamepadHandler(int jid, int action);
+		static void			gamepadHandler(int jid, int action);
 
-    public:
+	public:
 
-        static Component::EventDelegate<int> onKeyPress;
-        static Component::EventDelegate<int> onKeyDown;
-        static Component::EventDelegate<int> onKeyUp;
+		static Component::EventDelegate<int> onKeyPress;
+		static Component::EventDelegate<int> onKeyDown;
+		static Component::EventDelegate<int> onKeyUp;
 		static Component::EventDelegate<GLFWgamepadstate, GLFWgamepadstate> onGamePadStateChanged;
 
-        void initialize(GLFWwindow *window);
+		void initialize() override;
 
-        void update(Engine::deltaTime /*elapsed*/);
+		void update(Engine::deltaTime /*elapsed*/) override;
 
-    };
+	};
 
 }
 

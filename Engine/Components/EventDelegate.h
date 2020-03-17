@@ -75,7 +75,7 @@ namespace Component {
         log<module, low>("ComponentEvent#", id, " called.");
 
         for (auto listener : subscribers) {
-            listener->emplaceChildComponent<Component::EventArgs<Args...>>(args...);
+            listener->getStore().emplaceComponent<Component::EventArgs<Args...>>(args...);
         }
         for (auto listener : direct_subscribers) {
             (*listener)(args...);

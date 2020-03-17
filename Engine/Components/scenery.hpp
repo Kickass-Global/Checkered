@@ -48,7 +48,7 @@ namespace Component {
             actor->position = position;
             actor->rotation = rotation;
 
-            actor->node->addChildComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+            actor->node->getStore().addComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
         }
 
         DrivableScenery(glm::vec3 position, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) : mesh(
@@ -60,7 +60,7 @@ namespace Component {
 
             actor->type = PhysicsActor::Type::Ground;
             actor->position = position;
-            actor->node->addChildComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+            actor->node->getStore().addComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
         }
 
         DrivableScenery(
@@ -71,7 +71,7 @@ namespace Component {
 
             actor->type = PhysicsActor::Type::Ground;
             actor->position = position;
-            actor->node->addChildComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+            actor->node->getStore().addComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
         }
 
 
@@ -91,7 +91,7 @@ namespace Component {
 
             actor->type = PhysicsActor::Type::DynamicObject;
             actor->position = position;
-            actor->node->addChildComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+            actor->node->getStore().addComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
         }
 	};
 
@@ -115,7 +115,7 @@ namespace Component {
 
             actor->type = PhysicsActor::Type::TriggerVolume;
             actor->position = position;
-            actor->node->addChildComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+            actor->node->getStore().addComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
 
             onActorOverlapBeginHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
                 this, &Waypoint::onActorOverlapBegin
@@ -156,7 +156,7 @@ namespace Component {
                                                                                                           )) {
 
             actor->position = position;
-            actor->node->addChildComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+            actor->node->getStore().addComponent(getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
         }
 	};
 }

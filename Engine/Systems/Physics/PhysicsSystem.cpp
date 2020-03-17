@@ -462,11 +462,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
     for (auto &actor : actors) {
         auto *component = static_cast<ComponentBase *>(actor->userData);
         if (component && actor->getType() == PxActorType::eRIGID_DYNAMIC) {
-            auto A = dynamic_cast<PxRigidActor *>(actor);
+            auto A = static_cast<PxRigidActor *>(static_cast<PxBase*>(actor));
             if (A) {
                 auto T = A->getGlobalPose();
-                component->eraseChildComponentsOfType<WorldTransform>();
-                component->emplaceChildComponent<WorldTransform>(T);
+                component->getStore().eraseComponentsOfType<WorldTransform>();
+                component->getStore().emplaceComponent<WorldTransform>(T);
             }
         }
     }

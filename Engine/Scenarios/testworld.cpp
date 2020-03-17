@@ -29,7 +29,7 @@ void TestWorld::load() {
     auto physicsSystem = getEngine()->addSubSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = getEngine()->addSubSystem<Engine::vehicleSystem>();
     //auto openALSoundSystem =
-    getEngine()->addSubSystem<Engine::SoundSystem>();
+    //getEngine()->addSubSystem<Engine::SoundSystem>();
 
     vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
@@ -38,21 +38,19 @@ void TestWorld::load() {
 
     getEngine()->addSubSystem<Engine::DamageSystem>();
     auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
-    auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
+   // auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
     auto liveReloadSystem = getEngine()->addSubSystem<Debug::LiveReloadSystem>();
-    auto inputSystem = getEngine()->addSubSystem<Input::InputSystem>();
+    auto inputSystem = getEngine()->getSubSystem<Input::InputSystem>();
 
     //renderingSystem->addSubSystem<Engine::FontSystem>(); // yo dawg, I heard you like systems in your systems.
 
     auto hornSystem = getEngine()->addSubSystem<Horn::hornSystem>();
 
-    // hookup inputs from current window
-    inputSystem->initialize(renderingSystem->getWindow());
 
     // hookup key press event with camera system
     auto eventSystem = getEngine()->addSubSystem<Engine::EventSystem>();
     eventSystem->order = 0;
-    renderingSystem->order = 2;
+   // renderingSystem->order = 2;
 
     Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
     Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
@@ -131,7 +129,7 @@ void TestWorld::load() {
     auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
         "Assets/Meshes/billboard_quad.obj"
     );
-    billboard_mesh->emplaceChildComponent<WorldTransform>();
+    billboard_mesh->getStore().emplaceComponent<WorldTransform>();
 
 
     auto sprite = getEngine()->createComponent<Component::Billboard>();
@@ -237,7 +235,7 @@ void TestWorld::load() {
         auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
             "Assets/Meshes/billboard_quad.obj"
         );
-        billboard_mesh->emplaceChildComponent<WorldTransform>();
+        billboard_mesh->getStore().emplaceComponent<WorldTransform>();
 
 
         auto sprite = getEngine()->createComponent<Component::Billboard>();
@@ -420,3 +418,6 @@ void TestWorld::load() {
     auto end = start + milliseconds(1); // do this so physx doesn't complain about time being 0.
     // endregion
 }
+
+TestWorld::TestWorld(EngineSystem *enginePtr)
+    : ScenarioInterface(enginePtr) {}

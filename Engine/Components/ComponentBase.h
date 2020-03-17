@@ -13,70 +13,35 @@
 #include <algorithm>
 #include "ComponentInterface.h"
 #include <Engine.h>
+#include <Node.hpp>
 
 namespace Component {
 
+	class ComponentBase : public ComponentInterface {
+		friend class ::EngineStore;
 
-    class ComponentBase : public ComponentInterface {
-        friend class ::EngineStore;
+	protected:
+		Node children;
+		// this hack is here because this is the easiest way.
+		Engine::EngineSystem* enginePtr = Engine::current;
+	public:
+		ComponentId id = ++ ++next_id;
 
-    protected:
-        struct Node children;
+		[[nodiscard]] Node& getChildren() override { return children; }
 
-        Engine::EngineSystem *enginePtr = nullptr;
+		[[nodiscard]] ComponentId getId() const override { return id; }
 
-    public:
-        ComponentId id = ++ ++next_id;
+		Engine::EngineSystem* getEngine() { return enginePtr; }
+		Node& getStore() { return children;  }
 
-        [[nodiscard]] struct Node &getChildren() override { return children; }
+		ComponentBase& operator=(const ComponentBase& other) {
 
-        [[nodiscard]] ComponentId getId() const override { return id; }
+			if (this == &other)return *this;
 
-        Engine::EngineSystem *getEngine() { return enginePtr; }
-
-        template<typename T>
-        void addChildComponent(std::shared_ptr<T> component) {
-
-            children.addComponent(component);
-        }
-
-        void addChildComponents() {}
-
-        template<typename T>
-        void addChildComponents(std::shared_ptr<T> component) {
-
-            children.addComponent(component);
-        }
-
-        template<typename T, typename Ts>
-        void addChildComponents(std::shared_ptr<T> component, std::shared_ptr<T> components) {
-
-            children.addComponent(component);
-            addChildComponents(components);
-        }
-
-
-        template<typename T>
-        void eraseChildComponentsOfType() {
-
-            children.eraseComponentsOfType<T>();
-        }
-
-
-        template<typename T, typename... Args>
-        void emplaceChildComponent(Args &&... args) {
-
-            children.addComponent(getEngine()->getSubSystem<EngineStore>()->create<T>(args...));
-        }
-
-        ComponentBase &operator=(const ComponentBase &other) {
-
-            if (this == &other)return *this;
-
-            children = other.children;
-            //id  = other.id; // don't change it
-        }
-    };
+			children = other.children;
+			//id  = other.id; // don't change it
+		}
+	};
 
 }
 

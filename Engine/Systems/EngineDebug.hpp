@@ -6,7 +6,7 @@
 #define ENGINE_ENGINEDEBUG_HPP
 
 #include <string>
-#include <iosfwd>
+#include <iostream>
 #include <glm/fwd.hpp>
 #include <sstream>
 
@@ -14,7 +14,6 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-
 
 namespace Engine {
 
