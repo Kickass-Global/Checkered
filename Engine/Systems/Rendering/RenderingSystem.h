@@ -84,6 +84,10 @@ namespace Rendering {
 
     public:
 
+        void reset() {
+            batches.clear();
+        }
+
         static Component::EventDelegate<int, int> onWindowSizeChanged;
         static Component::EventDelegate<Engine::deltaTime> onRender;
 

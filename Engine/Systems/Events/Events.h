@@ -32,6 +32,10 @@ namespace Engine {
 
         void update(Engine::deltaTime /*elapsed*/) override;
 
+        void reset() {
+            registeredHandlers.clear();
+        }
+
         template<typename... Args>
         void registerHandler(std::shared_ptr<Component::EventHandler<Args...>> handler) {
 

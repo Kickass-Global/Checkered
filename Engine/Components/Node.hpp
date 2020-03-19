@@ -10,7 +10,6 @@
 #include <memory>
 #include <algorithm>
 #include <variant>
-#include <EngineDebug.hpp>
 
 namespace Component {
 
@@ -127,21 +126,25 @@ namespace Component {
         }
 
         template<typename T>
-        void eraseComponent(std::shared_ptr<T> component) {
-            auto it = std::find(components[typeid(T)].begin(), components[typeid(T)].end(), [](auto element) {
-                return element.component == component;
-            })
+        void eraseComponent(T *component) {
+            auto it = std::find_if(components[typeid(T)].begin(),
+                                   components[typeid(T)].end(),
+                                   [component](NodeEntry &element) {
+                                       return static_cast<T *>(element.component.get()) ==
+                                              component;
+                                   });
+            if (it != components[typeid(T)].end()) {
+                components[typeid(T)].erase(it);
+            }
         }
 
         template<typename T>
         void eraseComponentsOfType() {
-
             static_assert(std::is_base_of<ComponentInterface, T>::value);
             components.erase(typeid(T));
         }
 
         void prune() {
-
             for (auto&[key, values] : components) {
                 auto begin = std::remove_if(values.begin(), values.end(), [](auto entry) {
                     return entry.momentary && --entry.ttl < 1;
@@ -151,10 +154,10 @@ namespace Component {
         }
 
         void eraseAllComponents() {
-
             for (auto&[key, values] : components) {
                 values.erase(values.begin(), values.end());
             }
+            components.clear();
         }
     };
 }

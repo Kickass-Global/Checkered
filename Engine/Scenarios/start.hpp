@@ -160,7 +160,10 @@ namespace Engine {
 		explicit Start(EngineSystem* pSystem) : ScenarioInterface(pSystem) {}
 
         void unload() override {
+            log<high>("onUnload");
 			getEngine()->getSubSystem<EngineStore>()->getRoot().eraseAllComponents();
+			getEngine()->getSubSystem<EventSystem>()->reset();
+			getEngine()->getSubSystem<Rendering::RenderingSystem>()->reset();
             ScenarioInterface::unload();
         }
 
