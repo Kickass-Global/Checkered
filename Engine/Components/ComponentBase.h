@@ -12,37 +12,41 @@
 #include <memory>
 #include <algorithm>
 #include "ComponentInterface.h"
-#include <Engine.h>
-#include <Node.hpp>
+#include "Node.hpp"
+#include "Engine.h"
+
 
 namespace Component {
 
-	class ComponentBase : public ComponentInterface {
-		friend class ::EngineStore;
+    class ComponentBase : public ComponentInterface {
+        friend class ::EngineStore;
 
-	protected:
-		Node children;
-		// this hack is here because this is the easiest way.
-		Engine::EngineSystem* enginePtr = Engine::current;
-	public:
-		ComponentId id = ++ ++next_id;
+    protected:
+        Node children;
 
-		[[nodiscard]] Node& getChildren() override { return children; }
+        // this hack is here because this is the easiest way.
+        Engine::EngineSystem *enginePtr = Engine::current;
 
-		[[nodiscard]] ComponentId getId() const override { return id; }
+    public:
+        ComponentId id = ++ ++next_id;
 
-		Engine::EngineSystem* getEngine() { return enginePtr; }
-		Node& getStore() { return children;  }
+        [[nodiscard]] struct Node &getChildren() override { return children; }
 
-		ComponentBase& operator=(const ComponentBase& other) {
+        [[nodiscard]] ComponentId getId() const override { return id; }
 
-			if (this == &other)return *this;
+        Engine::EngineSystem *getEngine() { return enginePtr; }
 
-			children = other.children;
-			//id  = other.id; // don't change it
-		}
-	};
+        struct Node &getStore() { return children; }
 
+        ComponentBase &operator=(const ComponentBase &other) {
+
+            if (this == &other)return *this;
+
+            children = other.children;
+            //id  = other.id; // don't change it
+            return *this;
+        }
+    };
 }
 
 #endif //ENGINE_COMPONENTBASE_H

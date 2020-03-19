@@ -112,7 +112,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                     45.0f, static_cast<float>(camera->viewport.width) / camera->viewport.height, 0.1f, 1000.0f
                 );
 
-                glViewport(0, 0, camera->viewport.width, camera->viewport.height);
+                glViewport(0, 0, static_cast<GLsizei>(camera->viewport.width),  static_cast<GLsizei>(camera->viewport.height));
 
                 batch->shader->bind();
 
@@ -132,7 +132,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     }
 
     for (auto instance : instancing_map) {
-        getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<MeshInstance>(instance.second->id);
+        getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<MeshInstance>(instance.second);
     }
 
     //    // this code handles drawing billboards into the world (hud, sprites, etc).
@@ -216,7 +216,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // 2. then render scene as normal with shadow mapping (using depth map)
-        glViewport(0, 0, camera->viewport.width, camera->viewport.height);
+        glViewport(0, 0,  static_cast<GLsizei>(camera->viewport.width),  static_cast<GLsizei>(camera->viewport.height));
         glClearColor(0.529, 0.808, 0.922, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -409,7 +409,7 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
         lengths.push_back(line.size());
     }
 
-    glShaderSource(m_id, lines.size(), cstrings.data(), lengths.data());
+    glShaderSource(m_id,  static_cast<GLsizei>(lines.size()), cstrings.data(), lengths.data());
     glCompileShader(m_id);
 
     GLint success;

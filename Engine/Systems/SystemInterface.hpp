@@ -19,11 +19,11 @@ namespace Engine {
     typedef float deltaTime;
 
     class SystemInterface {
-        std::map<std::type_index, std::unique_ptr<Engine::SystemInterface>> subsystems;
 
     protected:
         class EngineSystem *enginePtr = nullptr;
 
+        std::map<std::type_index, std::unique_ptr<Engine::SystemInterface>> subsystems;
     public:
         int order = 1;
 

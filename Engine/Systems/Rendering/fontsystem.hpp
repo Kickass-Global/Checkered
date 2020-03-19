@@ -143,7 +143,7 @@ namespace Engine {
                                text->text,
                                offset.x,
                                offset.y,
-                               text->font_size / 12.0,
+                               text->font_size / 12.0f,
                                text->color);
                 }
             }

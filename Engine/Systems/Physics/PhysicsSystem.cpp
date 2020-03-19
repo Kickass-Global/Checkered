@@ -352,11 +352,11 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(
     PxVehicleEngineData engine;
 
     engine.mMOI = 1;
-    engine.mPeakTorque = 1000.0;
-    engine.mMaxOmega = 1000.0;
-    engine.mDampingRateFullThrottle = 0.095;
-    engine.mDampingRateZeroThrottleClutchEngaged = 0.40;
-    engine.mDampingRateZeroThrottleClutchDisengaged = 0.35;
+    engine.mPeakTorque = 1000.0f;
+    engine.mMaxOmega = 1000.0f;
+    engine.mDampingRateFullThrottle = 0.095f;
+    engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+    engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
 
     pxVehicle->mDriveSimData.setEngineData(engine);
@@ -386,9 +386,9 @@ PxVehicleDrive4W *Physics::PhysicsSystem::createDrivableVehicle(
 
     PxVehicleClutchData clutch;
 
-    clutch.mStrength = 40.0;
+    clutch.mStrength = 40.0f;
     clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eESTIMATE;
-    clutch.mEstimateIterations = 5.0;
+    clutch.mEstimateIterations = 5;
 
     pxVehicle->mDriveSimData.setClutchData(clutch);
 
@@ -446,11 +446,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
             );
         }
         PxVehicleUpdates(
-            0.0001 + timestep / 1000.0f, grav, *cFrictionPairs, wheels.size(), wheels.data(),
+            0.0001f + timestep / 1000.0f, grav, *cFrictionPairs, wheels.size(), wheels.data(),
             vehicleQueryResults.data());
     }
 
-    cScene->simulate(0.0001 + timestep / 1000.0f);
+    cScene->simulate(0.0001f + timestep / 1000.0f);
     cScene->fetchResults(true);
 
     PxU32 nbActors;
@@ -538,8 +538,8 @@ PxTriangleMesh *Physics::PhysicsSystem::createTriMesh(Mesh *mesh) {
     meshDesc.points.stride = sizeof(Vertex);
     meshDesc.points.data = mesh->vertices.data();
 
-    meshDesc.triangles.count = mesh->indices.size() / 3; // assumption tri-mesh
-    meshDesc.triangles.stride = 3 * sizeof(PxU32);
+    meshDesc.triangles.count = static_cast<physx::PxU32>(mesh->indices.size() / 3); // assumption tri-mesh
+    meshDesc.triangles.stride = static_cast<physx::PxU32>(3 * sizeof(PxU32));
     meshDesc.triangles.data = mesh->indices.data();
 
     PxDefaultMemoryOutputStream writeBuffer;

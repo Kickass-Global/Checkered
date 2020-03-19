@@ -41,19 +41,19 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceHorn);
-            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound->getId());
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
         else if (sound->name == "acceleration")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceAcceleration);
-            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound->getId());
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
         else if (sound->name == "breaking")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceBreaking);
-            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound->getId());
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
     }
 }

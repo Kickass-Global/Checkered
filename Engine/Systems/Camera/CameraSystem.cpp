@@ -54,8 +54,8 @@ void ::Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int,
 	auto&& height = std::get<1>(args.values);
 
 	for (auto&& camera : getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
-		camera->viewport.width = width;
-		camera->viewport.height = height;
+		camera->viewport.width = static_cast<float>(width);
+		camera->viewport.height =  static_cast<float>(height);
 		camera->is_dirty = true;
 	}
 }
