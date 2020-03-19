@@ -106,6 +106,7 @@ void ::Camera::CameraSystem::onKeyPress(const Component::EventArgs<int> &args) {
 void ::Camera::CameraSystem::onKeyUp(const Component::EventArgs<int> &args) {
     //Engine::log<module>("onKeyUp=", std::get<0>(args.values));
     keys.erase(std::get<0>(args.values));
+    
 }
 
 void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
