@@ -66,6 +66,10 @@ void TestWorld::load() {
 	Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
 	Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
 
+	Input::InputSystem::onKeyPress += openALSoundSystem->onKeyPressHandler;
+	Input::InputSystem::onKeyDown += openALSoundSystem->onKeyDownHandler;
+	Input::InputSystem::onKeyUp += openALSoundSystem->onKeyUpHandler;
+
 	Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 	//endregion
 
