@@ -10,6 +10,12 @@
 #include <al.h>
 #include <alc.h>
 #include <Engine.h>
+
+#include "systeminterface.hpp"
+#include "EventHandler.h"
+
+#include "Events/Events.h"
+
 #include <fstream>
 #include <string>
 #include <vector>
@@ -26,7 +32,18 @@ namespace Engine {
         ALuint sourceAcceleration;
         ALuint sourceBreaking;
 
+        void onKeyDown(const Component::EventArgs<int>& args);
+        void onKeyUp(const Component::EventArgs<int>& args);
+        void onKeyPress(const Component::EventArgs<int>& args);
+
     public:
+        
+        std::shared_ptr<EventHandler<int>> onKeyPressHandler;
+        std::shared_ptr<EventHandler<int>> onKeyDownHandler;
+        std::shared_ptr<EventHandler<int>> onKeyUpHandler;
+
+      
+        
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
         
@@ -162,7 +179,14 @@ namespace Engine {
         ALuint load_sound(std::string s);
         int playSound(ALuint s);
     
-    };
+        void update_stream(const ALuint source,
+            const ALenum& format,
+            const std::int32_t& sampleRate,
+            const std::vector<char>& soundData,
+            std::size_t& cursor);
+        ALuint load_looping_sound(std::string filePath);
+
+ };
 }
 
 #endif //ENGINE_SOUNDSYSTEM_H
