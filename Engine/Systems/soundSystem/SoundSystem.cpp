@@ -294,14 +294,14 @@ int Engine::SoundSystem::playSound(ALuint s)
 {
         alCall(alSourcePlay, s);
 
-        
+       /*
         ALint state = AL_PLAYING;
         
         while (state == AL_PLAYING)
         {
             alCall(alGetSourcei, s, AL_SOURCE_STATE, &state);
         }
-        /*
+        
         alCall(alDeleteSources, 1, &source);
         alCall(alDeleteBuffers, 1, &buffer);
 
