@@ -37,7 +37,7 @@ void Engine::SoundSystem::initialize() {
 }
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
-
+    /*
     auto sounds = Engine::getStore().getRoot().getComponentsOfType<Component::Sound>();
     for (auto sound : sounds)
     {
@@ -59,7 +59,8 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             playSound(sourceBreaking);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
-    }
+
+    } */
 }
 
 
@@ -293,14 +294,14 @@ int Engine::SoundSystem::playSound(ALuint s)
 {
         alCall(alSourcePlay, s);
 
-        /*
+        
         ALint state = AL_PLAYING;
         
         while (state == AL_PLAYING)
         {
-            alCall(alGetSourcei, source, AL_SOURCE_STATE, &state);
+            alCall(alGetSourcei, s, AL_SOURCE_STATE, &state);
         }
-        
+        /*
         alCall(alDeleteSources, 1, &source);
         alCall(alDeleteBuffers, 1, &buffer);
 
@@ -314,8 +315,19 @@ int Engine::SoundSystem::playSound(ALuint s)
        
 }
 
+int Engine::SoundSystem::stopSound(ALuint s)
+{
+    alCall(alSourceStop, s);
+    return 0;
+}
+
+
 const std::size_t NUM_BUFFERS = 4;
 const std::size_t BUFFER_SIZE = 65536; // 32kb of data in each buffer
+
+
+
+
 
 void Engine::SoundSystem::update_stream(const ALuint source,
     const ALenum& format,
@@ -413,4 +425,37 @@ ALuint Engine::SoundSystem::load_looping_sound(std::string filePath)
     alCall(alSourceQueueBuffers, source, NUM_BUFFERS, &buffers[0]);
 
     return source;
+}
+
+void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
+{
+    auto key = args.get<0>();
+    if (key == GLFW_KEY_W)
+    {
+        playSound(sourceAcceleration);
+    }
+    else if (key == GLFW_KEY_S)
+    {
+        playSound(sourceBreaking);
+    }
+}
+void  Engine::SoundSystem::onKeyUp(const Component::EventArgs<int>& args)
+{
+    auto key = args.get<0>();
+    if (key == GLFW_KEY_W)
+    {
+        stopSound(sourceAcceleration);
+    }
+    else if (key == GLFW_KEY_S)
+    {
+        stopSound(sourceBreaking);
+    }
+}
+void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
+{
+    auto key = args.get<0>();
+    if (key == GLFW_KEY_SPACE)
+    {
+        playSound(sourceHorn);
+    }
 }

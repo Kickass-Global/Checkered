@@ -14,6 +14,8 @@
 #include "systeminterface.hpp"
 #include "EventHandler.h"
 
+#include <GLFW/glfw3.h>
+
 #include "Events/Events.h"
 
 #include <fstream>
@@ -184,7 +186,10 @@ namespace Engine {
             const std::int32_t& sampleRate,
             const std::vector<char>& soundData,
             std::size_t& cursor);
+        
         ALuint load_looping_sound(std::string filePath);
+
+        int stopSound(ALuint s);
 
  };
 }
