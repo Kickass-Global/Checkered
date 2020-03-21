@@ -151,7 +151,7 @@ namespace Component {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
 				}
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
-				Engine::createComponent<Component::Sound>("acceleration");
+				//Engine::createComponent<Component::Sound>("acceleration");
 			    
 			}
 			if (key == GLFW_KEY_A) {
@@ -168,7 +168,7 @@ namespace Component {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eREVERSE);
 					vehicle->pxVehicleInputData.setAnalogAccel(1);
 				}
-				Engine::createComponent<Component::Sound>("breaking");
+				//Engine::createComponent<Component::Sound>("breaking");
 			}
 		}
 
