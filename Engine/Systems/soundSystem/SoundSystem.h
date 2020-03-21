@@ -178,17 +178,13 @@ namespace Engine {
             std::int32_t& sampleRate,
             std::uint8_t& bitsPerSample,
             ALsizei& size);
+        
         ALuint load_sound(std::string s);
+       
+        ALuint load_looping_sound(std::string s);
+        
         int playSound(ALuint s);
     
-        void update_stream(const ALuint source,
-            const ALenum& format,
-            const std::int32_t& sampleRate,
-            const std::vector<char>& soundData,
-            std::size_t& cursor);
-        
-        ALuint load_looping_sound(std::string filePath);
-
         int stopSound(ALuint s);
 
  };

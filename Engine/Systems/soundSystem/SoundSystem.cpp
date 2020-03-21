@@ -31,8 +31,8 @@ void Engine::SoundSystem::initialize() {
         
     }
     sourceHorn = load_sound("Assets/Sounds/CARHORN4.wav");
-    sourceAcceleration = load_sound("Assets/Sounds/car+geardown.wav");
-    sourceBreaking = load_sound("Assets/Sounds/TIRE+SKID.wav");
+    sourceAcceleration = load_looping_sound("Assets/Sounds/car+geardown.wav");
+    sourceBreaking = load_looping_sound("Assets/Sounds/TIRE+SKID.wav");
 
 }
 
@@ -290,108 +290,25 @@ ALuint Engine::SoundSystem::load_sound(std::string filePath)
         return source;
 }
 
-int Engine::SoundSystem::playSound(ALuint s)
-{
-        alCall(alSourcePlay, s);
-
-       /*
-        ALint state = AL_PLAYING;
-        
-        while (state == AL_PLAYING)
-        {
-            alCall(alGetSourcei, s, AL_SOURCE_STATE, &state);
-        }
-        
-        alCall(alDeleteSources, 1, &source);
-        alCall(alDeleteBuffers, 1, &buffer);
-
-        alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, nullptr);
-        alcCall(alcDestroyContext, openALDevice, openALContext);
-
-        ALCboolean closed;
-        alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
-        */
-        return 0;
-       
-}
-
-int Engine::SoundSystem::stopSound(ALuint s)
-{
-    alCall(alSourceStop, s);
-    return 0;
-}
-
-
-const std::size_t NUM_BUFFERS = 4;
-const std::size_t BUFFER_SIZE = 65536; // 32kb of data in each buffer
-
-
-
-
-
-void Engine::SoundSystem::update_stream(const ALuint source,
-    const ALenum& format,
-    const std::int32_t& sampleRate,
-    const std::vector<char>& soundData,
-    std::size_t& cursor)
-{
-    ALint buffersProcessed = 0;
-    alCall(alGetSourcei, source, AL_BUFFERS_PROCESSED, &buffersProcessed);
-
-    if (buffersProcessed <= 0)
-        return;
-
-    while (buffersProcessed--)
-    {
-        ALuint buffer;
-        alCall(alSourceUnqueueBuffers, source, 1, &buffer);
-
-        ALsizei dataSize = BUFFER_SIZE;
-
-        char* data = new char[dataSize];
-        std::memset(data, 0, dataSize);
-
-        std::size_t dataSizeToCopy = BUFFER_SIZE;
-        if (cursor + BUFFER_SIZE > soundData.size())
-            dataSizeToCopy = soundData.size() - cursor;
-
-        std::memcpy(&data[0], &soundData[cursor], dataSizeToCopy);
-        cursor += dataSizeToCopy;
-
-        if (dataSizeToCopy < BUFFER_SIZE)
-        {
-            cursor = 0;
-            std::memcpy(&data[dataSizeToCopy], &soundData[cursor], BUFFER_SIZE - dataSizeToCopy);
-            cursor = BUFFER_SIZE - dataSizeToCopy;
-        }
-
-        alCall(alBufferData, buffer, format, data, BUFFER_SIZE, sampleRate);
-        alCall(alSourceQueueBuffers, source, 1, &buffer);
-
-        delete[] data;
-    }
-}
-
 ALuint Engine::SoundSystem::load_looping_sound(std::string filePath)
 {
+
     std::uint8_t 	channels;
     std::int32_t 	sampleRate;
     std::uint8_t 	bitsPerSample;
     ALsizei			dataSize;
-    char* rawSoundData = load_wav("carHorn.wav", channels, sampleRate, bitsPerSample, dataSize);
+    char* rawSoundData = load_wav(filePath, channels, sampleRate, bitsPerSample, dataSize);
     if (rawSoundData == nullptr || dataSize == 0)
     {
         std::cerr << "ERROR: Could not load wav" << std::endl;
-        return 0;
+
     }
     std::vector<char> soundData(rawSoundData, rawSoundData + dataSize);
 
-    ALuint buffers[NUM_BUFFERS];
-
-    alCall(alGenBuffers, NUM_BUFFERS, &buffers[0]);
+    ALuint buffer;
+    alCall(alGenBuffers, 1, &buffer);
 
     ALenum format;
-
     if (channels == 1 && bitsPerSample == 8)
         format = AL_FORMAT_MONO8;
     else if (channels == 1 && bitsPerSample == 16)
@@ -406,26 +323,52 @@ ALuint Engine::SoundSystem::load_looping_sound(std::string filePath)
             << "ERROR: unrecognised wave format: "
             << channels << " channels, "
             << bitsPerSample << " bps" << std::endl;
-        return 0;
+
     }
 
-    for (std::size_t i = 0; i < NUM_BUFFERS; ++i)
-    {
-        alCall(alBufferData, buffers[i], format, &soundData[i * BUFFER_SIZE], BUFFER_SIZE, sampleRate);
-    }
+    alCall(alBufferData, buffer, format, soundData.data(), soundData.size(), sampleRate);
+    soundData.clear(); // erase the sound in RAM
+
 
     ALuint source;
+
     alCall(alGenSources, 1, &source);
     alCall(alSourcef, source, AL_PITCH, 1);
     alCall(alSourcef, source, AL_GAIN, 1.0f);
     alCall(alSource3f, source, AL_POSITION, 0, 0, 0);
     alCall(alSource3f, source, AL_VELOCITY, 0, 0, 0);
-    alCall(alSourcei, source, AL_LOOPING, AL_FALSE);
-
-    alCall(alSourceQueueBuffers, source, NUM_BUFFERS, &buffers[0]);
+    alCall(alSourcei, source, AL_LOOPING, AL_TRUE);
+    alCall(alSourcei, source, AL_BUFFER, buffer);
 
     return source;
 }
+
+int Engine::SoundSystem::playSound(ALuint s)
+{
+        alCall(alSourcePlay, s);
+
+    
+        return 0;
+       
+}
+
+int Engine::SoundSystem::stopSound(ALuint s)
+{
+    alCall(alSourceStop, s);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
 {
