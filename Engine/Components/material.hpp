@@ -37,8 +37,15 @@ namespace Component {
 
             int index = 0;
             for (auto &texture : textures) {
-                glActiveTexture(GL_TEXTURE1 + index++);
-                glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+                if (texture) {
+                    glActiveTexture(GL_TEXTURE1 + index++);
+                    glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+                }
+                else
+                {
+                    glActiveTexture(GL_TEXTURE1 + index++);
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                }
             }
         }
     };

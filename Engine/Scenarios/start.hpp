@@ -18,9 +18,10 @@
 #include "scenariointerface.hpp"
 #include <Types.hpp>
 #include <testworld.hpp>
+#include <utility>
 
 struct LayoutItem {
-	Engine::BoxModel margin = { 10, 10, 10, 10 };
+	Engine::BoxModelLayer margin = { 10, 10, 10, 10 };
 	Engine::Rectangle box = { 0, 0, 400, 400 };
 };
 
@@ -28,27 +29,32 @@ struct MenuState : ComponentBase {
 
 	std::shared_ptr<Billboard> background;
 	std::shared_ptr<Text> text;
-	Plot plot;
+	BoxModel bounds;
 
 	void layout(Engine::Rectangle destination, Engine::RelativeAnchor anchor) {
-		auto d = plot.plot_at(destination, anchor);
-		background->anchor = { 1, 1 };
-		background->plot = d.rectangle;
-		text->plot = Engine::Plot{ {},{0,0,d.rectangle.width, d.rectangle.height} }.plot_at(d.rectangle, { 0,0 }).rectangle;
+		auto d = bounds.plot(destination, { 0, 0 }, { 0, 0 });
+		if (background) {
+			background->anchor = { 1, 1 };
+			background->plot = d;
+		}
+		text->plot = BoxModel{ d.x, d.y, d.width, d.height }.plot(d, { 0, 0 }, { -1, -1 });
 	}
 
 	MenuState(std::shared_ptr<Texture> background_image, std::string menu_text)
 		: background(getEngine()->createComponent<Billboard>(background_image)),
-		text(getEngine()->createComponent<Text>(menu_text)) {
+		text(getEngine()->createComponent<Text>(menu_text)),
+		bounds{ 0, 0, 640, 100 } {
+		text->vertical_align = eVerticalAlign::middle;
+	}
 
-		// todo: layout the billboard and the text
-		plot.rectangle = { 320,50, 640, 100 };
+	MenuState(std::string menu_text)
+		: text(getEngine()->createComponent<Text>(menu_text)),
+		bounds{ 0, 0, 640, 100 } {
 		text->vertical_align = eVerticalAlign::middle;
 	}
 };
 
 struct MenuItem : ComponentBase {
-	Engine::Rectangle box;
 	std::vector<MenuState> menu_states;
 	unsigned int current_state = 0;
 
@@ -57,7 +63,6 @@ struct MenuItem : ComponentBase {
 	}
 
 	void layout(Engine::Rectangle destination, Engine::RelativeAnchor anchor) {
-		box = destination;
 		for (auto& state : menu_states) {
 			state.layout(destination, anchor);
 		}
@@ -67,21 +72,22 @@ struct MenuItem : ComponentBase {
 };
 
 struct MenuList : public ComponentBase {
-	Engine::Rectangle box;
+	Engine::BoxModel box{ 0, 0, 640, 200 };
 	std::vector<MenuItem> items;
 	int selected_item_index = 0;
 	bool active = true;
 
 	MenuItem& current() { return items[selected_item_index]; }
 
-	void layout() {
-		float item_height = box.height / items.size();
-		int i = 0;
+	void layout(BoxModel destination) {
+
+		auto dst = box.plot(destination.box, { 0,0 }, { 0,0 });
+		auto boxes = dst.subdivide(items.size());
+		auto item_box = boxes.begin();
+
 		for (auto& item : items) {
-			auto item_box = Engine::Rectangle{ box.x, box.y + i * item_height, box.width, item_height };
-			auto item_anchor = Engine::RelativeAnchor{ 0,0 }; // center
-			item.layout(item_box, item_anchor);
-			i++;
+			item.layout(*item_box, { 0, 0 });
+			item_box++;
 		}
 	}
 
@@ -98,20 +104,25 @@ struct MenuList : public ComponentBase {
 
 struct MainMenu : public ComponentBase {
 	std::shared_ptr<MenuList> menu;
-
 	EventDelegate<int> onStart{ "onStart" };
 
 	MainMenu() {
 		menu = getEngine()->createComponent<MenuList>();
-		MenuState default_menu_state(getEngine()->createComponent<Texture>(
-			"Assets/Textures/Nature_Trees.png"), "Press Start to Continue...");
+		MenuState default_menu_state("Press Start to Continue...");
+		MenuState begin_menu_state("Begin Game");
 		MenuItem press_start_item;
+		MenuItem begin_game_item;
+
 		press_start_item.menu_states = { default_menu_state };
 		press_start_item.onSelected += [this](int) {
 			log<high>("onStart");
 			onStart(0);
 		};
+
+		begin_game_item.menu_states = { begin_menu_state };
+
 		menu->items.push_back(press_start_item);
+		menu->items.push_back(begin_game_item);
 	}
 };
 
@@ -119,25 +130,32 @@ struct MenuSystem : public SystemInterface {
 	std::shared_ptr<EventHandler<int>> onKeyPressHandler;
 
 	void initialize() override {
-		onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &MenuSystem::onKeyPress);
+		onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()
+			->createHandler(this, &MenuSystem::onKeyPress);
 	}
 
 	void update(Engine::deltaTime elapsed) override {
 		SystemInterface::update(elapsed);
-		auto cameras = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>();
-		auto lists = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<MenuList>();
+		auto cameras = getEngine()->getSubSystem<EngineStore>()
+			->getRoot()
+			.getComponentsOfType<Component::Camera>();
+		auto lists = getEngine()->getSubSystem<EngineStore>()
+			->getRoot()
+			.getComponentsOfType<MenuList>();
 
 		for (auto& list : lists) {
 			if (!list->active) continue;
-			list->box = { 0,0, cameras[0]->viewport.width, cameras[0]->viewport.height };
-			list->layout();
+			BoxModel screen{ 0, 0, cameras[0]->viewport.width, cameras[0]->viewport.height };
+			list->layout(screen);
 		}
 	}
 
 	void onKeyPress(const EventArgs<int>& args) {
 
 		auto key = args.get<0>();
-		auto lists = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<MenuList>();
+		auto lists = getEngine()->getSubSystem<EngineStore>()
+			->getRoot()
+			.getComponentsOfType<MenuList>();
 		for (auto& list : lists) {
 			if (!list->active) continue;
 			if (key == GLFW_KEY_SPACE) {
@@ -153,33 +171,32 @@ struct MenuSystem : public SystemInterface {
 		}
 	}
 };
-
 namespace Engine {
 	class Start : public ScenarioInterface {
 	public:
-		explicit Start(EngineSystem* pSystem) : ScenarioInterface(pSystem) {}
+		explicit Start(EngineSystem* pSystem)
+			: ScenarioInterface(pSystem) {}
 
-        void unload() override {
-            log<high>("onUnload");
+		void unload() override {
+			log<high>("onUnload");
 			getEngine()->getSubSystem<EngineStore>()->getRoot().eraseAllComponents();
 			getEngine()->getSubSystem<EventSystem>()->reset();
 			getEngine()->getSubSystem<Rendering::RenderingSystem>()->reset();
-            ScenarioInterface::unload();
-        }
+			ScenarioInterface::unload();
+		}
 
-        std::shared_ptr<MainMenu> menu;
+		std::shared_ptr<MainMenu> menu;
 
-        void load() override {
+		void load() override {
 
 			auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
 			auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
-			renderingSystem->onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
-
 			auto menuSystem = getEngine()->addSubSystem<MenuSystem>();
 			auto inputSystem = getEngine()->addSubSystem<Input::InputSystem>();
 			renderingSystem->addSubSystem<Engine::BillboardSystem>();
 			renderingSystem->addSubSystem<Engine::FontSystem>();
 
+			renderingSystem->onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 			inputSystem->onKeyPress += menuSystem->onKeyPressHandler;
 
 			getEngine()->createComponent<Component::Camera>();
@@ -192,10 +209,12 @@ namespace Engine {
 		}
 
 		void update(deltaTime d) override {
-
 			auto fps = getEngine()->createMomentaryComponent<Component::Text>(
 				"Frametime: " + std::to_string(d));
 			fps->font_size = 4;
+			fps->plot = { 0,0,640,480 };
+			fps->vertical_align = eVerticalAlign::bottom;
+			fps->align = eAlign::left;
 		}
 	};
 }

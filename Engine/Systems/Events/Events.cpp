@@ -16,3 +16,8 @@ void Engine::EventSystem::update(Engine::deltaTime time) {
 		}
 	} while (events_pending);
 }
+
+void EventSystem::early_update(Engine::deltaTime time) {
+    onTick(time);
+    SystemInterface::early_update(time);
+}

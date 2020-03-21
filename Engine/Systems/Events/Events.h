@@ -31,6 +31,7 @@ namespace Engine {
         Component::EventDelegate<Engine::deltaTime> onTick{"onTick"};
 
         void update(Engine::deltaTime /*elapsed*/) override;
+        void early_update(Engine::deltaTime time) override;
 
         void reset() {
             registeredHandlers.clear();

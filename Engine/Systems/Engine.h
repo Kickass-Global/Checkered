@@ -37,11 +37,11 @@ namespace Engine {
 		template <typename T>
 		void load_scenario() {
 			static_assert(std::is_base_of<ScenarioInterface, T>::value);
-
+			getEngine()->pause();
 			if (this->scenario) this->scenario->unload();
-
 			this->scenario = std::make_shared<T>(this);
 			this->scenario->load();
+            getEngine()->unpause();
 		}
 
 		EngineSystem() {
@@ -130,7 +130,11 @@ namespace Engine {
 
 			return store->getRoot().addMomentaryComponent(store->create<T>(args...));
 		}
-	};
+
+        void update();
+        void unpause();
+        void pause();
+    };
 
 	typedef float deltaTime;
 }

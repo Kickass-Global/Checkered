@@ -22,9 +22,18 @@
 #include <Billboard.h>
 #include <Rendering/fontsystem.hpp>
 #include <soundSystem/SoundSystem.h>
+#include <Rendering/BillboardSystem.h>
 #include "scenery.hpp"
 
 void TestWorld::load() {
+    auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
+    auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
+    renderingSystem->onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
+
+    renderingSystem->addSubSystem<Engine::BillboardSystem>();
+    renderingSystem->addSubSystem<Engine::FontSystem>();
+
+    auto inputSystem = getEngine()->addSubSystem<Input::InputSystem>();
 
     auto physicsSystem = getEngine()->addSubSystem<Physics::PhysicsSystem>();
     auto vehicleSystem = getEngine()->addSubSystem<Engine::vehicleSystem>();
@@ -37,10 +46,8 @@ void TestWorld::load() {
     componentSystem->onActorCreated += physicsSystem->onActorCreatedHandler;
 
     getEngine()->addSubSystem<Engine::DamageSystem>();
-    auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
-   // auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
+    // auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
     auto liveReloadSystem = getEngine()->addSubSystem<Debug::LiveReloadSystem>();
-    auto inputSystem = getEngine()->getSubSystem<Input::InputSystem>();
 
     //renderingSystem->addSubSystem<Engine::FontSystem>(); // yo dawg, I heard you like systems in your systems.
 
@@ -52,17 +59,17 @@ void TestWorld::load() {
     eventSystem->order = 0;
    // renderingSystem->order = 2;
 
-    Input::InputSystem::onKeyPress += cameraSystem->onKeyPressHandler;
-    Input::InputSystem::onKeyDown += cameraSystem->onKeyDownHandler;
-    Input::InputSystem::onKeyUp += cameraSystem->onKeyUpHandler;
+    inputSystem->onKeyPress += cameraSystem->onKeyPressHandler;
+    inputSystem->onKeyDown += cameraSystem->onKeyDownHandler;
+    inputSystem->onKeyUp += cameraSystem->onKeyUpHandler;
 
-    Input::InputSystem::onKeyPress += physicsSystem->onKeyPressHandler;
-    Input::InputSystem::onKeyDown += physicsSystem->onKeyDownHandler;
-    Input::InputSystem::onKeyUp += physicsSystem->onKeyUpHandler;
+    inputSystem->onKeyPress += physicsSystem->onKeyPressHandler;
+    inputSystem->onKeyDown += physicsSystem->onKeyDownHandler;
+    inputSystem->onKeyUp += physicsSystem->onKeyUpHandler;
 
-    Input::InputSystem::onKeyPress += hornSystem->onKeyPressHandler;
-    Input::InputSystem::onKeyDown += hornSystem->onKeyDownHandler;
-    Input::InputSystem::onKeyUp += hornSystem->onKeyUpHandler;
+    inputSystem->onKeyPress += hornSystem->onKeyPressHandler;
+    inputSystem->onKeyDown += hornSystem->onKeyDownHandler;
+    inputSystem->onKeyUp += hornSystem->onKeyUpHandler;
 
     Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
     //endregion
@@ -187,9 +194,9 @@ void TestWorld::load() {
     );
 
     player_vehicle->model = player_damage_model;
-    //player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-    //player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
-    player_vehicle->position = glm::vec3(0.0f, 0.0f, -40.0f);
+    player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
+    player_vehicle->position = glm::vec3(0.0f, 3.0f, -40.0f);
 
     //setup passenger system
 
@@ -219,7 +226,7 @@ void TestWorld::load() {
     );
 
     glm::vec3 origin = {10, 0, 20};
-    for (int i = 1; i < 50; i++) {
+    for (int i = 1; i < 10; i++) {
         obstacle_instances.add_instance_at(
             i / 50.0f * 200.0f * glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} - glm::vec3{0, 5, 0} +
             origin, hydrant_mesh, hydrant_material
@@ -287,6 +294,8 @@ void TestWorld::load() {
         const Component::EventArgs<Vehicle *> &args
     ) {
         auto meta = std::get<0>(args.values);
+
+        if(!meta->pxVehicle) return;
 
         auto player_location = player_vehicle->position; // translation vector of mat4
         auto ai_direction = glm::normalize(-meta->world_transform()[2]); // 'z' column vector of mat4 (i.e. forward)
@@ -421,3 +430,6 @@ void TestWorld::load() {
 
 TestWorld::TestWorld(EngineSystem *enginePtr)
     : ScenarioInterface(enginePtr) {}
+
+
+

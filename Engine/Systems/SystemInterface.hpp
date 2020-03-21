@@ -13,10 +13,12 @@
 #include <typeindex>
 #include <vector>
 #include <memory>
+#include <chrono>
 
 namespace Engine {
 
     typedef float deltaTime;
+    typedef std::chrono::duration<float> floatMilliseconds;
 
     class SystemInterface {
 
@@ -30,7 +32,9 @@ namespace Engine {
         class EngineSystem *getEngine() { return enginePtr; }
 
         virtual void update(Engine::deltaTime elapsed) {
-
+            for (auto &subsystem : subsystems) {
+                subsystem.second->early_update(elapsed);
+            }
             for (auto &subsystem : subsystems) {
                 subsystem.second->update(elapsed);
             }
@@ -41,6 +45,8 @@ namespace Engine {
 
         virtual void late_update(Engine::deltaTime /*elapsed*/) { /**/ }
 
+        virtual void early_update(Engine::deltaTime /*elapsed*/) { /**/ }
+
         /**
          * Creates a new system to the engine; systems need to be default constructable.
          * @tparam T the type of system
@@ -49,9 +55,13 @@ namespace Engine {
         template<typename T>
         T *addSubSystem() {
 
-            auto[it, _] = subsystems.emplace(typeid(T), new T());
-            it->second->enginePtr = enginePtr;
-            it->second->initialize();
+            auto[it, emplaced] = subsystems.emplace(typeid(T), new T());
+
+            if (emplaced) {
+                it->second->enginePtr = enginePtr;
+                it->second->initialize();
+            }
+
             return static_cast<T *>(it->second.get());
         }
 
@@ -79,11 +89,15 @@ namespace Engine {
         virtual void initialize() {}
     };
 
-    void setupWheelsSimulationData(
-        const float wheelMass, const float wheelMOI, const float wheelRadius, const float wheelWidth,
-        const unsigned int numWheels, const physx::PxVec3 *wheelCenterActorOffsets,
-        const physx::PxVec3 &chassisCMOffset, const float chassisMass, physx::PxVehicleWheelsSimData *wheelsSimData
-    );
+    void setupWheelsSimulationData(const float wheelMass,
+                                   const float wheelMOI,
+                                   const float wheelRadius,
+                                   const float wheelWidth,
+                                   const unsigned int numWheels,
+                                   const physx::PxVec3 *wheelCenterActorOffsets,
+                                   const physx::PxVec3 &chassisCMOffset,
+                                   const float chassisMass,
+                                   physx::PxVehicleWheelsSimData *wheelsSimData);
 }
 
 #endif //ENGINE_SYSTEMINTERFACE_HPP
