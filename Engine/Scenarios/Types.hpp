@@ -5,58 +5,76 @@
 #ifndef ENGINE_TYPES_HPP
 #define ENGINE_TYPES_HPP
 
+#include <vector>
+
 namespace Engine {
-	struct BoxModel {
-		float top;
-		float right;
-		float bottom;
-		float left;
-	};
 
-	struct RelativeAnchor {
-		float u;
-		float v;
-	};
+    struct BoxModelLayer {
+        float top;
+        float right;
+        float bottom;
+        float left;
+    };
 
-	struct Offset {
-		float x;
-		float y;
-	};
+    struct RelativeAnchor {
+        float u;
+        float v;
 
-	struct Rectangle {
-		float x;
-		float y;
-		float width;
-		float height;
+        std::tuple<float, float> operator()(float width, float height) {
+            return {(0.5 + u * 0.5) * width, (0.5 + v * 0.5) * height};
+        }
+    };
 
-		Rectangle operator-(const BoxModel& box) {
-			auto& [top, right, bottom, left] = box;
+    struct Offset {
+        float x;
+        float y;
+        Offset(float x, float y);
+    };
 
+    struct Rectangle {
+        float x;
+        float y;
+        float width;
+        float height;
+        Rectangle(float x, float y, float width, float height);
+        Rectangle() = default;
 
+        std::vector<Rectangle> subdivide(unsigned int n) {
+            auto sub_item_height = height / n;
+            auto sub_item_y = y;
+            std::vector<Rectangle> subdivisions;
+            subdivisions.reserve(n);
 
-			return { width - right - left, height - top - bottom };
-		}
-	};
+            for (int i = 0; i < n; ++i) {
+                subdivisions.emplace_back(x, sub_item_y, width, sub_item_height);
+                sub_item_y += sub_item_height;
+            }
 
-	struct Plot {
-		BoxModel margin = { 10,10,10,10 };
-		Rectangle rectangle = { 50, 50, 100, 100 };
+            return subdivisions;
+        }
+    };
 
-		Plot plot_at(Rectangle destination, RelativeAnchor anchor)
-		{
-			auto& [dx, dy, dw, dh] = destination;
-			auto& [sx, sy, sw, sh] = rectangle;
-			auto& [u, v] = anchor;
+    struct BoxModel {
+        BoxModelLayer margin = {10, 10, 10, 10};
+        Rectangle box = {50, 50, 100, 100};
 
-			auto ax = (0.5f * u + 0.5f) * dw;
-			auto ay = (0.5f * v + 0.5f) * dh;
+        explicit BoxModel(float x, float y, float width, float height)
+            : box(x, y, width, height) {}
 
-			return { margin, {dx + ax - sx, dy + ay - sy, sw, sh } };
-		}
-	};
+        /**
+         * Returns this box placed in the destination rectangle so that both anchors overlap.
+         */
+        Rectangle plot(Rectangle dst, RelativeAnchor dst_anchor, RelativeAnchor src_anchor) {
+            auto&&[dx, dy, dw, dh] = dst;
+            auto&&[sx, sy, sw, sh] = box;
+            auto&&[dax, day] = dst_anchor(dw, dh);
+            auto&&[sax, say] = src_anchor(sw, sh);
 
+            return {dx + dax - sax, dy + day - say, sw, sh};
+        };
 
-
+        
+    };
 }
 
 

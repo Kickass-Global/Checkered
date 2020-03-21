@@ -135,34 +135,6 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<MeshInstance>(instance.second);
     }
 
-    //    // this code handles drawing billboards into the world (hud, sprites, etc).
-    //    for (auto &camera :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
-    //        for (const auto &sprite :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Billboard>()) {
-    //
-    //            const auto &camera_view_matrix = camera->view;
-    //            const auto &viewport = camera->viewport;
-    //
-    //            auto offset = glm::translate(
-    //                glm::vec3(
-    //                    sprite->plot.x / viewport.width - sprite->anchor.x,
-    //                    sprite->plot.y / viewport.height - sprite->anchor.y, 0.0f
-    //                ));
-    //
-    //            auto anchor = glm::translate(glm::vec3(sprite->anchor.x, sprite->anchor.y, 0.0f));
-    //
-    //            auto scale = glm::scale(
-    //                glm::vec3(
-    //                    sprite->plot.width / viewport.width, sprite->plot.height / viewport.height,
-    //                    sprite->plot.height / viewport.height // todo, hack
-    //                ));
-    //
-    //
-    //            sprite->mesh_instance->instances.push_back(offset * scale * anchor);
-    //        }
-    //
-    //        break; // only use the first camera...
-    //    }
-
     // perform "passes"
 
 
