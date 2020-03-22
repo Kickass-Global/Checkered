@@ -33,7 +33,7 @@ void Engine::SoundSystem::initialize() {
     sourceHorn = load_sound("Assets/Sounds/CARHORN4.wav");
     sourceAcceleration = load_looping_sound("Assets/Sounds/car+geardown.wav");
     sourceBreaking = load_looping_sound("Assets/Sounds/TIRE+SKID.wav");
-    sourceMusic = load_sound("Assets/Sounds/backGroundMusic.wav");
+    sourceMusic = load_looping_sound("Assets/Sounds/backGroundMusic.wav");
 
     playSound(sourceMusic);
 }
