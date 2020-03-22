@@ -30,9 +30,11 @@ namespace Engine {
         
         ALCdevice* device;
         ALCcontext* openALContext;
+       
         ALuint sourceHorn;
         ALuint sourceAcceleration;
         ALuint sourceBreaking;
+        ALuint sourceMusic;
 
         void onKeyDown(const Component::EventArgs<int>& args);
         void onKeyUp(const Component::EventArgs<int>& args);
