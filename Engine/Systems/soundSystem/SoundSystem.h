@@ -36,6 +36,8 @@ namespace Engine {
         ALuint sourceBreaking;
         ALuint sourceMusic;
 
+        float volume = 0.5f;
+
         void onKeyDown(const Component::EventArgs<int>& args);
         void onKeyUp(const Component::EventArgs<int>& args);
         void onKeyPress(const Component::EventArgs<int>& args);
@@ -46,6 +48,8 @@ namespace Engine {
         std::shared_ptr<EventHandler<int>> onKeyDownHandler;
         std::shared_ptr<EventHandler<int>> onKeyUpHandler;
 
+        void volumeDown();
+        void volumeUp();
       
         
         void initialize() override;

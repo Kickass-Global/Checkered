@@ -336,7 +336,7 @@ ALuint Engine::SoundSystem::load_looping_sound(std::string filePath)
 
     alCall(alGenSources, 1, &source);
     alCall(alSourcef, source, AL_PITCH, 1);
-    alCall(alSourcef, source, AL_GAIN, 1.0f);
+    alCall(alSourcef, source, AL_GAIN, volume);
     alCall(alSource3f, source, AL_POSITION, 0, 0, 0);
     alCall(alSource3f, source, AL_VELOCITY, 0, 0, 0);
     alCall(alSourcei, source, AL_LOOPING, AL_TRUE);
@@ -361,7 +361,24 @@ int Engine::SoundSystem::stopSound(ALuint s)
 }
 
 
+void Engine::SoundSystem::volumeDown()
+{
+    volume = volume - 0.1;
+    alCall(alSourcef, sourceMusic, AL_GAIN, volume);
+    alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
+    alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
+    alCall(alSourcef, sourceHorn, AL_GAIN, volume);
 
+}
+
+void Engine::SoundSystem::volumeUp()
+{
+    volume = volume + 0.1;
+    alCall(alSourcef, sourceMusic, AL_GAIN, volume);
+    alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
+    alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
+    alCall(alSourcef, sourceHorn, AL_GAIN, volume);
+}
 
 
 
@@ -382,6 +399,7 @@ void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
     else if (key == GLFW_KEY_S)
     {
         playSound(sourceBreaking);
+
     }
 }
 void  Engine::SoundSystem::onKeyUp(const Component::EventArgs<int>& args)
@@ -402,5 +420,13 @@ void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
     if (key == GLFW_KEY_SPACE)
     {
         playSound(sourceHorn);
+    }
+    else if (key == GLFW_KEY_F1)
+    {
+        volumeUp();
+    }
+    else if (key == GLFW_KEY_F2)
+    {
+        volumeDown();
     }
 }
