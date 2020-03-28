@@ -1,6 +1,7 @@
 //
 // Created by root on 17/1/20.
-//
+// Refernces :: Used code from https://indiegamedev.net/2020/02/15/the-complete-guide-to-openal-with-c-part-1-playing-a-sound/
+
 
 #ifndef ENGINE_VEHICLE_H
 #define ENGINE_VEHICLE_H
@@ -151,7 +152,7 @@ namespace Component {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
 				}
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
-				//Engine::createComponent<Component::Sound>("acceleration");
+				Engine::createComponent<Component::Sound>("acceleration");
 			    
 			}
 			if (key == GLFW_KEY_A) {
@@ -163,12 +164,16 @@ namespace Component {
 			if (key == GLFW_KEY_S) {
 				if (v.z > 0.1) {
 					vehicle->pxVehicleInputData.setAnalogBrake(1);
+					
+					Engine::createComponent<Component::Sound>("breaking");
 				}
 				else {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eREVERSE);
 					vehicle->pxVehicleInputData.setAnalogAccel(1);
+					
+					Engine::createComponent<Component::Sound>("acceleration");
 				}
-				//Engine::createComponent<Component::Sound>("breaking");
+				
 			}
 		}
 
@@ -176,6 +181,9 @@ namespace Component {
 			auto key = std::get<0>(args.values);
 			if (key == GLFW_KEY_W) {
 				vehicle->pxVehicleInputData.setAnalogAccel(0);
+				Engine::createComponent<Component::Sound>("stopAcceleration");
+				Engine::createComponent<Component::Sound>("stopBreaking");
+			
 			}
 			if (key == GLFW_KEY_A) {
 				vehicle->pxVehicleInputData.setAnalogSteer(0);
@@ -185,6 +193,8 @@ namespace Component {
 			}
 			if (key == GLFW_KEY_S) {
 				vehicle->pxVehicleInputData.setAnalogBrake(0);
+				Engine::createComponent<Component::Sound>("stopAcceleration");
+				Engine::createComponent<Component::Sound>("stopBreaking");
 			}
 		}
 

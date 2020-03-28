@@ -5,6 +5,8 @@
 #include "SoundSystem.h"
 #include "Sound.h"
 
+
+
 void Engine::SoundSystem::initialize() {
    
     onKeyPressHandler = Engine::EventSystem::createHandler(this, &Engine::SoundSystem::onKeyPress);
@@ -32,7 +34,7 @@ void Engine::SoundSystem::initialize() {
     }
     sourceHorn = load_sound("Assets/Sounds/CARHORN4.wav");
     sourceAcceleration = load_looping_sound("Assets/Sounds/car+geardown.wav");
-    sourceBreaking = load_looping_sound("Assets/Sounds/TIRE+SKID.wav");
+    sourceBreaking = load_sound("Assets/Sounds/TIRE+SKID.wav");
     sourceMusic = load_looping_sound("Assets/Sounds/backGroundMusic.wav");
 
     playSound(sourceMusic);
@@ -40,16 +42,18 @@ void Engine::SoundSystem::initialize() {
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
     /*
-    auto sounds = Engine::getStore().getRoot().getComponentsOfType<Component::Sound>();
-    for (auto sound : sounds)
-    {
+    
         if (sound->name == "horn")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceHorn);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
-        else if (sound->name == "acceleration")
+     */  
+    auto sounds = Engine::getStore().getRoot().getComponentsOfType<Component::Sound>();
+    for (auto sound : sounds)
+    {
+        if (sound->name == "acceleration")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceAcceleration);
@@ -61,8 +65,19 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             playSound(sourceBreaking);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
-
-    } */
+        else if (sound->name == "stopAcceleration")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            stopSound(sourceAcceleration);
+            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        }
+        else if (sound->name == "stopBreaking")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            stopSound(sourceBreaking);
+            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        }
+    } 
 }
 
 
@@ -391,28 +406,47 @@ void Engine::SoundSystem::volumeUp()
 
 void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
 {
-    auto key = args.get<0>();
+
+    
+   
+    /*
+
+
+    
+    auto key = args.get<0>(); 
     if (key == GLFW_KEY_W)
     {
         playSound(sourceAcceleration);
     }
+   
+
+
     else if (key == GLFW_KEY_S)
     {
         playSound(sourceBreaking);
 
     }
+     */
+
 }
 void  Engine::SoundSystem::onKeyUp(const Component::EventArgs<int>& args)
 {
+   
+    /*
+    
     auto key = args.get<0>();
     if (key == GLFW_KEY_W)
     {
         stopSound(sourceAcceleration);
     }
+    
+   
     else if (key == GLFW_KEY_S)
     {
         stopSound(sourceBreaking);
     }
+    
+    */
 }
 void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
 {
@@ -430,3 +464,4 @@ void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
         volumeDown();
     }
 }
+
