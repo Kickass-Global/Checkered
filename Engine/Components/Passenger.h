@@ -11,6 +11,7 @@
 #include "Component.h"
 #include "scenery.hpp"
 #include "Engine.h"
+#include "ReportCard.h"
 
 using namespace physx;
 
@@ -30,6 +31,8 @@ namespace Component {
 
 		PxTransform pickupTransform;
 		PxTransform dropOffTransform;
+
+		ReportCard passengerReportCard;
 
 		void setPickupTransform(PxTransform pickupTrans);
 		void setDropoffTransform(PxTransform dropoffTrans);
