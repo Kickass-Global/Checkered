@@ -4,10 +4,6 @@
 
 #include "Events.h"
 
-std::vector<std::shared_ptr<EventHandlerBase>> Engine::EventSystem::registeredHandlers;
-
-Component::EventDelegate<Engine::deltaTime> Engine::EventSystem::onTick("onTick");
-
 void Engine::EventSystem::update(Engine::deltaTime time) {
 
 	// todo: combine EventArgs between updates so that handlers don't get showered with events. #optimization
@@ -19,4 +15,9 @@ void Engine::EventSystem::update(Engine::deltaTime time) {
 			events_pending |= handler->invoke_all();
 		}
 	} while (events_pending);
+}
+
+void EventSystem::early_update(Engine::deltaTime time) {
+    onTick(time);
+    SystemInterface::early_update(time);
 }
