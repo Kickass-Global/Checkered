@@ -21,7 +21,7 @@ namespace Engine {
         float v;
 
         std::tuple<float, float> operator()(float width, float height) {
-            return {(0.5 + u * 0.5) * width, (0.5 + v * 0.5) * height};
+            return {(0.5f + u * 0.5f) * width, (0.5f + v * 0.5f) * height};
         }
     };
 
