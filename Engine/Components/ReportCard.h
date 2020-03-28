@@ -28,7 +28,7 @@ namespace Component {
 
 	public:
 
-		ReportCard();
+		ReportCard() {}
 		ReportCard(float S_time, float A_time, float B_time, float C_time, float F_time);
 
 		void startReportCardTimer();			//call when passenger is picked up

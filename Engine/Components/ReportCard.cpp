@@ -31,7 +31,7 @@ void Component::ReportCard::endReportCardTimer() {
 
 char Component::ReportCard::createFinalReport() {
 	typedef duration<float> floatMilliseconds;
-	std::chrono::duration<float, milliseconds> delta = dropoff_time - pickup_time;
+	auto delta = dropoff_time - pickup_time;
 
 	delta = delta / 1000;		//delta is now in seconds
 	
