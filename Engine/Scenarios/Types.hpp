@@ -58,6 +58,8 @@ namespace Engine {
         BoxModelLayer margin = {10, 10, 10, 10};
         Rectangle box = {50, 50, 100, 100};
 
+        BoxModel() = default;
+
         explicit BoxModel(float x, float y, float width, float height)
             : box(x, y, width, height) {}
 

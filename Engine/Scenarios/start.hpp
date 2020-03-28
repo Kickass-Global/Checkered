@@ -19,10 +19,38 @@
 #include <Types.hpp>
 #include <testworld.hpp>
 #include <utility>
+#include <optional>
 
 struct LayoutItem {
 	Engine::BoxModelLayer margin = { 10, 10, 10, 10 };
 	Engine::Rectangle box = { 0, 0, 400, 400 };
+};
+
+template<typename T>
+struct state {
+	std::optional<T> previous;
+	T now;
+
+	state(T initial_value) : now(initial_value) {}
+
+	state<T>& operator = (const T& value) {
+		previous = now;
+		now = value;
+
+		return *this;
+	}
+
+	state<T>() = default;
+
+	bool has_changed() {
+		auto result = !previous || previous != now;
+		previous = now;
+		return result;
+	}
+
+	operator T() {
+		return now;
+	}
 };
 
 struct MenuState : ComponentBase {
@@ -31,14 +59,28 @@ struct MenuState : ComponentBase {
 	std::shared_ptr<Text> text;
 	BoxModel bounds;
 
+	state<bool> active;
+
 	void layout(Engine::Rectangle destination, Engine::RelativeAnchor anchor) {
+		if (active.has_changed()) {
+			if (active)
+			{
+				getEngine()->getSubSystem<EngineStore>()->getRoot().activate(background.get());
+				getEngine()->getSubSystem<EngineStore>()->getRoot().activate(text.get());
+			}
+			else {
+				getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(background.get());
+				getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(text.get());
+			}
+		}
 		auto d = bounds.plot(destination, { 0, 0 }, { 0, 0 });
 		if (background) {
-			background->anchor = { 1, 1 };
-			background->plot = d;
+			background->src = { 1, 1 };
+			background->plot.box = d;
 		}
 		text->plot = BoxModel{ d.x, d.y, d.width, d.height }.plot(d, { 0, 0 }, { -1, -1 });
 	}
+
 
 	MenuState(std::shared_ptr<Texture> background_image, std::string menu_text)
 		: background(getEngine()->createComponent<Billboard>(background_image)),
@@ -54,33 +96,63 @@ struct MenuState : ComponentBase {
 	}
 };
 
+
 struct MenuItem : ComponentBase {
-	std::vector<MenuState> menu_states;
-	unsigned int current_state = 0;
+
+	EventDelegate<int> onSelected{ "onSelected" };
+
+	MenuState selectedState;
+	MenuState defaultState;
+
+	state<int> current_state;
+
+	void deselect() {
+		current_state = 0;
+	}
 
 	void select() {
+		current_state = 1;
+	}
+
+	void activate() {
 		onSelected(0);
 	}
 
 	void layout(Engine::Rectangle destination, Engine::RelativeAnchor anchor) {
-		for (auto& state : menu_states) {
-			state.layout(destination, anchor);
+		if (current_state.has_changed()) {
+			if (current_state == 0) {
+				selectedState.active = true;
+				defaultState.active = false;
+			}
+			else {
+				selectedState.active = false;
+				defaultState.active = true;
+			}
+
 		}
+		selectedState.layout(destination, anchor);
+		defaultState.layout(destination, anchor);
 	}
 
-	EventDelegate<int> onSelected{ "onSelected" };
+	MenuItem(MenuState normal, MenuState selected) : selectedState(selected), defaultState(normal) {}
 };
 
 struct MenuList : public ComponentBase {
 	Engine::BoxModel box{ 0, 0, 640, 200 };
 	std::vector<MenuItem> items;
-	int selected_item_index = 0;
+	state<int> selected_item_index = 0;
 	bool active = true;
 
 	MenuItem& current() { return items[selected_item_index]; }
 
 	void layout(BoxModel destination) {
-
+		if (selected_item_index.has_changed()) {
+			for (int i = 0; i < items.size(); ++i)
+			{
+				if (i == selected_item_index) items[i].select();
+				else items[i].deselect();
+			}
+		}
 		auto dst = box.plot(destination.box, { 0,0 }, { 0,0 });
 		auto boxes = dst.subdivide(items.size());
 		auto item_box = boxes.begin();
@@ -93,12 +165,20 @@ struct MenuList : public ComponentBase {
 
 	int count() { return static_cast<int>(items.size()); };
 
-	void select_previous() {
-		selected_item_index = --selected_item_index % count();
+	unsigned modulo(int value, unsigned m) {
+		int mod = value % (int)m;
+		if (value < 0) {
+			mod += m;
+		}
+		return mod;
 	}
 
-	void select_next() {
-		selected_item_index = ++selected_item_index % count();
+	void select_previous_item() {
+		selected_item_index = modulo(selected_item_index - 1, count());
+	}
+
+	void select_next_item() {
+		selected_item_index = modulo(selected_item_index + 1, count());
 	}
 };
 
@@ -108,21 +188,17 @@ struct MainMenu : public ComponentBase {
 
 	MainMenu() {
 		menu = getEngine()->createComponent<MenuList>();
-		MenuState default_menu_state("Press Start to Continue...");
-		MenuState begin_menu_state("Begin Game");
-		MenuItem press_start_item;
-		MenuItem begin_game_item;
+		MenuItem press_start_item{ {"Press Start to Continue..."},{"Press Start to Continue..."} };
 
-		press_start_item.menu_states = { default_menu_state };
+		press_start_item.selectedState.text->color = { 236 / 255.,59 / 255.,131 / 255. };
+
 		press_start_item.onSelected += [this](int) {
 			log<high>("onStart");
 			onStart(0);
 		};
 
-		begin_game_item.menu_states = { begin_menu_state };
-
 		menu->items.push_back(press_start_item);
-		menu->items.push_back(begin_game_item);
+
 	}
 };
 
@@ -136,9 +212,11 @@ struct MenuSystem : public SystemInterface {
 
 	void update(Engine::deltaTime elapsed) override {
 		SystemInterface::update(elapsed);
+
 		auto cameras = getEngine()->getSubSystem<EngineStore>()
 			->getRoot()
 			.getComponentsOfType<Component::Camera>();
+
 		auto lists = getEngine()->getSubSystem<EngineStore>()
 			->getRoot()
 			.getComponentsOfType<MenuList>();
@@ -154,19 +232,19 @@ struct MenuSystem : public SystemInterface {
 
 		auto key = args.get<0>();
 		auto lists = getEngine()->getSubSystem<EngineStore>()
-			->getRoot()
-			.getComponentsOfType<MenuList>();
+			->getRoot().getComponentsOfType<MenuList>();
+
 		for (auto& list : lists) {
 			if (!list->active) continue;
 			if (key == GLFW_KEY_SPACE) {
 				// select the current menu item
-				list->current().select();
+				list->current().activate();
 			}
 			if (key == GLFW_KEY_UP) {
-				list->select_previous();
+				list->select_previous_item();
 			}
 			if (key == GLFW_KEY_DOWN) {
-				list->select_next();
+				list->select_next_item();
 			}
 		}
 	}
@@ -212,7 +290,7 @@ namespace Engine {
 			auto fps = getEngine()->createMomentaryComponent<Component::Text>(
 				"Frametime: " + std::to_string(d));
 			fps->font_size = 4;
-			fps->plot = { 0,0,640,480 };
+			fps->plot = { 10,10,640,480 };
 			fps->vertical_align = eVerticalAlign::bottom;
 			fps->align = eAlign::left;
 		}

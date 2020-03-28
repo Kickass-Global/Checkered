@@ -80,6 +80,8 @@ void TestWorld::load() {
         "Assets/Programs/basic.json"
     );
 
+    timer = getEngine()->createComponent<Timer>();
+    timer->start();
 
     // create a scene object to hold the ground components to follow.
     Instance<DrivableScenery> drivable_instances;
@@ -283,7 +285,7 @@ void TestWorld::load() {
         ai_vehicle->model = ai_damage_model;
         ai_vehicle->rotation = orientation;
         ai_vehicle->position = translation;
-        ai_vehicle->local_position = glm::vec3(0.0f, -1.45f, 0.0f);
+        ai_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
 
         return ai_vehicle;
     };
