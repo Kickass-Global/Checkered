@@ -9,7 +9,13 @@
 
 #include <al.h>
 #include <alc.h>
-#include <Engine.h>
+#include "Engine.h"
+
+#include"Vehicle.h"
+
+#include <PxPhysicsAPI.h>
+#include <vehicle/PxVehicleDrive4W.h>
+
 
 #include "systeminterface.hpp"
 #include "EventHandler.h"
@@ -42,8 +48,11 @@ namespace Engine {
         void onKeyUp(const Component::EventArgs<int>& args);
         void onKeyPress(const Component::EventArgs<int>& args);
 
-    public:
         
+    public:
+       
+        std::shared_ptr<Component::Vehicle> playerVehicle;
+
         std::shared_ptr<EventHandler<int>> onKeyPressHandler;
         std::shared_ptr<EventHandler<int>> onKeyDownHandler;
         std::shared_ptr<EventHandler<int>> onKeyUpHandler;
