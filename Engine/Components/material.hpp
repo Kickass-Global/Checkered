@@ -7,15 +7,17 @@
 #ifndef ENGINE_MATERIAL_HPP
 #define ENGINE_MATERIAL_HPP
 
+#include "glad/glad.h"
+
+#include <utility>
 #include <vector>
 #include <memory>
 
-#include "Component.h"
-#include "glad/glad.h"
 #include "texture.hpp"
+#include "Component.h"
 
 namespace Rendering {
-	class Program;
+    class Program;
 }
 
 using Rendering::Program;
@@ -26,15 +28,24 @@ namespace Component {
     public:
         std::shared_ptr<Program> shader;
         std::vector<std::shared_ptr<Texture>> textures;
+
         // maybe some uniforms down here, you know, whatever feels right...
 
-		Material(std::shared_ptr<Program> shader) : shader(shader), textures() {}
+        explicit Material(std::shared_ptr<Program> shader) : shader(std::move(shader)), textures() {}
 
         virtual void bind() {
+
             int index = 0;
             for (auto &texture : textures) {
-                glActiveTexture(GL_TEXTURE1 + index++);
-                glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+                if (texture) {
+                    glActiveTexture(GL_TEXTURE1 + index++);
+                    glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+                }
+                else
+                {
+                    glActiveTexture(GL_TEXTURE1 + index++);
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                }
             }
         }
     };

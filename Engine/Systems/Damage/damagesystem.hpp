@@ -16,8 +16,8 @@
 #include "../../Components/EventHandler.h"
 #include "../Events/Events.h"
 #include "EventDelegate.h"
-#include "../../Systems/systeminterface.hpp"
-#include "../systeminterface.hpp"
+#include "SystemInterface.hpp"
+#include "SystemInterface.hpp"
 #include "tags.h"
 
 namespace Engine {

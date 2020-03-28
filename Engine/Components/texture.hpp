@@ -7,8 +7,8 @@
 
 #include <glad/glad.h>
 #include <istream>
-#include <SOIL2.h>
 #include "Component.h"
+#include <SOIL2.h>
 
 namespace Component {
     class Texture : public ComponentBase {

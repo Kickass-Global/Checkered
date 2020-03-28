@@ -7,7 +7,7 @@
 #ifndef ENGINE_SCENECOMPONENTSYSTEM_HPP
 #define ENGINE_SCENECOMPONENTSYSTEM_HPP
 
-#include "../systeminterface.hpp"
+#include "SystemInterface.hpp"
 
 namespace Component {
     class SceneComponentSystem : public Engine::SystemInterface {

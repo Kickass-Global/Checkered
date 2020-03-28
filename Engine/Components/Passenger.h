@@ -36,12 +36,12 @@ namespace Component {
 
 		Passenger(glm::vec3 pickup_location, glm::vec3 dropoff_location, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material) {
 
-			pickup_actor = Engine::createComponent<Waypoint>(pickup_location, mesh, material);
-			dropoff_actor = Engine::createComponent<Waypoint>(dropoff_location, mesh, material);
-			pickup_actor->onEntered += std::bind(&Passenger::onPassengerPickedUp, this, std::placeholders::_1);
-			dropoff_actor->onEntered += std::bind(&Passenger::onPassengerDroppedOff, this, std::placeholders::_1);
-			dropoff_actor->mesh->enabled = false;
-		}
+            pickup_actor = getEngine()->createComponent<Waypoint>(pickup_location, mesh, material);
+            dropoff_actor = getEngine()->createComponent<Waypoint>(dropoff_location, mesh, material);
+            pickup_actor->onEntered += std::bind(&Passenger::onPassengerPickedUp, this, std::placeholders::_1);
+            dropoff_actor->onEntered += std::bind(&Passenger::onPassengerDroppedOff, this, std::placeholders::_1);
+            dropoff_actor->mesh->enabled = false;
+        }
 
 	private:
 

@@ -8,39 +8,42 @@
 #include <Component.h>
 #include <PxPhysicsAPI.h>
 #include "Mesh.h"
+#include "TransformData.hpp"
 #include <memory>
 #include <SceneComponent.h>
+#include <Engine.h>
 
 namespace Component {
-	class PhysicsActor : public ComponentBase {
+    class PhysicsActor : public ComponentBase {
 
-	public:
+    public:
 
-		EventDelegate<PhysicsActor*, PhysicsActor*> onBeginOverlap{ "onBeginOverlap" };
-		EventDelegate<PhysicsActor*, PhysicsActor*> onEndOverlap{ "onEndOverlap" };
+        EventDelegate<PhysicsActor *, PhysicsActor *> onBeginOverlap{"onBeginOverlap"};
+        EventDelegate<PhysicsActor *, PhysicsActor *> onEndOverlap{"onEndOverlap"};
+        EventDelegate<PhysicsActor *, PhysicsActor *> onCollision{"onCollision"};
 
-		std::shared_ptr<SceneComponent> node = Engine::createComponent<SceneComponent>(nullptr);
-		// this will be used to generate the collision bounds, may be different than the visual mesh.
-		std::shared_ptr<Mesh> mesh;
-		physx::PxRigidActor* actor;
-		glm::vec3 position = { 0,0,0 };
-		glm::quat rotation = glm::quat(1, 0, 0, 0);
-		
-		enum Type {
-			Ground,
-			DynamicObject,
-			StaticObject,
-			TriggerVolume
-		} type = StaticObject;
+        std::shared_ptr<SceneComponent> node = getEngine()->createComponent<SceneComponent>(nullptr);
 
-		glm::mat4 getWorldTransform();
+        // this will be used to generate the collision bounds, may be different than the visual mesh.
+        std::shared_ptr<Mesh> mesh;
+        physx::PxRigidActor *actor;
+        TransformData worldTransform{};
+        glm::vec3 position = {0, 0, 0};
+        glm::quat rotation = glm::quat(1, 0, 0, 0);
 
-		void update() {
-			node->m_localTransform = getWorldTransform();
-		}
+        enum Type {
+            Ground, DynamicObject, StaticObject, TriggerVolume
+        } type = StaticObject;
 
-		explicit PhysicsActor(std::shared_ptr<Component::Mesh>& mesh);
-	};
+        glm::mat4 getWorldTransform();
+
+        void update() {
+            // update children poses to match parent
+            node->m_localTransform = getWorldTransform();
+        }
+
+        explicit PhysicsActor(std::shared_ptr<Component::Mesh> &mesh);
+    };
 }
 
 

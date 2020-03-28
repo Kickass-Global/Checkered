@@ -12,9 +12,9 @@
 #include <tuple>
 #include <memory>
 
-#include "Engine.h"
 #include "Component.h"
 #include "EventHandler.h"
+#include "EngineDebug.hpp"
 
 namespace Component {
 
@@ -54,7 +54,7 @@ namespace Component {
 		 * Invokes the event args to all listeners
 		 * @param args the event args data
 		 */
-		void operator()(Args ... args);
+        void operator()(Args ... args);
 
 		/**
 		 * Adds a new subscriber to this event
@@ -72,15 +72,15 @@ namespace Component {
 	template<typename... Args>
 	void EventDelegate<Args...>::operator()(Args... args) {
 
-		Engine::log<module, Engine::low>("ComponentEvent#", id, " called.");
+        log<module, low>("ComponentEvent#", id, " called.");
 
-		for (auto listener : subscribers) {
-			listener->emplaceChildComponent<Component::EventArgs<Args...>>(args...);
-		}
-		for (auto listener : direct_subscribers) {
-			(*listener)(args...);
-		}
-	}
+        for (auto listener : subscribers) {
+            listener->getStore().emplaceComponent<Component::EventArgs<Args...>>(args...);
+        }
+        for (auto listener : direct_subscribers) {
+            (*listener)(args...);
+        }
+    }
 
 	/**
 	 * Adds a new subscriber to this event.
@@ -89,12 +89,12 @@ namespace Component {
 	template<typename... Args>
 	void EventDelegate<Args...>::operator+=(std::shared_ptr<EventHandler<Args...>>  subscriber) {
 
-		Engine::log<module>("Adding subscriber#", subscriber, " to ComponentEvent#", id);
+        log<module>("Adding subscriber#", subscriber, " to ComponentEvent#", id);
 
-		subscribers.push_back(subscriber);
-		Engine::EventSystem::registerHandler<Args...>(subscriber);
+        subscribers.push_back(subscriber);
+		subscriber->getEngine()->getSubSystem<EventSystem>()->registerHandler<Args...>(subscriber);
 
-	}
+    }
 
 	/**
  * Adds a new subscriber to this event.
@@ -111,8 +111,8 @@ namespace Component {
 	 */
 	template<typename... Args>
 	EventDelegate<Args...>::EventDelegate(std::string name) {
-		Engine::nameComponent(id, name);
-	}
+        //Engine::nameComponent(id, name);
+    }
 }
 
 #endif //ENGINE_EVENTDELEGATE_H

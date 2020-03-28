@@ -2,6 +2,7 @@
 // Created by root on 29/2/20.
 //
 
+#include <EngineDebug.hpp>
 #include "SoundSystem.h"
 #include "Sound.h"
 
@@ -33,26 +34,26 @@ void Engine::SoundSystem::initialize() {
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
 
-    auto sounds = Engine::getStore().getRoot().getComponentsOfType<Component::Sound>();
+    auto sounds = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Sound>();
     for (auto sound : sounds)
     {
         if (sound->name == "horn")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceHorn);
-            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
         else if (sound->name == "acceleration")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceAcceleration);
-            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
         else if (sound->name == "breaking")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceBreaking);
-            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
     }
 }

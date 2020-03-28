@@ -169,7 +169,8 @@ class PX_DEPRECATED PxBatchQuery
 							Note: Using past touching hits as cache will produce incorrect behavior since the cached hit will always be treated as blocking.
 
 	\note eBLOCK should not be returned from user filters for overlap(). Doing so will result in undefined behavior, and a warning will be issued.
-	\note If the PxQueryFlag::eNO_BLOCK flag is set, the eBLOCK will instead be automatically converted to an eTOUCH and the warning suppressed.
+	\note If the 
+	::eNO_BLOCK flag is set, the eBLOCK will instead be automatically converted to an eTOUCH and the warning suppressed.
 	\note This query call writes to a list associated with the query object and is NOT thread safe (for performance reasons there is no lock
 		and overlapping writes from different threads may result in undefined behavior).
 

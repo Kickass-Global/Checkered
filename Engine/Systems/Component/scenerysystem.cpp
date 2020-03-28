@@ -10,7 +10,7 @@ void Engine::ScenerySystem::initialize() {
 }
 
 void Engine::ScenerySystem::update(Engine::deltaTime) {
-    for (const auto &scenery : Engine::getStore().getRoot().getComponentsOfType<Scenery>()) {
-		
+    for (const auto &scenery :   getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Scenery>()) {
+
     }
 }
