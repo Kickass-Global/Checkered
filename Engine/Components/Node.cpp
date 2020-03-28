@@ -7,4 +7,4 @@
 Component::NodeEntry::NodeEntry(bool momentary,
                                 int ttl,
                                 std::shared_ptr<class ComponentBase> component)
-    : momentary(momentary), ttl(ttl), component(std::move(component)) {}
+    : momentary(momentary), ttl(ttl), active(true), component(std::move(component)) {}

@@ -17,8 +17,9 @@ namespace Component {
     class Billboard : public ComponentBase {
     public:
         std::shared_ptr<class PaintedMesh> mesh_instance;
-        Engine::Rectangle plot;
-        glm::vec2 anchor = {1, 1};
+        Engine::BoxModel plot;
+        Engine::RelativeAnchor src = { 1, 1 };
+        Engine::RelativeAnchor dst = { 1, 1 };
 
         Billboard() = default;
         explicit Billboard(std::shared_ptr<Texture> sprite);

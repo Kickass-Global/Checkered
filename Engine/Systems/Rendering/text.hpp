@@ -33,9 +33,29 @@ namespace Component {
         float font_size = 12;
         glm::vec3 color = {0, 0, 0};
         Engine::Rectangle plot;
+        Engine::RelativeAnchor dst;
+        Engine::RelativeAnchor src;
         eAlign align = eAlign::center;
         eVerticalAlign vertical_align = eVerticalAlign::top;
+
         explicit Text(std::string text);
+        template<typename... Args>
+        void set_text(Args... args) {
+
+            std::ostringstream buffer;
+            (buffer << ... << args);
+
+            text = buffer.str();
+        }
+
+        template<typename... Args>
+        Text(Args... args) {
+
+            std::ostringstream buffer;
+            (buffer << ... << args);
+
+            text = buffer.str();
+        }
     };
 }
 
