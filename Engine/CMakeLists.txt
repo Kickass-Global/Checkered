@@ -33,6 +33,7 @@ set(SRC main.cpp main.h
         Components/Plane.cpp Components/Plane.h
         Systems/Pipeline/EntityLoader.cpp Systems/Pipeline/EntityLoader.h
         Components/Model.cpp Components/Model.h
+        Components/ReportCard.cpp Components/ReportCard.h
         Components/Passenger.cpp Components/Passenger.h
         Components/Vehicle.cpp Components/Vehicle.h
         Components/EventHandler.cpp Components/EventHandler.h

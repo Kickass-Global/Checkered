@@ -10,6 +10,7 @@
 #include <Vehicle/vehiclesystem.hpp>
 #include <Vehicle.h>
 #include "Passenger.h"
+#include "ReportCard.h"
 
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -39,7 +40,7 @@ int main() {
 	TestWorld::load();
 
 	auto debug = Engine::addSystem<Debug::LiveReloadSystem>();
-	//debug->watch("tweak.txt");
+	//debug->watch("tweaks.txt");
 
 	// region initialize game-clocks
 	using namespace std::chrono;
