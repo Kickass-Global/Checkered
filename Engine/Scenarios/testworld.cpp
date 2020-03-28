@@ -200,6 +200,11 @@ void TestWorld::load() {
     player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
     player_vehicle->position = glm::vec3(0.0f, 3.0f, -40.0f);
 
+    auto arrow = getEngine()->createComponent<WaypointArrow>();
+    arrow->target_vehicle = player_vehicle;
+
+    getEngine()->getSubSystem<EventSystem>()->onTick += std::bind(&WaypointArrow::tick, arrow, std::placeholders::_1);
+
     //setup passenger system
 
     Instance<Obstacle> obstacle_instances;

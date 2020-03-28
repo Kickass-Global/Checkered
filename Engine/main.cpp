@@ -17,7 +17,7 @@ int main() {
     EngineSystem engine;
 
     engine.initialize();
-    engine.load_scenario<Start>();
+    engine.load_scenario<TestWorld>();
 
     while (running) {
         engine.update();
