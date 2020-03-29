@@ -183,12 +183,13 @@ struct ControlledVehicle : public ComponentBase {
     if (key == GLFW_KEY_S) {
       if (v.z > 0.1) {
         vehicle->pxVehicleInputData.setAnalogBrake(1);
+        getEngine()->createComponent<Component::Sound>("breaking");
       } else {
         vehicle->pxVehicle->mDriveDynData.forceGearChange(
             physx::PxVehicleGearsData::eREVERSE);
         vehicle->pxVehicleInputData.setAnalogAccel(1);
+        getEngine()->createComponent<Component::Sound>("acceleration");
       }
-      getEngine()->createComponent<Component::Sound>("breaking");
     }
   }
 
@@ -197,6 +198,8 @@ struct ControlledVehicle : public ComponentBase {
     auto key = std::get<0>(args.values);
     if (key == GLFW_KEY_W) {
       vehicle->pxVehicleInputData.setAnalogAccel(0);
+      getEngine()->createComponent<Component::Sound>("stopAcceleration");
+      getEngine()->createComponent<Component::Sound>("stopBreaking");
     }
     if (key == GLFW_KEY_A) {
       vehicle->pxVehicleInputData.setAnalogSteer(0);
@@ -206,6 +209,8 @@ struct ControlledVehicle : public ComponentBase {
     }
     if (key == GLFW_KEY_S) {
       vehicle->pxVehicleInputData.setAnalogBrake(0);
+      getEngine()->createComponent<Component::Sound>("stopAcceleration");
+      getEngine()->createComponent<Component::Sound>("stopBreaking");
     }
   }
 
@@ -235,7 +240,7 @@ struct ControlledVehicle : public ComponentBase {
     using namespace Engine;
     camera->local_rotation = delta;
   }
-};
+}; // namespace Component
 } // namespace Component
 
 #endif // ENGINE_VEHICLE_H

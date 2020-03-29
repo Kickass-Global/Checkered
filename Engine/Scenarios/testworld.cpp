@@ -38,8 +38,7 @@ void TestWorld::load() {
 
   auto physicsSystem = getEngine()->addSubSystem<Physics::PhysicsSystem>();
   auto vehicleSystem = getEngine()->addSubSystem<Engine::vehicleSystem>();
-  // auto openALSoundSystem =
-  // getEngine()->addSubSystem<Engine::SoundSystem>();
+  auto openALSoundSystem = getEngine()->addSubSystem<Engine::SoundSystem>();
 
   vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
@@ -73,6 +72,13 @@ void TestWorld::load() {
   inputSystem->onKeyPress += hornSystem->onKeyPressHandler;
   inputSystem->onKeyDown += hornSystem->onKeyDownHandler;
   inputSystem->onKeyUp += hornSystem->onKeyUpHandler;
+
+  Rendering::RenderingSystem::onWindowSizeChanged +=
+      cameraSystem->onWindowSizeHandler;
+  // endregion
+  inputSystem->onKeyPress += openALSoundSystem->onKeyPressHandler;
+  inputSystem->onKeyDown += openALSoundSystem->onKeyDownHandler;
+  inputSystem->onKeyUp += openALSoundSystem->onKeyUpHandler;
 
   Rendering::RenderingSystem::onWindowSizeChanged +=
       cameraSystem->onWindowSizeHandler;
@@ -227,7 +233,6 @@ void TestWorld::load() {
 
   getEngine()->getSubSystem<EventSystem>()->onTick +=
       std::bind(&WaypointArrow::tick, arrow, std::placeholders::_1);
-
 
   getEngine()->getSubSystem<EventSystem>()->onTick +=
       std::bind(&HealthBar::tick, health_bar, std::placeholders::_1);
@@ -476,10 +481,8 @@ void TestWorld::load() {
   using namespace std::chrono;
   typedef duration<float> floatMilliseconds; // define this to get float values;
   auto start = high_resolution_clock::now();
-  auto end =
-      start +
-      milliseconds(1); // do this so physx doesn't complain about time being 0.
-                       // endregion
+  auto end = start + milliseconds(1); // do this so physx doesn't complain about
+                                      // time being 0. endregion
 }
 
 TestWorld::TestWorld(EngineSystem *enginePtr) : ScenarioInterface(enginePtr) {}

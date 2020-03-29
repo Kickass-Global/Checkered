@@ -12,6 +12,7 @@
 #include <PxRigidActor.h>
 #include <PxRigidBody.h>
 #include <PxShape.h>
+#include "Sound.h"
 
 using namespace physx;
 
@@ -65,6 +66,7 @@ private:
     pickup_actor->mesh->enabled = false;
     dropoff_actor->mesh->enabled = false;
     onPassengerDroppedOffDelegate(0);
+    getEngine()->createComponent<Component::Sound>("passengerDroppedOff");
   }
 };
 
