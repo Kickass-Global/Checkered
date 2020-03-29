@@ -22,6 +22,7 @@ namespace Component {
         friend class ::EngineStore;
 
     protected:
+      virtual ~ComponentBase() = default;
         Node children;
 
         // this hack is here because this is the easiest way.

@@ -25,6 +25,7 @@ namespace Component {
 
         Billboard() = default;
         explicit Billboard(const std::shared_ptr<Texture>& billboard_image);
+        explicit Billboard(const std::shared_ptr<PaintedMesh>& billboard_mesh);
     };
 
 }
