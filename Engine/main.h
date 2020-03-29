@@ -7,8 +7,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 
 #include <functional>
 #include <iostream>
