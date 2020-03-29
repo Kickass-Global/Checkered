@@ -24,6 +24,7 @@ target_link_libraries(SOIL
         PRIVATE ${OPENGL_gl_LIBRARY}
         )
 
+add_subdirectory("Assets")
 add_subdirectory("Engine")
 
 

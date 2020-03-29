@@ -9,7 +9,9 @@
 #include "Component.h"
 #include "glm/vec2.hpp"
 #include "texture.hpp"
+#include "material.hpp"
 #include <Types.hpp>
+#include <Pipeline/Library.h>
 
 namespace Component {
 
@@ -22,7 +24,8 @@ namespace Component {
         Engine::RelativeAnchor dst = { 1, 1 };
 
         Billboard() = default;
-        explicit Billboard(std::shared_ptr<Texture> sprite);
+        explicit Billboard(const std::shared_ptr<Texture>& billboard_image);
+        explicit Billboard(const std::shared_ptr<PaintedMesh>& billboard_mesh);
     };
 
 }

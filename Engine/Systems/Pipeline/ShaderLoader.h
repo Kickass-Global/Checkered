@@ -29,7 +29,7 @@ namespace Pipeline {
         std::unique_ptr<Rendering::Shader> load(const std::string &filename) {
 
             std::ifstream ifs(filename);
-            Engine::assertLog<module>(ifs.is_open(), "load shader file " + filename);
+            Engine::log<module, high>(ifs.is_open(), "load shader file " + filename);
 
             std::vector<std::string> lines;
             std::string line;

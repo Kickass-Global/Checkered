@@ -1,10 +1,12 @@
 // Engine.cpp : Defines the entry point for the application.
 //
 
+#include <functional>
+
 #include "main.h"
+#include "Systems/Pipeline/EntityLoader.h"
 #include "Engine.h"
 #include <start.hpp>
-#include "scenery.hpp"
 
 int main() {
 
@@ -15,7 +17,7 @@ int main() {
     EngineSystem engine;
 
     engine.initialize();
-    engine.load_scenario<Start>();
+    engine.load_scenario<TestWorld>();
 
     while (running) {
         engine.update();
