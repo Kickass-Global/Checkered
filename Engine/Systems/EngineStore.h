@@ -95,7 +95,6 @@ public:
     }
 
     void late_update(Engine::deltaTime time) override {
-
         root.prune();
     }
 

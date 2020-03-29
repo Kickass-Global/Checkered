@@ -4,4 +4,5 @@
 
 #include "Vehicle.h"
 
-
+CollisionEvent::CollisionEvent(Vehicle* hitActor)
+    : hit_actor(hitActor) {}
