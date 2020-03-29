@@ -1,8 +1,8 @@
 #include <functional>
 
-#include "main.h"
-#include "Systems/Pipeline/EntityLoader.h"
 #include "Engine.h"
+#include "Systems/Pipeline/EntityLoader.h"
+#include "main.h"
 #include <start.hpp>
 
 int main() {
@@ -14,9 +14,10 @@ int main() {
   EngineSystem engine;
 
   engine.initialize();
-  engine.load_scenario<Start>();
+  engine.load_scenario<TestWorld>();
 
-  while (running) {
+  while (!glfwWindowShouldClose(
+      engine.getSubSystem<Rendering::RenderingSystem>()->getWindow())) {
     engine.update();
   }
 }

@@ -113,7 +113,11 @@ target_link_libraries(Engine
         PRIVATE glfw
         PRIVATE SOIL
         PRIVATE freetype
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
+
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/assimp-vc142-mtd.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/IrrXMLd.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/zlibstaticd.lib
+
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/OpenAL/libs/Win64/OpenAL32.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib
@@ -126,7 +130,6 @@ target_link_libraries(Engine
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXVehicle_static_64.lib
         PRIVATE ${OPENGL_gl_LIBRARY})
 
-configure_file("../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
 configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
 configure_file("../dlls/PhysX_64.dll" PhysX_64.dll COPYONLY)
 configure_file("../dlls/PhysXCommon_64.dll" PhysXCommon_64.dll COPYONLY)
@@ -147,7 +150,7 @@ target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
         SYSTEM PRIVATE "../Include/PxShared/include"
         SYSTEM PRIVATE "../Include/include"
         SYSTEM PRIVATE "../Include/glminclude"
-        SYSTEM PRIVATE "../Include/assimp/include"
+        SYSTEM PRIVATE ../3rd-party/assimp/x64-Debug/include
         SYSTEM PRIVATE "../Include/glad/include")
 
 add_custom_command(
