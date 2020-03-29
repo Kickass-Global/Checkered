@@ -33,8 +33,8 @@ struct HealthBar : public ComponentBase {
 
     health_sprite_dimensions.width = health_percentage * 3;
 
-    auto [x,y,w,h] = health_sprite_dimensions;
-    billboard->plot = BoxModel(w/2, h/2, w, h);
+    auto [x, y, w, h] = health_sprite_dimensions;
+    billboard->plot = BoxModel(w / 2, h / 2, w, h);
     billboard->dst = RelativeAnchor{-1, 1};
     billboard->src = {-1, 1};
   }

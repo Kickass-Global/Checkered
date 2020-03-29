@@ -213,34 +213,33 @@ struct ControlledVehicle : public ComponentBase {
       getEngine()->createComponent<Component::Sound>("stopBreaking");
     }
   }
-}
 
   void onGamePadStateChanged(
       const EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args) {
 
-  auto previous = std::get<0>(args.values);
-  auto current = std::get<1>(args.values);
-  float control_deadzone = 0.3f;
+    auto previous = std::get<0>(args.values);
+    auto current = std::get<1>(args.values);
+    float control_deadzone = 0.3f;
 
-  vehicle->pxVehicleInputData.setAnalogAccel(
-      current.buttons[GLFW_GAMEPAD_BUTTON_A]);
-  vehicle->pxVehicleInputData.setAnalogBrake(
-      current.buttons[GLFW_GAMEPAD_BUTTON_X]);
+    vehicle->pxVehicleInputData.setAnalogAccel(
+        current.buttons[GLFW_GAMEPAD_BUTTON_A]);
+    vehicle->pxVehicleInputData.setAnalogBrake(
+        current.buttons[GLFW_GAMEPAD_BUTTON_X]);
 
-  if (current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -control_deadzone ||
-      current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] >= control_deadzone) {
-    vehicle->pxVehicleInputData.setAnalogSteer(
-        -current.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
-  } else {
-    vehicle->pxVehicleInputData.setAnalogSteer(0);
+    if (current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -control_deadzone ||
+        current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] >= control_deadzone) {
+      vehicle->pxVehicleInputData.setAnalogSteer(
+          -current.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
+    } else {
+      vehicle->pxVehicleInputData.setAnalogSteer(0);
+    }
+
+    const auto rotation_scale = static_cast<float>(3.14157) / 180.0f;
+    auto camera_yaw = current.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] * rotation_scale;
+    auto delta = glm::quat(glm::vec3(0, glm::degrees(camera_yaw), 0));
+    using namespace Engine;
+    camera->local_rotation = delta;
   }
-
-  const auto rotation_scale = static_cast<float>(3.14157) / 180.0f;
-  auto camera_yaw = current.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] * rotation_scale;
-  auto delta = glm::quat(glm::vec3(0, glm::degrees(camera_yaw), 0));
-  using namespace Engine;
-  camera->local_rotation = delta;
-}
 }; // namespace Component
 } // namespace Component
 
