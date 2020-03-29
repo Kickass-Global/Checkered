@@ -94,13 +94,13 @@ struct Timer : public ComponentBase {
     text->align = eAlign::center;
     text->plot = {0, 0, 200, 40};
     text->src = {0, 0};
-    text->dst = {0, -.7};
+    text->dst = {0, -0.7f};
 
     background = getEngine()->createComponent<Billboard>(
         getEngine()->createComponent<Texture>("Assets/Textures/Props.png"));
     background->plot = BoxModel{0, 0, 200, 40};
     background->src = {0, 0};
-    background->dst = {0, -.7};
+    background->dst = {0, -0.7f};
   }
 
   Engine::floatMilliseconds deadline = std::chrono::minutes(2);

@@ -79,7 +79,7 @@ public:
 
   void onHitHandler(class Vehicle *actor, float impulse) {
     log<module, high>("Vehicle hit ", actor, " impulse ", impulse);
-    auto damage = std::clamp<int>(impulse / 1000.0, 0, 15);
+    auto damage = std::clamp<int>(static_cast<int>(impulse / 1000), 0, 15);
     model->getStore().emplaceComponent<Damage, 1>(damage);
   }
 

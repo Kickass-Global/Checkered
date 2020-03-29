@@ -337,11 +337,11 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
         cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
     const PxU32 raycastResultsSize =
         cVehicleSceneQueryData->getQueryResultBufferSize();
-    PxVehicleSuspensionRaycasts(cBatchQuery, wheels.size(), wheels.data(),
+    PxVehicleSuspensionRaycasts(cBatchQuery, static_cast<PxU32>(wheels.size()), wheels.data(),
                                 raycastResultsSize, raycastResults);
 
     // vehicle update
-    const PxVec3 grav = cScene->getGravity();
+    const PxVec3 gravity = cScene->getGravity();
     PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
 
     std::vector<PxVehicleWheelQueryResult> vehicleQueryResults;
@@ -350,7 +350,7 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
       vehicleQueryResults.push_back(
           {wheelQueryResults, wheels[0]->mWheelsSimData.getNbWheels()});
     }
-    PxVehicleUpdates(0.0001f + timestep / 1000.0f, grav, *cFrictionPairs,
+    PxVehicleUpdates(0.0001f + timestep / 1000.0f, gravity, *cFrictionPairs,
                      wheels.size(), wheels.data(), vehicleQueryResults.data());
   }
 
@@ -441,7 +441,7 @@ void Physics::PhysicsSystem::onVehicleCreated(
 PxTriangleMesh *Physics::PhysicsSystem::createTriMesh(Mesh *mesh) {
 
   PxTriangleMeshDesc meshDesc;
-  meshDesc.points.count = mesh->vertices.size();
+  meshDesc.points.count = static_cast<PxU32>(mesh->vertices.size());
   meshDesc.points.stride = sizeof(Vertex);
   meshDesc.points.data = mesh->vertices.data();
 
@@ -465,7 +465,7 @@ PxTriangleMesh *Physics::PhysicsSystem::createTriMesh(Mesh *mesh) {
 PxConvexMesh *Physics::PhysicsSystem::createConvexMesh(Mesh *mesh) {
 
   PxConvexMeshDesc convexDesc;
-  convexDesc.points.count = mesh->vertices.size();
+  convexDesc.points.count = static_cast<PxU32>(mesh->vertices.size());
   convexDesc.points.stride = sizeof(Vertex);
   convexDesc.points.data = mesh->vertices.data();
   convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
