@@ -1,6 +1,6 @@
 //
 // Created by root on 29/2/20.
-//
+//// Refernces :: Used code from https://indiegamedev.net/2020/02/15/the-complete-guide-to-openal-with-c-part-1-playing-a-sound/
 
 #pragma once
 
@@ -9,7 +9,21 @@
 
 #include <al.h>
 #include <alc.h>
-#include <Engine.h>
+#include "Engine.h"
+
+#include"Vehicle.h"
+
+#include <PxPhysicsAPI.h>
+#include <vehicle/PxVehicleDrive4W.h>
+
+
+#include "systeminterface.hpp"
+#include "EventHandler.h"
+
+#include <GLFW/glfw3.h>
+
+#include "Events/Events.h"
+
 #include <fstream>
 #include <string>
 #include <vector>
@@ -23,11 +37,34 @@ namespace Engine {
         
         ALCdevice* device;
         ALCcontext* openALContext;
+       
         ALuint sourceHorn;
         ALuint sourceAcceleration;
         ALuint sourceBreaking;
+        ALuint sourceMusic;
+        ALuint sourceDriving;
+        ALuint sourceCollision;
+        ALuint sourcePassengerDlivered;
 
+        float volume = 0.5f;
+
+        void onKeyDown(const Component::EventArgs<int>& args);
+        void onKeyUp(const Component::EventArgs<int>& args);
+        void onKeyPress(const Component::EventArgs<int>& args);
+
+        
     public:
+       
+        std::shared_ptr<Component::Vehicle> playerVehicle;
+
+        std::shared_ptr<EventHandler<int>> onKeyPressHandler;
+        std::shared_ptr<EventHandler<int>> onKeyDownHandler;
+        std::shared_ptr<EventHandler<int>> onKeyUpHandler;
+
+        void volumeDown();
+        void volumeUp();
+      
+        
         void initialize() override;
         void update(Engine::deltaTime /*elapsed*/) override;
 
@@ -158,10 +195,16 @@ namespace Engine {
             std::int32_t& sampleRate,
             std::uint8_t& bitsPerSample,
             ALsizei& size);
+        
         ALuint load_sound(std::string s);
+       
+        ALuint load_looping_sound(std::string s);
+        
         int playSound(ALuint s);
     
-    };
+        int stopSound(ALuint s);
+
+ };
 }
 
 #endif //ENGINE_SOUNDSYSTEM_H

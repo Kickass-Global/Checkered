@@ -6,8 +6,15 @@
 #include "SoundSystem.h"
 #include "Sound.h"
 
+
+
 void Engine::SoundSystem::initialize() {
    
+    onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &Engine::SoundSystem::onKeyPress);
+    onKeyDownHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &Engine::SoundSystem::onKeyDown);
+    onKeyUpHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &Engine::SoundSystem::onKeyUp);
+
+
     ALCdevice* openALDevice = alcOpenDevice(nullptr);
     if (!openALDevice)
         std::cerr << "Error could not open device";
@@ -27,12 +34,19 @@ void Engine::SoundSystem::initialize() {
         
     }
     sourceHorn = load_sound("Assets/Sounds/CARHORN4.wav");
-    sourceAcceleration = load_sound("Assets/Sounds/car+geardown.wav");
+    sourceAcceleration = load_looping_sound("Assets/Sounds/car+geardown.wav");
     sourceBreaking = load_sound("Assets/Sounds/TIRE+SKID.wav");
+    sourceMusic = load_looping_sound("Assets/Sounds/backGroundMusic.wav");
+    sourceDriving = load_looping_sound("Assets/Sounds/carMoving.wav");
+    sourceCollision = load_sound("Assets/Sounds/CarCrash.wav");
+    sourcePassengerDlivered = load_sound("Assets/Sounds/PassengerSuccess.wav");
 
+    playSound(sourceMusic);
 }
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
+    /*
+
 
     auto sounds = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Sound>();
     for (auto sound : sounds)
@@ -43,7 +57,11 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             playSound(sourceHorn);
             getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
-        else if (sound->name == "acceleration")
+     */
+    auto sounds = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Sound>();
+    for (auto sound : sounds)
+    {
+        if (sound->name == "acceleration")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceAcceleration);
@@ -52,8 +70,22 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
         else if (sound->name == "breaking")
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
-            playSound(sourceBreaking);
-            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+            playSound(sourceBreaking);getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+        }
+        else if (sound->name == "stopAcceleration")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            stopSound(sourceAcceleration);getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+        }
+        else if (sound->name == "stopBreaking")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            stopSound(sourceBreaking);getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+        }
+        else if (sound->name == "passengerDroppedOff")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound(sourcePassengerDlivered);getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
     }
 }
@@ -285,27 +317,161 @@ ALuint Engine::SoundSystem::load_sound(std::string filePath)
         return source;
 }
 
+ALuint Engine::SoundSystem::load_looping_sound(std::string filePath)
+{
+
+    std::uint8_t 	channels;
+    std::int32_t 	sampleRate;
+    std::uint8_t 	bitsPerSample;
+    ALsizei			dataSize;
+    char* rawSoundData = load_wav(filePath, channels, sampleRate, bitsPerSample, dataSize);
+    if (rawSoundData == nullptr || dataSize == 0)
+    {
+        std::cerr << "ERROR: Could not load wav" << std::endl;
+
+    }
+    std::vector<char> soundData(rawSoundData, rawSoundData + dataSize);
+
+    ALuint buffer;
+    alCall(alGenBuffers, 1, &buffer);
+
+    ALenum format;
+    if (channels == 1 && bitsPerSample == 8)
+        format = AL_FORMAT_MONO8;
+    else if (channels == 1 && bitsPerSample == 16)
+        format = AL_FORMAT_MONO16;
+    else if (channels == 2 && bitsPerSample == 8)
+        format = AL_FORMAT_STEREO8;
+    else if (channels == 2 && bitsPerSample == 16)
+        format = AL_FORMAT_STEREO16;
+    else
+    {
+        std::cerr
+            << "ERROR: unrecognised wave format: "
+            << channels << " channels, "
+            << bitsPerSample << " bps" << std::endl;
+
+    }
+
+    alCall(alBufferData, buffer, format, soundData.data(), soundData.size(), sampleRate);
+    soundData.clear(); // erase the sound in RAM
+
+
+    ALuint source;
+
+    alCall(alGenSources, 1, &source);
+    alCall(alSourcef, source, AL_PITCH, 1);
+    alCall(alSourcef, source, AL_GAIN, volume);
+    alCall(alSource3f, source, AL_POSITION, 0, 0, 0);
+    alCall(alSource3f, source, AL_VELOCITY, 0, 0, 0);
+    alCall(alSourcei, source, AL_LOOPING, AL_TRUE);
+    alCall(alSourcei, source, AL_BUFFER, buffer);
+
+    return source;
+}
+
 int Engine::SoundSystem::playSound(ALuint s)
 {
         alCall(alSourcePlay, s);
 
-        /*
-        ALint state = AL_PLAYING;
-        
-        while (state == AL_PLAYING)
-        {
-            alCall(alGetSourcei, source, AL_SOURCE_STATE, &state);
-        }
-        
-        alCall(alDeleteSources, 1, &source);
-        alCall(alDeleteBuffers, 1, &buffer);
 
-        alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, nullptr);
-        alcCall(alcDestroyContext, openALDevice, openALContext);
-
-        ALCboolean closed;
-        alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
-        */
         return 0;
        
 }
+
+int Engine::SoundSystem::stopSound(ALuint s)
+{
+    alCall(alSourceStop, s);
+    return 0;
+}
+
+
+void Engine::SoundSystem::volumeDown()
+{
+    volume = volume - 0.1;
+    alCall(alSourcef, sourceMusic, AL_GAIN, volume);
+    alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
+    alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
+    alCall(alSourcef, sourceHorn, AL_GAIN, volume);
+
+}
+
+void Engine::SoundSystem::volumeUp()
+{
+    volume = volume + 0.1;
+    alCall(alSourcef, sourceMusic, AL_GAIN, volume);
+    alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
+    alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
+    alCall(alSourcef, sourceHorn, AL_GAIN, volume);
+}
+
+
+
+
+
+
+
+
+
+
+void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
+{
+
+
+
+    /*
+
+
+
+    auto key = args.get<0>();
+    if (key == GLFW_KEY_W)
+    {
+        playSound(sourceAcceleration);
+    }
+
+
+
+    else if (key == GLFW_KEY_S)
+    {
+        playSound(sourceBreaking);
+
+    }
+     */
+
+}
+void  Engine::SoundSystem::onKeyUp(const Component::EventArgs<int>& args)
+{
+
+    /*
+
+    auto key = args.get<0>();
+    if (key == GLFW_KEY_W)
+    {
+        stopSound(sourceAcceleration);
+    }
+
+
+    else if (key == GLFW_KEY_S)
+    {
+        stopSound(sourceBreaking);
+    }
+
+    */
+}
+void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
+{
+    auto key = args.get<0>();
+    if (key == GLFW_KEY_SPACE)
+    {
+        playSound(sourceHorn);
+    }
+    else if (key == GLFW_KEY_F1)
+    {
+        volumeUp();
+    }
+    else if (key == GLFW_KEY_F2)
+    {
+        volumeDown();
+    }
+}
+
