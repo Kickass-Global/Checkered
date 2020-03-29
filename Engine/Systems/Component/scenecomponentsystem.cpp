@@ -20,9 +20,9 @@ void process_scene_component(SceneComponent* node) {
 	// foreach thing attached to this scene component, attach this transform to it...
 	for (auto child : node->getChildren().getComponentsOfType<PaintedMesh>())
 	{
-		child->eraseChildComponentsOfType<WorldTransform>();
+		child->getStore().eraseComponentsOfType<WorldTransform>();
 		if (child->enabled) {
-			child->emplaceChildComponent<WorldTransform>(T);
+			child->getStore().emplaceComponent<WorldTransform>(T);
 		}
 	}
 
@@ -34,22 +34,21 @@ void process_scene_component(SceneComponent* node) {
 
 void Component::SceneComponentSystem::update(Engine::deltaTime) {
 
-	// Go through every SceneComponent in the scene and update its transformation matrix, then update each component
-	// attached to the SceneComponent with the new world transform.
+    // Go through every SceneComponent in the scene and update its transformation matrix, then update each component
+    // attached to the SceneComponent with the new world transform.
 
-	auto actors = Engine::getStore().getRoot().getComponentsOfType<PhysicsActor>();
-	for (auto actor : actors)
-	{
-		// if actor is not initialized
-		if (!actor->actor)
-			onActorCreated(actor);
-		actor->update();
-	}
+    auto actors = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<PhysicsActor>();
+    for (auto actor : actors) {
+        // if actor is not initialized
+        if (!actor->actor)
+            onActorCreated(actor);
+        actor->update();
+    }
 
-	auto sceneComponents = Engine::getStore().getRoot().getComponentsOfType<SceneComponent>();
-	for (auto &sceneComponent : sceneComponents) {
-		process_scene_component(sceneComponent);
-	}
+    auto sceneComponents = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<SceneComponent>();
+    for (auto &sceneComponent : sceneComponents) {
+        process_scene_component(sceneComponent);
+    }
 }
 
 

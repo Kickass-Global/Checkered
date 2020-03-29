@@ -11,11 +11,10 @@ Component::EventDelegate<int> Input::InputSystem::onKeyDown("onKeyDown");
 Component::EventDelegate<int> Input::InputSystem::onKeyUp("onKeyUp");
 Component::EventDelegate<GLFWgamepadstate, GLFWgamepadstate> Input::InputSystem::onGamePadStateChanged("onGamePadStateChanged");
 
-void Input::InputSystem::initialize(GLFWwindow *window) {
+void Input::InputSystem::initialize() {
+	auto window = getEngine()->getSubSystem<Rendering::RenderingSystem>()->getWindow();
 	glfwSetKeyCallback(window, keyHandler);
 	glfwSetJoystickCallback(gamepadHandler);
-
-
 }
 
 void Input::InputSystem::keyHandler(GLFWwindow *, int key, int, int action, int) {

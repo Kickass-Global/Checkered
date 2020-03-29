@@ -33,6 +33,7 @@ set(SRC main.cpp main.h
         Components/Plane.cpp Components/Plane.h
         Systems/Pipeline/EntityLoader.cpp Systems/Pipeline/EntityLoader.h
         Components/Model.cpp Components/Model.h
+        Components/ReportCard.cpp Components/ReportCard.h
         Components/Passenger.cpp Components/Passenger.h
         Components/Vehicle.cpp Components/Vehicle.h
         Components/EventHandler.cpp Components/EventHandler.h
@@ -49,7 +50,7 @@ set(SRC main.cpp main.h
         Systems/Damage/damagesystem.cpp
         Systems/Damage/damagesystem.hpp
         Components/damage.cpp Components/damage.hpp
-        Systems/systeminterface.hpp Systems/Component/scenecomponentsystem.cpp
+        Systems/SystemInterface.hpp Systems/Component/scenecomponentsystem.cpp
         Systems/Component/scenecomponentsystem.hpp Components/physicspacket.cpp
         Components/physicspacket.hpp
         Systems/hornSystem/hornSystem.cpp
@@ -58,7 +59,19 @@ set(SRC main.cpp main.h
         Systems/soundSystem/SoundSystem.cpp Systems/soundSystem/SoundSystem.h
         Components/WorldTransform.h Components/WorldTransform.cpp
         Components/texture.cpp Components/texture.hpp
-        Components/material.cpp Components/material.hpp Components/PhysicsActor.cpp Components/PhysicsActor.h Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h Systems/EngineStore.cpp Systems/EngineStore.h)
+        Components/material.cpp Components/material.hpp 
+        Components/PhysicsActor.cpp Components/PhysicsActor.h 
+        Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h
+        Systems/EngineStore.cpp Systems/EngineStore.h
+        Systems/Physics/VehicleFactory.cpp Systems/Physics/VehicleFactory.hpp 
+        Systems/Physics/VehicleFactoryFunctions.cpp Systems/Physics/VehicleFactoryFunctions.hpp 
+        Components/TransformData.cpp Components/TransformData.hpp 
+        Components/bitmap.cpp Components/bitmap.hpp 
+        Systems/Rendering/fontsystem.cpp Systems/Rendering/fontsystem.hpp 
+        Systems/Rendering/text.cpp Systems/Rendering/text.hpp 
+        Scenarios/start.cpp Scenarios/start.hpp 
+        Scenarios/scenariointerface.cpp Scenarios/scenariointerface.hpp 
+        Systems/EngineDebug.cpp Systems/EngineDebug.hpp Components/Node.cpp Components/Node.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine
@@ -95,11 +108,11 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("../Include/glfw-3.3.1" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
-add_subdirectory("../Assets/" "${CMAKE_CURRENT_BINARY_DIR}/Assets")
 
 target_link_libraries(Engine
         PRIVATE glfw
         PRIVATE SOIL
+        PRIVATE freetype
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/OpenAL/libs/Win64/OpenAL32.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
@@ -136,4 +149,11 @@ target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
         SYSTEM PRIVATE "../Include/glminclude"
         SYSTEM PRIVATE "../Include/assimp/include"
         SYSTEM PRIVATE "../Include/glad/include")
+
+add_custom_command(
+        TARGET Engine POST_BUILD
+        COMMENT "Copying assets to engine directory"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/Assets
+        $<TARGET_FILE_DIR:Engine>/Assets)
 

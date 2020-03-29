@@ -32,7 +32,7 @@ namespace Component {
 		template <typename... Args>
 		SceneComponent(std::shared_ptr<SceneComponent> parent, std::shared_ptr<Args>... children) :m_parent(parent)
 		{
-			addChildComponents(children...);
+		    getStore().addComponents(children...);
 		}
 
 

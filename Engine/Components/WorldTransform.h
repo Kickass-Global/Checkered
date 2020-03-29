@@ -12,25 +12,34 @@
 #include "ComponentId.h"
 #include "ComponentBase.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include <foundation/PxTransform.h>
 
 namespace Component {
 
-	class WorldTransform : public ComponentBase {
-	public:
-		glm::vec3 scale;
-		glm::quat rotation;
-		glm::vec3 position;
+    class WorldTransform : public ComponentBase {
+    public:
+        glm::vec3 scale;
+        glm::quat rotation;
+        glm::vec3 position;
 
-		glm::mat4 world_matrix{ 1 };
+        glm::mat4 world_matrix{1};
 
-		WorldTransform() : world_matrix(1) {}
+        WorldTransform() : world_matrix(1) {}
 
-		explicit WorldTransform(glm::mat4 T) : world_matrix(T) {
-			glm::vec4 perspective;
-			glm::vec3 skew;
-			glm::decompose(T, scale, rotation, position, skew, perspective);
-		}
-	};
+        explicit WorldTransform(const physx::PxTransform &T) : position(T.p.x, T.p.y, T.p.z),
+                                                               rotation(T.q.w, T.q.x, T.q.y, T.q.z) {
+
+            glm::translate(world_matrix, {T.p.x, T.p.y, T.p.z});
+            world_matrix *= glm::mat4_cast(glm::quat(T.q.w, T.q.x, T.q.y, T.q.z));
+        }
+
+        explicit WorldTransform(glm::mat4 T) : world_matrix(T) {
+
+            glm::vec4 perspective;
+            glm::vec3 skew;
+            glm::decompose(T, scale, rotation, position, skew, perspective);
+        }
+    };
 
 }
 

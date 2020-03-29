@@ -1,5 +1,4 @@
 #include "astar.h"
-#include "Windows.h"
 #include <string>
 #define ASTAR_STEPSIZE 3
 using namespace std;
