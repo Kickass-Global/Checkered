@@ -1,6 +1,6 @@
 //
 // Created by root on 17/1/20.
-// Refernces :: Used code from https://indiegamedev.net/2020/02/15/the-complete-guide-to-openal-with-c-part-1-playing-a-sound/
+
 
 
 #ifndef ENGINE_VEHICLE_H
@@ -146,7 +146,7 @@ namespace Component {
 		void onKeyDown(const EventArgs<int>& args) {
 			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
 			auto key = std::get<0>(args.values);
-			if (key == GLFW_KEY_W) {
+	    	if (key == GLFW_KEY_W) {
 
 				if (v.z < 0.0) {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
@@ -155,6 +155,8 @@ namespace Component {
 				Engine::createComponent<Component::Sound>("acceleration");
 			    
 			}
+			
+			
 			if (key == GLFW_KEY_A) {
 				vehicle->pxVehicleInputData.setAnalogSteer(1);
 			}
@@ -163,11 +165,13 @@ namespace Component {
 			}
 			if (key == GLFW_KEY_S) {
 				if (v.z > 0.1) {
-					vehicle->pxVehicleInputData.setAnalogBrake(1);
 					
+					
+					vehicle->pxVehicleInputData.setAnalogBrake(1);
 					Engine::createComponent<Component::Sound>("breaking");
 				}
 				else {
+					
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eREVERSE);
 					vehicle->pxVehicleInputData.setAnalogAccel(1);
 					

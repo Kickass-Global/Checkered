@@ -36,8 +36,11 @@ void Engine::SoundSystem::initialize() {
     sourceAcceleration = load_looping_sound("Assets/Sounds/car+geardown.wav");
     sourceBreaking = load_sound("Assets/Sounds/TIRE+SKID.wav");
     sourceMusic = load_looping_sound("Assets/Sounds/backGroundMusic.wav");
+    sourceDriving = load_looping_sound("Assets/Sounds/carMoving.wav");
+    sourceCollision = load_sound("Assets/Sounds/CarCrash.wav");
+    sourcePassengerDlivered = load_sound("Assets/Sounds/PassengerSuccess.wav");
 
-    playSound(sourceMusic);
+    playSound(sourceMusic); 
 }
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
@@ -75,6 +78,12 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
         {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             stopSound(sourceBreaking);
+            Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
+        }
+        else if (sound->name == "passengerDroppedOff")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound(sourcePassengerDlivered);
             Engine::getStore().getRoot().eraseComponent<Component::Sound>(sound->getId());
         }
     } 
