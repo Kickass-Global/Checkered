@@ -103,10 +103,9 @@ void ::Camera::CameraSystem::onKeyPress(const Component::EventArgs<int> &args) {
     //Engine::log<module, Engine::low>("onKeyPress=", std::get<0>(args.values));
 }
 
-void ::Camera::CameraSystem::onKeyUp(const Component::EventArgs<int> &args) {
-    //Engine::log<module>("onKeyUp=", std::get<0>(args.values));
-    keys.erase(std::get<0>(args.values));
-    
+void ::Camera::CameraSystem::onKeyUp(const Component::EventArgs<int>& args) {
+	//Engine::log<module>("onKeyUp=", std::get<0>(args.values));
+	keys.erase(std::get<0>(args.values));
 }
 
 void ::Camera::CameraSystem::onKeyDown(const Component::EventArgs<int> &args) {
@@ -119,4 +118,22 @@ void ::Camera::CameraSystem::onGamepadStateChanged(const Component::EventArgs<GL
 
 	//auto input = std::get<1>(args.values);
 	//x += input.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+}
+
+void ::Camera::CameraSystem::initialize() {
+
+	SystemInterface::initialize();
+
+	// create event handlers
+
+	onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyPress);
+	onKeyDownHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyDown);
+	onKeyUpHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyUp);
+	onWindowSizeHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
+		this, &CameraSystem::onWindowSizeChanged
+	);
+	onGamepadStateChangedHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
+		this, &CameraSystem::onGamepadStateChanged
+	);
+
 }

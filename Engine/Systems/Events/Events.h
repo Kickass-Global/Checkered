@@ -9,84 +9,74 @@
 
 #include <functional>
 #include <vector>
+#include <memory>
 
 #include "Engine.h"
-#include "../../Systems/systeminterface.hpp"
-#include "../../Components/EventHandler.h"
+#include "SystemInterface.hpp"
+#include <EventHandler.h>
 #include <EventDelegate.h>
 
 namespace Engine {
 
-	template<typename... Args>
-	class Event {
-		std::vector<std::function<void(Args...)>> handlers;
-	public:
+    /**
+     * Monitors registered components for EventArg data and passes it on to the corresponding event handler.
+     * Notes:
+     * A component must be registered with this system to receive events through ComponentEvent events.
+     */
+    class EventSystem : public Engine::SystemInterface {
 
-		void operator()(Args ... args) {
-			for (auto &&handler : handlers) {
-				if (handler) handler(std::forward<Args>(args)...);
-			}
-		}
+        std::vector<std::shared_ptr<Component::EventHandlerBase>> registeredHandlers;
 
-		void operator+=(std::function<void(Args...)> handler) {
-			handlers.push_back(handler);
-		}
-	};
+    public:
+        Component::EventDelegate<Engine::deltaTime> onTick{"onTick"};
 
-	/**
-	 * Monitors registered components for EventArg data and passes it on to the corresponding event handler.
-	 * Notes:
-	 * A component must be registered with this system to receive events through ComponentEvent events.
-	 */
-	class EventSystem : public Engine::SystemInterface {
+        void update(Engine::deltaTime /*elapsed*/) override;
+        void early_update(Engine::deltaTime time) override;
 
-		static std::vector<std::shared_ptr<EventHandlerBase>> registeredHandlers;
+        void reset() {
+            registeredHandlers.clear();
+        }
 
-	public:
-		static Component::EventDelegate<Engine::deltaTime> onTick;
+        template<typename... Args>
+        void registerHandler(std::shared_ptr<Component::EventHandler<Args...>> handler) {
 
-		void update(Engine::deltaTime /*elapsed*/) override;
+            registeredHandlers.emplace_back(handler);
+        }
 
-		template<typename... Args>
-		static void registerHandler(std::shared_ptr<EventHandler<Args...>> handler) {
-			registeredHandlers.emplace_back(handler);
-		}
+        template<typename T, typename... Args>
+        std::shared_ptr<Component::EventHandler<Args...>> createHandler(
+            T *instance, void (T::*callback)(const Component::EventArgs<Args...> &)) {
 
-		template<typename T, typename... Args>
-		static std::shared_ptr<EventHandler<Args...>> createHandler(
-			T *instance,
-			void (T::*callback)(const Component::EventArgs<Args...> &)) {
+            auto handler = getEngine()->createComponent<Component::EventHandler<Args...>>();
+            handler->callback = std::bind(
+                callback, instance, std::placeholders::_1
+            );
+            return handler;
 
-			auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
-			handler->callback = std::bind(callback, instance,
-				std::placeholders::_1
-			);
-			return handler;
+        }
 
-		}
+        template<typename T>
+        std::shared_ptr<Component::EventHandler<Engine::deltaTime>> createTickHandler(
+            T *instance, void (T::* callback)(const Component::EventArgs<Engine::deltaTime> &)) {
 
-		template<typename T>
-		static std::shared_ptr<EventHandler<Engine::deltaTime>> createTickHandler(
-			T *instance,
-			void (T::* callback)(const Component::EventArgs<Engine::deltaTime> &)) {
+            auto handler = getEngine()->createComponent<Component::EventHandler<Engine::deltaTime>>();
+            handler->callback = std::bind(callback, instance, std::placeholders::_1);
 
-			auto handler = Engine::createComponent<Component::EventHandler<Engine::deltaTime>>();
-			handler->callback = std::bind(callback, instance, std::placeholders::_1);
-
-			onTick += handler;
-			return handler;
-		}
+            onTick += handler;
+            return handler;
+        }
 
 
-		template<typename... Args>
-		static std::shared_ptr<EventHandler<Args...>> createHandler(
-			std::function<void(const Component::EventArgs<Args...> &)> callback) {
+        template<typename... Args>
+        std::shared_ptr<Component::EventHandler<Args...>> createHandler(
+            std::function<void(const Component::EventArgs<Args...> &)> callback
+        ) {
 
-			auto handler = Engine::createComponent<Component::EventHandler<Args...>>();
-			handler->callback = callback;
-			return handler;
+            auto handler = getEngine()->createComponent<Component::EventHandler<Args...>>();
+            handler->callback = callback;
+            return handler;
 
-		}
-	};
+        }
+    };
 }
 #endif //ENGINE_EVENTS_H

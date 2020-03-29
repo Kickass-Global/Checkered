@@ -13,25 +13,12 @@
 #include "Rendering.h"
 #include "Engine.h"
 
-namespace Rendering {
+namespace Engine {
+    struct BillboardSystem : public SystemInterface {
+        std::shared_ptr<Mesh> quad_mesh;
+        void update(Engine::deltaTime time) override;
 
-    class BillboardSystem {
-
-        static Component::EventDelegate<Component::ComponentId> onBillboardChanged;
-
-        static void update() {
-
-            // look for billboard components and notify when they have been modified
-
-            /*for (auto &&billboard : Engine::getStore().getRoot().getComponentsOfType<Component::Billboard>()) {
-                auto billboard_was_modified = billboard.hasTag<Component::Dirty>(true);
-                if (billboard_was_modified) {
-                    Engine::log<module>("Billboard was modified ", billboard);
-                    onBillboardChanged(billboard);
-                }
-            }*/
-        }
-
+        void initialize() override;
     };
 
 }

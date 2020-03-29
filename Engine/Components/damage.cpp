@@ -3,3 +3,4 @@
 //
 
 #include "damage.hpp"
+Damage::Damage(int damageAmount) : damage_amount(damageAmount) {}

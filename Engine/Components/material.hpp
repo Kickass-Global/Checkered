@@ -7,37 +7,50 @@
 #ifndef ENGINE_MATERIAL_HPP
 #define ENGINE_MATERIAL_HPP
 
-#include <vector>
+#include "glad/glad.h"
+
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include "Component.h"
-#include "glad/glad.h"
 #include "texture.hpp"
 
 namespace Rendering {
-	class Program;
+class Program;
 }
 
 using Rendering::Program;
 
 namespace Component {
 
-    class Material : public ComponentBase {
-    public:
-        std::shared_ptr<Program> shader;
-        std::vector<std::shared_ptr<Texture>> textures;
-        // maybe some uniforms down here, you know, whatever feels right...
+class Material : public ComponentBase {
+public:
+  std::shared_ptr<Program> shader;
+  std::vector<std::shared_ptr<Texture>> textures;
 
-		Material(std::shared_ptr<Program> shader) : shader(shader), textures() {}
+  // maybe some uniforms down here, you know, whatever feels right...
 
-        virtual void bind() {
-            int index = 0;
-            for (auto &texture : textures) {
-                glActiveTexture(GL_TEXTURE1 + index++);
-                glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
-            }
-        }
-    };
-}
+  explicit Material(std::shared_ptr<Program> shader)
+      : shader(std::move(shader)), textures() {}
 
-#endif //ENGINE_MATERIAL_HPP
+  virtual void bind() {
+
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    int index = 0;
+    for (auto &texture : textures) {
+      if (texture) {
+        glActiveTexture(GL_TEXTURE1 + index++);
+        glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+      } else {
+        glActiveTexture(GL_TEXTURE1 + index++);
+        glBindTexture(GL_TEXTURE_2D, 0);
+      }
+    }
+  }
+};
+} // namespace Component
+
+#endif // ENGINE_MATERIAL_HPP
