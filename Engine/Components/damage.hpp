@@ -19,6 +19,7 @@ namespace Component {
     class Damage : public ComponentBase {
     public:
         int damage_amount;
+        Damage(int damageAmount);
     };
 
 /**
@@ -39,8 +40,8 @@ namespace Component {
         };
 		bool is_outdated = false;
 		glm::mat4 transform;
-        int current_damage;
-        int max_damage;
+        int current_damage = 0;
+        int max_damage = 100;
         std::vector<Part> parts;
     };
 }

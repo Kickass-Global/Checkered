@@ -14,9 +14,8 @@
 #include "Engine.h"
 
 namespace Engine {
-    class BillboardSystem : public SystemInterface {
+    struct BillboardSystem : public SystemInterface {
         std::shared_ptr<Mesh> quad_mesh;
-    public:
         void update(Engine::deltaTime time) override;
 
         void initialize() override;

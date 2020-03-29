@@ -16,8 +16,9 @@ in vec3 fLightReflection;
 out vec3 colour;
 
 void main() {
-    vec3 diffuse = texture(tDiffuse, fTexcoord.st).xyz;
-    colour = kA * diffuse + diffuse * max(dot(fLightDirection, fNormal), 0.0);
+    vec4 diffuse = texture(tDiffuse, fTexcoord.st);
+    if (diffuse.a < 0.1) { discard; }
+    colour = kA * diffuse.rgb + diffuse.rgb * max(dot(fLightDirection, fNormal), 0.0);
     //+ diffuse * pow(dot(fLightReflection, fViewer), 4);
 }
 
