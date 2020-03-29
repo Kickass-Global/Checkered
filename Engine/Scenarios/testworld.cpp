@@ -39,6 +39,7 @@ void TestWorld::load() {
   auto physicsSystem = getEngine()->addSubSystem<Physics::PhysicsSystem>();
   auto vehicleSystem = getEngine()->addSubSystem<Engine::vehicleSystem>();
   auto openALSoundSystem = getEngine()->addSubSystem<Engine::SoundSystem>();
+  auto scenarioLoader = getEngine()->addSubSystem<Pipeline::ScenarioLoader>();
 
   vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
@@ -154,6 +155,10 @@ void TestWorld::load() {
   building_instances.add_instance_at(glm::vec3{0, 0, -80}, building_mesh3,
                                      building_material3);
 
+  // load scenario
+  scenarioLoader->load_scenario(*this, "Assets/Meshes/city.dae");
+
+
   // setup a HUD element...
 
   auto billboard_mesh =
@@ -267,7 +272,7 @@ void TestWorld::load() {
 
   auto tree_mesh =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/Prop_Tree_02.fbx");
+          "Assets/Meshes/human.obj");
 
   glm::vec3 origin = {10, 0, 20};
   for (int i = 1; i < 10; i++) {

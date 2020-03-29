@@ -7,8 +7,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+// glad must come before GLFW (leave this comment to stop clangd from formatting
+// the order).
+#include <GLFW/glfw3.h>
 
 #include <functional>
 #include <iostream>

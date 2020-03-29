@@ -73,8 +73,10 @@ struct WaypointArrow : public ComponentBase {
           glm::vec4{target_vehicle->position.x, target_vehicle->position.y + 2,
                     target_vehicle->position.z, 1});
 
+      glm::mat4 T_offset = glm::translate(glm::vec3(0,0,0));
+
       m_mesh->getStore().eraseComponentsOfType<WorldTransform>();
-      m_mesh->getStore().emplaceComponent<WorldTransform>(T);
+      m_mesh->getStore().emplaceComponent<WorldTransform>(T * T_offset);
     }
   }
 };
