@@ -206,7 +206,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     // 2. then render scene as normal with shadow mapping (using depth map)
     glViewport(0, 0, static_cast<GLsizei>(camera->viewport.width),
                static_cast<GLsizei>(camera->viewport.height));
-    glClearColor(0.529, 0.808, 0.922, 1.0);
+    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto &&batch : batches) {
@@ -252,13 +252,13 @@ Rendering::RenderingSystem::findSuitableBufferFor(
     std::shared_ptr<Mesh> &mesh, std::shared_ptr<Material> &material) {
 
   auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-      10000000, sizeof(mesh->vertices[0]), GL_ARRAY_BUFFER);
+      10000000, static_cast<int>(sizeof(mesh->vertices[0])), GL_ARRAY_BUFFER);
 
   auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-      10000000, sizeof(mesh->indices[0]), GL_ELEMENT_ARRAY_BUFFER);
+      10000000, static_cast<int>(sizeof(mesh->indices[0])), GL_ELEMENT_ARRAY_BUFFER);
 
   auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-      10000000, sizeof(glm::mat4), GL_ARRAY_BUFFER);
+      10000000, static_cast<int>(sizeof(glm::mat4)), GL_ARRAY_BUFFER);
 
   auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer,
                                                instanceBuffer);
@@ -396,7 +396,7 @@ Rendering::Shader::Shader(GLenum shader_type, std::vector<std::string> &lines) {
 
   for (auto &&line : lines) {
     cstrings.push_back(line.c_str());
-    lengths.push_back(line.size());
+    lengths.push_back(static_cast<int>(line.size()));
   }
 
   glShaderSource(m_id, static_cast<GLsizei>(lines.size()), cstrings.data(),

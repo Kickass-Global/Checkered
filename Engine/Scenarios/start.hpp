@@ -147,7 +147,7 @@ struct MenuList : public ComponentBase {
             }
         }
         auto dst = box.plot(destination.box, {0, 0}, {0, 0});
-        auto boxes = dst.subdivide(items.size());
+        auto boxes = dst.subdivide(static_cast<unsigned int>(items.size()));
         auto item_box = boxes.begin();
 
         for (auto &item : items) {
