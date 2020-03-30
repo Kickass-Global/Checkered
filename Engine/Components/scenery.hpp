@@ -164,6 +164,22 @@ public:
   std::shared_ptr<PhysicsActor> actor;
   std::shared_ptr<PaintedMesh> mesh;
 
+  Scenery(glm::mat4 T, std::shared_ptr<Mesh> mesh,
+      std::shared_ptr<Material> material)
+      : mesh(getEngine()->createComponent<PaintedMesh>(mesh, material)),
+      actor(getEngine()->createComponent<PhysicsActor>(mesh)) {
+
+      glm::vec4 perspective;
+      glm::vec3 skew, scale, position;
+      glm::quat rotation;
+      glm::decompose(T, scale, rotation, position, skew, perspective);
+
+      actor->position = position;
+      actor->rotation = rotation;
+      actor->node->getStore().addComponent(
+          getEngine()->createComponent<SceneComponent>(actor->node, this->mesh));
+  }
+
   Scenery(glm::vec3 position, std::shared_ptr<Mesh> mesh,
           std::shared_ptr<Material> material)
       : mesh(getEngine()->createComponent<PaintedMesh>(mesh, material)),
