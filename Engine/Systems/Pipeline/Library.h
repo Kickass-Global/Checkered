@@ -48,6 +48,11 @@ namespace Pipeline {
             return assets.at(asset_name);
         }
 
+        template <typename T>
+        void setAsset(std::string name, T component) {
+            emplace(name, component);
+        }
+
         template<typename T>
         std::shared_ptr<T> getAsset(const std::string &name) {
 

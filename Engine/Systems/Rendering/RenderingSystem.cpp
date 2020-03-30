@@ -94,7 +94,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
       buffer(instance->mesh, instance->material);
     }
     if (!instance->instances.empty()) {
-      Engine::log<module, Engine::low>("Updating instances(",
+      Engine::log<module, low>("Updating instances(",
                                        instance->instances.size(),
                                        ") of component#", instance);
 
@@ -173,6 +173,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
     // get player location....
 
+    glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     auto player = dynamic_cast<Component::Vehicle *>(camera->target.get());
     glm::mat4 lightViewProjection{1};
@@ -188,12 +189,13 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
           // bind programs, textures, and uniforms needed to render the batch
           depth_shader->bind();
 
+          auto location = glGetUniformLocation(depth_shader->programId(), "M_View");
           glUniformMatrix4fv(
-              glGetUniformLocation(depth_shader->programId(), "M_View"), 1,
+              location, 1,
               false, glm::value_ptr(lightView));
-
+          location = glGetUniformLocation(depth_shader->programId(), "M_Perspective");
           glUniformMatrix4fv(
-              glGetUniformLocation(depth_shader->programId(), "M_Perspective"),
+              location,
               1, false, glm::value_ptr(lightProjection));
 
           batch->bind(*this);
@@ -201,6 +203,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
         }
       }
     }
+    glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // 2. then render scene as normal with shadow mapping (using depth map)
@@ -252,13 +255,13 @@ Rendering::RenderingSystem::findSuitableBufferFor(
     std::shared_ptr<Mesh> &mesh, std::shared_ptr<Material> &material) {
 
   auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-      10000000, static_cast<int>(sizeof(mesh->vertices[0])), GL_ARRAY_BUFFER);
+      500000 , static_cast<int>(sizeof(mesh->vertices[0])), GL_ARRAY_BUFFER);
 
   auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-      10000000, static_cast<int>(sizeof(mesh->indices[0])), GL_ELEMENT_ARRAY_BUFFER);
+      500000 , static_cast<int>(sizeof(mesh->indices[0])), GL_ELEMENT_ARRAY_BUFFER);
 
   auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-      10000000, static_cast<int>(sizeof(glm::mat4)), GL_ARRAY_BUFFER);
+      50000, static_cast<int>(sizeof(glm::mat4)), GL_ARRAY_BUFFER);
 
   auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer,
                                                instanceBuffer);

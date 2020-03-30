@@ -12,6 +12,7 @@
 #include <scenery.hpp>
 
 namespace Component {
+
 struct HealthBar : public ComponentBase {
   std::shared_ptr<Model> target; // display the health of this
   std::shared_ptr<Texture> health_sprite;
@@ -62,6 +63,7 @@ struct WaypointArrow : public ComponentBase {
                          ->getSubSystem<EngineStore>()
                          ->getRoot()
                          .getComponentsOfType<Waypoint>();
+
     if (!waypoints.empty()) {
       waypoint_location = waypoints[0]->actor->position;
       auto direction =
@@ -73,8 +75,10 @@ struct WaypointArrow : public ComponentBase {
           glm::vec4{target_vehicle->position.x, target_vehicle->position.y + 2,
                     target_vehicle->position.z, 1});
 
+      glm::mat4 T_offset = glm::translate(glm::vec3(0,0,0));
+
       m_mesh->getStore().eraseComponentsOfType<WorldTransform>();
-      m_mesh->getStore().emplaceComponent<WorldTransform>(T);
+      m_mesh->getStore().emplaceComponent<WorldTransform>(T * T_offset);
     }
   }
 };
