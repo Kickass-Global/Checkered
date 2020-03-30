@@ -12,7 +12,7 @@ public:
 
     PathNode() : parent(0) {}
     PathNode(float x, float z, PathNode* _parent = 0) : my_x(x), my_z(z), parent(_parent),
-        my_id((static_cast<int>(x + 192) / 3) * 64 + (static_cast<int>(z + 182) / 3)) {};
+        my_id(static_cast<int>((x + 384) / 6)* static_cast <int>(768 / 6) + static_cast<int>((z + 374) / 6)) {};
 
     float GetF() { return costReach + distTarget; }
     float GetDist(PathNode* nodeEnd)

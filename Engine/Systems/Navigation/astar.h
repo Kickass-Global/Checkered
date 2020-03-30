@@ -23,25 +23,27 @@ public:
     void ReachedPoint(glm::vec3 cPos);
     void CleanPath();
     void PrintPath();
-    void ClearOpenList() { openList.clear(); };
-    void ClearVisitedList() { visitList.clear(); };
-    void ClearPathToGoal() { pathToGoal.clear(); };
+    void CleanAll();
+    void ClearOpenList();
+    void ClearVisitedList();
+    void ClearPathToGoal();
     bool CheckInit;
     bool CheckFound;
-    nodeType** graphNodes;
+    int* graphNodes;
     std::vector<PathNode*> pathToGoal;
-    //void UpdatePath(glm::vec3 currentPos, glm::vec3 targetPos);
+    PathNode* startNode;
+    PathNode* endNode;
+
 
 private:
     void SetPosts(PathNode start, PathNode End);
     void PathOpened(float x, float z, float newCost, PathNode* parent);
     PathNode* GetNext();
     void ContinuePath();
-
-    PathNode* startNode;
-    PathNode* endNode;
+    int my_stepsize = 6;
     std::vector<PathNode*> openList;
     std::vector<PathNode*> visitList;
+    std::vector<PathNode*> fullList;
 };
 
 #endif //ASTAR_H
