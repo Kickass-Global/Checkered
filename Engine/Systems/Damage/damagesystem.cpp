@@ -5,6 +5,7 @@
 #include "damagesystem.hpp"
 #include <EngineStore.h>
 #include <WorldTransform.h>
+#include "Sound.h"
 
 void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
 
@@ -35,12 +36,18 @@ void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
     auto damages = model->getStore().getComponentsOfType<Damage>();
 
     if (!damages.empty()) {
+
+       
+
       int total_damage = 0;
       for (auto &damage : damages) {
         total_damage += damage->damage_amount;
       }
       model->current_damage = std::clamp(model->current_damage + total_damage,
                                          0, model->max_damage);
+     
+      
+    
     }
     model->getStore().eraseComponentsOfType<Damage>();
 

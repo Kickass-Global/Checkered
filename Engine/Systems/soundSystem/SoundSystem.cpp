@@ -87,6 +87,12 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourcePassengerDlivered);getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
+        else if (sound->name == "damageRecieved")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound(sourceCollision); 
+            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+        }
     }
 }
 
