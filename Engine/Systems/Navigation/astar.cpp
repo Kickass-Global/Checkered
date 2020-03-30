@@ -134,14 +134,22 @@ void AStar::ContinuePath() {
                 PathOpened(current->my_x + ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
                 PathOpened(current->my_x, current->my_z - ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
                 PathOpened(current->my_x, current->my_z + ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x - (0.70711 * ASTAR_STEPSIZE), current->my_z - (0.70711* ASTAR_STEPSIZE),
-                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x + (0.70711 * ASTAR_STEPSIZE), current->my_z - (0.70711* ASTAR_STEPSIZE),
-                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x - (0.70711 * ASTAR_STEPSIZE), current->my_z + (0.70711* ASTAR_STEPSIZE),
-                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x + (0.70711 * ASTAR_STEPSIZE), current->my_z + (0.70711* ASTAR_STEPSIZE),
-                    current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
+                PathOpened(current->my_x - (0.70711f * ASTAR_STEPSIZE),
+                           current->my_z - (0.70711f * ASTAR_STEPSIZE),
+                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
+                           current);
+                PathOpened(current->my_x + (0.70711f * ASTAR_STEPSIZE),
+                           current->my_z - (0.70711f * ASTAR_STEPSIZE),
+                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
+                           current);
+                PathOpened(current->my_x - (0.70711f * ASTAR_STEPSIZE),
+                           current->my_z + (0.70711f * ASTAR_STEPSIZE),
+                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
+                           current);
+                PathOpened(current->my_x + (0.70711f * ASTAR_STEPSIZE),
+                           current->my_z + (0.70711f * ASTAR_STEPSIZE),
+                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
+                           current);
 
 			for (int i = 0; i < openList.size(); i++) {
 				if (openList[i]->my_id == current->my_id) {
