@@ -39,8 +39,9 @@ public:
   std::shared_ptr<Model> model;
   ComponentId input{};
   std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
-  EventDelegate<Vehicle *> tickHandler = EventDelegate<Vehicle *>("handler");
+  EventDelegate<Vehicle *> tickHandler{"tickHandler"};
   EventDelegate<class Vehicle *, float> onHit{"onHit"};
+
   enum Type { Player, Taxi } type = Taxi;
   AStar path;
   glm::vec3 scale = {1, 1, 1};
@@ -79,7 +80,7 @@ public:
 
   void onHitHandler(class Vehicle *actor, float impulse) {
     log<module, high>("Vehicle hit ", actor, " impulse ", impulse);
-    auto damage = std::clamp<int>(static_cast<int>(impulse / 1000), 0, 15);
+    auto damage = std::clamp<int>(static_cast<int>(impulse / 300), 0, 15);
     model->getStore().emplaceComponent<Damage, 1>(damage);
   }
 
