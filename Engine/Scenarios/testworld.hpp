@@ -12,6 +12,7 @@
 #include <scenery.hpp>
 
 namespace Component {
+
 struct HealthBar : public ComponentBase {
   std::shared_ptr<Model> target; // display the health of this
   std::shared_ptr<Texture> health_sprite;
@@ -62,6 +63,7 @@ struct WaypointArrow : public ComponentBase {
                          ->getSubSystem<EngineStore>()
                          ->getRoot()
                          .getComponentsOfType<Waypoint>();
+
     if (!waypoints.empty()) {
       waypoint_location = waypoints[0]->actor->position;
       auto direction =
