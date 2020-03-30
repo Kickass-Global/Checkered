@@ -9,6 +9,8 @@
 #include <SceneComponent.h>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <material.hpp>
+#include <Vehicle.h>
+
 
 namespace Component {
 
@@ -125,11 +127,30 @@ public:
 
   void
   onActorOverlapBegin(const EventArgs<PhysicsActor *, PhysicsActor *> &args) {
-    onEntered(args.get<1>());
+
+      
+      std::cout << "player overlap begin waypoint" << std::endl;
+      
+      auto player_physics_actor = args.get<0>();
+      auto player_vehicle = player_physics_actor->getEngine()->getSubSystem<EngineStore>()
+          ->getRoot().getComponentsOfType<ControlledVehicle>()[0];
+    
+
+
+
+      onEntered(args.get<1>());
+          
+      
+          
+      
+
+    
   }
 
   void
   onActorOverlapEnd(const EventArgs<PhysicsActor *, PhysicsActor *> &args) {
+
+
     onExited(args.get<1>());
   }
 };

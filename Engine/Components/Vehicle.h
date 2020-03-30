@@ -133,6 +133,9 @@ struct ControlledVehicle : public ComponentBase {
   std::shared_ptr<EventHandler<int>> onKeyDownHandler;
   std::shared_ptr<EventHandler<int>> onKeyUpHandler;
 
+  bool isHonking = false;
+  bool isCarryingPasssenger = false;
+
   ControlledVehicle()
       : vehicle(getEngine()->createComponent<Vehicle>()),
         camera(getEngine()->createComponent<Camera>()) {
@@ -177,6 +180,11 @@ struct ControlledVehicle : public ComponentBase {
     if (key == GLFW_KEY_A) {
       vehicle->pxVehicleInputData.setAnalogSteer(1);
     }
+
+    if (key == GLFW_KEY_SPACE) {
+        isHonking = true;
+        
+    }
     if (key == GLFW_KEY_D) {
       vehicle->pxVehicleInputData.setAnalogSteer(-1);
     }
@@ -207,6 +215,11 @@ struct ControlledVehicle : public ComponentBase {
     if (key == GLFW_KEY_D) {
       vehicle->pxVehicleInputData.setAnalogSteer(0);
     }
+    if (key == GLFW_KEY_SPACE) {
+        isHonking = false;
+        
+    }
+
     if (key == GLFW_KEY_S) {
       vehicle->pxVehicleInputData.setAnalogBrake(0);
       getEngine()->createComponent<Component::Sound>("stopAcceleration");
