@@ -399,7 +399,8 @@ void Engine::SoundSystem::volumeDown()
     alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
     alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
     alCall(alSourcef, sourceHorn, AL_GAIN, volume);
-
+    alCall(alSourcef, sourceCollision, AL_GAIN, volume);
+    alCall(alSourcef, sourcePassengerDlivered, AL_GAIN, volume);
 }
 
 void Engine::SoundSystem::volumeUp()
@@ -409,6 +410,8 @@ void Engine::SoundSystem::volumeUp()
     alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
     alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
     alCall(alSourcef, sourceHorn, AL_GAIN, volume);
+    alCall(alSourcef, sourceCollision, AL_GAIN, volume);
+    alCall(alSourcef, sourcePassengerDlivered, AL_GAIN, volume);
 }
 
 
