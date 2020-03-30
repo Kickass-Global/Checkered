@@ -49,12 +49,16 @@ public:
     dropoff_actor->onEntered += std::bind(&Passenger::onPassengerDroppedOff,
                                           this, std::placeholders::_1);
     dropoff_actor->mesh->enabled = false;
+
+    passengerReportCard.setReportCardGradeTimes(20, 30, 45, 60, 120);
+
   }
 
 private:
   void onPassengerPickedUp(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger picked up");
+    passengerReportCard.startReportCardTimer();
     dropoff_actor->mesh->enabled = true;
     pickup_actor->mesh->enabled = false;
     onPassengerPickedUpDelegate(0);
@@ -63,6 +67,10 @@ private:
   void onPassengerDroppedOff(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger dropped off");
+    passengerReportCard.endReportCardTimer();
+    char grade = passengerReportCard.createFinalReport();
+    std::cout << "OnPassengerDroppedOff Grade: " << grade << std::endl;
+
     pickup_actor->mesh->enabled = false;
     dropoff_actor->mesh->enabled = false;
     onPassengerDroppedOffDelegate(0);
