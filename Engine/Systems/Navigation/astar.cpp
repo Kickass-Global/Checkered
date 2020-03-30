@@ -1,4 +1,5 @@
 #include "astar.h"
+#include "Windows.h"
 #include <string>
 #define ASTAR_STEPSIZE 3
 using namespace std;
@@ -11,28 +12,29 @@ AStar::AStar() {
 	CheckInit = false;
 }
 AStar::~AStar() {
-	for (int i = 0; i < openList.size(); i++)
-		delete openList[i];
+	ClearPathToGoal();
+}
+
+void AStar::CleanAll() {
+	for (int i = 0; i < fullList.size(); i++) { delete fullList[i]; };
+	fullList.clear();
+}
+void AStar::ClearOpenList() {
 	openList.clear();
-	for (int i = 0; i < visitList.size(); i++)
-		delete visitList[i];
+}
+void AStar::ClearVisitedList() {
 	visitList.clear();
-	for (int i = 0; i < pathToGoal.size(); i++)
-		delete pathToGoal[i];
+}
+void AStar::ClearPathToGoal() {
 	pathToGoal.clear();
 }
 
 void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 	if (!CheckInit) {
-		for (int i = 0; i < openList.size(); i++)
-			delete openList[i];
-		openList.clear();
-		for (int i = 0; i < visitList.size(); i++)
-			delete visitList[i];
-		visitList.clear();
-		for (int i = 0; i < pathToGoal.size(); i++)
-			delete pathToGoal[i];
-		pathToGoal.clear();
+		ClearOpenList();
+		ClearVisitedList();
+		ClearPathToGoal();
+		CleanAll();
 
 		PathNode start;
 		start.my_x = sPos.x;
@@ -42,8 +44,25 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 		end.my_x = tPos.x;
 		end.my_z = tPos.z;
 
-		std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
-		std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
+		//std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
+		//std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
+
+		SetPosts(start, end);
+		CheckInit = true;
+	}else {
+		ClearOpenList();
+		ClearVisitedList();
+
+		PathNode start;
+		start.my_x = sPos.x;
+		start.my_z = sPos.z;
+
+		PathNode end;
+		end.my_x = tPos.x;
+		end.my_z = tPos.z;
+
+		//std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
+		//std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
 
 		SetPosts(start, end);
 		CheckInit = true;
@@ -54,9 +73,8 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 }
 
 void AStar::ReachedPoint(glm::vec3 cPos) {
-	if (pathToGoal.size() && samef(cPos.x - 1.5f, pathToGoal[0]->my_x, (float)pow(ASTAR_STEPSIZE, 2))
-			&& samef(cPos.z - 1.5f, pathToGoal[0]->my_z, (float)pow(ASTAR_STEPSIZE, 2))) {
-		//std::cout << "reached point " << pathToGoal[0]->my_x << ", " << pathToGoal[0]->my_z << std::endl;
+	if (pathToGoal.size() && samef(cPos.x - 4.5f, pathToGoal[0]->my_x, (float)pow(my_stepsize, 2))
+			&& samef(cPos.z - 4.5f, pathToGoal[0]->my_z, (float)pow(my_stepsize, 1.5))) {
 		pathToGoal.erase(pathToGoal.begin());
 	}
 	return;
@@ -65,12 +83,12 @@ void AStar::ReachedPoint(glm::vec3 cPos) {
 void AStar::SetPosts(PathNode start, PathNode end) {
 	startNode = new PathNode(start.my_x, start.my_z, NULL);
 	endNode = new PathNode(end.my_x, end.my_z, &end);
+	fullList.push_back(startNode);
+	fullList.push_back(endNode);
 
 	startNode->costReach = 0;
 	startNode->distTarget = start.GetDist(endNode);
 	startNode->parent = 0;
-	startNode->search_id = 0;            //TODO: give searches ids
-
 
 	openList.push_back(startNode);
 }
@@ -83,30 +101,28 @@ PathNode* AStar::GetNext() {
 		nextNode = openList[0];
 		visitList.push_back(nextNode);
 		openList.erase(openList.begin());
-		//std::cout << "next node to explore is at: " << nextNode->my_x << ", " << nextNode->my_z 
-		//<< "  with cost: " << nextNode->GetF() << std::endl;
 	}
 	return nextNode;
 }
 
 void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 
-	int col = static_cast<int>(x + 192) / 3;
-	int row = static_cast<int>(z + 182) / 3;
+	int col = static_cast<int>(x + 390) / 12;
+	int row = static_cast<int>(z + 380) / 12;
 
 	if (col < 0) col = 0;
 	else if (col > 63) col = 63;
 	if (row < 0) row = 0;
 	else if (row > 63) row = 63;
 
-        //TODO: lower priority on buildings, sidewalks, and wrong direction roads
-    if ((int)graphNodes[col][row] == 9) { newCost += 200*ASTAR_STEPSIZE;}
-    else if ((int)graphNodes[col][row] == 0 && parent->my_z > z) { newCost += 3*ASTAR_STEPSIZE; }
-    else if ((int)graphNodes[col][row] == 1 && parent->my_x > x) { newCost += 3*ASTAR_STEPSIZE; }
-    else if ((int)graphNodes[col][row] == 2 && parent->my_x < x) { newCost += 3*ASTAR_STEPSIZE; }
-    else if ((int)graphNodes[col][row] == 3 && parent->my_z < z) { newCost += 3*ASTAR_STEPSIZE; }
+        //This lowers the priority on non-roads and wrong direction roads
+    if ((int)graphNodes[row * 64 + col] == 9) { newCost += 3000* my_stepsize;}
+    else if ((int)graphNodes[row * 64 + col] == 0 && parent->my_z > z) { newCost += 10* my_stepsize; }
+    else if ((int)graphNodes[row * 64 + col] == 1 && parent->my_x > x) { newCost += 10* my_stepsize; }
+    else if ((int)graphNodes[row * 64 + col] == 2 && parent->my_x < x) { newCost += 10* my_stepsize; }
+    else if ((int)graphNodes[row * 64 + col] == 3 && parent->my_z < z) { newCost += 10* my_stepsize; }
 
-	int id = (static_cast<int>(x + 192) / 3) * 64 + (static_cast<int>(z + 182) / 3);
+	int id = static_cast<int>((x + 384)/my_stepsize)* static_cast <int>(768/my_stepsize) + static_cast<int>((z + 374)/my_stepsize);
 	for (auto node : visitList) {
 		if (id == node->my_id) { return; }
 	}
@@ -116,48 +132,62 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 	newChild->distTarget = newChild->GetDist(endNode);
 
 	openList.push_back(newChild);
+	fullList.push_back(newChild);
 	return;
 }
 
 void AStar::ContinuePath() {
     while (!openList.empty()) {
         PathNode* current = GetNext();
-        if (current->GetDist(endNode) < (ASTAR_STEPSIZE*ASTAR_STEPSIZE)+1) {
+
+        if (current->GetDist(endNode) < (my_stepsize* my_stepsize)+1) {
             endNode->parent = current->parent;
             for (PathNode* getPath = endNode; getPath != NULL; getPath = getPath->parent)
                 pathToGoal.push_back(getPath);
             CheckFound = true;
             return;
         }
-        else {
-                PathOpened(current->my_x - ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x + ASTAR_STEPSIZE, current->my_z, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x, current->my_z - ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x, current->my_z + ASTAR_STEPSIZE, current->costReach + (float)pow(ASTAR_STEPSIZE, 2), current);
-                PathOpened(current->my_x - (0.70711f * ASTAR_STEPSIZE),
-                           current->my_z - (0.70711f * ASTAR_STEPSIZE),
-                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
-                           current);
-                PathOpened(current->my_x + (0.70711f * ASTAR_STEPSIZE),
-                           current->my_z - (0.70711f * ASTAR_STEPSIZE),
-                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
-                           current);
-                PathOpened(current->my_x - (0.70711f * ASTAR_STEPSIZE),
-                           current->my_z + (0.70711f * ASTAR_STEPSIZE),
-                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
-                           current);
-                PathOpened(current->my_x + (0.70711f * ASTAR_STEPSIZE),
-                           current->my_z + (0.70711f * ASTAR_STEPSIZE),
-                           current->costReach + (float)pow(ASTAR_STEPSIZE, 2),
-                           current);
-
-			for (int i = 0; i < openList.size(); i++) {
-				if (openList[i]->my_id == current->my_id) {
-					openList.erase(openList.begin() + i);
-					i--;
-				}
+		bool found = false;
+		PathNode* transfer = NULL;
+		for (auto i = 0; i < pathToGoal.size(); i++) {
+			if (found) {
+				//delete pathToGoal[i];
+				pathToGoal.erase(pathToGoal.begin() + i);
+				i--;
+			}
+			if (current->GetDist(pathToGoal[i]) < (my_stepsize * my_stepsize) + 1) {
+				found = true;
+				transfer = pathToGoal[i];
 			}
 		}
+		if(found){
+			transfer->parent = current->parent;
+			for (PathNode* getPath = transfer; getPath != NULL; getPath = getPath->parent)
+				pathToGoal.push_back(getPath);
+			CheckFound = true;
+			return;
+		}
+
+		PathOpened(current->my_x - my_stepsize, current->my_z, current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x + my_stepsize, current->my_z, current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x, current->my_z - my_stepsize, current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x, current->my_z + my_stepsize, current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x - (0.70711 * my_stepsize), current->my_z - (0.70711 * my_stepsize),
+			current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x + (0.70711 * my_stepsize), current->my_z - (0.70711 * my_stepsize),
+			current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x - (0.70711 * my_stepsize), current->my_z + (0.70711 * my_stepsize),
+			current->costReach + (float)pow(my_stepsize, 2), current);
+		PathOpened(current->my_x + (0.70711 * my_stepsize), current->my_z + (0.70711 * my_stepsize),
+			current->costReach + (float)pow(my_stepsize, 2), current);
+
+		for (int i = 0; i < openList.size(); i++) {
+			if (openList[i]->my_id == current->my_id) {
+				openList.erase(openList.begin() + i);
+				i--;
+			}
+		}
+
 	}
 }
 
@@ -166,6 +196,7 @@ void AStar::CleanPath() {
         for (auto i = 2; i < pathToGoal.size(); i++) { 
             if (samef(pathToGoal[i-2]->my_x, pathToGoal[i]->my_x) || samef(pathToGoal[i-2]->my_z, pathToGoal[i]->my_z)) {
                 i--;
+				//delete pathToGoal[i];
                 pathToGoal.erase(pathToGoal.begin() + i);
             }
         }
