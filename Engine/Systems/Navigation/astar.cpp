@@ -44,8 +44,8 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 		end.my_x = tPos.x;
 		end.my_z = tPos.z;
 
-		std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
-		std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
+		//std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
+		//std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
 
 		SetPosts(start, end);
 		CheckInit = true;
@@ -61,8 +61,8 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 		end.my_x = tPos.x;
 		end.my_z = tPos.z;
 
-		std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
-		std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
+		//std::cout << "Starting at x: " << start.my_x << "Starting at z: " << start.my_z << endl;
+		//std::cout << "Ending at x: " << end.my_x << "Ending at z: " << end.my_z << endl;
 
 		SetPosts(start, end);
 		CheckInit = true;
