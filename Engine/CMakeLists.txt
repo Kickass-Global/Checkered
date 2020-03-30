@@ -114,9 +114,7 @@ target_link_libraries(Engine
         PRIVATE SOIL
         PRIVATE freetype
 
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/assimp-vc142-mtd.lib
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/IrrXMLd.lib
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/zlibstaticd.lib
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/assimp-vc142-mt.lib
 
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/OpenAL/libs/Win64/OpenAL32.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
@@ -130,6 +128,7 @@ target_link_libraries(Engine
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXVehicle_static_64.lib
         PRIVATE ${OPENGL_gl_LIBRARY})
 
+configure_file("../dlls/assimp-vc142-mt.dll" assimp-vc142-mt.dll COPYONLY)
 configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
 configure_file("../dlls/PhysX_64.dll" PhysX_64.dll COPYONLY)
 configure_file("../dlls/PhysXCommon_64.dll" PhysXCommon_64.dll COPYONLY)
