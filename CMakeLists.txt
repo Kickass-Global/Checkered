@@ -10,7 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenGL REQUIRED)
 
 set(FREETYPE_DIR 3rd-party/freetype-2.10.0)
-
 add_subdirectory(3rd-party/freetype-2.10.0)
 
 add_library(SOIL 3rd-party/SOIL/srcs/etc1_utils.c

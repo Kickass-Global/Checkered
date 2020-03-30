@@ -39,25 +39,36 @@ void Engine::DamageSystem::update(Engine::deltaTime elapsed) {
       for (auto &damage : damages) {
         total_damage += damage->damage_amount;
       }
-      model->current_damage = std::clamp(model->current_damage + total_damage,
-                                         0, model->max_damage);
+
+      auto assign = [](auto &variable, auto &assignment) {
+        auto previous = variable;
+        variable = assignment;
+        return previous != assignment;
+      };
+
+      auto health_has_changed =
+          assign(model->current_damage,
+                 std::clamp(model->current_damage + total_damage, 0,
+                            model->max_damage));
+      if (health_has_changed) {
+        model->onHealthChanged(model->max_damage - model->current_damage);
+      }
     }
     model->getStore().eraseComponentsOfType<Damage>();
 
     for (auto &&part : model->parts) {
 
-      auto it =
-          std::find_if(part.variations.begin(), part.variations.end(),
-                       [current_damage = model->current_damage](auto variation) {
-                         return variation.damage_threshold > current_damage;
-                       });
+      auto it = std::find_if(
+          part.variations.begin(), part.variations.end(),
+          [current_damage = model->current_damage](auto variation) {
+            return variation.damage_threshold > current_damage;
+          });
 
       if (it != part.variations.end()) {
         auto previous = part.active_variation;
         part.active_variation = static_cast<int>(it - part.variations.begin());
 
         auto &&mesh = part.variations[part.active_variation].mesh;
-
 
         auto variation_changed = part.active_variation != previous;
 

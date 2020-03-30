@@ -72,7 +72,7 @@ VehicleDesc initVehicleDescription(bool is_player) {
   // modified for easier steering. Center of mass offset is 0.65m above the base
   // of the chassis and 0.25m towards the front.
   const PxF32 chassisMass = 1500.0f;
-  const PxVec3 chassisDims(2.0f, 3.0f, 4.0f);
+  const PxVec3 chassisDims(2.5f, 3.0f, 4.0f);
   const PxVec3 chassisMOI(
       (chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
           chassisMass / 12.0f,
@@ -85,7 +85,7 @@ VehicleDesc initVehicleDescription(bool is_player) {
   // Set up the wheel mass, radius, width, moment of inertia, and number of
   // wheels. Moment of inertia is just the moment of inertia of a cylinder.
   const PxF32 wheelMass = 50.0f;
-  const PxF32 wheelRadius = 0.35f;
+  const PxF32 wheelRadius = 0.55f;
   const PxF32 wheelWidth = 0.34f;
   const PxF32 wheelMOI = 0.35f;
   const PxU32 nbWheels = 4;

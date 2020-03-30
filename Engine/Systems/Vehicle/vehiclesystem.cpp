@@ -10,8 +10,15 @@
 #include <Vehicle.h>
 #include <physicspacket.hpp>
 #include <tags.h>
+#include <EngineDebug.hpp>
 
 void Engine::vehicleSystem::initialize() { SystemInterface::initialize(); }
+
+namespace physx {
+    std::ostream& operator<<(std::ostream& out, PxVec3 vec) {
+        return out << vec.x << " " << vec.y << " " << vec.z;
+    }
+}
 void Engine::vehicleSystem::update(Engine::deltaTime) {
 
   auto vehicles = getEngine()
@@ -32,6 +39,17 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
       auto physx_data = physicsUpdates[0];
       vehicle->rotation = physx_data->rotation;
       vehicle->position = physx_data->position;
+
+      auto is_flipped = physx::PxVec3{ 0,1,0 }.dot(vehicle->pxVehicle->getRigidDynamicActor()->getGlobalPose().transform(physx::PxVec3{ 0,1,0 })) < 0.15;
+      if (is_flipped) {
+          auto T = vehicle->pxVehicle->getRigidDynamicActor()->getGlobalPose();
+          auto local_up = T.rotate(physx::PxVec3{ 0,1,0 });
+          auto global_up = physx::PxVec3{ 0,1,0 };
+          auto force =1000 *  global_up - local_up;
+          vehicle->pxVehicle->getRigidDynamicActor()->addTorque(force);
+
+          Engine::log<module, high>("Applying torque: ", force);
+      }
 
       if (vehicle->model) {
         vehicle->model->transform = vehicle->world_transform();
