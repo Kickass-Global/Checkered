@@ -16,9 +16,12 @@
 
 #include "Component/scenecomponentsystem.hpp"
 #include "Engine.h"
+#include "HealthBar.hpp"
+#include "Waypoint.hpp"
 #include "WorldTransform.h"
 #include "scenery.hpp"
 #include <Billboard.h>
+#include <PlayerVehicle.hpp>
 #include <Rendering/BillboardSystem.h>
 #include <Rendering/fontsystem.hpp>
 #include <material.hpp>
@@ -111,7 +114,7 @@ void TestWorld::load() {
   // load the mesh component
   auto plane_mesh =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/checkeredBowl.fbx");
+          "Assets/Meshes/city2.obj");
   drivable_instances.add_instance_at(
       glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
           glm::translate(glm::vec3{0, -1, 0}),
@@ -219,53 +222,9 @@ void TestWorld::load() {
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
           "Assets/Meshes/taxi_mesh.fbx");
 
-  // setup the vehicle for the player...
-
-  auto player =
-      getEngine()->createNamedComponent<Component::ControlledVehicle>("player");
-  inputSystem->onGamePadStateChanged += player->onGamePadStateChangedHandler;
-  inputSystem->onKeyUp += player->onKeyUpHandler;
-  inputSystem->onKeyDown += player->onKeyDownHandler;
-
-  auto &player_vehicle = player->vehicle;
-
-  auto player_damage_model =
-      getEngine()->createNamedComponent<Component::Model>(
-          "player_damage_model");
-
-  player_damage_model->parts.push_back(Component::Model::Part{});
-  player_damage_model->parts[0].variations.push_back(
-      Component::Model::Variation{
-          2000000,
-          getEngine()->createComponent<PaintedMesh>(car_mesh, car_material)});
-
-  player_damage_model->onHealthChanged += [this](auto health) {
-    if (health < 1) {
-      log<high>("He's dead Jim");
-      auto matte = getEngine()->createComponent<Billboard>(
-          getEngine()->createComponent<Texture>(
-              "Assets/Textures/checkered-matte.png"));
-      matte->dst = {0, 0};
-      matte->src = {0, 0};
-    }
-  };
-
-  player_vehicle->model = player_damage_model;
-  player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-  player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
-  player_vehicle->position = glm::vec3(0.0f, 3.0f, -40.0f);
-
-  auto arrow = getEngine()->createComponent<WaypointArrow>();
-  arrow->target_vehicle = player_vehicle;
-
-  auto health_bar = getEngine()->createComponent<HealthBar>();
-  health_bar->target = player_damage_model;
-
-  getEngine()->getSubSystem<EventSystem>()->onTick +=
-      std::bind(&WaypointArrow::tick, arrow, std::placeholders::_1);
-
-  getEngine()->getSubSystem<EventSystem>()->onTick +=
-      std::bind(&HealthBar::tick, health_bar, std::placeholders::_1);
+  // setup the player object....
+  auto player = getEngine()->createComponent<Component::Player>();
+  auto &player_vehicle = player->controller->vehicle;
 
   // setup passenger system
 
@@ -529,17 +488,18 @@ void TestWorld::load() {
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   // spawn some ai bois into the world
-  auto dim = 1;
-  int spacing = 40;
-  for (int x = -dim; x <= dim; x++) {
-    for (int y = dim; y <= dim; y++) {
-      auto ai_vehicle =
-          make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
-      ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-      ai_vehicle->path.graphNodes = nav;
-      ai_vehicle->tickHandler += ticker; // give them brain
-    }
-  }
+  //  auto dim = 1;
+  //  int spacing = 40;
+  //  for (int x = -dim; x <= dim; x++) {
+  //    for (int y = dim; y <= dim; y++) {
+  //      auto ai_vehicle =
+  //          make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing +
+  //          10)));
+  //      ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1,
+  //      0)); ai_vehicle->path.graphNodes = nav; ai_vehicle->tickHandler +=
+  //      ticker; // give them brain
+  //    }
+  //  }
 
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();
