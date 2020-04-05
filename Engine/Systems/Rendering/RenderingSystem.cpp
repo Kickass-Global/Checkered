@@ -255,13 +255,14 @@ Rendering::RenderingSystem::findSuitableBufferFor(
     std::shared_ptr<Mesh> &mesh, std::shared_ptr<Material> &material) {
 
   auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-      500000 , static_cast<int>(sizeof(mesh->vertices[0])), GL_ARRAY_BUFFER);
+      50000000, static_cast<int>(sizeof(mesh->vertices[0])), GL_ARRAY_BUFFER);
 
   auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-      500000 , static_cast<int>(sizeof(mesh->indices[0])), GL_ELEMENT_ARRAY_BUFFER);
+      5000000, static_cast<int>(sizeof(mesh->indices[0])),
+      GL_ELEMENT_ARRAY_BUFFER);
 
   auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-      50000, static_cast<int>(sizeof(glm::mat4)), GL_ARRAY_BUFFER);
+      500000, static_cast<int>(sizeof(glm::mat4)), GL_ARRAY_BUFFER);
 
   auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer,
                                                instanceBuffer);
