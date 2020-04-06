@@ -5,6 +5,17 @@
 #ifndef ENGINE_HEALTHBAR_HPP
 #define ENGINE_HEALTHBAR_HPP
 
+#include "Rendering/text.hpp"
+#include "scenariointerface.hpp"
+#include <Billboard.h>
+#include <Engine.h>
+#include <Pipeline/Library.h>
+#include <Vehicle.h>
+#include <WorldTransform.h>
+#include <optional>
+#include <scenery.hpp>
+
+namespace Component {
 struct HealthBar : public ComponentBase {
   std::shared_ptr<Model> target; // display the health of this
   std::shared_ptr<Texture> health_sprite;
@@ -32,13 +43,5 @@ struct HealthBar : public ComponentBase {
     billboard->src = {-1, 1};
   }
 };
-#include "Rendering/text.hpp"
-#include "scenariointerface.hpp"
-#include <Billboard.h>
-#include <Engine.h>
-#include <Pipeline/Library.h>
-#include <Vehicle.h>
-#include <WorldTransform.h>
-#include <optional>
-#include <scenery.hpp>
+} // namespace Component
 #endif // ENGINE_HEALTHBAR_HPP
