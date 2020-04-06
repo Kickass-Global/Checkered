@@ -5,6 +5,17 @@
 #ifndef ENGINE_WAYPOINT_HPP
 #define ENGINE_WAYPOINT_HPP
 
+#include "Rendering/text.hpp"
+#include "scenariointerface.hpp"
+#include <Billboard.h>
+#include <Engine.h>
+#include <Pipeline/Library.h>
+#include <Vehicle.h>
+#include <WorldTransform.h>
+#include <optional>
+#include <scenery.hpp>
+
+namespace Component {
 struct WaypointArrow : public ComponentBase {
   std::shared_ptr<PaintedMesh> m_mesh;
   glm::vec3 waypoint_location = {0, 0, 0};
@@ -45,13 +56,5 @@ struct WaypointArrow : public ComponentBase {
     }
   }
 };
-#include "Rendering/text.hpp"
-#include "scenariointerface.hpp"
-#include <Billboard.h>
-#include <Engine.h>
-#include <Pipeline/Library.h>
-#include <Vehicle.h>
-#include <WorldTransform.h>
-#include <optional>
-#include <scenery.hpp>
+} // namespace Component
 #endif // ENGINE_WAYPOINT_HPP

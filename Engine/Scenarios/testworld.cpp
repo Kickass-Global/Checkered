@@ -106,7 +106,7 @@ void TestWorld::load() {
       getEngine()->createComponent<Component::Material>(basic_shader_program);
   ground_material->textures.push_back(
       getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/checkeredBowl.png"));
+          "Assets/Textures/bake.png"));
   ground_material->shader =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
           "Assets/Programs/basic.json");
@@ -114,7 +114,7 @@ void TestWorld::load() {
   // load the mesh component
   auto plane_mesh =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/city2.obj");
+          "Assets/Meshes/city-combined.obj");
   drivable_instances.add_instance_at(
       glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
           glm::translate(glm::vec3{0, -1, 0}),
