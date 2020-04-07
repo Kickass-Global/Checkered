@@ -28,7 +28,7 @@ using namespace snippetvehicle;
 
 const float GRAVITY = -9.81f;
 const float STATIC_FRICTION = 0.9f;
-const float DYNAMIC_FRICTION = 0.5f;
+const float DYNAMIC_FRICTION = 0.2f;
 const float RESTITUTION = 0.3f;
 
 Component::Passenger *activePassenger;
@@ -231,10 +231,11 @@ void Physics::PhysicsSystem::createDrivablePlayerVehicle() {
   //    createDrivableVehicle(PxTransform(0,0,0));
 }
 
-// TODO DIFFERENTIATE BETWEEN ENEMY VEHICLE AND PLAYER VEHICLE FOR COLLIDERS
+
 PxVehicleDrive4W *
 Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
                                               bool is_player) {
+    std::cout << "PhysicsSystem::createDrivableVehicle" << std::endl;
 
   PxVehicleDrive4W *pxVehicle;
   VehicleDesc vehicleDesc = initVehicleDescription(is_player);
@@ -262,11 +263,15 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
   engine.mMOI = 1;
   engine.mPeakTorque = 1000.0f;
   engine.mMaxOmega = 1000.0f;
-  engine.mDampingRateFullThrottle = 0.095f;
-  engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
-  engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
+  //engine.mDampingRateFullThrottle = 0.095f;
+  //engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+  //engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
   pxVehicle->mDriveSimData.setEngineData(engine);
+
+  PxVehicleDifferential4WData diff;
+  diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
+  pxVehicle->mDriveSimData.setDiffData(diff);
 
   PxVehicleTireData tireData;
   tireData.mFrictionVsSlipGraph[0][0] = 0.f;
@@ -292,7 +297,7 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
 
   PxVehicleClutchData clutch;
 
-  clutch.mStrength = 40.0f;
+  clutch.mStrength = 10.0f;
   clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eESTIMATE;
   clutch.mEstimateIterations = 5;
 
