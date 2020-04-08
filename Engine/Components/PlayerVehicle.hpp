@@ -41,7 +41,7 @@ struct Player : public ComponentBase {
             "Assets/Textures/Vehicle_Car01_c.png"));
     auto car_mesh =
         getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-            "Assets/Meshes/car_mesh.fbx");
+            "Assets/Meshes/car_body.obj");
 
     auto &player_vehicle = controller->vehicle;
 

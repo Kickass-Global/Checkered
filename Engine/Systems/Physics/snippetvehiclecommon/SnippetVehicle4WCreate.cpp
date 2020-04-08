@@ -52,23 +52,17 @@ namespace snippetvehicle {
             //Set the top of the wheel to be just touching the underside of the chassis.
             //Begin by setting the rear-left/rear-right/front-left,front-right wheels.
             wheelCentreOffsets[PxVehicleDrive4WWheelOrder::eREAR_LEFT] = PxVec3((-chassisDims.x + wheelWidth) * 0.5f,
-                                                                                -(chassisDims.y / 2 + wheelRadius),
-                                                                                wheelRearZ + 0 * deltaZ * 0.5f
-            );
+                       -(chassisDims.y / 2 + wheelRadius) - 0.4f,
+                       wheelRearZ - 0.2f + 0 * deltaZ * 0.5f);
             wheelCentreOffsets[PxVehicleDrive4WWheelOrder::eREAR_RIGHT] = PxVec3((+chassisDims.x - wheelWidth) * 0.5f,
-                                                                                 -(chassisDims.y / 2 + wheelRadius),
-                                                                                 wheelRearZ + 0 * deltaZ * 0.5f
-            );
+                       -(chassisDims.y / 2 + wheelRadius) - 0.4f,
+                       wheelRearZ - 0.2f + 0 * deltaZ * 0.5f);
             wheelCentreOffsets[PxVehicleDrive4WWheelOrder::eFRONT_LEFT] = PxVec3((-chassisDims.x + wheelWidth) * 0.5f,
-                                                                                 -(chassisDims.y / 2 + wheelRadius),
-                                                                                 wheelRearZ +
-                                                                                 (numLeftWheels - 1) * deltaZ
-            );
+                       -(chassisDims.y / 2 + wheelRadius) - 0.4f,
+                       wheelRearZ + (numLeftWheels - 1) * deltaZ);
             wheelCentreOffsets[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT] = PxVec3((+chassisDims.x - wheelWidth) * 0.5f,
-                                                                                  -(chassisDims.y / 2 + wheelRadius),
-                                                                                  wheelRearZ +
-                                                                                  (numLeftWheels - 1) * deltaZ
-            );
+                       -(chassisDims.y / 2 + wheelRadius) - 0.4f,
+                       wheelRearZ + (numLeftWheels - 1) * deltaZ);
             //Set the remaining wheels.
             for (PxU32 i = 2, wheelCount = 4;
                  i < numWheels - 2; i += 2, wheelCount += 2) {
@@ -93,18 +87,22 @@ namespace snippetvehicle {
             {
                 //Set up the wheel data structures with mass, moi, radius, width.
                 for (PxU32 i = 0; i < numWheels; i++) {
-                    wheels[i].mMass = wheelMass;
-                    wheels[i].mMOI = wheelMOI;
-                    wheels[i].mRadius = wheelRadius;
-                    wheels[i].mWidth = wheelWidth;
+                  wheels[i].mMass = wheelMass;
+                  wheels[i].mMOI = wheelMOI;
+                  wheels[i].mRadius = wheelRadius;
+                  wheels[i].mWidth = wheelWidth;
                 }
 
-                //Enable the handbrake for the rear wheels only.
-                wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque = 14000.0f;
-                wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 14000.0f;
-                //Enable steering for the front wheels only.
-                wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi * 0.3333f;
-                wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi * 0.3333f;
+                // Enable the handbrake for the rear wheels only.
+                wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT]
+                    .mMaxHandBrakeTorque = 14000.0f;
+                wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT]
+                    .mMaxHandBrakeTorque = 14000.0f;
+                // Enable steering for the front wheels only.
+                wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer =
+                    PxPi * 0.2333f;
+                wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer =
+                    PxPi * 0.2333f;
             }
 
             //Set up the tires.
@@ -127,11 +125,11 @@ namespace snippetvehicle {
 
                 //Set the suspension data.
                 for (PxU32 i = 0; i < numWheels; i++) {
-                    suspensions[i].mMaxCompression = 0.3f;
-                    suspensions[i].mMaxDroop = 0.1f;
-                    suspensions[i].mSpringStrength = 55000.0f;
-                    suspensions[i].mSpringDamperRate = 4500.0f;
-                    suspensions[i].mSprungMass = suspSprungMasses[i];
+                  suspensions[i].mMaxCompression = 0.3f;
+                  suspensions[i].mMaxDroop = 0.2f;
+                  suspensions[i].mSpringStrength = 45000.0f;
+                  suspensions[i].mSpringDamperRate = 4500.0f;
+                  suspensions[i].mSprungMass = suspSprungMasses[i];
                 }
 
                 //Set the camber angles.

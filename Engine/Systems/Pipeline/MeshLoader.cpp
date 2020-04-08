@@ -1,18 +1,20 @@
 #include "MeshLoader.h"
 #include "Library.h"
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
 #include <Engine.h>
 #include <scenery.cpp>
 
 std::shared_ptr<Component::Mesh>
 Pipeline::MeshLoader::load(std::string filename) {
 
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(
-		filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+  Assimp::Importer importer;
+  const aiScene *scene = importer.ReadFile(
+      filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
+                    aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-	if (!scene) {
-		Engine::log<module, Engine::high>(importer.GetErrorString());
+  if (!scene) {
+    Engine::log<module, Engine::high>(importer.GetErrorString());
 	}
 	Engine::assertLog<module>(scene, "Loading resource " + filename);
 

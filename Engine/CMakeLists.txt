@@ -71,7 +71,7 @@ set(SRC main.cpp main.h
         Systems/Rendering/text.cpp Systems/Rendering/text.hpp
         Scenarios/start.cpp Scenarios/start.hpp
         Scenarios/scenariointerface.cpp Scenarios/scenariointerface.hpp
-        Systems/EngineDebug.cpp Systems/EngineDebug.hpp Components/Node.cpp Components/Node.hpp Components/PlayerVehicle.cpp Components/PlayerVehicle.hpp)
+        Systems/EngineDebug.cpp Systems/EngineDebug.hpp Components/Node.cpp Components/Node.hpp Components/PlayerVehicle.cpp Components/PlayerVehicle.hpp Systems/Physics/Wheel.cpp Systems/Physics/Wheel.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine

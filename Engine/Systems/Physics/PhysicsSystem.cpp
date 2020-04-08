@@ -17,6 +17,7 @@
 #include "PhysicsSystem.h"
 #include "PxRigidStatic.h"
 #include "VehicleFactory.hpp"
+#include "Wheel.hpp"
 #include "physicspacket.hpp"
 #include "scenery.hpp"
 #include "snippetvehiclecommon/SnippetVehicleTireFriction.h"
@@ -72,7 +73,7 @@ VehicleDesc initVehicleDescription(bool is_player) {
   // modified for easier steering. Center of mass offset is 0.65m above the base
   // of the chassis and 0.25m towards the front.
   const PxF32 chassisMass = 1500.0f;
-  const PxVec3 chassisDims(2.5f, 3.0f, 4.0f);
+  const PxVec3 chassisDims(2.30239f, 2.17137f, 5.3818f);
   const PxVec3 chassisMOI(
       (chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
           chassisMass / 12.0f,
@@ -80,13 +81,13 @@ VehicleDesc initVehicleDescription(bool is_player) {
           chassisMass / 12.0f,
       (chassisDims.x * chassisDims.x + chassisDims.y * chassisDims.y) *
           chassisMass / 12.0f);
-  const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f + 0.05f, 0.25f);
+  const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f - 0.25f, 0.25f);
 
   // Set up the wheel mass, radius, width, moment of inertia, and number of
   // wheels. Moment of inertia is just the moment of inertia of a cylinder.
   const PxF32 wheelMass = 50.0f;
-  const PxF32 wheelRadius = 0.55f;
-  const PxF32 wheelWidth = 0.34f;
+  const PxF32 wheelRadius = 0.3231f;
+  const PxF32 wheelWidth = 0.2234f;
   const PxF32 wheelMOI = 0.35f;
   const PxU32 nbWheels = 4;
 
@@ -197,7 +198,7 @@ void Physics::PhysicsSystem::createScene() {
   sceneDesc.filterShader = FilterShader::setupFilterShader;
   sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
   sceneDesc.kineKineFilteringMode = PxPairFilteringMode::eKEEP;
-  sceneDesc.staticKineFilteringMode  = PxPairFilteringMode::eKEEP;
+  sceneDesc.staticKineFilteringMode = PxPairFilteringMode::eKEEP;
   cScene = cPhysics->createScene(sceneDesc);
 }
 
@@ -285,9 +286,9 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
 
   PxVehicleAckermannGeometryData acker;
   acker.mAccuracy = 1.0f;
-  acker.mFrontWidth = 1.0f;
-  acker.mRearWidth = 1.0f;
-  acker.mAxleSeparation = 1.0f;
+  acker.mFrontWidth = 2.30f;
+  acker.mRearWidth = 2.30f;
+  acker.mAxleSeparation = 3.37f;
   pxVehicle->mDriveSimData.setAckermannGeometryData(acker);
 
   PxVehicleClutchData clutch;
@@ -337,8 +338,9 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
         cVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
     const PxU32 raycastResultsSize =
         cVehicleSceneQueryData->getQueryResultBufferSize();
-    PxVehicleSuspensionRaycasts(cBatchQuery, static_cast<PxU32>(wheels.size()), wheels.data(),
-                                raycastResultsSize, raycastResults);
+    PxVehicleSuspensionRaycasts(cBatchQuery, static_cast<PxU32>(wheels.size()),
+                                wheels.data(), raycastResultsSize,
+                                raycastResults);
 
     // vehicle update
     const PxVec3 gravity = cScene->getGravity();
@@ -436,6 +438,15 @@ void Physics::PhysicsSystem::onVehicleCreated(
   // link the component with the physx actor so we can replicate updates.
   vehicleComponent->pxVehicle = pxVehicle;
   pxVehicle->getRigidDynamicActor()->userData = vehicleComponent;
+
+  //  pxVehicle->mWheelsDynData.setUserData(0,
+  //  vehicleComponent->front_left_wheel.get());
+  //  pxVehicle->mWheelsDynData.setUserData(1,
+  //  vehicleComponent->front_right_wheel.get());
+  //  pxVehicle->mWheelsDynData.setUserData(2,
+  //  vehicleComponent->back_left_wheel.get());
+  //  pxVehicle->mWheelsDynData.setUserData(3,
+  //  vehicleComponent->back_right_wheel.get());
 }
 
 PxTriangleMesh *Physics::PhysicsSystem::createTriMesh(Mesh *mesh) {

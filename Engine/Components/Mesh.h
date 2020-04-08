@@ -10,11 +10,8 @@
 #include <vector>
 #include "glm/glm.hpp"
 
-#include "assimp/Importer.hpp"
 #include "assimp/scene.h"
-#include "assimp/postprocess.h"
 
-#include "ComponentId.h"
 #include "ComponentBase.h"
 #include "material.hpp"
 

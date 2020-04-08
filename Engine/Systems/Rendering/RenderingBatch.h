@@ -58,7 +58,7 @@ public:
     auto offset = m_fill;
     m_fill += data.size() * sizeof(T);
 
-    Engine::assertLog<module>(m_fill < m_size, "Checking buffer fill");
+    Engine::assertLog<module>(m_fill <= m_size, "Checking buffer fill");
 
     return {offset, static_cast<int>(data.size()), sizeof(T)};
   }
