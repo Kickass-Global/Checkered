@@ -143,10 +143,12 @@ public:
   /**
    * Calls appropriate glDraw* command to draw the geometry in the batch.
    */
-  void draw(Rendering::RenderingSystem &renderingSystem);
+  void draw(
+      Rendering::RenderingSystem &renderingSystem,
+      std::function<bool(const Mesh &)> filter = [](auto) { return true; });
 
-  bool contains(std::shared_ptr<Mesh> mesh,
-                std::shared_ptr<Material> material) const;
+  [[nodiscard]] bool contains(std::shared_ptr<Mesh> mesh,
+                              std::shared_ptr<Material> material) const;
 
   void remove(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
 

@@ -108,23 +108,23 @@ void TestWorld::load() {
       "Assets/Textures/bake4.png");
 
   // load the mesh component
-  auto city_block_1 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/city-block-1.obj");
+  //  auto city_block_1 =
+  //      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+  //          "Assets/Meshes/city-block-1.obj");
   auto city_block_2 =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
           "Assets/Meshes/city-block-2.obj");
   auto city_block_3 =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
           "Assets/Meshes/city-block-3.obj");
-  auto city_block_4 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/city-block-4.obj");
+  //  auto city_block_4 =
+  //      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+  //          "Assets/Meshes/city-block-4.obj");
 
-  drivable_instances.add_instance_at(
-      glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-          glm::translate(glm::vec3{0, -1, 0}),
-      city_block_1, ground_material_1, city_block_1);
+  //  drivable_instances.add_instance_at(
+  //      glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
+  //          glm::translate(glm::vec3{0, -1, 0}),
+  //      city_block_1, ground_material_1, city_block_1);
   drivable_instances.add_instance_at(
       glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
           glm::translate(glm::vec3{0, -1, 0}),
@@ -133,10 +133,10 @@ void TestWorld::load() {
       glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
           glm::translate(glm::vec3{0, -1, 0}),
       city_block_3, ground_material_3, city_block_3);
-  drivable_instances.add_instance_at(
-      glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-          glm::translate(glm::vec3{0, -1, 0}),
-      city_block_4, ground_material_4, city_block_4);
+  //  drivable_instances.add_instance_at(
+  //      glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
+  //          glm::translate(glm::vec3{0, -1, 0}),
+  //      city_block_4, ground_material_4, city_block_4);
 
   // create some buildings
 
@@ -148,8 +148,12 @@ void TestWorld::load() {
       getEngine()->createComponent<Component::Material>(basic_shader_program);
 
   // create a sky...
+  auto sky_shader_program =
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
+          "Assets/Programs/sky.json");
+
   auto sky_material =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+      getEngine()->createComponent<Component::Material>(sky_shader_program);
   sky_material->textures.push_back(
       getEngine()->createComponent<Component::Texture>(
           "Assets/Textures/CGSkies_0338_free.jpg"));
@@ -495,19 +499,19 @@ void TestWorld::load() {
   std::shared_ptr<EventHandler<Vehicle *>> ticker =
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
-  // spawn some ai bois into the world
-  //  auto dim = 1;
-  //  int spacing = 40;
-  //  for (int x = -dim; x <= dim; x++) {
-  //    for (int y = dim; y <= dim; y++) {
-  //      auto ai_vehicle =
-  //          make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing +
-  //          10)));
-  //      ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1,
-  //      0)); ai_vehicle->path.graphNodes = nav; ai_vehicle->tickHandler +=
-  //      ticker; // give them brain
+  //   spawn some ai bois into the world
+  //    auto dim = 1;
+  //    int spacing = 40;
+  //    for (int x = -dim; x <= dim; x++) {
+  //      for (int y = dim; y <= dim; y++) {
+  //        auto ai_vehicle =
+  //            make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing +
+  //            10)));
+  //        ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1,
+  //        0)); ai_vehicle->path.graphNodes = nav; ai_vehicle->tickHandler +=
+  //        ticker; // give them brain
+  //      }
   //    }
-  //  }
 
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();

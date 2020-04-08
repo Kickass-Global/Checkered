@@ -47,7 +47,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
   //[dit](auto material) {return material == dit->first.second.get(); });
   // if (it
   //== materials.end()) { 			log<high>("Erasing batch
-  //details"); dit = batch->details.erase(dit);
+  // details"); dit = batch->details.erase(dit);
   //		}
   //	}
   //}
@@ -169,19 +169,20 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    float near_plane = -5.0f, far_plane = 100.0f;
+    float near_plane = -15.0f, far_plane = 15.0f;
     glm::mat4 lightProjection =
-        glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+        glm::ortho(-15.0f, 15.0f, -15.0f, 15.0f, near_plane, far_plane);
     // get player location....
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    //    glEnable(GL_CULL_FACE);
+    //    glCullFace(GL_FRONT);
     auto player = dynamic_cast<Component::Vehicle *>(camera->target.get());
     glm::mat4 lightViewProjection{1};
     if (player) {
-      glm::mat4 lightView =
-          glm::lookAt(player->position + glm::vec3(-20.0f, 41.0f, -10.0f),
-                      player->position, glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::mat4 lightView = glm::lookAt(
+          player->position +
+              10.0f * glm::normalize(glm::vec3(-1157.59f, 334.705f, -48.9735f)),
+          player->position, glm::vec3(0.0f, 1.0f, 0.0f));
       lightViewProjection = lightProjection * lightView;
 
       for (auto &&batch : batches) {
@@ -199,7 +200,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                              glm::value_ptr(lightProjection));
 
           batch->bind(*this);
-          batch->draw(*this);
+          batch->draw(*this, [](const Mesh &mesh) { return mesh.cast_shadow; });
         }
       }
     }

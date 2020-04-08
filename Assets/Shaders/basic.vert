@@ -34,7 +34,6 @@ void main() {
 	fLightSpacePosition = (M_LightSpace * vec4(fPosition,1)).xyz;
 
     gl_Position = M_Perspective * M_View * iInstanceMatrix * vec4(vPosition,1.0);
-
 }
 
 

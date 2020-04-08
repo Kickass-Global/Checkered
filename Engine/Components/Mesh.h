@@ -31,9 +31,9 @@ namespace Component {
     class Mesh : public ComponentBase {
 
     public:
-
-        std::vector<Vertex> vertices;
-        std::vector<int> indices;
+      bool cast_shadow = false;
+      std::vector<Vertex> vertices;
+      std::vector<int> indices;
 
     };
 
