@@ -85,18 +85,20 @@ public:
   }
 
   Vehicle()
-      : pxSteerVsForwardSpeedData{0.0f,  0.75f, 35.0f,  0.75f,
-                                  60.0f, 0.1f,  120.0f, 0.1f},
+      : pxSteerVsForwardSpeedData{0.0f,  0.75f, 
+                                  5.0f,  0.75f,
+                                  30.0f, 0.125f,  
+                                  120.0f, 0.1f},
         pxKeySmoothingData{{
-                               6.0f, // rise rate eANALOG_INPUT_ACCEL
-                               6.0f, // rise rate eANALOG_INPUT_BRAKE
-                               6.0f, // rise rate eANALOG_INPUT_HANDBRAKE
+                               3.0f, // rise rate eANALOG_INPUT_ACCEL
+                               3.0f, // rise rate eANALOG_INPUT_BRAKE
+                               10.0f, // rise rate eANALOG_INPUT_HANDBRAKE
                                2.5f, // rise rate eANALOG_INPUT_STEER_LEFT
                                2.5f, // rise rate eANALOG_INPUT_STEER_RIGHT
                            },
                            {
-                               10.0f, // fall rate eANALOG_INPUT_ACCEL
-                               10.0f, // fall rate eANALOG_INPUT_BRAKE
+                               5.0f, // fall rate eANALOG_INPUT_ACCEL
+                               5.0f, // fall rate eANALOG_INPUT_BRAKE
                                10.0f, // fall rate eANALOG_INPUT_HANDBRAKE
                                5.0f,  // fall rate eANALOG_INPUT_STEER_LEFT
                                5.0f   // fall rate eANALOG_INPUT_STEER_RIGHT
@@ -104,14 +106,14 @@ public:
         pxPadSmoothingData{{
                                6.0f, // rise rate eANALOG_INPUT_ACCEL
                                6.0f, // rise rate eANALOG_INPUT_BRAKE
-                               6.0f, // rise rate eANALOG_INPUT_HANDBRAKE
+                               12.0f, // rise rate eANALOG_INPUT_HANDBRAKE
                                2.5f, // rise rate eANALOG_INPUT_STEER_LEFT
                                2.5f, // rise rate eANALOG_INPUT_STEER_RIGHT
                            },
                            {
                                10.0f, // fall rate eANALOG_INPUT_ACCEL
                                10.0f, // fall rate eANALOG_INPUT_BRAKE
-                               10.0f, // fall rate eANALOG_INPUT_HANDBRAKE
+                               12.0f, // fall rate eANALOG_INPUT_HANDBRAKE
                                5.0f,  // fall rate eANALOG_INPUT_STEER_LEFT
                                5.0f   // fall rate eANALOG_INPUT_STEER_RIGHT
                            }} {
@@ -170,11 +172,13 @@ struct ControlledVehicle : public ComponentBase {
     auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
     auto key = std::get<0>(args.values);
     if (key == GLFW_KEY_W) {
-
-      if (v.z < 0.0) {
+        
+      if (v.z < 0.0) { //is going backwards
+          vehicle->pxVehicleInputData.setAnalogBrake(1);
         vehicle->pxVehicle->mDriveDynData.forceGearChange(
             physx::PxVehicleGearsData::eNEUTRAL);
       }
+      vehicle->pxVehicleInputData.setAnalogBrake(0);
       vehicle->pxVehicleInputData.setAnalogAccel(1);
       getEngine()->createComponent<Component::Sound>("acceleration");
     }
@@ -190,10 +194,11 @@ struct ControlledVehicle : public ComponentBase {
       vehicle->pxVehicleInputData.setAnalogSteer(-1);
     }
     if (key == GLFW_KEY_S) {
-      if (v.z > 0.1) {
+      if (v.z >= 0.1) {  //is going forward
         vehicle->pxVehicleInputData.setAnalogBrake(1);
         getEngine()->createComponent<Component::Sound>("breaking");
       } else {
+        
         vehicle->pxVehicle->mDriveDynData.forceGearChange(
             physx::PxVehicleGearsData::eREVERSE);
         vehicle->pxVehicleInputData.setAnalogAccel(1);
@@ -222,7 +227,7 @@ struct ControlledVehicle : public ComponentBase {
     }
 
     if (key == GLFW_KEY_S) {
-      vehicle->pxVehicleInputData.setAnalogBrake(0);
+        vehicle->pxVehicleInputData.setAnalogBrake(0);
       getEngine()->createComponent<Component::Sound>("stopAcceleration");
       getEngine()->createComponent<Component::Sound>("stopBreaking");
     }
