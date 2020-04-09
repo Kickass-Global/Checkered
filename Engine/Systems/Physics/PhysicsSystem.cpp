@@ -263,11 +263,15 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
   engine.mMOI = 1;
   engine.mPeakTorque = 1000.0f;
   engine.mMaxOmega = 1000.0f;
-  engine.mDampingRateFullThrottle = 0.095f;
-  engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
-  engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
+  //engine.mDampingRateFullThrottle = 0.095f;
+  //engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+  //engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
   pxVehicle->mDriveSimData.setEngineData(engine);
+
+  PxVehicleDifferential4WData diff;
+  diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
+  pxVehicle->mDriveSimData.setDiffData(diff);
 
   PxVehicleTireData tireData;
   tireData.mFrictionVsSlipGraph[0][0] = 0.f;
@@ -293,7 +297,7 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
 
   PxVehicleClutchData clutch;
 
-  clutch.mStrength = 40.0f;
+  clutch.mStrength = 10.0f;
   clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eESTIMATE;
   clutch.mEstimateIterations = 5;
 
@@ -379,16 +383,14 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 }
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
-  deltaTime = std::min(deltaTime, 32.0f);
-  const auto step_target = 4.0;
 
-  // clamp the number of steps to at most 4 steps.
-  int number_of_update_steps =
-      std::min(4.0, std::floor(deltaTime / step_target));
-  float time_per_step = deltaTime / static_cast<float>(number_of_update_steps);
-  for (auto step = 0; step < number_of_update_steps; ++step) {
-    stepPhysics(time_per_step);
-  }
+  deltaTime = std::min(deltaTime, 32.0f);
+  stepPhysics(deltaTime);
+  /*const auto step_target = 8.0;
+  int steps = std::floor(deltaTime / step_target);
+  float step_delta = deltaTime / steps;
+  for (auto step = 0; step < steps; ++step) {
+  }*/
 }
 
 std::ostream &physx::operator<<(std::ostream &out,
@@ -440,15 +442,6 @@ void Physics::PhysicsSystem::onVehicleCreated(
   // link the component with the physx actor so we can replicate updates.
   vehicleComponent->pxVehicle = pxVehicle;
   pxVehicle->getRigidDynamicActor()->userData = vehicleComponent;
-
-  //  pxVehicle->mWheelsDynData.setUserData(0,
-  //  vehicleComponent->front_left_wheel.get());
-  //  pxVehicle->mWheelsDynData.setUserData(1,
-  //  vehicleComponent->front_right_wheel.get());
-  //  pxVehicle->mWheelsDynData.setUserData(2,
-  //  vehicleComponent->back_left_wheel.get());
-  //  pxVehicle->mWheelsDynData.setUserData(3,
-  //  vehicleComponent->back_right_wheel.get());
 }
 
 PxTriangleMesh *Physics::PhysicsSystem::createTriMesh(Mesh *mesh) {
