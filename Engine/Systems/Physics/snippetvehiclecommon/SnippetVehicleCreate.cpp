@@ -124,7 +124,8 @@ namespace snippetvehicle {
              PxMaterial **chassisMaterials, PxConvexMesh **chassisConvexMeshes,
              const PxU32 numChassisMeshes,
              const PxFilterData &chassisSimFilterData,
-             PxPhysics &physics) {
+             PxPhysics &physics,
+                PxTransform& chassis_local_pose) {
         //We need a rigid body actor for the vehicle.
         //Don't forget to add the actor to the scene after setting up the associated vehicle.
         PxRigidDynamic *vehActor = physics.createRigidDynamic(
@@ -154,7 +155,7 @@ namespace snippetvehicle {
                     *chassisMaterials[i]);
             chassisShape->setQueryFilterData(chassisQryFilterData);
             chassisShape->setSimulationFilterData(chassisSimFilterData);
-            chassisShape->setLocalPose(PxTransform(PxIdentity));
+            chassisShape->setLocalPose(chassis_local_pose);
         }
 
         vehActor->setMass(chassisData.mMass);

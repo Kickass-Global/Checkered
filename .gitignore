@@ -5,3 +5,5 @@ out/**
 .idea/**
 enc_temp_folder/**
 cmake-build*/**
+
+*.blend[1-9]

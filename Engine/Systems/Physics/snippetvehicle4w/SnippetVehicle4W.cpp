@@ -357,7 +357,7 @@ void initPhysics() {
 
     //Create a vehicle that will drive on the plane.
     VehicleDesc vehicleDesc = initVehicleDesc();
-    gVehicle4W = createVehicle4W(vehicleDesc, gPhysics, gCooking);
+    gVehicle4W = createVehicle4W(vehicleDesc, gPhysics, gCooking, PxTransform());
     PxTransform startTransform(PxVec3(0, (vehicleDesc.chassisDims.y * 0.5f +
                                           vehicleDesc.wheelRadius + 1.0f), 0),
                                PxQuat(PxIdentity));

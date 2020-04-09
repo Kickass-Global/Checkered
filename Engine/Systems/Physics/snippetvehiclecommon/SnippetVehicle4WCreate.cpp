@@ -239,7 +239,7 @@ namespace snippetvehicle {
     }
 
     PxVehicleDrive4W *createVehicle4W(
-        const VehicleDesc &vehicle4WDesc, PxPhysics *physics, PxCooking *cooking
+        const VehicleDesc &vehicle4WDesc, PxPhysics *physics, PxCooking *cooking, PxTransform chassis_local_pose
     ) {
 
         const PxVec3 chassisDims = vehicle4WDesc.chassisDims;
@@ -276,9 +276,7 @@ namespace snippetvehicle {
             }
 
             //Chassis just has a single convex shape for simplicity.
-            PxConvexMesh *chassisConvexMesh = createChassisMesh(
-                chassisDims, *physics, *cooking
-            );
+            PxConvexMesh* chassisConvexMesh = vehicle4WDesc.chassis; 
             PxConvexMesh *chassisConvexMeshes[1] = {chassisConvexMesh};
             PxMaterial *chassisMaterials[1] = {vehicle4WDesc.chassisMaterial};
 
@@ -290,7 +288,7 @@ namespace snippetvehicle {
 
             veh4WActor = createVehicleActor(
                 rigidBodyData, wheelMaterials, wheelConvexMeshes, numWheels, wheelSimFilterData, chassisMaterials,
-                chassisConvexMeshes, 1, chassisSimFilterData, *physics
+                chassisConvexMeshes, 1, chassisSimFilterData, *physics, chassis_local_pose
             );
         }
 

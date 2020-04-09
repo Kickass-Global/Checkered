@@ -73,7 +73,7 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
         auto force = 1000 * global_up - local_up;
         vehicle->pxVehicle->getRigidDynamicActor()->addTorque(force);
 
-        Engine::log<module, high>("Applying torque: ", force);
+        Engine::log<module, medium>("Applying torque: ", force);
       }
 
       if (vehicle->model) {

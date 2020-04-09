@@ -3,4 +3,4 @@
 //
 
 #include "damage.hpp"
-Damage::Damage(int damageAmount) : damage_amount(damageAmount) {}
+Damage::Damage(int damageAmount, std::string region) : damage_amount(damageAmount), name_of_region(region) {}

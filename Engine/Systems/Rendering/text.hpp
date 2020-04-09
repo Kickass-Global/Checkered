@@ -50,7 +50,7 @@ namespace Component {
 
         template<typename... Args>
         Text(Args... args) {
-
+            
             std::ostringstream buffer;
             (buffer << ... << args);
 

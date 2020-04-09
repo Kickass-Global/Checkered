@@ -79,7 +79,8 @@ namespace Physics {
 
         void onKeyPress(const EventArgs<int> &args);
 
-        PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform, bool is_player);
+        void onVehicleRegionDestroyed(PxVehicleDrive4W* vehicle, std::string region_name);
+        PxVehicleDrive4W *createDrivableVehicle(const PxTransform &worldTransform, bool is_player, PxConvexMesh* mesh, const PxTransform& chassis_local_transform);
 
         void onVehicleCreated(const EventArgs<Vehicle *> &args);
 
@@ -89,7 +90,7 @@ namespace Physics {
 
         PxTriangleMesh *createTriMesh(Mesh *mesh);
 
-        PxConvexMesh *createConvexMesh(Mesh *mesh);
+        PxConvexMesh *createConvexMesh(const Mesh *mesh);
 
         void onPassengerCreated(Passenger *passenger);
     };

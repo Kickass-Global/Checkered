@@ -51,9 +51,17 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() {
     vec3 diffuse = texture(tDiffuse, fTexcoord.st).xyz;
+
+    const float gamma = 2.0;
+  
+    // reinhard tone mapping
+    vec3 mapped = diffuse / (diffuse + vec3(1.0));
+    // gamma correction 
+    mapped = pow(mapped, vec3(1.0 / gamma));
+
     float shadow = ShadowCalculation(vec4(fLightSpacePosition,1));
 
-    colour = kA * (1.0 - shadow) * diffuse + diffuse * max(dot(fLightDirection, fNormal), 0.0);
+    colour = kA * (1.0 - shadow) * mapped + mapped * max(dot(fLightDirection, fNormal), 0.0);
     //+ diffuse * pow(dot(fLightReflection, fViewer), 4);
 }
 
