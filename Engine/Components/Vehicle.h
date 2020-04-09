@@ -88,6 +88,11 @@ public:
     log<module, high>("Vehicle hit ", actor, " impulse ", impulse);
     auto damage = std::clamp<int>(static_cast<int>(impulse / 300), 0, 15);
     model->getStore().emplaceComponent<Damage, 1>(damage);
+
+    if (damage > 0 && actor->type == Player)
+    {
+        getEngine()->createComponent<Component::Sound>("damageRecieved");
+    }
   }
 
   Vehicle()
