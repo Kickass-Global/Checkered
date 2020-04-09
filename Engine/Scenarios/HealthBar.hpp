@@ -30,8 +30,7 @@ struct HealthBar : public ComponentBase {
   }
 
   void tick(float time) {
-    auto health_percentage = (target->max_damage - target->current_damage) /
-                             static_cast<float>(target->max_damage) * 100.0f;
+    auto health_percentage = target->health  / target->max_health * 100.0f;
     auto number_of_health_symbols =
         std::clamp<float>(health_percentage, 0, 100);
 
