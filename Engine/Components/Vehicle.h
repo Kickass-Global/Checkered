@@ -22,6 +22,7 @@
 #include "Engine.h"
 #include "PhysicsActor.h"
 
+#include <Physics/Wheel.hpp>
 #include <Sound.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -33,7 +34,7 @@ struct CollisionEvent : public ComponentBase {
   CollisionEvent(class Vehicle *hitActor);
 };
 
-class Vehicle : public ComponentBase {
+struct Vehicle : public ComponentBase {
 public:
   bool is_outdated = true;
   std::shared_ptr<Model> model;
@@ -41,6 +42,11 @@ public:
   std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
   EventDelegate<Vehicle *> tickHandler{"tickHandler"};
   EventDelegate<class Vehicle *, float> onHit{"onHit"};
+
+  std::shared_ptr<Wheel> front_left_wheel;
+  std::shared_ptr<Wheel> front_right_wheel;
+  std::shared_ptr<Wheel> back_left_wheel;
+  std::shared_ptr<Wheel> back_right_wheel;
 
   enum Type { Player, Taxi } type = Taxi;
   AStar path;
@@ -122,6 +128,11 @@ public:
         this, &Vehicle::onTick);
     onHit += std::bind(&Vehicle::onHitHandler, this, std::placeholders::_1,
                        std::placeholders::_2);
+
+    front_left_wheel = getEngine()->createComponent<Wheel>();
+    front_right_wheel = getEngine()->createComponent<Wheel>();
+    back_left_wheel = getEngine()->createComponent<Wheel>();
+    back_right_wheel = getEngine()->createComponent<Wheel>();
   }
 };
 
@@ -183,8 +194,7 @@ struct ControlledVehicle : public ComponentBase {
     }
 
     if (key == GLFW_KEY_SPACE) {
-        isHonking = true;
-        
+      isHonking = true;
     }
     if (key == GLFW_KEY_D) {
       vehicle->pxVehicleInputData.setAnalogSteer(-1);
@@ -217,8 +227,7 @@ struct ControlledVehicle : public ComponentBase {
       vehicle->pxVehicleInputData.setAnalogSteer(0);
     }
     if (key == GLFW_KEY_SPACE) {
-        isHonking = false;
-        
+      isHonking = false;
     }
 
     if (key == GLFW_KEY_S) {

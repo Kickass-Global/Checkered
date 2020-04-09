@@ -2,7 +2,6 @@
 
 #include "Engine.h"
 #include "Systems/Pipeline/EntityLoader.h"
-#include "main.h"
 #include <start.hpp>
 
 int main() {

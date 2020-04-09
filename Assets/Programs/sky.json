@@ -1,0 +1,18 @@
+{
+  "entity": {
+    "shaders": [
+      {
+        "shader": [
+          0,
+          "Assets/Shaders/sky.vert"
+        ]
+      },
+      {
+        "shader": [
+          1,
+          "Assets/Shaders/sky.frag"
+        ]
+      }
+    ]
+  }
+}

@@ -44,9 +44,10 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
   //	while (dit != batch->details.end())
   //	{
   //		auto it = std::find_if(materials.begin(), materials.end(),
-  //[dit](auto material) {return material == dit->first.second.get(); }); 		if (it
-  //== materials.end()) { 			log<high>("Erasing batch details"); 			dit =
-  //batch->details.erase(dit);
+  //[dit](auto material) {return material == dit->first.second.get(); });
+  // if (it
+  //== materials.end()) { 			log<high>("Erasing batch
+  // details"); dit = batch->details.erase(dit);
   //		}
   //	}
   //}
@@ -95,8 +96,8 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     }
     if (!instance->instances.empty()) {
       Engine::log<module, low>("Updating instances(",
-                                       instance->instances.size(),
-                                       ") of component#", instance);
+                               instance->instances.size(), ") of component#",
+                               instance);
 
       updateInstanceData(
           instance->mesh, instance->material,
@@ -168,19 +169,20 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    float near_plane = -5.0f, far_plane = 100.0f;
+    float near_plane = -15.0f, far_plane = 15.0f;
     glm::mat4 lightProjection =
-        glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+        glm::ortho(-15.0f, 15.0f, -15.0f, 15.0f, near_plane, far_plane);
     // get player location....
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    //    glEnable(GL_CULL_FACE);
+    //    glCullFace(GL_FRONT);
     auto player = dynamic_cast<Component::Vehicle *>(camera->target.get());
     glm::mat4 lightViewProjection{1};
     if (player) {
-      glm::mat4 lightView =
-          glm::lookAt(player->position + glm::vec3(-20.0f, 41.0f, -10.0f),
-                      player->position, glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::mat4 lightView = glm::lookAt(
+          player->position +
+              10.0f * glm::normalize(glm::vec3(-1157.59f, 334.705f, -48.9735f)),
+          player->position, glm::vec3(0.0f, 1.0f, 0.0f));
       lightViewProjection = lightProjection * lightView;
 
       for (auto &&batch : batches) {
@@ -189,17 +191,16 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
           // bind programs, textures, and uniforms needed to render the batch
           depth_shader->bind();
 
-          auto location = glGetUniformLocation(depth_shader->programId(), "M_View");
-          glUniformMatrix4fv(
-              location, 1,
-              false, glm::value_ptr(lightView));
-          location = glGetUniformLocation(depth_shader->programId(), "M_Perspective");
-          glUniformMatrix4fv(
-              location,
-              1, false, glm::value_ptr(lightProjection));
+          auto location =
+              glGetUniformLocation(depth_shader->programId(), "M_View");
+          glUniformMatrix4fv(location, 1, false, glm::value_ptr(lightView));
+          location =
+              glGetUniformLocation(depth_shader->programId(), "M_Perspective");
+          glUniformMatrix4fv(location, 1, false,
+                             glm::value_ptr(lightProjection));
 
           batch->bind(*this);
-          batch->draw(*this);
+          batch->draw(*this, [](const Mesh &mesh) { return mesh.cast_shadow; });
         }
       }
     }
@@ -254,15 +255,28 @@ std::shared_ptr<Rendering::GeometryBatch>
 Rendering::RenderingSystem::findSuitableBufferFor(
     std::shared_ptr<Mesh> &mesh, std::shared_ptr<Material> &material) {
 
+  // assume that we only have one mesh per batch because I don't think that we
+  // will have time to implement proper batching now.
+
+  auto size_of_array_data =
+      mesh->vertices.size() * sizeof(decltype(mesh->vertices)::value_type);
+  auto size_of_element_data =
+      mesh->indices.size() * sizeof(decltype(mesh->indices)::value_type);
+
+  // assume that we can have up to 100 instances in a single buffer
+  auto size_of_instance_data = sizeof(glm::mat4) * 100;
+
   auto arrayBuffer = std::make_shared<Rendering::BatchBuffer>(
-      50000000, static_cast<int>(sizeof(mesh->vertices[0])), GL_ARRAY_BUFFER);
+      size_of_array_data, static_cast<int>(sizeof(mesh->vertices[0])),
+      GL_ARRAY_BUFFER);
 
   auto elementBuffer = std::make_shared<Rendering::BatchBuffer>(
-      5000000, static_cast<int>(sizeof(mesh->indices[0])),
+      size_of_element_data, static_cast<int>(sizeof(mesh->indices[0])),
       GL_ELEMENT_ARRAY_BUFFER);
 
   auto instanceBuffer = std::make_shared<Rendering::BatchBuffer>(
-      500000, static_cast<int>(sizeof(glm::mat4)), GL_ARRAY_BUFFER);
+      size_of_instance_data, static_cast<int>(sizeof(glm::mat4)),
+      GL_ARRAY_BUFFER);
 
   auto batch = std::make_shared<GeometryBatch>(arrayBuffer, elementBuffer,
                                                instanceBuffer);
@@ -319,7 +333,7 @@ void Rendering::RenderingSystem::initialize() {
 
   glfwSetWindowSizeCallback(window, windowSizeHandler);
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(0);
+  glfwSwapInterval(1); // enable VSync
 
   Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
                             "initialize GLAD");

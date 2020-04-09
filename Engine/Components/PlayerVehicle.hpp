@@ -30,18 +30,25 @@ struct Player : public ComponentBase {
     inputSystem->onKeyUp += controller->onKeyUpHandler;
     inputSystem->onKeyDown += controller->onKeyDownHandler;
 
-    auto basic_shader_program =
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-            "Assets/Programs/basic.json");
+    auto car_material = getEngine()->createComponent<Component::Material>();
 
-    auto car_material =
-        getEngine()->createComponent<Component::Material>(basic_shader_program);
     car_material->textures.push_back(
         getEngine()->createComponent<Component::Texture>(
             "Assets/Textures/Vehicle_Car01_c.png"));
     auto car_mesh =
         getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-            "Assets/Meshes/car_mesh.fbx");
+            "Assets/Meshes/car_body.obj");
+    auto car_left_mirror =
+        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+            "Assets/Meshes/car_left_mirror.obj");
+    auto car_right_mirror =
+        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+            "Assets/Meshes/car_right_mirror.obj");
+    auto car_bumper =
+        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+            "Assets/Meshes/car_front_bumper.obj");
+
+    car_mesh->cast_shadow = true;
 
     auto &player_vehicle = controller->vehicle;
 
@@ -50,10 +57,26 @@ struct Player : public ComponentBase {
             "player_damage_model");
 
     player_damage_model->parts.push_back(Component::Model::Part{});
+    player_damage_model->parts.push_back(Component::Model::Part{});
+    player_damage_model->parts.push_back(Component::Model::Part{});
+    player_damage_model->parts.push_back(Component::Model::Part{});
+
     player_damage_model->parts[0].variations.push_back(
         Component::Model::Variation{
             2000000,
             getEngine()->createComponent<PaintedMesh>(car_mesh, car_material)});
+    player_damage_model->parts[1].variations.push_back(
+        Component::Model::Variation{
+            2000000, getEngine()->createComponent<PaintedMesh>(car_left_mirror,
+                                                               car_material)});
+    player_damage_model->parts[2].variations.push_back(
+        Component::Model::Variation{
+            2000000, getEngine()->createComponent<PaintedMesh>(car_right_mirror,
+                                                               car_material)});
+    player_damage_model->parts[3].variations.push_back(
+        Component::Model::Variation{
+            2000000, getEngine()->createComponent<PaintedMesh>(car_bumper,
+                                                               car_material)});
 
     player_damage_model->onHealthChanged += [this](auto health) {
       if (health < 1) {

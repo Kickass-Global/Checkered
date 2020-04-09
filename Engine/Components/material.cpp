@@ -3,3 +3,8 @@
 //
 
 #include "material.hpp"
+#include <Pipeline/Library.h>
+Material::Material() : textures() {
+  shader = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
+      "Assets/Programs/basic.json");
+}

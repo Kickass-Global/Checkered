@@ -31,7 +31,7 @@ foreach (file ${SHADERS})
 endforeach ()
 
 
-FILE(GLOB_RECURSE SHADERS ${CMAKE_CURRENT_SOURCE_DIR}/Textures *.png *.jpg *.jpeg)
+FILE(GLOB_RECURSE SHADERS ${CMAKE_CURRENT_SOURCE_DIR}/Textures *.png *.jpg *.jpeg *.dds)
 foreach (file ${SHADERS})
     FILE(RELATIVE_PATH ITEM_PATH_REL ${CMAKE_CURRENT_SOURCE_DIR} ${file})
     message(STATUS "Copying "  ${CMAKE_CURRENT_BINARY_DIR}/../Engine/Assets/${ITEM_PATH_REL})

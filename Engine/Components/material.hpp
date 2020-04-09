@@ -34,10 +34,16 @@ public:
   explicit Material(std::shared_ptr<Program> shader)
       : shader(std::move(shader)), textures() {}
 
+  Material();
+  explicit Material(std::string texture_asset_name) : Material() {
+    textures.push_back(
+        getEngine()->createComponent<Component::Texture>(texture_asset_name));
+  }
+
   virtual void bind() {
 
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //    glEnable(GL_BLEND);
+    //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     int index = 0;
     for (auto &texture : textures) {
