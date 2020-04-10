@@ -200,7 +200,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                              glm::value_ptr(lightProjection));
 
           batch->bind(*this);
-          batch->draw(*this, [](const Mesh &mesh) { return mesh.cast_shadow; });
+          batch->draw(*this, [](const Mesh *mesh) { return mesh && mesh->cast_shadow; });
         }
       }
     }
@@ -333,7 +333,7 @@ void Rendering::RenderingSystem::initialize() {
 
   glfwSetWindowSizeCallback(window, windowSizeHandler);
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(1); // enable VSync
+  glfwSwapInterval(0); // enable VSync
 
   Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
                             "initialize GLAD");

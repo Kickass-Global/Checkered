@@ -186,7 +186,7 @@ void TestWorld::load() {
           "Assets/Meshes/Building_Shop_02.fbx");
 
   // load scenario
-  // scenarioLoader->load_scenario(*this, "Assets/Meshes/city.dae");
+  scenarioLoader->load_scenario(*this, "Assets/Meshes/obstacles.dae");
 
   // setup a HUD element...
 

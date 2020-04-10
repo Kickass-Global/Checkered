@@ -16,8 +16,8 @@
 #include <Events/Events.h>
 #include <GLFW/glfw3.h>
 #include <PxPhysicsAPI.h>
-#include <vehicle/PxVehicleDrive4W.h>
 #include <scenery.hpp>
+#include <vehicle/PxVehicleDrive4W.h>
 
 #include "ComponentInterface.h"
 #include "Engine.h"
@@ -47,7 +47,8 @@ namespace Component {
 		glm::quat orientation;
 		glm::decompose(T, scale, orientation, translation, skew, perspective);
 		return physx::PxTransform(translation.x, translation.y, translation.z,
-			physx::PxQuat(orientation.x, orientation.y, orientation.z, orientation.w));
+			physx::PxQuat(orientation.x, orientation.y,
+				orientation.z, orientation.w));
 	}
 
 	struct Vehicle : public ComponentBase {
@@ -58,7 +59,8 @@ namespace Component {
 		std::shared_ptr<EventHandler<Engine::deltaTime>> onTickHandler;
 		EventDelegate<Vehicle*> tickHandler{ "tickHandler" };
 		EventDelegate<CollisionEventArgs&> onHit{ "onHit" };
-		EventDelegate<physx::PxVehicleDrive4W*, std::string> onRegionDestroyed{ "onRegionDestroyed" };
+		EventDelegate<physx::PxVehicleDrive4W*, std::string> onRegionDestroyed{
+			"onRegionDestroyed" };
 
 		std::shared_ptr<Wheel> front_left_wheel;
 		std::shared_ptr<Wheel> front_right_wheel;
@@ -68,7 +70,7 @@ namespace Component {
 		enum Type { Player, Taxi } type = Taxi;
 		AStar path;
 		glm::vec3 scale = { 1, 1, 1 };
-		glm::quat rotation = { 1,0,0,0 };
+		glm::quat rotation = { 1, 0, 0, 0 };
 		glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::vec3 position;
 		glm::vec3 local_position = { 0, 0, 0 };
@@ -116,14 +118,14 @@ namespace Component {
 			log<module, high>("Region ", region_name, " has been destroyed.");
 			onRegionDestroyed(pxVehicle, region_name); // mmm onion
 			auto&& region = model->getRegionByName(region_name);
-			auto garbage = getEngine()->createComponent<Obstacle>(world_transform(), 
-				region.getActiveVariation().mesh->mesh, 
+			auto garbage = getEngine()->createComponent<Obstacle>(
+				world_transform(), region.getActiveVariation().mesh->mesh,
 				region.getActiveVariation().mesh->material);
 		}
 
 		Vehicle()
-			: pxSteerVsForwardSpeedData{ 0.0f,  0.75f, 35.0f,  0.75f,
-										60.0f, 0.1f,  120.0f, 0.1f },
+			: pxSteerVsForwardSpeedData{ 0.0f,  0.75f, 5.0f,  0.75f,
+										30.0f, 0.75f,  120.0f, 0.75f },
 			pxKeySmoothingData{ {
 								   6.0f, // rise rate eANALOG_INPUT_ACCEL
 								   6.0f, // rise rate eANALOG_INPUT_BRAKE
@@ -160,7 +162,8 @@ namespace Component {
 			onHit += std::bind(&Vehicle::onHitHandler, this, std::placeholders::_1);
 
 			model = getEngine()->createComponent<Model>();
-			model->onRegionDestroyed += std::bind(&Vehicle::onRegionDestroyedHandler, this, std::placeholders::_1);
+			model->onRegionDestroyed += std::bind(&Vehicle::onRegionDestroyedHandler,
+				this, std::placeholders::_1);
 
 			front_left_wheel = getEngine()->createComponent<Wheel>();
 			front_right_wheel = getEngine()->createComponent<Wheel>();
@@ -214,11 +217,8 @@ namespace Component {
 			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
 			auto key = std::get<0>(args.values);
 			if (key == GLFW_KEY_W) {
-
-				if (v.z < 0.0) {
-					vehicle->pxVehicle->mDriveDynData.forceGearChange(
-						physx::PxVehicleGearsData::eNEUTRAL);
-				}
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eFIRST);
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
 				getEngine()->createComponent<Component::Sound>("acceleration");
 			}
@@ -233,7 +233,7 @@ namespace Component {
 				vehicle->pxVehicleInputData.setAnalogSteer(-1);
 			}
 			if (key == GLFW_KEY_S) {
-				if (v.z > 0.1) {
+				if (v.z > 0.1) { // is moving forward
 					vehicle->pxVehicleInputData.setAnalogBrake(1);
 					getEngine()->createComponent<Component::Sound>("breaking");
 				}
@@ -247,9 +247,11 @@ namespace Component {
 		}
 
 		void onKeyUp(const EventArgs<int>& args) {
-
 			auto key = std::get<0>(args.values);
+
 			if (key == GLFW_KEY_W) {
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eNEUTRAL);
 				vehicle->pxVehicleInputData.setAnalogAccel(0);
 				getEngine()->createComponent<Component::Sound>("stopAcceleration");
 				getEngine()->createComponent<Component::Sound>("stopBreaking");
@@ -265,21 +267,51 @@ namespace Component {
 			}
 
 			if (key == GLFW_KEY_S) {
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eNEUTRAL);
 				vehicle->pxVehicleInputData.setAnalogBrake(0);
 				getEngine()->createComponent<Component::Sound>("stopAcceleration");
 				getEngine()->createComponent<Component::Sound>("stopBreaking");
 			}
 		}
 
+		bool reverse = false;
 		void onGamePadStateChanged(
 			const EventArgs<GLFWgamepadstate, GLFWgamepadstate>& args) {
 
+			auto norm = [](auto value) { return 0.5 * value + 0.5;  };
+
 			auto previous = std::get<0>(args.values);
 			auto current = std::get<1>(args.values);
-			float control_deadzone = 0.3f;
+			float control_deadzone = 0.03f;
 
-			vehicle->pxVehicleInputData.setAnalogAccel(
-				current.buttons[GLFW_GAMEPAD_BUTTON_A]);
+			float reverse_throttle_value = norm(current.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]);
+			float throttle_value = norm(current.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER]);
+
+			if (reverse_throttle_value > 0.2f)
+			{
+				reverse = true;
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eREVERSE);
+
+				vehicle->pxVehicleInputData.setAnalogAccel(
+					reverse_throttle_value
+				);
+			}
+			else if (throttle_value > 0.000001f) {
+
+				if (reverse) {
+					reverse = false;
+					vehicle->pxVehicle->mDriveDynData.forceGearChange(
+						physx::PxVehicleGearsData::eNEUTRAL);
+				}
+
+				vehicle->pxVehicleInputData.setAnalogAccel(
+					throttle_value
+				);
+			}
+
+
 			vehicle->pxVehicleInputData.setAnalogBrake(
 				current.buttons[GLFW_GAMEPAD_BUTTON_X]);
 
