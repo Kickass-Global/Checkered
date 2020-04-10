@@ -327,7 +327,7 @@ PxVehicleDrive4W *createVehicle4W(const VehicleDesc &vehicle4WDesc,
 
     // Gears
     PxVehicleGearsData gears;
-    gears.mSwitchTime = 0.5f;
+    gears.mSwitchTime = 0.25f;
     driveSimData.setGearsData(gears);
 
     // Clutch

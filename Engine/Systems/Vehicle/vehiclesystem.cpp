@@ -70,7 +70,7 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
         auto T = vehicle->pxVehicle->getRigidDynamicActor()->getGlobalPose();
         auto local_up = T.rotate(physx::PxVec3{0, 1, 0});
         auto global_up = physx::PxVec3{0, 1, 0};
-        auto force = 1000 * global_up - local_up;
+        auto force = 1500 * global_up - local_up;
         vehicle->pxVehicle->getRigidDynamicActor()->addTorque(force);
 
         Engine::log<module, medium>("Applying torque: ", force);

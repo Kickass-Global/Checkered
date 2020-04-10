@@ -78,17 +78,17 @@ VehicleDesc initVehicleDescription(bool is_player) {
 		(chassisDims.y * chassisDims.y + chassisDims.z * chassisDims.z) *
 		chassisMass / 12.0f,
 		(chassisDims.x * chassisDims.x + chassisDims.z * chassisDims.z) *
-		chassisMass / 10.0f,
+		chassisMass / 12.0f,
 		(chassisDims.x * chassisDims.x + chassisDims.y * chassisDims.y) *
 		chassisMass / 12.0f);
-	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f, -1.25f);
+	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y * 0.5f, -0.25f);
 
 	// Set up the wheel mass, radius, width, moment of inertia, and number of
 	// wheels. Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 50.0f;
+	const PxF32 wheelMass = 30.0f;
 	const PxF32 wheelRadius = 0.3231f;
 	const PxF32 wheelWidth = 0.3234f;
-	const PxF32 wheelMOI = 0.55f;
+	const PxF32 wheelMOI = 0.25f;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -251,22 +251,23 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 		-10),
 		PxQuat(PxIdentity));
 
-	pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform *
-		worldTransform);
+	pxVehicle->getRigidDynamicActor()->setGlobalPose(startTransform * worldTransform);
 
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
 	pxVehicle->setToRestState();
 	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
+	pxVehicle->mDriveDynData.mAutoBoxSwitchTime = 0.5;
+
 
 	PxVehicleEngineData engine;
 
 	engine.mMOI = 1;
-	engine.mPeakTorque = 600.0f;
-	engine.mMaxOmega = 900.0f;
-	engine.mDampingRateFullThrottle = 0.195f;
-	engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+	engine.mPeakTorque = 900.0f;
+	engine.mMaxOmega = 600.0f;
+	engine.mDampingRateFullThrottle = 0.1095f;
+	engine.mDampingRateZeroThrottleClutchEngaged = 0.20f;
 	engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
 	pxVehicle->mDriveSimData.setEngineData(engine);
@@ -282,9 +283,10 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 	tireData.mFrictionVsSlipGraph[1][1] = 1.0f;
 	tireData.mFrictionVsSlipGraph[2][0] = 1.f;
 	tireData.mFrictionVsSlipGraph[2][1] = 0.6f;
-	tireData.mLongitudinalStiffnessPerUnitGravity = 5.f;
+	tireData.mLongitudinalStiffnessPerUnitGravity = 150.f;
+	tireData.mCamberStiffnessPerUnitGravity = 150.f;
 	tireData.mLatStiffX = 2;
-	tireData.mLatStiffY = 18;
+	tireData.mLatStiffY = 15;
 
 	for (int i = 0; i < 3; i++) {
 		pxVehicle->mWheelsSimData.setTireData(0, tireData);
@@ -299,7 +301,7 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 
 	PxVehicleClutchData clutch;
 
-	clutch.mStrength = 15.0f;
+	clutch.mStrength = 10.0f;
 	clutch.mAccuracyMode = PxVehicleClutchAccuracyMode::eESTIMATE;
 	clutch.mEstimateIterations = 5;
 
@@ -475,7 +477,7 @@ void Physics::PhysicsSystem::onVehicleCreated(
 		}
 	}
 
-	vehicleComponent->onRegionDestroyed += std::bind(&PhysicsSystem::onVehicleRegionDestroyed, 
+	vehicleComponent->onRegionDestroyed += std::bind(&PhysicsSystem::onVehicleRegionDestroyed,
 		this, std::placeholders::_1, std::placeholders::_2);
 
 	Engine::log<module, Engine::high>("onVehicleCreated #", vehicleComponent);
@@ -509,7 +511,7 @@ PxTriangleMesh* Physics::PhysicsSystem::createTriMesh(Mesh* mesh) {
 	return cPhysics->createTriangleMesh(readBuffer);
 }
 
-PxConvexMesh* Physics::PhysicsSystem::createConvexMesh(const Mesh * mesh) {
+PxConvexMesh* Physics::PhysicsSystem::createConvexMesh(const Mesh* mesh) {
 
 	PxConvexMeshDesc convexDesc;
 	convexDesc.points.count = static_cast<PxU32>(mesh->vertices.size());
@@ -548,7 +550,7 @@ void Physics::PhysicsSystem::onActorCreated(
 		PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(
 			*aPhysicsActor->actor,
 			PxTriangleMeshGeometry(createTriMesh(aMesh.get())), *cMaterial);
-		
+
 	}
 	if (aPhysicsActor->type == PhysicsActor::Type::Ground) {
 		aPhysicsActor->actor =
@@ -580,8 +582,8 @@ void Physics::PhysicsSystem::onActorCreated(
 
 	switch (aPhysicsActor->type) {
 	case PhysicsActor::Type::StaticObject:
-		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eScenery | FilterGroup::eGround,
-			FilterMask::eEverything);
+		FilterShader::setupFiltering(aPhysicsActor->actor, FilterGroup::eGround,
+			FilterMask::eGroundColliders);
 		FilterShader::setupQueryFiltering(aPhysicsActor->actor, 0,
 			QueryFilterMask::eDrivable);
 		break;
