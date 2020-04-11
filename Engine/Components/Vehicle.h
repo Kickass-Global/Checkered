@@ -219,28 +219,29 @@ namespace Component {
 
 
 			if (key == GLFW_KEY_W) {
-				vehicle->pxVehicle->mDriveDynData.forceGearChange(
-					physx::PxVehicleGearsData::eFIRST);
+
+
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
 				getEngine()->createComponent<Component::Sound>("acceleration");
 			}
 
 			if (key == GLFW_KEY_S) {
-				if (v.z > 0.1) { // is moving forward
-					vehicle->pxVehicleInputData.setAnalogBrake(1);
-					getEngine()->createComponent<Component::Sound>("breaking");
-				}
-				else {
-					vehicle->pxVehicle->mDriveDynData.forceGearChange(
-						physx::PxVehicleGearsData::eREVERSE);
-					vehicle->pxVehicleInputData.setAnalogAccel(1);
-					getEngine()->createComponent<Component::Sound>("acceleration");
-				}
+				vehicle->pxVehicleInputData.setAnalogBrake(1);
+				getEngine()->createComponent<Component::Sound>("breaking");
 			}
+
+			if (key == GLFW_KEY_D) {
+				vehicle->pxVehicleInputData.setAnalogSteer(-1);
+			}
+
+			if (key == GLFW_KEY_A) {
+				vehicle->pxVehicleInputData.setAnalogSteer(1);
+			}
+
 			if (key == GLFW_KEY_LEFT_SHIFT) {
 				vehicle->pxVehicle->mDriveDynData.forceGearChange(
 					physx::PxVehicleGearsData::eREVERSE);
-
+				
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
 			}
 
@@ -249,6 +250,10 @@ namespace Component {
 
 		void onKeyUp(const EventArgs<int>& args) {
 			auto key = std::get<0>(args.values);
+
+			auto key = std::get<0>(args.values);
+			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
+
 
 			if (key == GLFW_KEY_W) {
 				vehicle->pxVehicle->mDriveDynData.forceGearChange(
@@ -270,13 +275,6 @@ namespace Component {
 				vehicle->pxVehicleInputData.setAnalogSteer(0);
 			}
 
-			if (key == GLFW_KEY_S) {
-				vehicle->pxVehicle->mDriveDynData.forceGearChange(
-					physx::PxVehicleGearsData::eNEUTRAL);
-				vehicle->pxVehicleInputData.setAnalogBrake(0);
-				getEngine()->createComponent<Component::Sound>("stopAcceleration");
-				getEngine()->createComponent<Component::Sound>("stopBreaking");
-			}
 			if (key == GLFW_KEY_LEFT_SHIFT) {
 				vehicle->pxVehicleInputData.setAnalogAccel(0);
 				//vehicle->pxVehicleInputData.setAnalogBrake(1);
@@ -285,7 +283,7 @@ namespace Component {
 
 
 
-
+			
 
 
 

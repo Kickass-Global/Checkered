@@ -255,12 +255,20 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
-        pxVehicle->setToRestState();
+	pxVehicle->setToRestState();
+	
+	
+	pxVehicle->mDriveDynData.setUseAutoGears(true);
 
         pxVehicle->mDriveDynData.setUseAutoGears(true);
         pxVehicle->mDriveDynData.mAutoBoxSwitchTime = 0.5;
 
-        PxVehicleEngineData engine;
+	engine.mMOI = .5;
+	engine.mPeakTorque = 10000.0f;
+	engine.mMaxOmega = 1000.0f;
+	engine.mDampingRateFullThrottle = 0.095f;
+	engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+	engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
         engine.mMOI = .5;
         engine.mPeakTorque = 900.0f;
