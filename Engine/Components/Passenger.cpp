@@ -52,9 +52,18 @@ void PassengerSystem::update(Engine::deltaTime elapsed) {
     current_passenger = getEngine()->createComponent<Component::Passenger>(
         pick_up_location, drop_off_location, tree_mesh, tree_material);
 
+    //check if report card should be deleted
+    if (current_passenger->passengerReportCard.reportCardTimeOut()) {
+        
+    }
+    current_passenger->passengerReportCard.destroyReportCard();
+
     current_passenger->onPassengerDroppedOffDelegate += [this](int id) {
-      // spawn the next passenger...
+      // spawn next passenger
       current_passenger.reset();
+
+
+
     };
   }
 }

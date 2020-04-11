@@ -2,6 +2,7 @@
 #ifndef PASSENGER_H
 #define PASSENGER_H
 
+#include <thread>
 #include "Component.h"
 #include "ComponentId.h"
 #include "Engine.h"
@@ -75,8 +76,10 @@ private:
     using namespace Engine;
     log<high>("Passenger dropped off");
     passengerReportCard.endReportCardTimer();
-    char grade = passengerReportCard.createFinalReport();
-    std::cout << "OnPassengerDroppedOff Grade: " << grade << std::endl;
+    passengerReportCard.createFinalReport();
+    passengerReportCard.displayReportCard(passengerReportCard.grade);
+    passengerReportCard.isDisplayed = true;
+    
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
@@ -88,11 +91,14 @@ private:
 };
 
 struct PassengerSystem : public SystemInterface {
-  std::vector<glm::vec3> locations = {{0, 0, 0},
-                                      {106, 0, -30},
-                                      {212, -13.5, 239},
-                                      {-151.5, 0, 43},
-                                      {-117, 21.84, -336}}; // possible spawns
+    /*
+    std::vector<glm::vec3> locations = { {0,0,0},{106,0,-30},
+    {212,-13.5,239},{-151.5,0,43},{-117,21.84,-336} };
+    */
+
+  std::vector<glm::vec3> locations = {{-4,0,-40},
+                                      {-20,0,-35}
+                                      }; // possible spawns
   std::shared_ptr<Passenger> current_passenger;
 
   void update(Engine::deltaTime elapsed) override;
