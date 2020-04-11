@@ -88,7 +88,7 @@ VehicleDesc initVehicleDescription(bool is_player) {
 	const PxF32 wheelMass = 50.0f;
 	const PxF32 wheelRadius = 0.3231f;
 	const PxF32 wheelWidth = 0.2234f;
-	const PxF32 wheelMOI = 0.35f;
+	const PxF32 wheelMOI = 0.1f;
 	const PxU32 nbWheels = 4;
 
 	VehicleDesc vehicleDesc;
@@ -257,17 +257,18 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
 	pxVehicle->setToRestState();
-	pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	
+	
 	pxVehicle->mDriveDynData.setUseAutoGears(true);
 
 	PxVehicleEngineData engine;
 
-	engine.mMOI = 1;
-	engine.mPeakTorque = 1000.0f;
+	engine.mMOI = .5;
+	engine.mPeakTorque = 10000.0f;
 	engine.mMaxOmega = 1000.0f;
-	//engine.mDampingRateFullThrottle = 0.095f;
-	//engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
-	//engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
+	engine.mDampingRateFullThrottle = 0.095f;
+	engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+	engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
 	pxVehicle->mDriveSimData.setEngineData(engine);
 
