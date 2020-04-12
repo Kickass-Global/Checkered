@@ -216,22 +216,15 @@ namespace Component {
 
 			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
 			auto key = std::get<0>(args.values);
+
+
 			if (key == GLFW_KEY_W) {
 				vehicle->pxVehicle->mDriveDynData.forceGearChange(
 					physx::PxVehicleGearsData::eFIRST);
 				vehicle->pxVehicleInputData.setAnalogAccel(1);
 				getEngine()->createComponent<Component::Sound>("acceleration");
 			}
-			if (key == GLFW_KEY_A) {
-				vehicle->pxVehicleInputData.setAnalogSteer(1);
-			}
 
-			if (key == GLFW_KEY_SPACE) {
-				isHonking = true;
-			}
-			if (key == GLFW_KEY_D) {
-				vehicle->pxVehicleInputData.setAnalogSteer(-1);
-			}
 			if (key == GLFW_KEY_S) {
 				if (v.z > 0.1) { // is moving forward
 					vehicle->pxVehicleInputData.setAnalogBrake(1);
@@ -244,6 +237,14 @@ namespace Component {
 					getEngine()->createComponent<Component::Sound>("acceleration");
 				}
 			}
+			if (key == GLFW_KEY_LEFT_SHIFT) {
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eREVERSE);
+
+				vehicle->pxVehicleInputData.setAnalogAccel(1);
+			}
+
+
 		}
 
 		void onKeyUp(const EventArgs<int>& args) {
@@ -254,16 +255,19 @@ namespace Component {
 					physx::PxVehicleGearsData::eNEUTRAL);
 				vehicle->pxVehicleInputData.setAnalogAccel(0);
 				getEngine()->createComponent<Component::Sound>("stopAcceleration");
+			}
+
+			if (key == GLFW_KEY_S) {
+				vehicle->pxVehicleInputData.setAnalogBrake(0);
 				getEngine()->createComponent<Component::Sound>("stopBreaking");
 			}
-			if (key == GLFW_KEY_A) {
-				vehicle->pxVehicleInputData.setAnalogSteer(0);
-			}
+
 			if (key == GLFW_KEY_D) {
 				vehicle->pxVehicleInputData.setAnalogSteer(0);
 			}
-			if (key == GLFW_KEY_SPACE) {
-				isHonking = false;
+
+			if (key == GLFW_KEY_A) {
+				vehicle->pxVehicleInputData.setAnalogSteer(0);
 			}
 
 			if (key == GLFW_KEY_S) {
@@ -273,6 +277,18 @@ namespace Component {
 				getEngine()->createComponent<Component::Sound>("stopAcceleration");
 				getEngine()->createComponent<Component::Sound>("stopBreaking");
 			}
+			if (key == GLFW_KEY_LEFT_SHIFT) {
+				vehicle->pxVehicleInputData.setAnalogAccel(0);
+				//vehicle->pxVehicleInputData.setAnalogBrake(1);
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eFIRST);
+			}
+
+
+
+
+
+
+
 		}
 
 		bool reverse = false;
