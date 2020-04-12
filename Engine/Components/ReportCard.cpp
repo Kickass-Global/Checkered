@@ -36,7 +36,7 @@ bool Component::ReportCard::reportCardTimeOut() {
 
 	duration delta = report_card_disp_end - report_card_disp_start;
 	delta = delta / 1000000000;
-	std::cout <<"delta count: " <<delta.count() << std::endl;
+	
 	if (delta.count() >= 5) {
 		return true;
 	}
@@ -47,29 +47,38 @@ bool Component::ReportCard::reportCardTimeOut() {
 
 char Component::ReportCard::createFinalReport() {
 	duration delta = dropoff_time - pickup_time;
+	
 
 	delta = delta / 1000000000;		//delta is now in seconds
+
 	
+	std::cout << "Time taken to drop off passenger: " << delta.count() << std::endl; ;
+
 	if (delta.count() <= S_grade_time) {
 		grade = 'S';
+		
 		return 'S';
 	}
 	else if (delta.count() < A_grade_time) {
 		grade = 'A';
+		
 		return 'A';
 	}
 	else if (delta.count() < B_grade_time) {
 		grade = 'B';
+		
 		return 'B';
 	}
 	else if (delta.count() < C_grade_time)
 	{
 		grade = 'C';
+		
 		return 'C';
 	}
 
 	else {
 		grade = 'F';
+		
 		return 'F';
 	
 	}
@@ -81,31 +90,25 @@ char Component::ReportCard::createFinalReport() {
 
 void Component::ReportCard::displayReportCard(char grade) {
 
-	std::cout << "show report card" << std::endl;
+	
+	isDisplayed = true;
+	
 	auto filename = "";
 
-	switch (grade)
-	{
-	case 'S':
+	if (grade == 'S')
 		filename = "Assets/Textures/report_card_s.png";
 
-	case 'A':
-		filename = "Assets/Textures/report_card_s.png";
+	else if (grade == 'A')
+		filename = "Assets/Textures/report_card_a.png";
 
-	case 'B':
-		filename = "Assets/Textures/report_card_s.png";
+	else if (grade == 'B')
+		filename = "Assets/Textures/report_card_b.png";
 
-	case 'C':
-		filename = "Assets/Textures/report_card_s.png";
+	else if(grade == 'C')
+		filename = "Assets/Textures/report_card_c.png";
 
-	case 'F':
-		filename = "Assets/Textures/report_card_s.png";
-
-
-	default:
-		std::cout << "No grade assigned to report card"<<std::endl;
-		break;
-	}
+	else if(grade == 'F')
+		filename = "Assets/Textures/report_card_c.png";
 
 	
 
@@ -137,9 +140,9 @@ void Component::ReportCard::displayReportCard(char grade) {
 
 	}
 	
-	isDisplayed = true;
+	
 	report_card_disp_start = std::chrono::steady_clock::now();
-
+	
 }
 
 void Component::ReportCard::destroyReportCard() {

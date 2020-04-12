@@ -62,7 +62,9 @@ private:
   void onPassengerPickedUp(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger picked up");
+
     passengerReportCard.startReportCardTimer();
+
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         pickup_actor.get());
     getEngine()->getSubSystem<EngineStore>()->getRoot().activate<Waypoint>(
@@ -70,16 +72,19 @@ private:
     dropoff_actor->mesh->enabled = true;
     pickup_actor->mesh->enabled = false;
     onPassengerPickedUpDelegate(0);
+
+
   }
 
   void onPassengerDroppedOff(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger dropped off");
+
     passengerReportCard.endReportCardTimer();
     passengerReportCard.createFinalReport();
     passengerReportCard.displayReportCard(passengerReportCard.grade);
-    passengerReportCard.isDisplayed = true;
     
+
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
