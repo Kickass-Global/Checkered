@@ -255,30 +255,28 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 
 	cScene->addActor(*pxVehicle->getRigidDynamicActor());
 
-	pxVehicle->setToRestState();
+        pxVehicle->setToRestState();
 
+        pxVehicle->mDriveDynData.setUseAutoGears(true);
+        pxVehicle->mDriveDynData.mAutoBoxSwitchTime = 0.5;
 
-	pxVehicle->mDriveDynData.setUseAutoGears(true);
-	pxVehicle->mDriveDynData.mAutoBoxSwitchTime = 0.5;
+        PxVehicleEngineData engine;
 
+        engine.mMOI = .5;
+        engine.mPeakTorque = 900.0f;
+        engine.mMaxOmega = 600.0f;
+        engine.mDampingRateFullThrottle = 0.195f;
+        engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
+        engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
 
-	PxVehicleEngineData engine;
+        pxVehicle->mDriveSimData.setEngineData(engine);
 
-	engine.mMOI = .5;
-	engine.mPeakTorque = 10000.0f;
-	engine.mMaxOmega = 1000.0f;
-	engine.mDampingRateFullThrottle = 0.095f;
-	engine.mDampingRateZeroThrottleClutchEngaged = 0.40f;
-	engine.mDampingRateZeroThrottleClutchDisengaged = 0.35f;
+        PxVehicleDifferential4WData diff;
+        diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
+        pxVehicle->mDriveSimData.setDiffData(diff);
 
-	pxVehicle->mDriveSimData.setEngineData(engine);
-
-	PxVehicleDifferential4WData diff;
-	diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
-	pxVehicle->mDriveSimData.setDiffData(diff);
-
-	PxVehicleTireData tireData;
-	tireData.mFrictionVsSlipGraph[0][0] = 0.f;
+        PxVehicleTireData tireData;
+        tireData.mFrictionVsSlipGraph[0][0] = 0.f;
 	tireData.mFrictionVsSlipGraph[0][1] = 0.4f;
 	tireData.mFrictionVsSlipGraph[1][0] = 0.5f;
 	tireData.mFrictionVsSlipGraph[1][1] = 1.0f;
