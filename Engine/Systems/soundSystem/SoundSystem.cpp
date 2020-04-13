@@ -42,6 +42,10 @@ void Engine::SoundSystem::initialize() {
     sourcePassengerDlivered = load_sound("Assets/Sounds/PassengerSuccess.wav");
 
     playSound(sourceMusic);
+
+    accelerationBuffer = load_buffer("Assets/Sounds/car+geardown.wav");
+    breakingBuffer = load_buffer("Assets/Sounds/TIRE+SKID.wav");
+    drivingBuffer = load_buffer("Assets/Sounds/carMoving.wav");
 }
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
@@ -481,3 +485,43 @@ void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
     }
 }
 
+ALuint Engine::SoundSystem::load_buffer(std::string filePath)
+{
+    std::uint8_t 	channels;
+    std::int32_t 	sampleRate;
+    std::uint8_t 	bitsPerSample;
+    ALsizei			dataSize;
+    char* rawSoundData = load_wav(filePath, channels, sampleRate, bitsPerSample, dataSize);
+    if (rawSoundData == nullptr || dataSize == 0)
+    {
+        std::cerr << "ERROR: Could not load wav" << std::endl;
+
+    }
+    std::vector<char> soundData(rawSoundData, rawSoundData + dataSize);
+
+    ALuint buffer;
+    alCall(alGenBuffers, 1, &buffer);
+
+    ALenum format;
+    if (channels == 1 && bitsPerSample == 8)
+        format = AL_FORMAT_MONO8;
+    else if (channels == 1 && bitsPerSample == 16)
+        format = AL_FORMAT_MONO16;
+    else if (channels == 2 && bitsPerSample == 8)
+        format = AL_FORMAT_STEREO8;
+    else if (channels == 2 && bitsPerSample == 16)
+        format = AL_FORMAT_STEREO16;
+    else
+    {
+        std::cerr
+            << "ERROR: unrecognised wave format: "
+            << channels << " channels, "
+            << bitsPerSample << " bps" << std::endl;
+
+    }
+
+    alCall(alBufferData, buffer, format, soundData.data(), soundData.size(), sampleRate);
+    soundData.clear(); // erase the sound in RAM
+
+    return buffer;
+}

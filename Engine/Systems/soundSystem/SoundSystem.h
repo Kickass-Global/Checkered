@@ -46,6 +46,10 @@ namespace Engine {
         ALuint sourceCollision;
         ALuint sourcePassengerDlivered;
 
+        ALuint accelerationBuffer;
+        ALuint breakingBuffer;
+        ALuint drivingBuffer;
+
         float volume = 0.5f;
 
         void onKeyDown(const Component::EventArgs<int>& args);
@@ -203,6 +207,8 @@ namespace Engine {
         int playSound(ALuint s);
     
         int stopSound(ALuint s);
+
+        ALuint load_buffer(std::string filePath);
 
  };
 }
