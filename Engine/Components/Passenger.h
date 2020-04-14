@@ -54,6 +54,8 @@ public:
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
 
+    passengerReportCard = getEngine()->createComponent<Component::ReportCard>();
+
     passengerReportCard.setReportCardGradeTimes(20, 30, 45, 60, 120);
 
   }
