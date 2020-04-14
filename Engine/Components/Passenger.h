@@ -83,7 +83,13 @@ private:
     using namespace Engine;
     log<high>("Passenger dropped off");
 
+<<<<<<< refs/remotes/origin/master
     passengerReportCard->destroyReportCard();
+=======
+    passengerReportCard->endReportCardTimer();
+    passengerReportCard->createFinalReport();
+    passengerReportCard->displayReportCard(passengerReportCard->grade);
+>>>>>>> - pointer
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());

@@ -23,10 +23,11 @@ namespace Component {
 		Damage(int damageAmount, std::string region);
 	};
 
-	struct DamageRegion : public  ComponentBase {
-		std::string region_name;
-		[[explicit]] DamageRegion(const std::string& name_of_region) : region_name(name_of_region) {}
-	};
+        struct DamageRegion : public ComponentBase {
+          std::string region_name;
+          DamageRegion(const std::string &name_of_region)
+              : region_name(name_of_region) {}
+        };
 
 	/**
 	 * This component controls how entities change in response to damage and
