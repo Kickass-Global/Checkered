@@ -33,7 +33,7 @@ public:
   PxTransform pickupTransform;
   PxTransform dropOffTransform;
 
-  ReportCard passengerReportCard;
+  std::shared_ptr<ReportCard> passengerReportCard;
 
   void setPickupTransform(PxTransform pickupTrans);
   void setDropoffTransform(PxTransform dropoffTrans);
@@ -53,9 +53,8 @@ public:
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
-
-    passengerReportCard.setReportCardGradeTimes(20, 30, 45, 60, 120);
-
+    passengerReportCard = getEngine()->createComponent<ReportCard>();
+    passengerReportCard->setReportCardGradeTimes(20, 30, 45, 60, 120);
   }
 
 private:
@@ -63,7 +62,7 @@ private:
     using namespace Engine;
     log<high>("Passenger picked up");
 
-    passengerReportCard.startReportCardTimer();
+    passengerReportCard->startReportCardTimer();
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         pickup_actor.get());
@@ -72,19 +71,15 @@ private:
     dropoff_actor->mesh->enabled = true;
     pickup_actor->mesh->enabled = false;
     onPassengerPickedUpDelegate(0);
-
-
   }
 
   void onPassengerDroppedOff(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger dropped off");
 
-    passengerReportCard.endReportCardTimer();
-    passengerReportCard.createFinalReport();
-    passengerReportCard.displayReportCard(passengerReportCard.grade);
-    
-
+    passengerReportCard->endReportCardTimer();
+    passengerReportCard->createFinalReport();
+    passengerReportCard->displayReportCard(passengerReportCard.grade);
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
