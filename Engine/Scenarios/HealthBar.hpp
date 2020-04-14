@@ -30,10 +30,11 @@ struct HealthBar : public ComponentBase {
   //updates health bar
   void updateHealthBar() {
       
-      std::cout << "Current health: " << target->health << std::endl;
+      
       getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
 
       if (target->health == 100) {
+          std::cout << "Current health: 100" <<  std::endl;
           health_sprite =
               getEngine()->createComponent<Texture>("Assets/Textures/health_bar_100.png");
           health_sprite_dimensions = { 0, 0, 256, 64 };
@@ -42,7 +43,7 @@ struct HealthBar : public ComponentBase {
 
 
       if (target->health > 75 && target->health < 100 ) {
-          
+          std::cout << "Current health: under 100" << std::endl;
           health_sprite =
               getEngine()->createComponent<Texture>("Assets/Textures/health_bar_75.png");
           health_sprite_dimensions = { 0, 0, 256, 64 };
@@ -50,6 +51,7 @@ struct HealthBar : public ComponentBase {
       }
 
       else if (target->health > 50 && target->health < 75) {
+          std::cout << "Current health: under 75" << std::endl;
           getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
           health_sprite =
               getEngine()->createComponent<Texture>("Assets/Textures/health_bar_50.png");
@@ -58,6 +60,7 @@ struct HealthBar : public ComponentBase {
       }
 
       else if (target->health < 50) {
+          std::cout << "Current health: under 50" << std::endl;
           getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
           health_sprite =
               getEngine()->createComponent<Texture>("Assets/Textures/health_bar_25.png");
