@@ -2,7 +2,6 @@
 #ifndef PASSENGER_H
 #define PASSENGER_H
 
-#include <thread>
 #include "Component.h"
 #include "ComponentId.h"
 #include "Engine.h"
@@ -14,6 +13,8 @@
 #include <PxRigidActor.h>
 #include <PxRigidBody.h>
 #include <PxShape.h>
+#include <future>
+#include <thread>
 
 using namespace physx;
 
@@ -57,7 +58,6 @@ public:
     passengerReportCard = getEngine()->createComponent<Component::ReportCard>();
 
     passengerReportCard->setReportCardGradeTimes(20, 30, 45, 60, 120);
-
   }
 
 private:
@@ -68,7 +68,12 @@ private:
     passengerReportCard->startReportCardTimer();
     passengerReportCard->endReportCardTimer();
     passengerReportCard->createFinalReport();
-    passengerReportCard->displayReportCard();
+    passengerReportCard->displayReportCard(passengerReportCard->grade);
+
+    std::thread([&]() {
+      std::this_thread::sleep_for(std::chrono::seconds(5));
+      passengerReportCard->destroyReportCard();
+    }).detach(); // todo not this...
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         pickup_actor.get());
@@ -97,14 +102,13 @@ private:
 };
 
 struct PassengerSystem : public SystemInterface {
-    /*
-    std::vector<glm::vec3> locations = { {0,0,0},{106,0,-30},
-    {212,-13.5,239},{-151.5,0,43},{-117,21.84,-336} };
-    */
+  /*
+  std::vector<glm::vec3> locations = { {0,0,0},{106,0,-30},
+  {212,-13.5,239},{-151.5,0,43},{-117,21.84,-336} };
+  */
 
-  std::vector<glm::vec3> locations = {{-4,0,-40},
-                                      {-20,0,-35}
-                                      }; // possible spawns
+  std::vector<glm::vec3> locations = {{-4, 0, -40},
+                                      {-20, 0, -35}}; // possible spawns
   std::shared_ptr<Passenger> current_passenger;
 
   void update(Engine::deltaTime elapsed) override;
