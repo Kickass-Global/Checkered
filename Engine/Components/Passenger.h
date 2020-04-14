@@ -79,7 +79,7 @@ private:
 
     passengerReportCard->endReportCardTimer();
     passengerReportCard->createFinalReport();
-    passengerReportCard->displayReportCard(passengerReportCard.grade);
+    passengerReportCard->displayReportCard(passengerReportCard->grade);
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
