@@ -238,7 +238,7 @@ PxVehicleDrive4W*
 Physics::PhysicsSystem::createDrivableVehicle(const PxTransform& worldTransform,
 	bool is_player, PxConvexMesh* chassis_mesh, const PxTransform& chassis_local_transform) {
 
-	PxVehicleDrive4W* pxVehicle;
+  PxVehicleDrive4W* pxVehicle;
 	VehicleDesc vehicleDesc = initVehicleDescription(is_player);
 	vehicleDesc.chassis = chassis_mesh;
 
