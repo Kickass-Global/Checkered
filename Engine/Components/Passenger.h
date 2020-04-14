@@ -83,7 +83,9 @@ private:
     using namespace Engine;
     log<high>("Passenger dropped off");
 
-    passengerReportCard->destroyReportCard();
+    passengerReportCard->endReportCardTimer();
+    passengerReportCard->createFinalReport();
+    passengerReportCard->displayReportCard(passengerReportCard->grade);
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
