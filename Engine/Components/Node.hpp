@@ -76,7 +76,7 @@ struct Node {
     }
   }
 
-  template <typename T> std::vector<T *> getComponentsOfType() {
+  template <typename T> std::vector<T *> getComponentsOfType(bool get_inactive_components = false) {
 
     static_assert(std::is_base_of<ComponentInterface, T>::value);
 
@@ -88,8 +88,9 @@ struct Node {
     result.reserve(it->second.size());
 
     for (auto ref : it->second) {
-      if (!ref.active)
-        continue;
+        if (!get_inactive_components && !ref.active) {
+            continue;
+        }
       auto ptr = std::static_pointer_cast<T>(ref.component).get();
       result.push_back(ptr);
     }

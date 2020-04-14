@@ -17,9 +17,11 @@ void Engine::BillboardSystem::update(Engine::deltaTime time) {
 	for (auto& camera : getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Camera>()) {
 
 		BoxModel screen{ 0, 0, camera->viewport.width, camera->viewport.height };
-
+		for (const auto& sprite : getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Billboard>(true)) {
+			sprite->mesh_instance->getStore().eraseComponentsOfType<WorldTransform>();
+		}
 		for (const auto& sprite : getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Billboard>()) {
-
+			
 			auto dst = sprite->plot.plot(screen.box, sprite->dst, sprite->src);
 
 			const auto& camera_view_matrix = camera->view;
@@ -41,7 +43,6 @@ void Engine::BillboardSystem::update(Engine::deltaTime time) {
 					dst.height / viewport.height // #todo, hack
 				));
 
-			sprite->mesh_instance->getStore().eraseComponentsOfType<WorldTransform>();
 			sprite->mesh_instance->getStore().emplaceComponent<WorldTransform>(offset * scale * anchor);
 		}
 

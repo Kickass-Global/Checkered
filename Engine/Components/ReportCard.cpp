@@ -101,23 +101,13 @@ void Component::ReportCard::displayReportCard(char grade) {
   auto report_bill_mesh =
       getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
           "Assets/Meshes/billboard_quad.obj");
-  //	report_bill_mesh->getStore().emplaceComponent<Component::Billboard>();
 
-  report_card_sprite = getEngine()->createComponent<Component::Billboard>();
+  std::cout << "createReportCard" << std::endl;
+  report_card_sprite = getEngine()->createComponent<Component::Billboard>(
+      getEngine()->createComponent<Component::Texture>(filename));
+
   report_card_sprite->plot = BoxModel{0, 0, 256, 256};
   report_card_sprite->dst = RelativeAnchor{0, 0};
-  {
-    auto report_card_mat = getEngine()->createComponent<Component::Material>(
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-            "Assets/Programs/billboard.json"));
-
-    report_card_mat->textures.push_back(
-        getEngine()->createComponent<Component::Texture>(filename));
-
-    report_card_sprite->mesh_instance =
-        getEngine()->createNamedComponent<PaintedMesh>(
-            "report_card_mesh_instance", report_bill_mesh, report_card_mat);
-  }
 
   report_card_disp_start = std::chrono::steady_clock::now();
 }
