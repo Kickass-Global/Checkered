@@ -56,7 +56,7 @@ public:
 
     passengerReportCard = getEngine()->createComponent<Component::ReportCard>();
 
-    passengerReportCard.setReportCardGradeTimes(20, 30, 45, 60, 120);
+    passengerReportCard->setReportCardGradeTimes(20, 30, 45, 60, 120);
 
   }
 
@@ -66,6 +66,9 @@ private:
     log<high>("Passenger picked up");
 
     passengerReportCard->startReportCardTimer();
+    passengerReportCard->endReportCardTimer();
+    passengerReportCard->createFinalReport();
+    passengerReportCard->displayReportCard();
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         pickup_actor.get());
@@ -80,9 +83,7 @@ private:
     using namespace Engine;
     log<high>("Passenger dropped off");
 
-    passengerReportCard->endReportCardTimer();
-    passengerReportCard->createFinalReport();
-    passengerReportCard->displayReportCard(passengerReportCard.grade);
+    passengerReportCard->destroyReportCard();
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
