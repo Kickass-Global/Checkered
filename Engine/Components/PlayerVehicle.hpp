@@ -89,6 +89,7 @@ namespace Component {
 					matte->dst = { 0, 0 };
 					matte->src = { 0, 0 };
 				}
+				
 			};
 
 			// when a region is destroyed we want to detach the shape from the vehicle 
