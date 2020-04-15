@@ -2,7 +2,21 @@
 #include "ReportCard.h"
 #include <iostream>
 
+
+Component::ReportCard::ReportCard() {
+
+    
+    report_bill_mesh =
+        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+            "Assets/Meshes/billboard_quad.obj");
+}
+
 Component::ReportCard::ReportCard(float S, float A, float B, float C, float F) {
+
+    
+    report_bill_mesh =
+        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+            "Assets/Meshes/billboard_quad.obj");
 
   S_grade_time = S;
   A_grade_time = A;
@@ -27,23 +41,14 @@ void Component::ReportCard::startReportCardTimer() {
 
 void Component::ReportCard::endReportCardTimer() {
   dropoff_time = std::chrono::steady_clock::now();
+
+  createFinalReport();
+  displayReportCard();
 }
 
-bool Component::ReportCard::reportCardTimeOut() {
 
-  report_card_disp_end = steady_clock::now();
 
-  duration delta = report_card_disp_end - report_card_disp_start;
-  delta = delta / 1000000000;
-
-  if (delta.count() >= 5) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-char Component::ReportCard::createFinalReport() {
+ void Component::ReportCard::createFinalReport() {
   duration delta = dropoff_time - pickup_time;
 
   delta = delta / 1000000000; // delta is now in seconds
@@ -55,31 +60,31 @@ char Component::ReportCard::createFinalReport() {
   if (delta.count() <= S_grade_time) {
     grade = 'S';
 
-    return 'S';
+
   } else if (delta.count() < A_grade_time) {
     grade = 'A';
 
-    return 'A';
+
   } else if (delta.count() < B_grade_time) {
     grade = 'B';
 
-    return 'B';
+
   } else if (delta.count() < C_grade_time) {
     grade = 'C';
 
-    return 'C';
+
   }
 
   else {
     grade = 'F';
 
-    return 'F';
+
   }
 }
 
-void Component::ReportCard::displayReportCard(char grade) {
+void Component::ReportCard::displayReportCard() {
 
-  isDisplayed = true;
+
 
   auto filename = "";
 
@@ -98,23 +103,22 @@ void Component::ReportCard::displayReportCard(char grade) {
   else if (grade == 'F')
     filename = "Assets/Textures/report_card_c.png";
 
-  auto report_bill_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/billboard_quad.obj");
+
 
   std::cout << "createReportCard" << std::endl;
   report_card_sprite = getEngine()->createComponent<Component::Billboard>(
       getEngine()->createComponent<Component::Texture>(filename));
 
-  report_card_sprite->plot = BoxModel{0, 0, 256, 256};
-  report_card_sprite->dst = RelativeAnchor{0, 0};
+  report_card_sprite->plot = BoxModel{0, -0.5, 256, 256};
+  report_card_sprite->dst = RelativeAnchor{0, 1};
+  report_card_sprite->src = { 0,1 };
 
   report_card_disp_start = std::chrono::steady_clock::now();
 }
 
 void Component::ReportCard::destroyReportCard() {
   std::cout << "destroyReportCard" << std::endl;
-  isDisplayed = false;
+  
   getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(
       report_card_sprite.get());
 }

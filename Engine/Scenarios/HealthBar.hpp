@@ -18,55 +18,67 @@
 namespace Component {
 struct HealthBar : public ComponentBase {
   std::shared_ptr<Model> target; // display the health of this
-  std::shared_ptr<Texture> health_sprite;
+  std::shared_ptr<Texture> health_sprite_100;
+  std::shared_ptr<Texture> health_sprite_75;
+  std::shared_ptr<Texture> health_sprite_50;
+  std::shared_ptr<Texture> health_sprite_25;
   std::shared_ptr<Billboard> billboard;
-  Engine::Rectangle health_sprite_dimensions;
+
+
   int previous_health;
 
   HealthBar() {
+      std::cout << "create health bar" << std::endl;
 
+      
+
+      health_sprite_100 =
+          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_100.png");
+      
+
+      health_sprite_75 =
+          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_75.png");
+
+      health_sprite_50 =
+          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_50.png");
+      
+      health_sprite_25 =
+          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_25.png");
+
+      billboard = getEngine()->createComponent<Billboard>(health_sprite_100);
+      billboard->plot = BoxModel(0, 0, 256, 64);
+      billboard->dst = RelativeAnchor{ -1,1 };
+      billboard->src = { -1,1 };
+      
   }
 
-  //updates health bar
   void updateHealthBar() {
       
-      
-      getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
 
-      if (target->health == 100) {
-          std::cout << "Current health: 100" <<  std::endl;
-          health_sprite =
-              getEngine()->createComponent<Texture>("Assets/Textures/health_bar_100.png");
-          health_sprite_dimensions = { 0, 0, 256, 64 };
-          billboard = getEngine()->createComponent<Billboard>(health_sprite);
-      }
 
 
       if (target->health > 75 && target->health < 100 ) {
-          std::cout << "Current health: under 100" << std::endl;
-          health_sprite =
-              getEngine()->createComponent<Texture>("Assets/Textures/health_bar_75.png");
-          health_sprite_dimensions = { 0, 0, 256, 64 };
-          billboard = getEngine()->createComponent<Billboard>(health_sprite);
+
+          billboard->mesh_instance->material->textures[0] = health_sprite_75;
+
       }
 
       else if (target->health > 50 && target->health < 75) {
-          std::cout << "Current health: under 75" << std::endl;
-          getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
-          health_sprite =
-              getEngine()->createComponent<Texture>("Assets/Textures/health_bar_50.png");
-          health_sprite_dimensions = { 0, 0, 256, 64 };
-          billboard = getEngine()->createComponent<Billboard>(health_sprite);
+      
+          billboard->mesh_instance->material->textures[0] = health_sprite_50;
       }
 
       else if (target->health < 50) {
-          std::cout << "Current health: under 50" << std::endl;
-          getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
-          health_sprite =
-              getEngine()->createComponent<Texture>("Assets/Textures/health_bar_25.png");
-          health_sprite_dimensions = { 0, 0, 256, 64 };
-          billboard = getEngine()->createComponent<Billboard>(health_sprite);
+          
+          billboard->mesh_instance->material->textures[0] = health_sprite_25;
       }
+
+      else if (target->health < 1) {
+          getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(
+              billboard.get());
+      }
+
+
 
 
   }
@@ -81,18 +93,18 @@ struct HealthBar : public ComponentBase {
   }
 
   void tick(float time) {
-    auto health_percentage = target->health  / target->max_health * 100.0f;
 
+    auto health_percentage = target->health  / target->max_health * 100.0f;
     if (healthHasChanged())
         updateHealthBar();
 
     
-    health_sprite_dimensions.width = health_percentage * 3;
+    //health_sprite_dimensions.width = health_percentage * 3;
 
-    auto [x, y, w, h] = health_sprite_dimensions;
-    billboard->plot = BoxModel(w / 2, h / 2, w, h);
-    billboard->dst = RelativeAnchor{-1, 1};
-    billboard->src = {-1, 1};
+    //auto [x, y, w, h] = health_sprite_dimensions;
+   // billboard->plot = BoxModel(w / 2, h / 2, w, h);
+    //billboard->dst = RelativeAnchor{-1, 1};
+    //billboard->src = {-1, 1};
     
     previous_health = target->health;
   }

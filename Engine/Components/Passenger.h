@@ -66,14 +66,6 @@ private:
     log<high>("Passenger picked up");
 
     passengerReportCard->startReportCardTimer();
-    passengerReportCard->endReportCardTimer();
-    passengerReportCard->createFinalReport();
-    passengerReportCard->displayReportCard(passengerReportCard->grade);
-
-    std::thread([&]() {
-      std::this_thread::sleep_for(std::chrono::seconds(5));
-      passengerReportCard->destroyReportCard();
-    }).detach(); // todo not this...
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         pickup_actor.get());
@@ -92,9 +84,17 @@ private:
     passengerReportCard->destroyReportCard();
 =======
     passengerReportCard->endReportCardTimer();
+<<<<<<< refs/remotes/origin/master
     passengerReportCard->createFinalReport();
     passengerReportCard->displayReportCard(passengerReportCard->grade);
 >>>>>>> - pointer
+=======
+
+    std::thread([&]() {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        passengerReportCard->destroyReportCard();
+    }).detach(); // todo not this...
+>>>>>>> Health bar and report card functional
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
