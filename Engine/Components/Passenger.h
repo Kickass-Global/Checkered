@@ -80,21 +80,12 @@ private:
     using namespace Engine;
     log<high>("Passenger dropped off");
 
-<<<<<<< refs/remotes/origin/master
-    passengerReportCard->destroyReportCard();
-=======
     passengerReportCard->endReportCardTimer();
-<<<<<<< refs/remotes/origin/master
-    passengerReportCard->createFinalReport();
-    passengerReportCard->displayReportCard(passengerReportCard->grade);
->>>>>>> - pointer
-=======
 
     std::thread([&]() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
         passengerReportCard->destroyReportCard();
     }).detach(); // todo not this...
->>>>>>> Health bar and report card functional
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
