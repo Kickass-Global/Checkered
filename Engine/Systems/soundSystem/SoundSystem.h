@@ -70,6 +70,9 @@ namespace Engine {
 
         void volumeDown();
         void volumeUp();
+
+        int timePassed = 0;
+        bool sourcesGenerated = false;
       
         
         void initialize() override;
@@ -212,6 +215,9 @@ namespace Engine {
         int stopSound(ALuint s);
 
         ALuint load_buffer(std::string filePath);
+        ALuint generateSource();
+        
+        void generateSources();
 
  };
 }

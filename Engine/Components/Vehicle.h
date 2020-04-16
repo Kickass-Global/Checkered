@@ -67,6 +67,7 @@ namespace Component {
 
 		ALuint aiSource;
 		
+		
 		bool initialAccelerate = false;
 		bool initialBreak = false;
 		

@@ -500,19 +500,19 @@ void TestWorld::load() {
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   //   spawn some ai bois into the world
-  //    auto dim = 1;
-  //    int spacing = 40;
-  //    for (int x = -dim; x <= dim; x++) {
-  //      for (int y = dim; y <= dim; y++) {
-  //        auto ai_vehicle =
-  //            make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing +
-  //            10)));
-  //        ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1,
-  //        0)); ai_vehicle->path.graphNodes = nav; ai_vehicle->tickHandler +=
-  //        ticker; // give them brain
-  //      }
-  //    }
-
+  auto dim = 1;
+      int spacing = 40;
+      for (int x = -dim; x <= dim; x++) {
+        for (int y = dim; y <= dim; y++) {
+          auto ai_vehicle =
+              make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing +
+              10)));
+         ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1,
+          0)); ai_vehicle->path.graphNodes = nav; ai_vehicle->tickHandler +=
+          ticker; // give them brain
+        }
+      }
+        
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();
   // camera->target = player_vehicle; // make camera follow player.
