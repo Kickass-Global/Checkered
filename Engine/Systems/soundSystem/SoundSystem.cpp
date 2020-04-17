@@ -48,6 +48,7 @@ void Engine::SoundSystem::initialize() {
     breakingBuffer = load_buffer("Assets/Sounds/TIRE+SKID.wav");
     drivingBuffer = load_buffer("Assets/Sounds/carMoving.wav");
 
+
     std::cout << "Check" << std::endl;
 
    
@@ -78,7 +79,11 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             playerVelocity = glm::vec3(velocity.x, velocity.y, velocity.z);
         }
     }
-    
+    float currentTotalVelocity = sqrt(playerVelocity.x * playerVelocity.x + playerVelocity.y * playerVelocity.y + playerVelocity.z * playerVelocity.z);
+    if (currentTotalVelocity < 0.08)
+    {
+        stopSound(sourceDriving);
+    }
 
     alCall(alListener3f, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
     alCall(alListener3f, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
@@ -89,6 +94,7 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
     alCall(alSource3f, sourceBreaking, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
     alCall(alSource3f, sourceBreaking, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
 
+    alCall(alSourcef, sourceDriving, AL_GAIN, drivingVolume);
     alCall(alSource3f, sourceDriving, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
     alCall(alSource3f, sourceDriving, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
 
@@ -172,16 +178,19 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
 
             glm::vec3 vehiclePosition = vehicle->position;
             auto velocity = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
+            glm::vec3 vehicleVelocity = glm::vec3(velocity.x, velocity.y, velocity.z);
+
+            float totalVehicleVelocity = sqrt(vehicleVelocity.x * vehicleVelocity.x + vehicleVelocity.y * vehicleVelocity.y + vehicleVelocity.z * vehicleVelocity.z);
 
             alCall(alSource3f, vehicle->aiSource, AL_POSITION, vehiclePosition.x, vehiclePosition.y, vehiclePosition.z);
-            alCall(alSource3f, vehicle->aiSource, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+            alCall(alSource3f, vehicle->aiSource, AL_VELOCITY, vehicleVelocity.x, vehicleVelocity.y, vehicleVelocity.z);
 
             if (vehicle->pxVehicleInputData.getAnalogAccel() == 1)
             {
                 currentAcceleration = true;
                 if (currentAcceleration != vehicle->initialAccelerate)
                 {
-
+                    stopSound(vehicle->aiSource);
                     alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_TRUE);
                     alCall(alSourcei, vehicle->aiSource, AL_BUFFER, accelerationBuffer);
                     playSound(vehicle->aiSource);
@@ -197,8 +206,12 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
                 if (currentAcceleration != vehicle->initialAccelerate)
                 {
                     stopSound(vehicle->aiSource);
-                    
                     std::cout << "Ai Vehicle stopped accelerated " << vehicle->aiSource << std::endl;
+                   
+                    alCall(alSourcef, vehicle->aiSource, AL_GAIN, drivingVolume);
+                    alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_TRUE);
+                    alCall(alSourcei, vehicle->aiSource, AL_BUFFER, drivingBuffer);
+                    playSound(vehicle->aiSource);
                     
                     vehicle->initialAccelerate = false;
 
@@ -209,6 +222,9 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
                 currentBreaking = true;
                 if (currentBreaking != vehicle->initialBreak)
                 {
+                    stopSound(vehicle->aiSource);
+                    
+
                     alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_FALSE);
                     alCall(alSourcei, vehicle->aiSource, AL_BUFFER, breakingBuffer);
                     playSound(vehicle->aiSource);
@@ -228,6 +244,10 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
                     
                     vehicle->initialBreak = false;
                 }
+            }
+            if (totalVehicleVelocity < 0.1)
+            {
+                stopSound(vehicle->aiSource);
             }
         }
     }

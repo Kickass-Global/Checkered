@@ -32,6 +32,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include <cmath>
+
 #define alCall(function, ...) alCallImpl(__FILE__, __LINE__, function, __VA_ARGS__)
 #define alcCall(function, device, ...) alcCallImpl(__FILE__, __LINE__, function, device, __VA_ARGS__)
 
@@ -54,6 +56,7 @@ namespace Engine {
         ALuint drivingBuffer;
 
         float volume = 0.5f;
+        float drivingVolume = 0.7f;
 
         void onKeyDown(const Component::EventArgs<int>& args);
         void onKeyUp(const Component::EventArgs<int>& args);

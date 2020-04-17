@@ -240,7 +240,7 @@ namespace Component {
 				if (v.z > 0.1) { // is moving forward
 					vehicle->pxVehicleInputData.setAnalogBrake(1);
 					getEngine()->createComponent<Component::Sound>("breaking");
-					getEngine()->createComponent<Component::Sound>("stopCarMoving");
+					
 				}
 				else {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(

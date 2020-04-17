@@ -500,7 +500,7 @@ void TestWorld::load() {
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   //   spawn some ai bois into the world
-  auto dim = 1;
+      auto dim = 1;
       int spacing = 40;
       for (int x = -dim; x <= dim; x++) {
         for (int y = dim; y <= dim; y++) {
