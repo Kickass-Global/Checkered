@@ -277,10 +277,6 @@ namespace Component {
 
 
 
-			
-
-
-
 		}
 
 		void onGamePadStateChanged(
@@ -290,10 +286,24 @@ namespace Component {
 			auto current = std::get<1>(args.values);
 			float control_deadzone = 0.3f;
 
-			vehicle->pxVehicleInputData.setAnalogAccel(
-				current.buttons[GLFW_GAMEPAD_BUTTON_A]);
-			vehicle->pxVehicleInputData.setAnalogBrake(
-				current.buttons[GLFW_GAMEPAD_BUTTON_X]);
+
+			if (current.buttons[GLFW_GAMEPAD_BUTTON_A]) {			//on key press
+				vehicle->pxVehicleInputData.setAnalogAccel(1);
+				getEngine()->createComponent<Component::Sound>("acceleration");
+			}
+
+			if (current.buttons[GLFW_GAMEPAD_BUTTON_B]) {
+				vehicle->pxVehicleInputData.setAnalogBrake(1);
+				getEngine()->createComponent<Component::Sound>("breaking");
+			}
+
+			if (current.buttons[GLFW_GAMEPAD_BUTTON_X]) {
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eREVERSE);
+
+				vehicle->pxVehicleInputData.setAnalogAccel(1);
+			}
+
 
 			if (current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -control_deadzone ||
 				current.axes[GLFW_GAMEPAD_AXIS_LEFT_X] >= control_deadzone) {
@@ -303,6 +313,24 @@ namespace Component {
 			else {
 				vehicle->pxVehicleInputData.setAnalogSteer(0);
 			}
+
+			if (previous.buttons[GLFW_GAMEPAD_BUTTON_A] && !current.buttons[GLFW_GAMEPAD_BUTTON_A]) {	//on key up
+				vehicle->pxVehicleInputData.setAnalogAccel(0);
+				getEngine()->createComponent<Component::Sound>("stopAcceleration");
+			}
+
+			if (previous.buttons[GLFW_GAMEPAD_BUTTON_B] && !current.buttons[GLFW_GAMEPAD_BUTTON_B]) {	
+				vehicle->pxVehicleInputData.setAnalogBrake(0);
+				getEngine()->createComponent<Component::Sound>("stopBreaking");
+			}
+
+			if (previous.buttons[GLFW_GAMEPAD_BUTTON_X] && !current.buttons[GLFW_GAMEPAD_BUTTON_X]) {
+				vehicle->pxVehicleInputData.setAnalogAccel(0);
+				//vehicle->pxVehicleInputData.setAnalogBrake(1);
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eFIRST);
+			}
+
+
 
 			const auto rotation_scale = static_cast<float>(3.14157) / 180.0f;
 			auto camera_yaw = current.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] * rotation_scale;
