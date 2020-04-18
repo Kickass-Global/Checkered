@@ -10,11 +10,8 @@
 #include <vector>
 #include "glm/glm.hpp"
 
-#include "assimp/Importer.hpp"
 #include "assimp/scene.h"
-#include "assimp/postprocess.h"
 
-#include "ComponentId.h"
 #include "ComponentBase.h"
 #include "material.hpp"
 
@@ -34,9 +31,9 @@ namespace Component {
     class Mesh : public ComponentBase {
 
     public:
-
-        std::vector<Vertex> vertices;
-        std::vector<int> indices;
+      bool cast_shadow = false;
+      std::vector<Vertex> vertices;
+      std::vector<int> indices;
 
     };
 

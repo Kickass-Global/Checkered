@@ -14,6 +14,7 @@ namespace Component {
 
 		high_resolution_clock::time_point pickup_time;
 		high_resolution_clock::time_point dropoff_time;
+		
 
 
 		float S_grade_time;				//sets the time to beat to get an A grade, B grade etc.
@@ -24,7 +25,7 @@ namespace Component {
 
 
 
-		char createFinalReport();
+		
 
 
 
@@ -36,7 +37,7 @@ namespace Component {
 		void startReportCardTimer();			//call when passenger is picked up
 		void endReportCardTimer();				//call when passenger is dropped off
 		void setReportCardGradeTimes(float S_time, float A_time, float B_time, float C_time, float F_time);
-
+		char createFinalReport();
 
 
 

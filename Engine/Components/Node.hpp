@@ -119,7 +119,7 @@ struct Node {
   }
 
   template <typename T, int ttl, typename... Args>
-  std::shared_ptr<T> emplaceComponent(Args &&... args) {
+  std::shared_ptr<T> emplaceComponent(Args... args) {
     static_assert(std::is_base_of<ComponentInterface, T>::value);
 
     auto component = create<T>(ttl, args...);

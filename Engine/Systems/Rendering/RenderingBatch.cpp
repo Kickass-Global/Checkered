@@ -6,9 +6,13 @@
 
 namespace Rendering {
 
-void GeometryBatch::draw(Rendering::RenderingSystem &renderingSystem) {
+void GeometryBatch::draw(Rendering::RenderingSystem &renderingSystem,
+                         std::function<bool(const Mesh*)> filter) {
 
   for (auto [key, detail] : details) {
+
+    if (!filter(key.first.get()))
+      continue;
 
     if (key.second) {
       key.second->bind();

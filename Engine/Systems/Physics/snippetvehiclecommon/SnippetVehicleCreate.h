@@ -83,6 +83,7 @@ namespace snippetvehicle {
                   shapeUserDatas(NULL) {
         }
 
+        PxConvexMesh* chassis;
         PxF32 chassisMass;
         PxVec3 chassisDims;
         PxVec3 chassisMOI;
@@ -103,8 +104,9 @@ namespace snippetvehicle {
     };
 
     PxVehicleDrive4W *
-    createVehicle4W(const VehicleDesc &vehDesc, PxPhysics *physics,
-                    PxCooking *cooking);
+    createVehicle4W(const VehicleDesc &vehDesc,
+ PxPhysics *physics,
+                    PxCooking *cooking, PxTransform chassis_local_pose);
 
     PxVehicleDriveTank *
     createVehicleTank(const VehicleDesc &vehDesc, PxPhysics *physics,
@@ -144,7 +146,8 @@ namespace snippetvehicle {
              PxMaterial **chassisMaterials, PxConvexMesh **chassisConvexMeshes,
              const PxU32 numChassisMeshes,
              const PxFilterData &chassisSimFilterData,
-             PxPhysics &physics);
+             PxPhysics &physics,
+                PxTransform& chassis_local_pose);
 
     void
     configureUserData(PxVehicleWheels *vehicle, ActorUserData *actorUserData,

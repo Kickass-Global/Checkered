@@ -29,6 +29,11 @@
 #include <vector>
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+
+#include <cmath>
+
 #define alCall(function, ...) alCallImpl(__FILE__, __LINE__, function, __VA_ARGS__)
 #define alcCall(function, device, ...) alcCallImpl(__FILE__, __LINE__, function, device, __VA_ARGS__)
 
@@ -46,7 +51,12 @@ namespace Engine {
         ALuint sourceCollision;
         ALuint sourcePassengerDlivered;
 
+        ALuint accelerationBuffer;
+        ALuint breakingBuffer;
+        ALuint drivingBuffer;
+
         float volume = 0.5f;
+        float drivingVolume = 0.7f;
 
         void onKeyDown(const Component::EventArgs<int>& args);
         void onKeyUp(const Component::EventArgs<int>& args);
@@ -63,6 +73,9 @@ namespace Engine {
 
         void volumeDown();
         void volumeUp();
+
+        int timePassed = 0;
+        bool sourcesGenerated = false;
       
         
         void initialize() override;
@@ -203,6 +216,11 @@ namespace Engine {
         int playSound(ALuint s);
     
         int stopSound(ALuint s);
+
+        ALuint load_buffer(std::string filePath);
+        ALuint generateSource();
+        
+        void generateSources();
 
  };
 }

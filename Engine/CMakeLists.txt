@@ -60,18 +60,18 @@ set(SRC main.cpp main.h
         Components/WorldTransform.h Components/WorldTransform.cpp
         Components/texture.cpp Components/texture.hpp
         Components/material.cpp Components/material.hpp 
-        Components/PhysicsActor.cpp Components/PhysicsActor.h 
+        Components/PhysicsActor.cpp Components/PhysicsActor.h
         Systems/Component/scenerysystem.cpp Systems/Component/scenerysystem.h
         Systems/EngineStore.cpp Systems/EngineStore.h
-        Systems/Physics/VehicleFactory.cpp Systems/Physics/VehicleFactory.hpp 
-        Systems/Physics/VehicleFactoryFunctions.cpp Systems/Physics/VehicleFactoryFunctions.hpp 
-        Components/TransformData.cpp Components/TransformData.hpp 
-        Components/bitmap.cpp Components/bitmap.hpp 
-        Systems/Rendering/fontsystem.cpp Systems/Rendering/fontsystem.hpp 
-        Systems/Rendering/text.cpp Systems/Rendering/text.hpp 
-        Scenarios/start.cpp Scenarios/start.hpp 
-        Scenarios/scenariointerface.cpp Scenarios/scenariointerface.hpp 
-        Systems/EngineDebug.cpp Systems/EngineDebug.hpp Components/Node.cpp Components/Node.hpp)
+        Systems/Physics/VehicleFactory.cpp Systems/Physics/VehicleFactory.hpp
+        Systems/Physics/VehicleFactoryFunctions.cpp Systems/Physics/VehicleFactoryFunctions.hpp
+        Components/TransformData.cpp Components/TransformData.hpp
+        Components/bitmap.cpp Components/bitmap.hpp
+        Systems/Rendering/fontsystem.cpp Systems/Rendering/fontsystem.hpp
+        Systems/Rendering/text.cpp Systems/Rendering/text.hpp
+        Scenarios/start.cpp Scenarios/start.hpp
+        Scenarios/scenariointerface.cpp Scenarios/scenariointerface.hpp
+        Systems/EngineDebug.cpp Systems/EngineDebug.hpp Components/Node.cpp Components/Node.hpp Components/PlayerVehicle.cpp Components/PlayerVehicle.hpp Systems/Physics/Wheel.cpp Systems/Physics/Wheel.hpp)
 
 # Add source to this project's executable.
 add_executable(Engine
@@ -113,7 +113,9 @@ target_link_libraries(Engine
         PRIVATE glfw
         PRIVATE SOIL
         PRIVATE freetype
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/assimp-vc141-mtd.lib
+
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/assimp/x64-Debug/lib/assimp-vc142-mt.lib
+
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rd-party/OpenAL/libs/Win64/OpenAL32.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysX_64.lib
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXCharacterKinematic_static_64.lib
@@ -126,7 +128,7 @@ target_link_libraries(Engine
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../libs/x64/PhysXVehicle_static_64.lib
         PRIVATE ${OPENGL_gl_LIBRARY})
 
-configure_file("../dlls/assimp-vc141-mtd.dll" assimp-vc141-mtd.dll COPYONLY)
+configure_file("../dlls/assimp-vc142-mt.dll" assimp-vc142-mt.dll COPYONLY)
 configure_file("../dlls/PhysXGpu_64.dll" PhysXGpu_64.dll COPYONLY)
 configure_file("../dlls/PhysX_64.dll" PhysX_64.dll COPYONLY)
 configure_file("../dlls/PhysXCommon_64.dll" PhysXCommon_64.dll COPYONLY)
@@ -147,7 +149,7 @@ target_include_directories(Engine SYSTEM PRIVATE ${OPENGL_INCLUDE_DIR}
         SYSTEM PRIVATE "../Include/PxShared/include"
         SYSTEM PRIVATE "../Include/include"
         SYSTEM PRIVATE "../Include/glminclude"
-        SYSTEM PRIVATE "../Include/assimp/include"
+        SYSTEM PRIVATE ../3rd-party/assimp/x64-Debug/include
         SYSTEM PRIVATE "../Include/glad/include")
 
 add_custom_command(

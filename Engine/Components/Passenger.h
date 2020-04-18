@@ -6,13 +6,13 @@
 #include "ComponentId.h"
 #include "Engine.h"
 #include "ReportCard.h"
+#include "Sound.h"
 #include "scenery.hpp"
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
 #include <PxRigidActor.h>
 #include <PxRigidBody.h>
 #include <PxShape.h>
-#include "Sound.h"
 
 using namespace physx;
 
@@ -49,12 +49,23 @@ public:
     dropoff_actor->onEntered += std::bind(&Passenger::onPassengerDroppedOff,
                                           this, std::placeholders::_1);
     dropoff_actor->mesh->enabled = false;
+
+    getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
+        dropoff_actor.get());
+
+    passengerReportCard.setReportCardGradeTimes(20, 30, 45, 60, 120);
+
   }
 
 private:
   void onPassengerPickedUp(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger picked up");
+    passengerReportCard.startReportCardTimer();
+    getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
+        pickup_actor.get());
+    getEngine()->getSubSystem<EngineStore>()->getRoot().activate<Waypoint>(
+        dropoff_actor.get());
     dropoff_actor->mesh->enabled = true;
     pickup_actor->mesh->enabled = false;
     onPassengerPickedUpDelegate(0);
@@ -63,11 +74,29 @@ private:
   void onPassengerDroppedOff(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger dropped off");
+    passengerReportCard.endReportCardTimer();
+    char grade = passengerReportCard.createFinalReport();
+    std::cout << "OnPassengerDroppedOff Grade: " << grade << std::endl;
+
+    getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
+        dropoff_actor.get());
     pickup_actor->mesh->enabled = false;
     dropoff_actor->mesh->enabled = false;
     onPassengerDroppedOffDelegate(0);
     getEngine()->createComponent<Component::Sound>("passengerDroppedOff");
   }
+};
+
+struct PassengerSystem : public SystemInterface {
+  std::vector<glm::vec3> locations = {{0, 0, 0},
+                                      {106, 0, -30},
+                                      {212, -13.5, 239},
+                                      {-151.5, 0, 43},
+                                      {-117, 21.84, -336}}; // possible spawns
+  std::shared_ptr<Passenger> current_passenger;
+
+  void update(Engine::deltaTime elapsed) override;
+  void initialize() override;
 };
 
 } // namespace Component

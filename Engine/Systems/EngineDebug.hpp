@@ -59,14 +59,13 @@ namespace Engine {
     }
 
     enum Importance {
-        low, medium, high
+        low, medium, high, none
     };
 
     constexpr Importance loggingLevel = high;
 
-
     template<char const *m, Importance importance, class ... Ts>
-    void log(Ts...args) {
+    void log(Ts...args) { 
 
         if (importance >= loggingLevel) {
 

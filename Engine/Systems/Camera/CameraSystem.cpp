@@ -66,7 +66,7 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
         // this line of code controls the camera returning to 'neutral' position
         // behind the target...
         camera->rotation = glm::slerp(camera->rotation, transform->rotation,
-                                      0.3f); // todo, scale this with speed
+                                      0.03f); // todo, scale this with speed
         camera->position = transform->position + glm::vec3(offset);
 
         // Engine::log<module>(transform->rotation);

@@ -59,7 +59,7 @@ PxVehicleDrive4W *Engine::VehicleFactory::createVehicle(const struct VehicleDesc
 
         veh4WActor = snippetvehicle::createVehicleActor(
             rigidBodyData, wheelMaterials, wheelConvexMeshes, numWheels, wheelSimFilterData, chassisMaterials,
-            chassisConvexMeshes, 1, chassisSimFilterData, *pxPhysics
+            chassisConvexMeshes, 1, chassisSimFilterData, *pxPhysics, PxTransform()
         );
     }
 

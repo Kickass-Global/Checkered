@@ -207,7 +207,7 @@ namespace snippetvehicle {
                      wheelSimFilterData,
                      chassisMaterials, chassisConvexMeshes, 1,
                      chassisSimFilterData,
-                     *physics);
+                     *physics, PxTransform());
         }
 
         //Set up the sim data for the wheels.

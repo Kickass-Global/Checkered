@@ -11,74 +11,7 @@
 #include <optional>
 #include <scenery.hpp>
 
-namespace Component {
-struct HealthBar : public ComponentBase {
-  std::shared_ptr<Model> target; // display the health of this
-  std::shared_ptr<Texture> health_sprite;
-  std::shared_ptr<Billboard> billboard;
-  Engine::Rectangle health_sprite_dimensions;
-
-  HealthBar() {
-    health_sprite =
-        getEngine()->createComponent<Texture>("Assets/Textures/health.png");
-    health_sprite_dimensions = {0, 0, 32, 32};
-    billboard = getEngine()->createComponent<Billboard>(health_sprite);
-  }
-
-  void tick(float time) {
-    auto health_percentage = (target->max_damage - target->current_damage) /
-                             static_cast<float>(target->max_damage) * 100.0f;
-    auto number_of_health_symbols =
-        std::clamp<float>(health_percentage, 0, 100);
-
-    health_sprite_dimensions.width = health_percentage * 3;
-
-    auto [x, y, w, h] = health_sprite_dimensions;
-    billboard->plot = BoxModel(w / 2, h / 2, w, h);
-    billboard->dst = RelativeAnchor{-1, 1};
-    billboard->src = {-1, 1};
-  }
-};
-
-struct WaypointArrow : public ComponentBase {
-  std::shared_ptr<Component::PaintedMesh> m_mesh;
-  glm::vec3 waypoint_location = {0, 0, 0};
-  std::shared_ptr<Vehicle> target_vehicle;
-
-  WaypointArrow() {
-    const std::shared_ptr<Program> &basic_program =
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-            "Assets/Programs/basic.json");
-    auto material =
-        getEngine()->createComponent<Component::Material>(basic_program);
-    auto mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-        "Assets/Meshes/arrow.obj");
-    m_mesh = getEngine()->createComponent<PaintedMesh>(mesh, material);
-  }
-
-  void tick(float time) {
-
-    auto waypoints = getEngine()
-                         ->getSubSystem<EngineStore>()
-                         ->getRoot()
-                         .getComponentsOfType<Waypoint>();
-    if (!waypoints.empty()) {
-      waypoint_location = waypoints[0]->actor->position;
-      auto direction =
-          -glm::normalize(waypoint_location - target_vehicle->position);
-      auto up = glm::vec3{0, 1, 0};
-      auto p = glm::cross(direction, up);
-      glm::mat4 T = glm::mat4(
-          glm::vec4(p, 0), glm::vec4(up, 0), glm::vec4(direction, 0),
-          glm::vec4{target_vehicle->position.x, target_vehicle->position.y + 2,
-                    target_vehicle->position.z, 1});
-
-      m_mesh->getStore().eraseComponentsOfType<WorldTransform>();
-      m_mesh->getStore().emplaceComponent<WorldTransform>(T);
-    }
-  }
-};
-} // namespace Component
+namespace Component {} // namespace Component
 struct Timer : public ComponentBase {
 
   std::shared_ptr<Billboard> background;

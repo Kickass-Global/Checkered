@@ -1,5 +1,6 @@
 
 #include "ReportCard.h"
+#include <iostream>
 
 Component::ReportCard::ReportCard(float S, float A, float B, float C, float F) {
 
@@ -32,8 +33,8 @@ void Component::ReportCard::endReportCardTimer() {
 char Component::ReportCard::createFinalReport() {
 	duration delta = dropoff_time - pickup_time;
 
-	delta = delta / 1000;		//delta is now in seconds
-	
+	delta = delta / 1000000000;		//delta is now in seconds
+	std::cout << "Component::ReportCard time taken: " <<delta.count()<<" seconds"<< std::endl;
 	if (delta.count() <= S_grade_time) return 'S';
 	else if (delta.count() < A_grade_time) return 'A';
 	else if (delta.count() < B_grade_time) return 'B';
