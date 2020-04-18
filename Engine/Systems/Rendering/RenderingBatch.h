@@ -150,7 +150,7 @@ public:
    */
   void draw(
       Rendering::RenderingSystem &renderingSystem,
-      std::function<bool(const Mesh &)> filter = [](auto) { return true; });
+      std::function<bool(const Mesh*)> filter = [](auto) { return true; });
 
   [[nodiscard]] bool contains(std::shared_ptr<Mesh> mesh,
                               std::shared_ptr<Material> material) const;
