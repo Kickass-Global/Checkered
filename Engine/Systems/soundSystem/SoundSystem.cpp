@@ -51,23 +51,23 @@ void Engine::SoundSystem::initialize() {
 
     std::cout << "Check" << std::endl;
 
-   
+
     std::cout << "Check2" << std::endl;
 
 }
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
-   
+
     if (timePassed < 102)
     timePassed = timePassed + 1;
-    
+
     if (timePassed > 100)
     {
-   
-   
+
+
 
     auto vehicles = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Vehicle>();
-    
+
     glm::vec3 playerPosition;
     glm::vec3 playerVelocity;
     for (const auto& vehicle : vehicles)
@@ -109,7 +109,7 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
 
 
 
-    
+
 
 
     auto sounds = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Sound>();
@@ -156,20 +156,20 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             stopSound(sourceDriving); getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
-    
+
     }
-    
-   
+
+
         if (sourcesGenerated == false)
         {
             generateSources();
             sourcesGenerated = true;
         }
 
-        
+
         for ( auto& vehicle : vehicles)
         {
-            
+
 
              if (vehicle->type == Component::Vehicle::Type::Player) { continue; }
 
@@ -207,12 +207,12 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
                 {
                     stopSound(vehicle->aiSource);
                     std::cout << "Ai Vehicle stopped accelerated " << vehicle->aiSource << std::endl;
-                   
+
                     alCall(alSourcef, vehicle->aiSource, AL_GAIN, drivingVolume);
                     alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_TRUE);
                     alCall(alSourcei, vehicle->aiSource, AL_BUFFER, drivingBuffer);
                     playSound(vehicle->aiSource);
-                    
+
                     vehicle->initialAccelerate = false;
 
                 }
@@ -223,12 +223,12 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
                 if (currentBreaking != vehicle->initialBreak)
                 {
                     stopSound(vehicle->aiSource);
-                    
+
 
                     alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_FALSE);
                     alCall(alSourcei, vehicle->aiSource, AL_BUFFER, breakingBuffer);
                     playSound(vehicle->aiSource);
-                    
+
                     std::cout << "Ai Vehicle started Breaking " << vehicle->aiSource << std::endl;
 
                     vehicle->initialBreak = true;
@@ -241,7 +241,7 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
                 {
 
                     stopSound(vehicle->aiSource);
-                    
+
                     vehicle->initialBreak = false;
                 }
             }
@@ -558,7 +558,7 @@ void Engine::SoundSystem::volumeDown()
     alCall(alSourcef, sourceHorn, AL_GAIN, volume);
     alCall(alSourcef, sourceCollision, AL_GAIN, volume);
     alCall(alSourcef, sourceDriving, AL_GAIN, volume);
-
+    alCall(alSourcef, sourcePassengerDlivered, AL_GAIN, volume);
 }
 
 void Engine::SoundSystem::volumeUp()
@@ -569,6 +569,7 @@ void Engine::SoundSystem::volumeUp()
     alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
     alCall(alSourcef, sourceHorn, AL_GAIN, volume);
     alCall(alSourcef, sourceCollision, AL_GAIN, volume);
+    alCall(alSourcef, sourcePassengerDlivered, AL_GAIN, volume);
     alCall(alSourcef, sourceDriving, AL_GAIN, volume);
 }
 
@@ -593,7 +594,7 @@ void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
             }
 
         }
-        
+
         auto key = args.get<0>();
         if (key != GLFW_KEY_W && key != GLFW_KEY_S && v.z != 0)
         {
@@ -697,5 +698,5 @@ void Engine::SoundSystem::generateSources()
         vehicle->aiSource = generateSource();
         std::cout << "Vehicle Source generated: " << vehicle->aiSource << std::endl;
     }
-    
+
 }

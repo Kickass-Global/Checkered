@@ -66,11 +66,11 @@ namespace Component {
 			"onRegionDestroyed" };
 
 		ALuint aiSource;
-		
-		
+
+
 		bool initialAccelerate = false;
 		bool initialBreak = false;
-		
+
 
 		std::shared_ptr<Wheel> front_left_wheel;
 		std::shared_ptr<Wheel> front_right_wheel;
@@ -240,7 +240,7 @@ namespace Component {
 				if (v.z > 0.1) { // is moving forward
 					vehicle->pxVehicleInputData.setAnalogBrake(1);
 					getEngine()->createComponent<Component::Sound>("breaking");
-					
+
 				}
 				else {
 					vehicle->pxVehicle->mDriveDynData.forceGearChange(
@@ -260,7 +260,7 @@ namespace Component {
 		}
 
 		void onKeyUp(const EventArgs<int>& args) {
-			
+
 			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
 			auto key = std::get<0>(args.values);
 
