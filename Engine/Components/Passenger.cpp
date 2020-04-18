@@ -13,6 +13,7 @@ void Component::Passenger::setPickupTransform(PxTransform trans) {
 void Component::Passenger::setDropoffTransform(PxTransform trans) {
   dropOffTransform = trans;
 }
+
 void PassengerSystem::update(Engine::deltaTime elapsed) {
   SystemInterface::update(elapsed);
 
@@ -53,7 +54,7 @@ void PassengerSystem::update(Engine::deltaTime elapsed) {
         pick_up_location, drop_off_location, tree_mesh, tree_material);
 
     current_passenger->onPassengerDroppedOffDelegate += [this](int id) {
-      // spawn the next passenger...
+      // spawn next passenger
       current_passenger.reset();
     };
   }

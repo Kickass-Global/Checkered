@@ -99,6 +99,7 @@ class GeometryBatch {
 
 public:
   std::shared_ptr<Program> shader;
+  bool enabled = false;
 
   std::shared_ptr<Rendering::BatchBuffer> arrayBuffer;
   std::shared_ptr<Rendering::BatchBuffer> elementBuffer;
@@ -122,10 +123,14 @@ public:
     int count = size / stride;
     auto replace_existing_data = count <= detail[2].count;
 
+    enabled = true;
+
     switch (buffer) {
     case 2:
       if (replace_existing_data) {
-        instanceBuffer->replace_existing_data(size, data, detail[buffer]);
+        if (size) {
+          instanceBuffer->replace_existing_data(size, data, detail[buffer]);
+        }
         detail[buffer].count = count;
       } else {
         detail[2] = instanceBuffer->push_back(count, data, stride);
