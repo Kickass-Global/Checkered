@@ -342,7 +342,7 @@ void Rendering::RenderingSystem::initialize() {
 
   glfwSetWindowSizeCallback(window, windowSizeHandler);
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(0); // enable VSync
+  glfwSwapInterval(1); // enable VSync
 
   Engine::assertLog<module>(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
                             "initialize GLAD");
