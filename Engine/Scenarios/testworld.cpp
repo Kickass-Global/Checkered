@@ -86,8 +86,8 @@ void TestWorld::load() {
   auto basic_shader_program = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
       "Assets/Programs/basic.json");
 
-  timer = getEngine()->createComponent<Timer>();
-  timer->start();
+ // timer = getEngine()->createComponent<Timer>();
+  //timer->start();
 
   // create a scene object to hold the ground components to follow.
   Instance<DrivableScenery> drivable_instances;
