@@ -94,36 +94,32 @@ void TestWorld::load() {
 
   // make a material component
   auto ground_material_1 =
-      getEngine()->createComponent<Component::Material>("Assets/Textures/bake1.png");
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake_nw.png");
   auto ground_material_2 =
-      getEngine()->createComponent<Component::Material>("Assets/Textures/bake2.png");
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake_ne.png");
   auto ground_material_3 =
-      getEngine()->createComponent<Component::Material>("Assets/Textures/bake3.png");
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake_sw.png");
   auto ground_material_4 =
-      getEngine()->createComponent<Component::Material>("Assets/Textures/bake4.png");
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake_se.png");
 
   // load the mesh component
-  auto city_block_1 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-      "Assets/Meshes/city-block-1.obj");
-  auto city_block_2 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-      "Assets/Meshes/city-block-2.obj");
-  auto city_block_3 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-      "Assets/Meshes/city-block-3.obj");
-  auto city_block_4 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-      "Assets/Meshes/city-block-4.obj");
+  auto city_block_1 =
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/city_nw.obj");
+  auto city_block_2 =
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/city_ne.obj");
+  auto city_block_3 =
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/city_sw.obj");
+  auto city_block_4 =
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/city_se.obj");
 
-  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-                                         glm::translate(glm::vec3{0, -1, 0}),
-                                     city_block_1, ground_material_1, city_block_1);
-  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-                                         glm::translate(glm::vec3{0, -1, 0}),
-                                     city_block_2, ground_material_2, city_block_2);
-  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-                                         glm::translate(glm::vec3{0, -1, 0}),
-                                     city_block_3, ground_material_3, city_block_3);
-  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-                                         glm::translate(glm::vec3{0, -1, 0}),
-                                     city_block_4, ground_material_4, city_block_4);
+  drivable_instances.add_instance_at(glm::translate(glm::vec3{0, 0, 0}), city_block_1,
+                                     ground_material_1, city_block_1);
+  drivable_instances.add_instance_at(glm::translate(glm::vec3{0, 0, 0}), city_block_2,
+                                     ground_material_2, city_block_2);
+  drivable_instances.add_instance_at(glm::translate(glm::vec3{0, 0, 0}), city_block_3,
+                                     ground_material_3, city_block_3);
+  drivable_instances.add_instance_at(glm::translate(glm::vec3{0, 0, 0}), city_block_4,
+                                     ground_material_4, city_block_4);
 
   // create some buildings
 
