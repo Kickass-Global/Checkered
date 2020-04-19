@@ -66,6 +66,7 @@ struct MenuState : ComponentBase {
             if (active) {
                 getEngine()->getSubSystem<EngineStore>()->getRoot().activate(background.get());
                 getEngine()->getSubSystem<EngineStore>()->getRoot().activate(text.get());
+
             } else {
                 getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(background.get());
                 getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(text.get());
@@ -79,6 +80,7 @@ struct MenuState : ComponentBase {
         text->plot = BoxModel{d.x, d.y, d.width, d.height}.plot(d, {0, 1}, {-1, -1});
         text->src = {0, 0};
         text->dst = {0, 0};
+        
     }
 
     MenuState(std::shared_ptr<Texture> background_image, std::string menu_text)
@@ -180,19 +182,37 @@ struct MainMenu : public ComponentBase {
     EventDelegate<int> onStart{"onStart"};
 
     MainMenu() {
+
+        //start game button
         menu = getEngine()->createComponent<MenuList>();
-        MenuItem press_start_item{{"Press Start to Continue..."},
-                                  {"Press Start to Continue..."}};
 
-        press_start_item.selectedState.text->color = {236 / 255., 59 / 255., 131 / 255.};
 
-        press_start_item.onSelected += [this](int) {
-            log<high>("onStart");
+        MenuItem start_item{ {"Get Checkered!"},{"Get Checkered!"} };
+        start_item.defaultState.text->align = eAlign::left;
+        start_item.selectedState.text->align = eAlign::left;
+        start_item.selectedState.text->color = { 0,1,0 };
+        start_item.onSelected += [this](int) {
             onStart(0);
-        };
 
-        menu->items.push_back(press_start_item);
+        };
+        menu->items.push_back(start_item);
+
+        
+        //quit game button
+        MenuItem quit_item{ {"Quit"},{"Quit"} };
+        quit_item.defaultState.text->align = eAlign::right;
+        quit_item.selectedState.text->align = eAlign::right;
+        quit_item.selectedState.text->color = { 1,0,0 };
+        quit_item.onSelected += [this](int) {
+            exit(0);
+        };
+        menu->items.push_back(quit_item);
+
+
     }
+    
+
+
 };
 
 struct MenuSystem : public SystemInterface {
@@ -215,7 +235,7 @@ struct MenuSystem : public SystemInterface {
 
         for (auto &list : lists) {
             if (!list->active) continue;
-            BoxModel screen{0, 0, cameras[0]->viewport.width, cameras[0]->viewport.height};
+            BoxModel screen{1, 0, cameras[0]->viewport.width, cameras[0]->viewport.height};
             list->layout(screen);
         }
     }
@@ -231,16 +251,27 @@ struct MenuSystem : public SystemInterface {
             if (!list->active) continue;
             if (key == GLFW_KEY_SPACE) {
                 // select the current menu item
+                list->select_next_item();
                 list->current().activate();
             }
-            if (key == GLFW_KEY_UP) {
+            if (key == GLFW_KEY_RIGHT) {
                 list->select_previous_item();
             }
-            if (key == GLFW_KEY_DOWN) {
+            if (key == GLFW_KEY_LEFT) {
                 list->select_next_item();
             }
         }
     }
+
+
+    void onGamePadStateChanged(const EventArgs<GLFWgamepadstate, GLFWgamepadstate>& args) {
+
+        auto gamepad = std::get<0>(args.values);
+
+
+
+    }
+    
 };
 namespace Engine {
     class Start : public ScenarioInterface {
