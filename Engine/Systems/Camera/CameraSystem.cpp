@@ -4,31 +4,31 @@
 
 #include "CameraSystem.h"
 #include <WorldTransform.h>
+#include <glm/gtx/euler_angles.hpp>
 
 void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
   for (auto &&key : keys) {
-    if (!keys.count(key))
-      continue;
+    if (!keys.count(key)) continue;
 
     switch (key) {
-    case GLFW_KEY_RIGHT:
-      x += increment;
-      break;
-    case GLFW_KEY_DOWN:
-      y -= increment;
-      break;
-    case GLFW_KEY_LEFT:
-      x -= increment;
-      break;
-    case GLFW_KEY_UP:
-      y += increment;
-      break;
-    case GLFW_KEY_PAGE_UP:
-      u += increment;
-      break;
-    case GLFW_KEY_PAGE_DOWN:
-      u -= increment;
-      break;
+      case GLFW_KEY_RIGHT:
+        x += increment;
+        break;
+      case GLFW_KEY_DOWN:
+        y -= increment;
+        break;
+      case GLFW_KEY_LEFT:
+        x -= increment;
+        break;
+      case GLFW_KEY_UP:
+        y += increment;
+        break;
+      case GLFW_KEY_PAGE_UP:
+        u += increment;
+        break;
+      case GLFW_KEY_PAGE_DOWN:
+        u -= increment;
+        break;
     }
   }
 
@@ -53,23 +53,33 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
 
     if (camera->target) {
 
-      Engine::log<module, Engine::low>("Updating camera to look at #",
-                                       camera->target->getId());
+      Engine::log<module, Engine::low>("Updating camera to look at #", camera->target->getId());
 
-      const auto transforms =
-          camera->target->getChildren().getComponentsOfType<WorldTransform>();
+      const auto transforms = camera->target->getChildren().getComponentsOfType<WorldTransform>();
       if (!transforms.empty()) {
         auto transform = transforms[0];
-        auto offset =
-            glm::toMat4(camera->rotation) * glm::vec4(camera->offset, 1);
+
+        // let me explain: this code extracts the yaw from the quaternion. Does glm::
+        // already have this function you ask? Yes, yes it does.
+        // Does it work in this case? No, no it does not...
+
+        auto local_rotation = glm::vec3(glm::mat4_cast(transform->rotation)[0]);
+        glm::mat4 T(1);
+        T[0] = glm::vec4(local_rotation, 0);
+        T[1] = glm::vec4{0, 1, 0, 0};
+        T[2] = glm::vec4(glm::normalize(glm::cross(local_rotation, glm::vec3(0, 1, 0))), 0);
+        T[3] = glm::vec4{0, 0, 0, 1};
+
+        auto offset = glm::mat4_cast(camera->rotation) * glm::vec4(camera->offset, 1);
 
         // this line of code controls the camera returning to 'neutral' position
         // behind the target...
-        camera->rotation = glm::slerp(camera->rotation, transform->rotation,
-                                      0.03f); // todo, scale this with speed
-        camera->position = transform->position + glm::vec3(offset);
 
-        // Engine::log<module>(transform->rotation);
+        auto rest_pose = glm::quat_cast(T);
+        camera->rotation = glm::slerp(camera->rotation, rest_pose,
+                                      0.03f);// todo, scale this with speed
+
+        camera->position = transform->position + glm::vec3(offset);
 
         glm::vec3 eye = camera->position;
         glm::vec3 target = transform->position;
@@ -89,12 +99,10 @@ void ::Camera::CameraSystem::update(Engine::deltaTime elapsed) {
   }
 }
 
-void ::Camera::CameraSystem::onWindowSizeChanged(
-    const Component::EventArgs<int, int> &args) {
+void ::Camera::CameraSystem::onWindowSizeChanged(const Component::EventArgs<int, int> &args) {
 
-  Engine::log<module, Engine::low>(
-      "onWindowSizeChanged=", std::get<0>(args.values), ", ",
-      std::get<0>(args.values));
+  Engine::log<module, Engine::low>("onWindowSizeChanged=", std::get<0>(args.values), ", ",
+                                   std::get<0>(args.values));
 
   auto &&width = std::get<0>(args.values);
   auto &&height = std::get<1>(args.values);
@@ -137,15 +145,14 @@ void ::Camera::CameraSystem::initialize() {
 
   // create event handlers
 
-  onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
-      this, &CameraSystem::onKeyPress);
-  onKeyDownHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
-      this, &CameraSystem::onKeyDown);
-  onKeyUpHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
-      this, &CameraSystem::onKeyUp);
+  onKeyPressHandler =
+      getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyPress);
+  onKeyDownHandler =
+      getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyDown);
+  onKeyUpHandler =
+      getEngine()->getSubSystem<EventSystem>()->createHandler(this, &CameraSystem::onKeyUp);
   onWindowSizeHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
       this, &CameraSystem::onWindowSizeChanged);
-  onGamepadStateChangedHandler =
-      getEngine()->getSubSystem<EventSystem>()->createHandler(
-          this, &CameraSystem::onGamepadStateChanged);
+  onGamepadStateChangedHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(
+      this, &CameraSystem::onGamepadStateChanged);
 }
