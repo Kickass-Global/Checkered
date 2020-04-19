@@ -109,16 +109,17 @@ struct Player : public ComponentBase {
             40, getEngine()->createComponent<PaintedMesh>(car_liscense,
                                                           liscense_material)});
 
-    player_damage_model->onHealthChanged += [this](auto health) {
-      if (health < 1) {
-        log<high>("He's dead Jim");
-        auto matte = getEngine()->createComponent<Billboard>(
-            getEngine()->createComponent<Texture>(
-                "Assets/Textures/checkered-matte.png"));
-        matte->dst = {0, 0};
-        matte->src = {0, 0};
-      }
-    };
+			player_damage_model->onHealthChanged += [this](auto health) {
+				if (health < 1) {
+					log<high>("He's dead Jim");
+					auto matte = getEngine()->createComponent<Billboard>(
+						getEngine()->createComponent<Texture>(
+							"Assets/Textures/checkered-matte.png"));
+					matte->dst = { 0, 0 };
+					matte->src = { 0, 0 };
+				}
+
+			};
 
     // when a region is destroyed we want to detach the shape from the vehicle
     // and spawn a new physics actors object into the game at its location.

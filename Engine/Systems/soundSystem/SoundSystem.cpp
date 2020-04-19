@@ -8,6 +8,7 @@
 
 
 
+
 void Engine::SoundSystem::initialize() {
    
     onKeyPressHandler = getEngine()->getSubSystem<EventSystem>()->createHandler(this, &Engine::SoundSystem::onKeyPress);
@@ -42,22 +43,75 @@ void Engine::SoundSystem::initialize() {
     sourcePassengerDlivered = load_sound("Assets/Sounds/PassengerSuccess.wav");
 
     playSound(sourceMusic);
+
+    accelerationBuffer = load_buffer("Assets/Sounds/car+geardown.wav");
+    breakingBuffer = load_buffer("Assets/Sounds/TIRE+SKID.wav");
+    drivingBuffer = load_buffer("Assets/Sounds/carMoving.wav");
+
+
+    std::cout << "Check" << std::endl;
+
+
+    std::cout << "Check2" << std::endl;
+
 }
 
 void Engine::SoundSystem::update(Engine::deltaTime) {
-    /*
 
+    if (timePassed < 102)
+    timePassed = timePassed + 1;
 
-    auto sounds = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Sound>();
-    for (auto sound : sounds)
+    if (timePassed > 100)
     {
-        if (sound->name == "horn")
+
+
+
+    auto vehicles = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Vehicle>();
+
+    glm::vec3 playerPosition;
+    glm::vec3 playerVelocity;
+    for (const auto& vehicle : vehicles)
+    {
+        if (vehicle->type == Component::Vehicle::Type::Player)
         {
-            Engine::log<module, Engine::high>("Playing sound ", sound->name);
-            playSound(sourceHorn);
-            getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+            playerPosition = vehicle->position;
+            auto velocity = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
+            playerVelocity = glm::vec3(velocity.x, velocity.y, velocity.z);
         }
-     */
+    }
+    float currentTotalVelocity = sqrt(playerVelocity.x * playerVelocity.x + playerVelocity.y * playerVelocity.y + playerVelocity.z * playerVelocity.z);
+    if (currentTotalVelocity < 0.08)
+    {
+        stopSound(sourceDriving);
+    }
+
+    alCall(alListener3f, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alListener3f, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+    alCall(alSource3f, sourceAcceleration, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alSource3f, sourceAcceleration, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+    alCall(alSource3f, sourceBreaking, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alSource3f, sourceBreaking, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+    alCall(alSourcef, sourceDriving, AL_GAIN, drivingVolume);
+    alCall(alSource3f, sourceDriving, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alSource3f, sourceDriving, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+    alCall(alSource3f, sourceCollision, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alSource3f, sourceCollision, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+    alCall(alSource3f, sourceHorn, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alSource3f, sourceHorn, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+    alCall(alSource3f, sourcePassengerDlivered, AL_POSITION, playerPosition.x, playerPosition.y, playerPosition.z);
+    alCall(alSource3f, sourcePassengerDlivered, AL_VELOCITY, playerVelocity.x, playerVelocity.y, playerVelocity.z);
+
+
+
+
+
+
     auto sounds = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Sound>();
     for (auto sound : sounds)
     {
@@ -92,7 +146,110 @@ void Engine::SoundSystem::update(Engine::deltaTime) {
             Engine::log<module, Engine::high>("Playing sound ", sound->name);
             playSound(sourceCollision); getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
         }
-    
+        else if (sound->name == "carMoving")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            playSound(sourceDriving); getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+        }
+        else if (sound->name == "stopCarMoving")
+        {
+            Engine::log<module, Engine::high>("Playing sound ", sound->name);
+            stopSound(sourceDriving); getEngine()->getSubSystem<EngineStore>()->getRoot().eraseComponent<Component::Sound>(sound);
+        }
+
+    }
+
+
+        if (sourcesGenerated == false)
+        {
+            generateSources();
+            sourcesGenerated = true;
+        }
+
+
+        for ( auto& vehicle : vehicles)
+        {
+
+
+             if (vehicle->type == Component::Vehicle::Type::Player) { continue; }
+
+            bool currentAcceleration;
+            bool currentBreaking;
+
+            glm::vec3 vehiclePosition = vehicle->position;
+            auto velocity = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
+            glm::vec3 vehicleVelocity = glm::vec3(velocity.x, velocity.y, velocity.z);
+
+            float totalVehicleVelocity = sqrt(vehicleVelocity.x * vehicleVelocity.x + vehicleVelocity.y * vehicleVelocity.y + vehicleVelocity.z * vehicleVelocity.z);
+
+            alCall(alSource3f, vehicle->aiSource, AL_POSITION, vehiclePosition.x, vehiclePosition.y, vehiclePosition.z);
+            alCall(alSource3f, vehicle->aiSource, AL_VELOCITY, vehicleVelocity.x, vehicleVelocity.y, vehicleVelocity.z);
+
+            if (vehicle->pxVehicleInputData.getAnalogAccel() == 1)
+            {
+                currentAcceleration = true;
+                if (currentAcceleration != vehicle->initialAccelerate)
+                {
+                    stopSound(vehicle->aiSource);
+                    alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_TRUE);
+                    alCall(alSourcei, vehicle->aiSource, AL_BUFFER, accelerationBuffer);
+                    playSound(vehicle->aiSource);
+                    std::cout << "Ai Vehicle accelerated " << vehicle->aiSource << std::endl;
+
+                    vehicle->initialAccelerate = true;
+
+                }
+            }
+            if (vehicle->pxVehicleInputData.getAnalogAccel() == 0)
+            {
+                currentAcceleration = false;
+                if (currentAcceleration != vehicle->initialAccelerate)
+                {
+                    stopSound(vehicle->aiSource);
+                    std::cout << "Ai Vehicle stopped accelerated " << vehicle->aiSource << std::endl;
+
+                    alCall(alSourcef, vehicle->aiSource, AL_GAIN, drivingVolume);
+                    alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_TRUE);
+                    alCall(alSourcei, vehicle->aiSource, AL_BUFFER, drivingBuffer);
+                    playSound(vehicle->aiSource);
+
+                    vehicle->initialAccelerate = false;
+
+                }
+            }
+            if (vehicle->pxVehicleInputData.getAnalogBrake() == 1)
+            {
+                currentBreaking = true;
+                if (currentBreaking != vehicle->initialBreak)
+                {
+                    stopSound(vehicle->aiSource);
+
+
+                    alCall(alSourcei, vehicle->aiSource, AL_LOOPING, AL_FALSE);
+                    alCall(alSourcei, vehicle->aiSource, AL_BUFFER, breakingBuffer);
+                    playSound(vehicle->aiSource);
+
+                    std::cout << "Ai Vehicle started Breaking " << vehicle->aiSource << std::endl;
+
+                    vehicle->initialBreak = true;
+                }
+            }
+            if (vehicle->pxVehicleInputData.getAnalogBrake() == 0)
+            {
+                currentBreaking = false;
+                if (currentBreaking != vehicle->initialBreak)
+                {
+
+                    stopSound(vehicle->aiSource);
+
+                    vehicle->initialBreak = false;
+                }
+            }
+            if (totalVehicleVelocity < 0.1)
+            {
+                stopSound(vehicle->aiSource);
+            }
+        }
     }
 }
 
@@ -394,21 +551,26 @@ int Engine::SoundSystem::stopSound(ALuint s)
 
 void Engine::SoundSystem::volumeDown()
 {
-    volume = volume - 0.1;
+    volume = volume - 0.05;
     alCall(alSourcef, sourceMusic, AL_GAIN, volume);
     alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
     alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
     alCall(alSourcef, sourceHorn, AL_GAIN, volume);
-
+    alCall(alSourcef, sourceCollision, AL_GAIN, volume);
+    alCall(alSourcef, sourceDriving, AL_GAIN, volume);
+    alCall(alSourcef, sourcePassengerDlivered, AL_GAIN, volume);
 }
 
 void Engine::SoundSystem::volumeUp()
 {
-    volume = volume + 0.1;
+    volume = volume + 0.05;
     alCall(alSourcef, sourceMusic, AL_GAIN, volume);
     alCall(alSourcef, sourceAcceleration, AL_GAIN, volume);
     alCall(alSourcef, sourceBreaking, AL_GAIN, volume);
     alCall(alSourcef, sourceHorn, AL_GAIN, volume);
+    alCall(alSourcef, sourceCollision, AL_GAIN, volume);
+    alCall(alSourcef, sourcePassengerDlivered, AL_GAIN, volume);
+    alCall(alSourcef, sourceDriving, AL_GAIN, volume);
 }
 
 
@@ -422,28 +584,23 @@ void Engine::SoundSystem::volumeUp()
 
 void Engine::SoundSystem::onKeyDown(const Component::EventArgs<int>& args)
 {
+    /**
+        auto vehicles = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Vehicle>();
+        for (auto vehicle : vehicles)
+        {
+            if (vehicle->type == Component::Vehicle::Type::Player)
+            {
 
+            }
 
+        }
 
-    /*
+        auto key = args.get<0>();
+        if (key != GLFW_KEY_W && key != GLFW_KEY_S && v.z != 0)
+        {
 
-
-
-    auto key = args.get<0>();
-    if (key == GLFW_KEY_W)
-    {
-        playSound(sourceAcceleration);
-    }
-
-
-
-    else if (key == GLFW_KEY_S)
-    {
-        playSound(sourceBreaking);
-
-    }
-     */
-
+        }
+       */
 }
 void  Engine::SoundSystem::onKeyUp(const Component::EventArgs<int>& args)
 {
@@ -481,3 +638,65 @@ void Engine::SoundSystem::onKeyPress(const Component::EventArgs<int>& args)
     }
 }
 
+ALuint Engine::SoundSystem::load_buffer(std::string filePath)
+{
+    std::uint8_t 	channels;
+    std::int32_t 	sampleRate;
+    std::uint8_t 	bitsPerSample;
+    ALsizei			dataSize;
+    char* rawSoundData = load_wav(filePath, channels, sampleRate, bitsPerSample, dataSize);
+    if (rawSoundData == nullptr || dataSize == 0)
+    {
+        std::cerr << "ERROR: Could not load wav" << std::endl;
+
+    }
+    std::vector<char> soundData(rawSoundData, rawSoundData + dataSize);
+
+    ALuint buffer;
+    alCall(alGenBuffers, 1, &buffer);
+
+    ALenum format;
+    if (channels == 1 && bitsPerSample == 8)
+        format = AL_FORMAT_MONO8;
+    else if (channels == 1 && bitsPerSample == 16)
+        format = AL_FORMAT_MONO16;
+    else if (channels == 2 && bitsPerSample == 8)
+        format = AL_FORMAT_STEREO8;
+    else if (channels == 2 && bitsPerSample == 16)
+        format = AL_FORMAT_STEREO16;
+    else
+    {
+        std::cerr
+            << "ERROR: unrecognised wave format: "
+            << channels << " channels, "
+            << bitsPerSample << " bps" << std::endl;
+
+    }
+
+    alCall(alBufferData, buffer, format, soundData.data(), soundData.size(), sampleRate);
+    soundData.clear(); // erase the sound in RAM
+
+    return buffer;
+}
+ALuint Engine::SoundSystem::generateSource()
+{
+    ALuint source;
+    alCall(alGenSources, 1, &source);
+    alCall(alSourcef, source, AL_PITCH, 1);
+    alCall(alSourcef, source, AL_GAIN, volume);
+    alCall(alSourcei, source, AL_SOURCE_RELATIVE, AL_FALSE);
+
+    return source;
+}
+
+void Engine::SoundSystem::generateSources()
+{
+    auto vehicles = getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Vehicle>();
+    for (auto& vehicle : vehicles)
+    {
+        if (vehicle->type == Component::Vehicle::Type::Player) { continue; }
+        vehicle->aiSource = generateSource();
+        std::cout << "Vehicle Source generated: " << vehicle->aiSource << std::endl;
+    }
+
+}

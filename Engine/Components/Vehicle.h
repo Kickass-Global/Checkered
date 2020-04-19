@@ -28,6 +28,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include <al.h>
+#include <alc.h>
+
 namespace Component {
 
   struct CollisionEventArgs {
@@ -61,10 +64,17 @@ public:
     EventDelegate<CollisionEventArgs &> onHit{"onHit"};
     EventDelegate<physx::PxVehicleDrive4W *, std::string> onRegionDestroyed{"onRegionDestroyed"};
 
-    std::shared_ptr<Wheel> front_left_wheel;
-    std::shared_ptr<Wheel> front_right_wheel;
-    std::shared_ptr<Wheel> back_left_wheel;
-    std::shared_ptr<Wheel> back_right_wheel;
+		ALuint aiSource;
+
+
+		bool initialAccelerate = false;
+		bool initialBreak = false;
+
+
+		std::shared_ptr<Wheel> front_left_wheel;
+		std::shared_ptr<Wheel> front_right_wheel;
+		std::shared_ptr<Wheel> back_left_wheel;
+		std::shared_ptr<Wheel> back_right_wheel;
 
     enum Type { Player, Taxi } type = Taxi;
     AStar path;
@@ -209,11 +219,14 @@ public:
       auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
       auto key = std::get<0>(args.values);
 
-      if (key == GLFW_KEY_W) {
-        vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eFIRST);
-        vehicle->pxVehicleInputData.setAnalogAccel(1);
-        getEngine()->createComponent<Component::Sound>("acceleration");
-      }
+
+			if (key == GLFW_KEY_W) {
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eFIRST);
+				vehicle->pxVehicleInputData.setAnalogAccel(1);
+				getEngine()->createComponent<Component::Sound>("acceleration");
+				getEngine()->createComponent<Component::Sound>("stopCarMoving");
+			}
 
       if (key == GLFW_KEY_S) {
         if (v.z > 0.1) {// is moving forward
@@ -234,14 +247,21 @@ public:
       }
     }
 
-    void onKeyUp(const EventArgs<int> &args) {
-      auto key = std::get<0>(args.values);
+		void onKeyUp(const EventArgs<int>& args) {
 
-      if (key == GLFW_KEY_W) {
-        vehicle->pxVehicle->mDriveDynData.forceGearChange(physx::PxVehicleGearsData::eNEUTRAL);
-        vehicle->pxVehicleInputData.setAnalogAccel(0);
-        getEngine()->createComponent<Component::Sound>("stopAcceleration");
-      }
+			auto v = vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
+			auto key = std::get<0>(args.values);
+
+			if (key == GLFW_KEY_W) {
+				vehicle->pxVehicle->mDriveDynData.forceGearChange(
+					physx::PxVehicleGearsData::eNEUTRAL);
+				vehicle->pxVehicleInputData.setAnalogAccel(0);
+				getEngine()->createComponent<Component::Sound>("stopAcceleration");
+			//	if (v.z > 0.5)
+				//{
+					getEngine()->createComponent<Component::Sound>("carMoving");
+			//	}
+			}
 
       if (key == GLFW_KEY_S) {
         vehicle->pxVehicleInputData.setAnalogBrake(0);
