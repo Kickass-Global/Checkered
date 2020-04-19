@@ -8,13 +8,13 @@
 std::shared_ptr<Component::Mesh>
 Pipeline::MeshLoader::load(std::string filename) {
 
-  Assimp::Importer importer;
-  const aiScene *scene = importer.ReadFile(
-      filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-                    aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(
+		filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-  if (!scene) {
-    Engine::log<module, Engine::high>(importer.GetErrorString());
+	if (!scene) {
+		Engine::log<module, Engine::high>(importer.GetErrorString());
 	}
 	Engine::assertLog<module>(scene, "Loading resource " + filename);
 
@@ -110,31 +110,23 @@ void Pipeline::ScenarioLoader::load_scenario(const ScenarioInterface& scenario,
 			scene->mMeshes[i]->mName.C_Str(), mesh);
 	}
 
-	auto static_collection =
-		std::find_if(scene->mRootNode->mChildren,
-			scene->mRootNode->mChildren + scene->mRootNode->mNumChildren,
-			[](auto node) { return node->mName == aiString("Static"); });
+	for (int i = 0; i < scene->mRootNode->mNumChildren; ++i) {
+		// load all static object as scenery then...
+		auto child = scene->mRootNode->mChildren[i];
+		auto mesh_index = child->mMeshes[0];
+		auto transform = child->mTransformation;
+		auto mesh_name = scene->mMeshes[mesh_index]->mName.C_Str();
+		auto instance_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(mesh_name);
 
-	if (static_collection !=
-		scene->mRootNode->mChildren + scene->mRootNode->mNumChildren) {
-		for (int i = 0; i < (*static_collection)->mNumChildren; ++i) {
-			// load all static object as scenery then...
-			auto child = (*static_collection)->mChildren[i];
-			auto mesh_index = child->mMeshes[0];
-			auto transform = scene->mRootNode->mTransformation * (*static_collection)->mTransformation * child->mTransformation;
-			auto mesh_name = scene->mMeshes[mesh_index]->mName.C_Str();
-			auto instance_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(mesh_name);
-			auto basic_shader_program =
-				getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-					"Assets/Programs/basic.json");
-			auto material = getEngine()->createComponent<Component::Material>(basic_shader_program);
+		auto material = getEngine()->createComponent<Component::Material>();
 
-			Instance<Scenery> building_instances;
-			glm::mat4 T(transform.a1, transform.b1, transform.c1, transform.d1,
-				transform.a2, transform.b2, transform.c2, transform.d2,
-				transform.a3, transform.b3, transform.c3, transform.d3,
-				transform.a4, transform.b4, transform.c4, transform.d4);
-			building_instances.add_instance_at(T, instance_mesh, material);
-		}
+		Instance<Scenery> building_instances;
+		glm::mat4 T(transform.a1, transform.b1, transform.c1, transform.d1,
+			transform.a2, transform.b2, transform.c2, transform.d2,
+			transform.a3, transform.b3, transform.c3, transform.d3,
+			transform.a4, transform.b4, transform.c4, transform.d4);
+
+		building_instances.add_instance_at(T, instance_mesh, material);
 	}
+
 }

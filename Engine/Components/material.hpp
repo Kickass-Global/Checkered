@@ -17,46 +17,45 @@
 #include "texture.hpp"
 
 namespace Rendering {
-class Program;
+  class Program;
 }
 
 using Rendering::Program;
 
 namespace Component {
 
-class Material : public ComponentBase {
+  class Material : public ComponentBase {
 public:
-  std::shared_ptr<Program> shader;
-  std::vector<std::shared_ptr<Texture>> textures;
+    std::shared_ptr<Program> shader;
+    std::vector<std::shared_ptr<Texture>> textures;
 
-  // maybe some uniforms down here, you know, whatever feels right...
+    // maybe some uniforms down here, you know, whatever feels right...
 
-  explicit Material(std::shared_ptr<Program> shader)
-      : shader(std::move(shader)), textures() {}
+    explicit Material(std::shared_ptr<Program> shader) : shader(std::move(shader)), textures() {}
 
-  Material();
-  explicit Material(std::string texture_asset_name) : Material() {
-    textures.push_back(
-        getEngine()->createComponent<Component::Texture>(texture_asset_name));
-  }
+    Material();
 
-  virtual void bind() {
+    explicit Material(std::string texture_asset_name) : Material() {
+      textures.push_back(getEngine()->createComponent<Component::Texture>(texture_asset_name));
+    }
 
-    //    glEnable(GL_BLEND);
-    //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    virtual void bind() {
 
-    int index = 0;
-    for (auto &texture : textures) {
-      if (texture) {
-        glActiveTexture(GL_TEXTURE1 + index++);
-        glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
-      } else {
-        glActiveTexture(GL_TEXTURE1 + index++);
-        glBindTexture(GL_TEXTURE_2D, 0);
+      //    glEnable(GL_BLEND);
+      //    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+      int index = 0;
+      for (auto &texture : textures) {
+        if (texture) {
+          glActiveTexture(GL_TEXTURE1 + index++);
+          glBindTexture(GL_TEXTURE_2D, texture->m_texture_id);
+        } else {
+          glActiveTexture(GL_TEXTURE1 + index++);
+          glBindTexture(GL_TEXTURE_2D, 0);
+        }
       }
     }
-  }
-};
-} // namespace Component
+  };
+}// namespace Component
 
-#endif // ENGINE_MATERIAL_HPP
+#endif// ENGINE_MATERIAL_HPP

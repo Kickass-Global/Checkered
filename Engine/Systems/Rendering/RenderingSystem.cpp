@@ -209,7 +209,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                              glm::value_ptr(lightProjection));
 
           batch->bind(*this);
-          batch->draw(*this, [](const Mesh &mesh) { return mesh.cast_shadow; });
+          batch->draw(*this, [](const Mesh *mesh) { return mesh && mesh->cast_shadow; });
         }
       }
     }
