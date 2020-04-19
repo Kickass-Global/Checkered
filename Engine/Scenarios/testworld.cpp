@@ -155,7 +155,8 @@ void TestWorld::load() {
       "Assets/Meshes/Building_Shop_02.fbx");
 
   // load scenario
-  scenarioLoader->load_scenario(*this, "Assets/Meshes/obstacles.dae");
+  scenarioLoader->load_scenario<Obstacle>(*this, "Assets/Meshes/obstacles.dae");
+  scenarioLoader->load_scenario<Scenery>(*this, "Assets/Meshes/static.dae");
 
   // setup a HUD element...
 
@@ -233,24 +234,16 @@ void TestWorld::load() {
 
   // ai factory method...
   auto make_ai = [this, &taxi_mesh, &taxi_material](glm::mat4 world_transform = glm::mat4{1}) {
-    auto ai_vehicle = getEngine()->createNamedComponent<Component::Vehicle>("ai_vehicle");
-    auto ai_damage_model = getEngine()->createNamedComponent<Component::Model>("ai_vehicle_model");
-    ai_damage_model->max_health = 30;
-    ai_damage_model->health = 30;
-
-    ai_damage_model->parts.push_back(Component::Model::Part{});
-    ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{
-        2000000, getEngine()->createComponent<PaintedMesh>(taxi_mesh, taxi_material)});
+    auto ai_vehicle = getEngine()->createNamedComponent<Component::Taxi>("ai_vehicle");
 
     glm::quat orientation;
     glm::vec3 scale, translation, skew;
     glm::vec4 perspective;
     glm::decompose(world_transform, scale, orientation, translation, skew, perspective);
 
-    ai_vehicle->model = ai_damage_model;
-    ai_vehicle->rotation = orientation;
-    ai_vehicle->position = translation;
-    ai_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
+    ai_vehicle->player_vehicle->rotation = orientation;
+    ai_vehicle->player_vehicle->position = translation;
+    ai_vehicle->player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
 
     return ai_vehicle;
   };
@@ -424,9 +417,9 @@ void TestWorld::load() {
   for (int x = -dim; x <= dim; x++) {
     for (int y = dim; y <= dim; y++) {
       auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
-      ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-      ai_vehicle->path.graphNodes = nav;
-      ai_vehicle->tickHandler += ticker;// give them brain
+      ai_vehicle->player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+      ai_vehicle->player_vehicle->path.graphNodes = nav;
+      ai_vehicle->player_vehicle->tickHandler += ticker;// give them brain
     }
   }
 
