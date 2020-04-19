@@ -116,11 +116,13 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 	else if (row > 63) row = 63;
 
         //This lowers the priority on non-roads and wrong direction roads
-    if ((int)graphNodes[row * 64 + col] == 9) { newCost += 3000* my_stepsize;}
+    if ((int)graphNodes[row * 64 + col] == 9) { newCost += 1000* my_stepsize;}
     else if ((int)graphNodes[row * 64 + col] == 0 && parent->my_z > z) { newCost += 10* my_stepsize; }
     else if ((int)graphNodes[row * 64 + col] == 1 && parent->my_x > x) { newCost += 10* my_stepsize; }
     else if ((int)graphNodes[row * 64 + col] == 2 && parent->my_x < x) { newCost += 10* my_stepsize; }
     else if ((int)graphNodes[row * 64 + col] == 3 && parent->my_z < z) { newCost += 10* my_stepsize; }
+	else if ((int)graphNodes[row * 64 + col] > 3  && (int)graphNodes[row * 64 + col] < 8) { newCost += 200 * my_stepsize; }
+	else if ((int)graphNodes[row * 64 + col] == 8) { newCost += 2000000 * my_stepsize; }
 
 	int id = static_cast<int>((x + 384)/my_stepsize)* static_cast <int>(768/my_stepsize) + static_cast<int>((z + 374)/my_stepsize);
 	for (auto node : visitList) {
