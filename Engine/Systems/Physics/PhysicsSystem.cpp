@@ -227,6 +227,7 @@ Physics::PhysicsSystem::createDrivableVehicle(const PxTransform &worldTransform,
   VehicleDesc vehicleDesc = initVehicleDescription(is_player);
   vehicleDesc.chassis = chassis_mesh;
 
+
   vehicles.push_back(createVehicle4W(vehicleDesc, cPhysics, cCooking, chassis_local_transform));
   pxVehicle = vehicles.back();
 
@@ -421,19 +422,20 @@ void Physics::PhysicsSystem::onVehicleCreated(
   auto is_player = vehicleComponent->type == Vehicle::Type::Player;
   auto pxVehicle = createDrivableVehicle(
       T, is_player,
-      createConvexMesh(vehicleComponent->model->parts[0].variations[0].mesh->mesh.get()), local_T);
+      createConvexMesh(vehicleComponent->model->parts[4].variations[0].mesh->mesh.get()), local_T);
 
   // Go through the list of regions on the vehicle and create a corresponding shape in physx;
 
-  for (int i = 1; i < vehicleComponent->model->parts.size(); ++i) {
+  for (int i = 5; i < vehicleComponent->model->parts.size(); ++i) {
 
     auto &&region = vehicleComponent->model->parts[i];
+    if (region.is_wheel) continue;
     auto default_variation = region.variations[0].mesh;
     auto shape = PxRigidActorExt::createExclusiveShape(
         *pxVehicle->getRigidDynamicActor(),
         PxConvexMeshGeometry(createConvexMesh(default_variation->mesh.get())), *cMaterial);
     shape->setName(region.region_name.c_str());
-    shape->setLocalPose(local_T);
+    shape->setLocalPose(local_T * convert_from(region.transform));
 
 
     if (is_player) {

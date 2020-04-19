@@ -7,5 +7,11 @@ out vec3 colour;
 
 void main() {
     vec3 diffuse = texture(tDiffuse, fTexcoord.st).xyz;
-    colour = diffuse;
+    const float gamma = 2.0;
+  
+    // reinhard tone mapping
+    vec3 mapped = diffuse / (diffuse + vec3(1.0));
+    // gamma correction 
+    mapped = pow(mapped, vec3(1.0 / gamma));
+    colour = mapped;
 }
