@@ -58,19 +58,22 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                        .getComponentsOfType<PaintedMesh>()) {
     if (!mesh->enabled)
       continue;
+
     auto Ts = mesh->getChildren().getComponentsOfType<WorldTransform>();
-    if (!Ts.empty()) {
-      auto key = std::make_pair(mesh->mesh.get(), mesh->material.get());
-      auto it = instancing_map.find(key);
-      if (it == instancing_map.end()) {
-        auto instance = getEngine()->createComponent<MeshInstance>(
-            mesh->mesh, mesh->material);
-        auto [it2, _] = instancing_map.emplace(key, instance.get());
+    //    if (!Ts.empty()) {
+    auto key = std::make_pair(mesh->mesh.get(), mesh->material.get());
+    auto it = instancing_map.find(key);
+    if (it == instancing_map.end()) {
+      auto instance = getEngine()->createComponent<MeshInstance>(
+          mesh->mesh, mesh->material);
+      auto [it2, _] = instancing_map.emplace(key, instance.get());
+      if (!Ts.empty())
         it2->second->instances.push_back(Ts[0]->world_matrix);
-      } else {
+    } else {
+      if (!Ts.empty())
         it->second->instances.push_back(Ts[0]->world_matrix);
-      }
     }
+    //    }
   }
 
   auto is_buffered = [this](auto instance_mesh) {
@@ -80,6 +83,10 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     }
     return false;
   };
+
+  for (auto &&batch : batches) {
+    batch->enabled = false;
+  }
 
   // Find and update any GameObjects with meshes that should be drawn...
   auto meshes = getEngine()
@@ -94,7 +101,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
                                         instance->getId());
       buffer(instance->mesh, instance->material);
     }
-    if (!instance->instances.empty()) {
+//    if (!instance->instances.empty()) {
       Engine::log<module, low>("Updating instances(",
                                instance->instances.size(), ") of component#",
                                instance);
@@ -103,9 +110,11 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
           instance->mesh, instance->material,
           static_cast<int>(sizeof(glm::mat4) * instance->instances.size()),
           (float *)instance->instances.data(), sizeof(glm::mat4));
-    }
+//    }
     instance->instances.clear();
   }
+
+
 
   glClearColor(0, 0, 0.5f, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -186,7 +195,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
       lightViewProjection = lightProjection * lightView;
 
       for (auto &&batch : batches) {
-        if (!batch->details.empty()) {
+        if (batch->enabled && !batch->details.empty()) {
 
           // bind programs, textures, and uniforms needed to render the batch
           depth_shader->bind();
@@ -214,7 +223,7 @@ void Rendering::RenderingSystem::update(Engine::deltaTime time) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto &&batch : batches) {
-      if (!batch->details.empty()) {
+      if (batch->enabled && !batch->details.empty()) {
 
         glUniformMatrix4fv(
             glGetUniformLocation(batch->shader->programId(), "M_LightSpace"), 1,

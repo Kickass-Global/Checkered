@@ -13,6 +13,8 @@
 #include <PxRigidActor.h>
 #include <PxRigidBody.h>
 #include <PxShape.h>
+#include <future>
+#include <thread>
 
 using namespace physx;
 
@@ -32,7 +34,7 @@ public:
   PxTransform pickupTransform;
   PxTransform dropOffTransform;
 
-  ReportCard passengerReportCard;
+  std::shared_ptr<ReportCard> passengerReportCard;
 
   void setPickupTransform(PxTransform pickupTrans);
   void setDropoffTransform(PxTransform dropoffTrans);
@@ -53,15 +55,18 @@ public:
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
 
-    passengerReportCard.setReportCardGradeTimes(20, 30, 45, 60, 120);
+    passengerReportCard = getEngine()->createComponent<Component::ReportCard>();
 
+    passengerReportCard->setReportCardGradeTimes(20, 30, 45, 60, 120);
   }
 
 private:
   void onPassengerPickedUp(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger picked up");
-    passengerReportCard.startReportCardTimer();
+
+    passengerReportCard->startReportCardTimer();
+
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         pickup_actor.get());
     getEngine()->getSubSystem<EngineStore>()->getRoot().activate<Waypoint>(
@@ -74,9 +79,13 @@ private:
   void onPassengerDroppedOff(PhysicsActor *) {
     using namespace Engine;
     log<high>("Passenger dropped off");
-    passengerReportCard.endReportCardTimer();
-    char grade = passengerReportCard.createFinalReport();
-    std::cout << "OnPassengerDroppedOff Grade: " << grade << std::endl;
+
+    passengerReportCard->endReportCardTimer();
+
+    std::thread([&]() {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        passengerReportCard->destroyReportCard();
+    }).detach(); // todo not this...
 
     getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate<Waypoint>(
         dropoff_actor.get());
@@ -88,11 +97,13 @@ private:
 };
 
 struct PassengerSystem : public SystemInterface {
-  std::vector<glm::vec3> locations = {{0, 0, 0},
-                                      {106, 0, -30},
-                                      {212, -13.5, 239},
-                                      {-151.5, 0, 43},
-                                      {-117, 21.84, -336}}; // possible spawns
+  /*
+  std::vector<glm::vec3> locations = { {0,0,0},{106,0,-30},
+  {212,-13.5,239},{-151.5,0,43},{-117,21.84,-336} };
+  */
+
+  std::vector<glm::vec3> locations = {{-4, 0, -40},
+                                      {-20, 0, -35}}; // possible spawns
   std::shared_ptr<Passenger> current_passenger;
 
   void update(Engine::deltaTime elapsed) override;
