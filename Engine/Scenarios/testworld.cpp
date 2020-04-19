@@ -26,8 +26,7 @@
 
 void TestWorld::load() {
   auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
-  auto renderingSystem =
-      getEngine()->addSubSystem<Rendering::RenderingSystem>();
+  auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
   renderingSystem->onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
 
   renderingSystem->addSubSystem<Engine::BillboardSystem>();
@@ -43,8 +42,7 @@ void TestWorld::load() {
 
   vehicleSystem->onVehicleCreated += physicsSystem->onVehicleCreatedHandler;
 
-  auto componentSystem =
-      getEngine()->addSubSystem<Component::SceneComponentSystem>();
+  auto componentSystem = getEngine()->addSubSystem<Component::SceneComponentSystem>();
   componentSystem->onActorCreated += physicsSystem->onActorCreatedHandler;
 
   getEngine()->addSubSystem<Engine::DamageSystem>();
@@ -74,22 +72,19 @@ void TestWorld::load() {
   inputSystem->onKeyDown += hornSystem->onKeyDownHandler;
   inputSystem->onKeyUp += hornSystem->onKeyUpHandler;
 
-  Rendering::RenderingSystem::onWindowSizeChanged +=
-      cameraSystem->onWindowSizeHandler;
+  Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
   // endregion
   inputSystem->onKeyPress += openALSoundSystem->onKeyPressHandler;
   inputSystem->onKeyDown += openALSoundSystem->onKeyDownHandler;
   inputSystem->onKeyUp += openALSoundSystem->onKeyUpHandler;
 
-  Rendering::RenderingSystem::onWindowSizeChanged +=
-      cameraSystem->onWindowSizeHandler;
+  Rendering::RenderingSystem::onWindowSizeChanged += cameraSystem->onWindowSizeHandler;
   // endregion
 
   // setup the ground mesh
 
-  auto basic_shader_program =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-          "Assets/Programs/basic.json");
+  auto basic_shader_program = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
+      "Assets/Programs/basic.json");
 
   timer = getEngine()->createComponent<Timer>();
   timer->start();
@@ -98,101 +93,78 @@ void TestWorld::load() {
   Instance<DrivableScenery> drivable_instances;
 
   // make a material component
-  auto ground_material_1 = getEngine()->createComponent<Component::Material>(
-      "Assets/Textures/bake1.png");
-  auto ground_material_2 = getEngine()->createComponent<Component::Material>(
-      "Assets/Textures/bake2.png");
-  auto ground_material_3 = getEngine()->createComponent<Component::Material>(
-      "Assets/Textures/bake3.png");
-  auto ground_material_4 = getEngine()->createComponent<Component::Material>(
-      "Assets/Textures/bake4.png");
+  auto ground_material_1 =
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake1.png");
+  auto ground_material_2 =
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake2.png");
+  auto ground_material_3 =
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake3.png");
+  auto ground_material_4 =
+      getEngine()->createComponent<Component::Material>("Assets/Textures/bake4.png");
 
   // load the mesh component
-    auto city_block_1 =
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-            "Assets/Meshes/city-block-1.obj");
-  auto city_block_2 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/city-block-2.obj");
-  auto city_block_3 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/city-block-3.obj");
-    auto city_block_4 =
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-            "Assets/Meshes/city-block-4.obj");
+  auto city_block_1 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/city-block-1.obj");
+  auto city_block_2 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/city-block-2.obj");
+  auto city_block_3 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/city-block-3.obj");
+  auto city_block_4 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/city-block-4.obj");
 
-    drivable_instances.add_instance_at(
-        glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-            glm::translate(glm::vec3{0, -1, 0}),
-        city_block_1, ground_material_1, city_block_1);
-  drivable_instances.add_instance_at(
-      glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-          glm::translate(glm::vec3{0, -1, 0}),
-      city_block_2, ground_material_2, city_block_2);
-  drivable_instances.add_instance_at(
-      glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-          glm::translate(glm::vec3{0, -1, 0}),
-      city_block_3, ground_material_3, city_block_3);
-    drivable_instances.add_instance_at(
-        glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
-            glm::translate(glm::vec3{0, -1, 0}),
-        city_block_4, ground_material_4, city_block_4);
+  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
+                                         glm::translate(glm::vec3{0, -1, 0}),
+                                     city_block_1, ground_material_1, city_block_1);
+  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
+                                         glm::translate(glm::vec3{0, -1, 0}),
+                                     city_block_2, ground_material_2, city_block_2);
+  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
+                                         glm::translate(glm::vec3{0, -1, 0}),
+                                     city_block_3, ground_material_3, city_block_3);
+  drivable_instances.add_instance_at(glm::rotate(glm::radians(-90.0f), glm::vec3{1, 0, 0}) *
+                                         glm::translate(glm::vec3{0, -1, 0}),
+                                     city_block_4, ground_material_4, city_block_4);
 
   // create some buildings
 
-  auto building_material1 =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
-  auto building_material2 =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
-  auto building_material3 =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto building_material1 = getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto building_material2 = getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto building_material3 = getEngine()->createComponent<Component::Material>(basic_shader_program);
 
   // create a sky...
   auto sky_shader_program =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-          "Assets/Programs/sky.json");
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>("Assets/Programs/sky.json");
 
-  auto sky_material =
-      getEngine()->createComponent<Component::Material>(sky_shader_program);
+  auto sky_material = getEngine()->createComponent<Component::Material>(sky_shader_program);
   sky_material->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/CGSkies_0338_free.jpg"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/CGSkies_0338_free.jpg"));
   auto skybox_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/skybox.obj");
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/skybox.obj");
 
-  auto sky =
-      getEngine()->createComponent<PaintedMesh>(skybox_mesh, sky_material);
+  auto sky = getEngine()->createComponent<PaintedMesh>(skybox_mesh, sky_material);
   sky->getStore().emplaceComponent<Component::WorldTransform>();
 
   building_material1->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/House_01.png"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/House_01.png"));
   building_material2->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/House_02.png"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/House_02.png"));
   building_material3->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/House_03.png"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/House_03.png"));
 
-  auto building_mesh1 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/Building_House_01.fbx");
-  auto building_mesh2 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/Building_House_013.fbx");
-  auto building_mesh3 =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/Building_Shop_02.fbx");
+  auto building_mesh1 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/Building_House_01.fbx");
+  auto building_mesh2 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/Building_House_013.fbx");
+  auto building_mesh3 = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/Building_Shop_02.fbx");
 
   // load scenario
   scenarioLoader->load_scenario(*this, "Assets/Meshes/obstacles.dae");
 
   // setup a HUD element...
 
-  auto billboard_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/billboard_quad.obj");
+  auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/billboard_quad.obj");
   billboard_mesh->getStore().emplaceComponent<WorldTransform>();
 
   auto sprite = getEngine()->createComponent<Component::Billboard>();
@@ -203,8 +175,7 @@ void TestWorld::load() {
             "Assets/Programs/billboard.json"));
 
     material->textures.push_back(
-        getEngine()->createComponent<Component::Texture>(
-            "Assets/Textures/Nature_Trees.png"));
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
 
     sprite->mesh_instance = getEngine()->createNamedComponent<PaintedMesh>(
         "billboard_mesh_instance", billboard_mesh, material);
@@ -212,27 +183,20 @@ void TestWorld::load() {
 
   // setup the mesh used for the cars...
 
-  auto car_material =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto car_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
   car_material->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/Vehicle_Car01_c.png"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/Vehicle_Car01_c.png"));
   auto car_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/car_mesh.fbx");
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/car_mesh.fbx");
 
-  auto car_mesh_instance =
-      getEngine()->createComponent<MeshInstance>(car_mesh, car_material);
+  auto car_mesh_instance = getEngine()->createComponent<MeshInstance>(car_mesh, car_material);
 
-  auto taxi_material =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto taxi_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
   taxi_material->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/Vehicle_Taxi.png"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/Vehicle_Taxi.png"));
 
   auto taxi_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/taxi_mesh.fbx");
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/taxi_mesh.fbx");
 
   // setup the player object....
   auto player = getEngine()->createComponent<Component::Player>();
@@ -241,40 +205,30 @@ void TestWorld::load() {
   // setup passenger system
 
   Instance<Obstacle> obstacle_instances;
-  auto dumpster_material =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto dumpster_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
 
   dumpster_material->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/Road_divider.png"));
-  auto dumpster_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/dumpster_mesh.fbx");
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/Road_divider.png"));
+  auto dumpster_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/dumpster_mesh.fbx");
 
-  auto hydrant_material =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto hydrant_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
   hydrant_material->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/Props.png"));
-  auto hydrant_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/Props_Buoy_02.fbx");
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/Props.png"));
+  auto hydrant_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+      "Assets/Meshes/Props_Buoy_02.fbx");
 
-  auto tree_material =
-      getEngine()->createComponent<Component::Material>(basic_shader_program);
+  auto tree_material = getEngine()->createComponent<Component::Material>(basic_shader_program);
   tree_material->textures.push_back(
-      getEngine()->createComponent<Component::Texture>(
-          "Assets/Textures/Nature_Trees.png"));
+      getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
 
   auto tree_mesh =
-      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/human.obj");
+      getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>("Assets/Meshes/human.obj");
 
   glm::vec3 origin = {10, 0, 20};
   for (int i = 1; i < 10; i++) {
     obstacle_instances.add_instance_at(
-        i / 50.0f * 200.0f *
-                glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} -
+        i / 50.0f * 200.0f * glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} -
             glm::vec3{0, 5, 0} + origin,
         hydrant_mesh, hydrant_material);
   }
@@ -282,23 +236,20 @@ void TestWorld::load() {
   using namespace Engine;
 
   // ai factory method...
-  auto make_ai = [this, &taxi_mesh,
-                  &taxi_material](glm::mat4 world_transform = glm::mat4{1}) {
-    auto ai_vehicle =
-        getEngine()->createNamedComponent<Component::Vehicle>("ai_vehicle");
-    auto ai_damage_model =
-        getEngine()->createNamedComponent<Component::Model>("ai_vehicle_model");
+  auto make_ai = [this, &taxi_mesh, &taxi_material](glm::mat4 world_transform = glm::mat4{1}) {
+    auto ai_vehicle = getEngine()->createNamedComponent<Component::Vehicle>("ai_vehicle");
+    auto ai_damage_model = getEngine()->createNamedComponent<Component::Model>("ai_vehicle_model");
+    ai_damage_model->max_health = 30;
+    ai_damage_model->health = 30;
 
     ai_damage_model->parts.push_back(Component::Model::Part{});
     ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{
-        2000000,
-        getEngine()->createComponent<PaintedMesh>(taxi_mesh, taxi_material)});
+        2000000, getEngine()->createComponent<PaintedMesh>(taxi_mesh, taxi_material)});
 
     glm::quat orientation;
     glm::vec3 scale, translation, skew;
     glm::vec4 perspective;
-    glm::decompose(world_transform, scale, orientation, translation, skew,
-                   perspective);
+    glm::decompose(world_transform, scale, orientation, translation, skew, perspective);
 
     ai_vehicle->model = ai_damage_model;
     ai_vehicle->rotation = orientation;
@@ -315,39 +266,28 @@ void TestWorld::load() {
   // setup ai "brain"
 
   // setup ai "brain"
-  std::function<void(const Component::EventArgs<Vehicle *> &)>
-      ai_tick_callback = [player_vehicle](
-                             const Component::EventArgs<Vehicle *> &args) {
+  std::function<void(const Component::EventArgs<Vehicle *> &)> ai_tick_callback =
+      [player_vehicle](const Component::EventArgs<Vehicle *> &args) {
         auto meta = std::get<0>(args.values);
 
-        if (!player_vehicle->pxVehicle)
-          return;
+        if (!player_vehicle->pxVehicle) return;
 
-        auto player_linVelo = player_vehicle->pxVehicle->getRigidDynamicActor()
-                                  ->getLinearVelocity();
+        auto player_linVelo =
+            player_vehicle->pxVehicle->getRigidDynamicActor()->getLinearVelocity();
         auto player_location =
-            player_vehicle->position +
-            glm::vec3(player_linVelo.x, 0,
-                      player_linVelo.z); // translation vector of mat4
-        auto ai_direction =
-            glm::normalize(-meta->world_transform()[2]); // 'z' column vector of
-                                                         // mat4 (i.e. forward)
-        auto ai_location = meta->position; // translation vector of mat4
+            player_vehicle->position + glm::vec3(player_linVelo.x, 0,
+                                                 player_linVelo.z);// translation vector of mat4
+        auto ai_direction = glm::normalize(-meta->world_transform()[2]);// 'z' column vector of
+                                                                        // mat4 (i.e. forward)
+        auto ai_location = meta->position;// translation vector of mat4
         auto ai_velocity =
-            (float)(pow(
-                meta->pxVehicle->getRigidDynamicActor()->getLinearVelocity().x,
-                2)) +
-            (float)(pow(
-                meta->pxVehicle->getRigidDynamicActor()->getLinearVelocity().z,
-                2));
+            (float) (pow(meta->pxVehicle->getRigidDynamicActor()->getLinearVelocity().x, 2)) +
+            (float) (pow(meta->pxVehicle->getRigidDynamicActor()->getLinearVelocity().z, 2));
 
-        auto player_distance =
-            (float)(pow(ai_location.x - player_location.x, 2)) +
-            (float)(pow(ai_location.z - player_location.z, 2));
+        auto player_distance = (float) (pow(ai_location.x - player_location.x, 2)) +
+                               (float) (pow(ai_location.z - player_location.z, 2));
         // check if the player is to the left or right of the ai.
-        auto perpdot = [](auto v1, auto v2) {
-          return v1.z * v2.x - v1.x * v2.z;
-        };
+        auto perpdot = [](auto v1, auto v2) { return v1.z * v2.x - v1.x * v2.z; };
 
         meta->pxVehicleInputData.setAnalogSteer(0);
 
@@ -356,44 +296,38 @@ void TestWorld::load() {
         if (player_distance < 4800.0f) {
           meta->path.ClearPathToGoal();
 
-          auto player_direction = perpdot(
-              glm::normalize(player_location - ai_location), ai_direction);
+          auto player_direction =
+              perpdot(glm::normalize(player_location - ai_location), ai_direction);
           // check if the player is in front or behind the ai.
-          auto heading =
-              [p = glm::normalize(glm::vec3(player_location - ai_location)),
-               b = glm::vec3(ai_direction)]() { return glm::dot(p, b); };
+          auto heading = [p = glm::normalize(glm::vec3(player_location - ai_location)),
+                          b = glm::vec3(ai_direction)]() { return glm::dot(p, b); };
 
           const auto ai_is_driving_away = heading() < 0.0f;
           const auto player_is_left = player_direction > 0;
 
-          if (ai_is_driving_away) { // turn the ai around...
+          if (ai_is_driving_away) {// turn the ai around...
 
-            meta->pxVehicle->mDriveDynData.forceGearChange(
-                PxVehicleGearsData::eFIRST);
+            meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
             meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-            if (ai_velocity > 0.05f)
-              meta->pxVehicleInputData.setAnalogAccel(0);
+            if (ai_velocity > 0.05f) meta->pxVehicleInputData.setAnalogAccel(0);
             else
               meta->pxVehicleInputData.setAnalogAccel(1);
 
-            if (player_is_left)
-              meta->pxVehicleInputData.setAnalogSteer(-1);
+            if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
             else
               meta->pxVehicleInputData.setAnalogSteer(1);
 
-          } else { // driving towards player
+          } else {// driving towards player
 
             meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
 
-            const auto pointed_at_player =
-                -0.2f <= player_direction && player_direction <= 0.2f;
+            const auto pointed_at_player = -0.2f <= player_direction && player_direction <= 0.2f;
 
-            if (pointed_at_player) { // drive straight
+            if (pointed_at_player) {// drive straight
               meta->pxVehicleInputData.setAnalogAccel(1);
-            } else { // steer towards player
-              if (player_is_left)
-                meta->pxVehicleInputData.setAnalogSteer(-1);
+            } else {// steer towards player
+              if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
               else
                 meta->pxVehicleInputData.setAnalogSteer(1);
 
@@ -405,9 +339,8 @@ void TestWorld::load() {
           }
 
         } else if (meta->path.pathToGoal.size() > 0) {
-          auto playerPathChange =
-              (float)(pow(meta->path.startNode->my_x - player_location.x, 2)) +
-              (float)(pow(meta->path.startNode->my_z - player_location.z, 2));
+          auto playerPathChange = (float) (pow(meta->path.startNode->my_x - player_location.x, 2)) +
+                                  (float) (pow(meta->path.startNode->my_z - player_location.z, 2));
           if (19200.0f < playerPathChange) {
             // Update the path using current path nodes as possible end points
             meta->path.FindPath(player_location, ai_location);
@@ -415,46 +348,39 @@ void TestWorld::load() {
           }
 
           auto nextPoint = meta->path.pathToGoal[0];
-          auto player_distance =
-              (float)(pow(ai_location.x - (nextPoint->my_x + 4.5f), 2)) +
-              (float)(pow(ai_location.z - ((nextPoint->my_z + 4.5f)), 2));
+          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 4.5f), 2)) +
+                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 4.5f)), 2));
 
           auto player_direction =
-              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0,
-                                               nextPoint->my_z + 4.5f) -
+              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
                                      ai_location),
                       ai_direction);
           // check if the point is in front or behind the ai.
           auto heading =
-              [p = glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0,
-                                            nextPoint->my_z + 4.5f) -
+              [p = glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
                                   ai_location),
                b = glm::vec3(ai_direction)]() { return glm::dot(p, b); };
 
           const auto ai_is_driving_away = heading() < 0.0f;
           const auto player_is_left = player_direction > 0;
 
-          if (ai_is_driving_away) { // turn the ai around...
-            meta->pxVehicle->mDriveDynData.forceGearChange(
-                PxVehicleGearsData::eFIRST);
+          if (ai_is_driving_away) {// turn the ai around...
+            meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
             meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-            if (ai_velocity > 0.05f)
-              meta->pxVehicleInputData.setAnalogAccel(0);
+            if (ai_velocity > 0.05f) meta->pxVehicleInputData.setAnalogAccel(0);
             else
               meta->pxVehicleInputData.setAnalogAccel(1);
 
-            if (player_is_left)
-              meta->pxVehicleInputData.setAnalogSteer(-1);
+            if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
             else
               meta->pxVehicleInputData.setAnalogSteer(1);
 
-          } else { // driving towards point
+          } else {// driving towards point
 
             meta->pxVehicle->mDriveDynData.setUseAutoGears(true);
 
-            const auto pointed_at_player =
-                -0.2f <= player_direction && player_direction <= 0.2f;
+            const auto pointed_at_player = -0.2f <= player_direction && player_direction <= 0.2f;
 
             if (pointed_at_player) {
               if (ai_velocity * 50 > player_distance && ai_velocity > 0.05f) {
@@ -464,12 +390,10 @@ void TestWorld::load() {
                   nextPoint = meta->path.pathToGoal[1];
 
                   player_direction = perpdot(
-                      glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0,
-                                               nextPoint->my_z + 4.5f) -
+                      glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
                                      ai_location),
                       ai_direction);
-                  if (player_direction > 0.3)
-                    meta->pxVehicleInputData.setAnalogSteer(-1);
+                  if (player_direction > 0.3) meta->pxVehicleInputData.setAnalogSteer(-1);
                   else if (player_direction < -0.3)
                     meta->pxVehicleInputData.setAnalogSteer(1);
                 }
@@ -478,9 +402,8 @@ void TestWorld::load() {
                 meta->pxVehicleInputData.setAnalogAccel(1);
               }
 
-            } else { // steer towards player
-              if (player_is_left)
-                meta->pxVehicleInputData.setAnalogSteer(-1);
+            } else {// steer towards player
+              if (player_is_left) meta->pxVehicleInputData.setAnalogSteer(-1);
               else
                 meta->pxVehicleInputData.setAnalogSteer(1);
 
@@ -500,16 +423,16 @@ void TestWorld::load() {
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   //   spawn some ai bois into the world
-      auto dim = 1;
-      int spacing = 190;
-      for (int x = -dim; x <= dim; x++) {
-        for (int y = -dim; y <= dim; y++) {
-          auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
-          ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0)); 
-          ai_vehicle->path.graphNodes = nav; 
-          //ai_vehicle->tickHandler += ticker; // give them brain
-        }
-      }
+  auto dim = 1;
+  int spacing = 40;
+  for (int x = -dim; x <= dim; x++) {
+    for (int y = dim; y <= dim; y++) {
+      auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
+      ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+      ai_vehicle->path.graphNodes = nav;
+      ai_vehicle->tickHandler += ticker;// give them brain
+    }
+  }
 
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();
@@ -519,10 +442,10 @@ void TestWorld::load() {
 
   // region initialize game-clocks
   using namespace std::chrono;
-  typedef duration<float> floatMilliseconds; // define this to get float values;
+  typedef duration<float> floatMilliseconds;// define this to get float values;
   auto start = high_resolution_clock::now();
-  auto end = start + milliseconds(1); // do this so physx doesn't complain about
-                                      // time being 0. endregion
+  auto end = start + milliseconds(1);// do this so physx doesn't complain about
+                                     // time being 0. endregion
 }
 
 TestWorld::TestWorld(EngineSystem *enginePtr) : ScenarioInterface(enginePtr) {}
