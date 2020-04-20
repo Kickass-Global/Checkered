@@ -88,7 +88,7 @@ void TestWorld::load() {
       "Assets/Programs/basic.json");
 
   timer = getEngine()->createComponent<Timer>();
-//  timer->start();
+  //  timer->start();
 
   // create a scene object to hold the ground components to follow.
   Instance<DrivableScenery> drivable_instances;
@@ -398,17 +398,16 @@ void TestWorld::load() {
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   //   spawn some ai bois into the world
-  auto dim = 1;
-  int spacing = 200;
-  for (int x = -dim; x <= -dim; x++) {
-    for (int y = -dim; y <= 0; y++) {
-      std::cout << "Creating taxi at:" << x * spacing << ", " << y * spacing + 10 << std::endl;
-      auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 25 - 10*y, y * spacing + 10)));
-      ai_vehicle->player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-      ai_vehicle->player_vehicle->path.graphNodes = nav;
-      ai_vehicle->player_vehicle->tickHandler += ticker;
-    }
+  origin = {0, 0, 20};
+  for (int i = 1; i <= 10; i++) {
+    auto ai_vehicle = make_ai(glm::translate(
+        i / 50.0f * 200.0f * glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} -
+        glm::vec3{0, 5, 0} + origin));
+    ai_vehicle->player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    ai_vehicle->player_vehicle->path.graphNodes = nav;
+    ai_vehicle->player_vehicle->tickHandler += ticker;
   }
+
 
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();

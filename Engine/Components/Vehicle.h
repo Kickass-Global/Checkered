@@ -30,6 +30,7 @@
 
 #include <al.h>
 #include <alc.h>
+#include <future>
 
 namespace Component {
 
@@ -119,7 +120,7 @@ public:
     void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
       auto collisions = getStore().getComponentsOfType<CollisionEvent>();
       if (!collisions.empty()) log<module, high>("Hit ", collisions.size());
-      tickHandler(this);
+      //std::async([&]() { tickHandler(this); });    
     }
 
     void onHitHandler(CollisionEventArgs &args) {
