@@ -123,10 +123,21 @@ public:
     }
 
     void onHitHandler(CollisionEventArgs &args) {
+      
+      
       auto [vehicle, impulse, region] = args;
+      
       auto damage = std::clamp<int>(static_cast<int>(impulse / 300), 0, 15);
       log<module, high>("Vehicle hit region ", region, " causing ", damage, " damage");
+     
       model->getStore().emplaceComponent<Damage, 1>(damage, region);
+      
+      //if(!vehicle) return;
+      if(damage>10 && type == Component::Vehicle::Type::Player)
+      {
+          getEngine()->createComponent<Component::Sound>("damageRecieved");
+           std::cout <<"Collision sound should go off."<< std::endl; 
+      }
     }
 
 
