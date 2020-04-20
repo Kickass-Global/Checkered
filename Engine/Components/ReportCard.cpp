@@ -101,7 +101,7 @@ void Component::ReportCard::displayReportCard() {
     filename = "Assets/Textures/report_card_c.png";
 
   else if (grade == 'F')
-    filename = "Assets/Textures/report_card_c.png";
+    filename = "Assets/Textures/report_card_f.png";
 
 
 

@@ -165,10 +165,36 @@ struct MainMenu : public ComponentBase {
       log<high>("onStart");
       onStart(0);
     };
+        MenuItem start_item{ {"Get Checkered!"},{"Get Checkered!"} };
+        start_item.defaultState.text->align = eAlign::left;
+        start_item.selectedState.text->align = eAlign::left;
+        start_item.selectedState.text->color = { 0,1,0 };
+        start_item.onSelected += [this](int) {
+            onStart(0);
+
+        };
 
     menu->items.push_back(press_start_item);
     menu->items.push_back(quit_item);
   }
+        menu->items.push_back(start_item);
+
+        
+        //quit game button
+        MenuItem quit_item{ {"Quit"},{"Quit"} };
+        quit_item.defaultState.text->align = eAlign::right;
+        quit_item.selectedState.text->align = eAlign::right;
+        quit_item.selectedState.text->color = { 1,0,0 };
+        quit_item.onSelected += [this](int) {
+            exit(0);
+        };
+        menu->items.push_back(quit_item);
+
+
+    }
+    
+
+
 };
 
 struct MenuSystem : public SystemInterface {
@@ -202,16 +228,31 @@ struct MenuSystem : public SystemInterface {
     auto lists =
         getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<MenuList>();
 
-    for (auto &list : lists) {
-      if (!list->active) continue;
-      if (key == GLFW_KEY_SPACE) {
-        // select the current menu item
-        list->current().activate();
-      }
-      if (key == GLFW_KEY_UP) { list->select_previous_item(); }
-      if (key == GLFW_KEY_DOWN) { list->select_next_item(); }
+        for (auto &list : lists) {
+            if (!list->active) continue;
+            if (key == GLFW_KEY_SPACE) {
+                // select the current menu item
+                list->select_next_item();
+                list->current().activate();
+            }
+            if (key == GLFW_KEY_RIGHT) {
+                list->select_previous_item();
+            }
+            if (key == GLFW_KEY_LEFT) {
+                list->select_next_item();
+            }
+        }
     }
-  }
+
+
+    void onGamePadStateChanged(const EventArgs<GLFWgamepadstate, GLFWgamepadstate>& args) {
+
+        auto gamepad = std::get<0>(args.values);
+
+
+
+    }
+    
 };
 namespace Engine {
   class Start : public ScenarioInterface {

@@ -105,16 +105,10 @@ namespace Component {
       auto health_percentage = target->health / target->max_health * 100.0f;
       if (healthHasChanged()) updateHealthBar();
 
-
-      //health_sprite_dimensions.width = health_percentage * 3;
-
-      //auto [x, y, w, h] = health_sprite_dimensions;
-      // billboard->plot = BoxModel(w / 2, h / 2, w, h);
-      //billboard->dst = RelativeAnchor{-1, 1};
-      //billboard->src = {-1, 1};
-
-      previous_health = target->health;
-    }
-  };
-}// namespace Component
-#endif// ENGINE_HEALTHBAR_HPP
+    
+    
+    previous_health = target->health;
+  }
+};
+} // namespace Component
+#endif // ENGINE_HEALTHBAR_HPP
