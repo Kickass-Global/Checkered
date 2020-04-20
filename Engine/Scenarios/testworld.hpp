@@ -21,6 +21,15 @@ class TestWorld : public Engine::ScenarioInterface {
   std::shared_ptr<Timer> timer;
   TestWorld(Engine::EngineSystem *enginePtr);
 
+  void unload() override {
+    log<high>("onUnload");
+    getEngine()->getSubSystem<EngineStore>()->getRoot().eraseAllComponents();
+    getEngine()->getSubSystem<EventSystem>()->reset();
+    getEngine()->getSubSystem<Rendering::RenderingSystem>()->reset();
+    getEngine()->initialize();
+    ScenarioInterface::unload();
+  }
+
   private:
   void load() override;
 

@@ -108,17 +108,7 @@ struct MenuItem : ComponentBase {
         defaultState.active = true;
       }
     }
-    //Title Screen Background
-    auto title_screen_billboard = getEngine()->createComponent<Component::Billboard>(
-        getEngine()->createComponent<Component::Texture>("Assets/Textures/Checkered_Title_Screen.png")
-        );
-    title_screen_billboard->src(0, 1);
-    title_screen_billboard->dst(0, 1);
-    title_screen_billboard->plot = BoxModel(0, 0, 1920, 1080);
 
-
-    defaultState.background = title_screen_billboard;
-    selectedState.background = title_screen_billboard;
 
 
     selectedState.layout(anchor);
@@ -262,6 +252,7 @@ public:
 
     void load() override {
 
+
       auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
       auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
       auto menuSystem = getEngine()->addSubSystem<MenuSystem>();
@@ -273,6 +264,14 @@ public:
       inputSystem->onKeyPress += menuSystem->onKeyPressHandler;
 
       getEngine()->createComponent<Component::Camera>();
+
+      //Title Screen Background
+      auto title_screen_billboard = getEngine()->createComponent<Component::Billboard>(
+          getEngine()->createComponent<Component::Texture>(
+              "Assets/Textures/Checkered_Title_Screen.png"));
+      title_screen_billboard->src(0, 0);
+      title_screen_billboard->dst(0, 0);
+      title_screen_billboard->plot = BoxModel(0, 0, 640, 480);
 
       menu = getEngine()->createComponent<MainMenu>();
       menu->onStart += [this](int) {

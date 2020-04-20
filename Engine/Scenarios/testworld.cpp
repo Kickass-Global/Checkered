@@ -24,6 +24,7 @@
 #include <material.hpp>
 #include <soundSystem/SoundSystem.h>
 #include <texture.hpp>
+#include <start.hpp>
 
 
 void TestWorld::load() {
@@ -184,6 +185,10 @@ void TestWorld::load() {
   // setup the player object....
   auto player = getEngine()->createComponent<Component::Player>();
   auto &player_vehicle = player->controller->vehicle;
+
+  //player->controller->vehicle->onVehicleDestroyed += [this](auto) { 
+  //    getEngine()->load_scenario<Start>();
+  //};
 
   // setup passenger system
 
@@ -443,3 +448,5 @@ void TestWorld::load() {
 }
 
 TestWorld::TestWorld(EngineSystem *enginePtr) : ScenarioInterface(enginePtr) {}
+
+

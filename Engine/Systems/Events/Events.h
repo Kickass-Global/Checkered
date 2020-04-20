@@ -34,7 +34,7 @@ namespace Engine {
         void early_update(Engine::deltaTime time) override;
 
         void reset() {
-            registeredHandlers.clear();
+          registeredHandlers.clear();
         }
 
         template<typename... Args>

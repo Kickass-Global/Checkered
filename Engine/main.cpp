@@ -19,8 +19,7 @@ int main() {
   engine.initialize();
   engine.load_scenario<Start>();
 
-  while (!glfwWindowShouldClose(
-      engine.getSubSystem<Rendering::RenderingSystem>()->getWindow())) {
+  do {
     engine.update();
-  }
+  } while (!glfwWindowShouldClose(engine.getSubSystem<Rendering::RenderingSystem>()->getWindow()));
 }
