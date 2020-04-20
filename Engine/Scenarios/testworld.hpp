@@ -30,8 +30,9 @@ class TestWorld : public Engine::ScenarioInterface {
     auto fps =
         getEngine()->createMomentaryComponent<Component::Text>("Frametime: " + std::to_string(d));
     fps->font_size = 4;
-    fps->color = {1, 1, 1};
-    fps->plot = {10, 10, 640, 480};
+    fps->plot = {10, 10, 100, 40};
+    fps->dst = {-1, -1};
+    fps->src = {-1, -1};
     fps->vertical_align = eVerticalAlign::bottom;
     fps->align = eAlign::left;
   }

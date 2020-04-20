@@ -161,7 +161,7 @@ namespace Component {
           getEngine()->createComponent<Component::Texture>("Assets/Textures/liscense.png"));
 
       auto car_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-          "Assets/Meshes/taxi_mesh.fbx");
+          "Assets/Meshes/taxi.obj");
       auto car_left_mirror = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
           "Assets/Meshes/car_left_mirror.obj");
       auto car_right_mirror = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
@@ -185,7 +185,7 @@ namespace Component {
       player_damage_model->parts.push_back(Component::Model::Part{{}, 0, "car_tire", 0, 500});
       player_damage_model->parts.push_back(Component::Model::Part{{}, 0, "car_tire", 0, 500});
 
-      player_damage_model->parts.push_back(Component::Model::Part{{}, 0, "chassis", 0, 10, true});
+      player_damage_model->parts.push_back(Component::Model::Part{{}, 0, "chassis", 0, 100, true});
       player_damage_model->parts.push_back(Component::Model::Part{{}, 0, "car_left_mirror", 0, 5});
       player_damage_model->parts.push_back(Component::Model::Part{{}, 0, "car_right_mirror", 0, 5});
       player_damage_model->parts.push_back(
@@ -214,7 +214,7 @@ namespace Component {
 
       size_t chassis = 4;
       player_damage_model->parts[chassis + 0].variations.push_back(Component::Model::Variation{
-          10, getEngine()->createComponent<PaintedMesh>(car_mesh, car_material)});
+          100, getEngine()->createComponent<PaintedMesh>(car_mesh, car_material)});
 
       player_damage_model->parts[chassis + 1].variations.push_back(Component::Model::Variation{
           5, getEngine()->createComponent<PaintedMesh>(car_left_mirror, car_material)});

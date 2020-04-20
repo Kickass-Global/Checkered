@@ -152,49 +152,28 @@ struct MainMenu : public ComponentBase {
 
   MainMenu() {
     menu = getEngine()->createComponent<MenuList>();
-    MenuItem press_start_item{{"Press Start to Continue"}, {"Press Start to Continue"}};
+    MenuItem press_start_item{{"Get Checkered!"}, {"Get Checkered!"}};
     press_start_item.anchor = {0, 0, 0, 40};
 
     MenuItem quit_item{{"Quit"}, {"Quit"}};
     quit_item.anchor = {0, 0, 0, -40};
 
     press_start_item.selectedState.text->color = {236 / 255., 59 / 255., 131 / 255.};
+    press_start_item.defaultState.text->color = {236 / 2550., 59 / 2550., 131 / 2550.};
+
     quit_item.selectedState.text->color = {236 / 255., 59 / 255., 131 / 255.};
+    quit_item.defaultState.text->color = {236 / 2550., 59 / 2550., 131 / 2550.};
 
     press_start_item.onSelected += [this](int) {
       log<high>("onStart");
       onStart(0);
     };
-        MenuItem start_item{ {"Get Checkered!"},{"Get Checkered!"} };
-        start_item.defaultState.text->align = eAlign::left;
-        start_item.selectedState.text->align = eAlign::left;
-        start_item.selectedState.text->color = { 0,1,0 };
-        start_item.onSelected += [this](int) {
-            onStart(0);
+    quit_item.onSelected += [this](int) { exit(0); };
 
-        };
-
+    
     menu->items.push_back(press_start_item);
     menu->items.push_back(quit_item);
   }
-        menu->items.push_back(start_item);
-
-        
-        //quit game button
-        MenuItem quit_item{ {"Quit"},{"Quit"} };
-        quit_item.defaultState.text->align = eAlign::right;
-        quit_item.selectedState.text->align = eAlign::right;
-        quit_item.selectedState.text->color = { 1,0,0 };
-        quit_item.onSelected += [this](int) {
-            exit(0);
-        };
-        menu->items.push_back(quit_item);
-
-
-    }
-    
-
-
 };
 
 struct MenuSystem : public SystemInterface {
@@ -228,31 +207,21 @@ struct MenuSystem : public SystemInterface {
     auto lists =
         getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<MenuList>();
 
-        for (auto &list : lists) {
-            if (!list->active) continue;
-            if (key == GLFW_KEY_SPACE) {
-                // select the current menu item
-                list->select_next_item();
-                list->current().activate();
-            }
-            if (key == GLFW_KEY_RIGHT) {
-                list->select_previous_item();
-            }
-            if (key == GLFW_KEY_LEFT) {
-                list->select_next_item();
-            }
-        }
+    for (auto &list : lists) {
+      if (!list->active) continue;
+      if (key == GLFW_KEY_SPACE) {
+        list->current().activate();
+      }
+      if (key == GLFW_KEY_RIGHT) { list->select_previous_item(); }
+      if (key == GLFW_KEY_LEFT) { list->select_next_item(); }
     }
+  }
 
 
-    void onGamePadStateChanged(const EventArgs<GLFWgamepadstate, GLFWgamepadstate>& args) {
+  void onGamePadStateChanged(const EventArgs<GLFWgamepadstate, GLFWgamepadstate> &args) {
 
-        auto gamepad = std::get<0>(args.values);
-
-
-
-    }
-    
+    auto gamepad = std::get<0>(args.values);
+  }
 };
 namespace Engine {
   class Start : public ScenarioInterface {
@@ -295,6 +264,8 @@ public:
           getEngine()->createMomentaryComponent<Component::Text>("Frametime: " + std::to_string(d));
       fps->font_size = 4;
       fps->plot = {10, 10, 100, 40};
+      fps->dst = {-1, -1};
+      fps->src = {-1, -1};
       fps->vertical_align = eVerticalAlign::bottom;
       fps->align = eAlign::left;
     }
