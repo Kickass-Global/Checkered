@@ -25,6 +25,7 @@
 #include <soundSystem/SoundSystem.h>
 #include <texture.hpp>
 
+
 void TestWorld::load() {
   auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
   auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
@@ -389,6 +390,7 @@ void TestWorld::load() {
           }
         } else {
           meta->path.CheckInit = false;
+
           meta->path.FindPath(player_location, ai_location);
           meta->path.CleanPath();
           meta->path.PrintPath();
@@ -399,7 +401,7 @@ void TestWorld::load() {
 
   //   spawn some ai bois into the world
   origin = {0, 0, 20};
-  for (int i = 1; i <= 10; i++) {
+  for (int i = 1; i <= 5; i++) {
     auto ai_vehicle = make_ai(glm::translate(
         i / 50.0f * 200.0f * glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} -
         glm::vec3{0, 5, 0} + origin));

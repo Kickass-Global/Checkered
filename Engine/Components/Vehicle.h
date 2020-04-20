@@ -120,7 +120,7 @@ public:
     void onTick(const Component::EventArgs<Engine::deltaTime> &args) {
       auto collisions = getStore().getComponentsOfType<CollisionEvent>();
       if (!collisions.empty()) log<module, high>("Hit ", collisions.size());
-      //std::async([&]() { tickHandler(this); });    
+      tickHandler(this);
     }
 
     void onHitHandler(CollisionEventArgs &args) {
