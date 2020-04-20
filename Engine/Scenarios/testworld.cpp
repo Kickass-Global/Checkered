@@ -268,7 +268,7 @@ void TestWorld::load() {
 
         meta->path.ReachedPoint(ai_location);
 
-        if (player_distance < 4800.0f) {
+        if (player_distance < 2600.0f) {
           meta->path.ClearPathToGoal();
 
           auto player_direction =
@@ -285,7 +285,8 @@ void TestWorld::load() {
             meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
             meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-            if (ai_velocity > 0.05f) meta->pxVehicleInputData.setAnalogAccel(0);
+            if (ai_velocity > 0.0005f) 
+                meta->pxVehicleInputData.setAnalogAccel(0);
             else
               meta->pxVehicleInputData.setAnalogAccel(1);
 
@@ -306,7 +307,7 @@ void TestWorld::load() {
               else
                 meta->pxVehicleInputData.setAnalogSteer(1);
 
-              if (ai_velocity * 10 > player_distance && ai_velocity > 0.05f)
+              if (ai_velocity * 100 > player_distance && ai_velocity > 0.05f)
                 meta->pxVehicleInputData.setAnalogAccel(0);
               else
                 meta->pxVehicleInputData.setAnalogAccel(1);
@@ -323,16 +324,16 @@ void TestWorld::load() {
           }
 
           auto nextPoint = meta->path.pathToGoal[0];
-          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 5.5f), 2)) +
-                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 5.5f)), 2));
+          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 4.0f), 2)) +
+                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 4.0f)), 2));
 
           auto player_direction =
-              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
+              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 4.0f, 0, nextPoint->my_z + 4.0f) -
                                      ai_location),
                       ai_direction);
           // check if the point is in front or behind the ai.
           auto heading =
-              [p = glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
+              [p = glm::normalize(glm::vec3(nextPoint->my_x + 4.0f, 0, nextPoint->my_z + 4.0f) -
                                   ai_location),
                b = glm::vec3(ai_direction)]() { return glm::dot(p, b); };
 
@@ -343,7 +344,7 @@ void TestWorld::load() {
             meta->pxVehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
             meta->pxVehicle->mDriveDynData.setUseAutoGears(false);
 
-            if (ai_velocity > 0.05f) meta->pxVehicleInputData.setAnalogAccel(0);
+            if (ai_velocity > 0.0005f) meta->pxVehicleInputData.setAnalogAccel(0);
             else
               meta->pxVehicleInputData.setAnalogAccel(1);
 
@@ -358,7 +359,7 @@ void TestWorld::load() {
             const auto pointed_at_player = -0.2f <= player_direction && player_direction <= 0.2f;
 
             if (pointed_at_player) {
-              if (ai_velocity * 50 > player_distance && ai_velocity > 0.05f) {
+              if (ai_velocity * 10 > player_distance && ai_velocity > 0.05f) {
                 meta->pxVehicleInputData.setAnalogAccel(0);
                 // ready turn for next node if one exists
                 if (meta->path.pathToGoal.size() > 1) {
@@ -368,9 +369,9 @@ void TestWorld::load() {
                       glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                      ai_location),
                       ai_direction);
-                  if (player_direction > 0.3) meta->pxVehicleInputData.setAnalogSteer(-1);
+                  if (player_direction > 0.3) meta->pxVehicleInputData.setAnalogSteer(-0.5);
                   else if (player_direction < -0.3)
-                    meta->pxVehicleInputData.setAnalogSteer(1);
+                    meta->pxVehicleInputData.setAnalogSteer(0.5);
                 }
 
               } else {
@@ -382,7 +383,7 @@ void TestWorld::load() {
               else
                 meta->pxVehicleInputData.setAnalogSteer(1);
 
-              if (ai_velocity * 50 > player_distance && ai_velocity > 0.05f)
+              if (ai_velocity * 1000 > player_distance && ai_velocity > 0.0005f)
                 meta->pxVehicleInputData.setAnalogAccel(0);
               else
                 meta->pxVehicleInputData.setAnalogAccel(1);
@@ -395,6 +396,22 @@ void TestWorld::load() {
           meta->path.CleanPath();
           meta->path.PrintPath();
         }
+
+        if (ai_velocity < FLT_EPSILON*10000){
+            meta->framesStopped ++;
+            //std::cout << "stuck " << meta->framesStopped << std::endl;
+        }
+        else {
+            if(meta->framesStopped>0)
+                meta->framesStopped --;
+        }
+        if(meta->framesStopped > 30){
+            //std::cout << "respawning taxi" << std::endl;
+            /*meta->framesStopped = 0;
+            meta->position = glm::vec3(-300, 25, -180);
+            meta->path.ClearPathToGoal();*/
+        }
+
       };
   std::shared_ptr<EventHandler<Vehicle *>> ticker =
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
