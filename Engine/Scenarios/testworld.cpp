@@ -16,6 +16,7 @@
 #include "Component/scenecomponentsystem.hpp"
 #include "Engine.h"
 #include "WorldTransform.h"
+#include "timer.hpp"
 #include <Billboard.h>
 #include <PlayerVehicle.hpp>
 #include <Rendering/BillboardSystem.h>
@@ -23,6 +24,7 @@
 #include <material.hpp>
 #include <soundSystem/SoundSystem.h>
 #include <texture.hpp>
+
 
 void TestWorld::load() {
   auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
@@ -87,7 +89,7 @@ void TestWorld::load() {
       "Assets/Programs/basic.json");
 
   timer = getEngine()->createComponent<Timer>();
-  timer->start();
+  //  timer->start();
 
   // create a scene object to hold the ground components to follow.
   Instance<DrivableScenery> drivable_instances;
@@ -155,27 +157,12 @@ void TestWorld::load() {
       "Assets/Meshes/Building_Shop_02.fbx");
 
   // load scenario
-  scenarioLoader->load_scenario(*this, "Assets/Meshes/obstacles.dae");
+  scenarioLoader->load_scenario<Obstacle>(*this, "Assets/Meshes/obstacles.dae");
+  scenarioLoader->load_scenario<Scenery>(*this, "Assets/Meshes/static.dae");
 
   // setup a HUD element...
 
-  auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-      "Assets/Meshes/billboard_quad.obj");
-  billboard_mesh->getStore().emplaceComponent<WorldTransform>();
-
-  auto sprite = getEngine()->createComponent<Component::Billboard>();
-  sprite->plot = BoxModel{10, 10, 100, 100};
-  {
-    auto material = getEngine()->createComponent<Component::Material>(
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-            "Assets/Programs/billboard.json"));
-
-    material->textures.push_back(
-        getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
-
-    sprite->mesh_instance = getEngine()->createNamedComponent<PaintedMesh>(
-        "billboard_mesh_instance", billboard_mesh, material);
-  }
+  getEngine()->createComponent<Map>();
 
   // setup the mesh used for the cars...
 
@@ -233,24 +220,16 @@ void TestWorld::load() {
 
   // ai factory method...
   auto make_ai = [this, &taxi_mesh, &taxi_material](glm::mat4 world_transform = glm::mat4{1}) {
-    auto ai_vehicle = getEngine()->createNamedComponent<Component::Vehicle>("ai_vehicle");
-    auto ai_damage_model = getEngine()->createNamedComponent<Component::Model>("ai_vehicle_model");
-    ai_damage_model->max_health = 30;
-    ai_damage_model->health = 30;
-
-    ai_damage_model->parts.push_back(Component::Model::Part{});
-    ai_damage_model->parts[0].variations.push_back(Component::Model::Variation{
-        2000000, getEngine()->createComponent<PaintedMesh>(taxi_mesh, taxi_material)});
+    auto ai_vehicle = getEngine()->createNamedComponent<Component::Taxi>("ai_vehicle");
 
     glm::quat orientation;
     glm::vec3 scale, translation, skew;
     glm::vec4 perspective;
     glm::decompose(world_transform, scale, orientation, translation, skew, perspective);
 
-    ai_vehicle->model = ai_damage_model;
-    ai_vehicle->rotation = orientation;
-    ai_vehicle->position = translation;
-    ai_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
+    ai_vehicle->player_vehicle->rotation = orientation;
+    ai_vehicle->player_vehicle->position = translation;
+    ai_vehicle->player_vehicle->local_position = glm::vec3(0.0f, -2.0f, 0.0f);
 
     return ai_vehicle;
   };
@@ -412,6 +391,7 @@ void TestWorld::load() {
           }
         } else {
           meta->path.CheckInit = false;
+
           meta->path.FindPath(player_location, ai_location);
           meta->path.CleanPath();
           meta->path.PrintPath();
@@ -437,17 +417,16 @@ void TestWorld::load() {
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   //   spawn some ai bois into the world
-  auto dim = 1;
-  int spacing = 200;
-  for (int x = -dim; x <= dim; x++) {
-    for (int y = -dim; y <= -dim; y++) {
-      auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 25 - 10*y, y * spacing + 10)));
-      ai_vehicle->framesStopped = 0;
-      ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-      ai_vehicle->path.graphNodes = nav;
-      ai_vehicle->tickHandler += ticker;// give them brain
-    }
+  origin = {0, 0, 20};
+  for (int i = 1; i <= 5; i++) {
+    auto ai_vehicle = make_ai(glm::translate(
+        i / 50.0f * 200.0f * glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} -
+        glm::vec3{0, 5, 0} + origin));
+    ai_vehicle->player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    ai_vehicle->player_vehicle->path.graphNodes = nav;
+    ai_vehicle->player_vehicle->tickHandler += ticker;
   }
+
 
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();

@@ -16,95 +16,96 @@
 #include <scenery.hpp>
 
 namespace Component {
-struct HealthBar : public ComponentBase {
-  std::shared_ptr<Model> target; // display the health of this
-  std::shared_ptr<Texture> health_sprite_100;
-  std::shared_ptr<Texture> health_sprite_75;
-  std::shared_ptr<Texture> health_sprite_50;
-  std::shared_ptr<Texture> health_sprite_25;
-  std::shared_ptr<Billboard> billboard;
+
+  struct Map : public ComponentBase {
+    Map() {
+      auto texture = getEngine()->createComponent<Texture>("Assets/Textures/map.png");
+
+      auto material = getEngine()->createComponent<Material>(
+          getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
+              "Assets/Programs/map.json"));
+      material->textures.push_back(texture);
+
+      auto billboard = getEngine()->createComponent<Billboard>();
+      billboard->mesh_instance = getEngine()->createComponent<PaintedMesh>(
+          getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
+              "Assets/Meshes/billboard_quad.obj"),
+          material);
+
+      billboard->plot = BoxModel(0, 0, 100, 100);
+      billboard->dst = RelativeAnchor{1, 1};
+      billboard->src = {1, 1};
+    }
+  };
+
+  struct HealthBar : public ComponentBase {
+    std::shared_ptr<Model> target;// display the health of this
+    std::shared_ptr<Texture> health_sprite_100;
+    std::shared_ptr<Texture> health_sprite_75;
+    std::shared_ptr<Texture> health_sprite_50;
+    std::shared_ptr<Texture> health_sprite_25;
+    std::shared_ptr<Billboard> billboard;
 
 
-  int previous_health;
+    int previous_health;
 
-  HealthBar() {
+    HealthBar() {
       std::cout << "create health bar" << std::endl;
 
-      
 
       health_sprite_100 =
           getEngine()->createComponent<Texture>("Assets/Textures/health_bar_100.png");
-      
 
-      health_sprite_75 =
-          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_75.png");
 
-      health_sprite_50 =
-          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_50.png");
-      
-      health_sprite_25 =
-          getEngine()->createComponent<Texture>("Assets/Textures/health_bar_25.png");
+      health_sprite_75 = getEngine()->createComponent<Texture>("Assets/Textures/health_bar_75.png");
+
+      health_sprite_50 = getEngine()->createComponent<Texture>("Assets/Textures/health_bar_50.png");
+
+      health_sprite_25 = getEngine()->createComponent<Texture>("Assets/Textures/health_bar_25.png");
 
       billboard = getEngine()->createComponent<Billboard>(health_sprite_100);
       billboard->plot = BoxModel(0, 0, 256, 64);
-      billboard->dst = RelativeAnchor{ -1,1 };
-      billboard->src = { -1,1 };
-      
-  }
+      billboard->dst = RelativeAnchor{-1, 1};
+      billboard->src = {-1, 1};
+    }
 
-  void updateHealthBar() {
-      
+    void updateHealthBar() {
 
 
+      if (target->health > 75 && target->health < 100) {
 
-      if (target->health > 75 && target->health < 100 ) {
-
-          billboard->mesh_instance->material->textures[0] = health_sprite_75;
+        billboard->mesh_instance->material->textures[0] = health_sprite_75;
 
       }
 
       else if (target->health > 50 && target->health < 75) {
-      
-          billboard->mesh_instance->material->textures[0] = health_sprite_50;
+
+        billboard->mesh_instance->material->textures[0] = health_sprite_50;
       }
 
       else if (target->health < 50) {
-          
-          billboard->mesh_instance->material->textures[0] = health_sprite_25;
+
+        billboard->mesh_instance->material->textures[0] = health_sprite_25;
       }
 
       else if (target->health < 1) {
-          getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(
-              billboard.get());
+        getEngine()->getSubSystem<EngineStore>()->getRoot().deactivate(billboard.get());
       }
+    }
 
+    //checks if health of car has changed since last frame
+    bool healthHasChanged() {
 
-
-
-  }
-
-  //checks if health of car has changed since last frame
-  bool healthHasChanged() {
-      
-      if (target->health != previous_health) {
-          return true;
-      }
+      if (target->health != previous_health) { return true; }
       return false;
-  }
+    }
 
-  void tick(float time) {
+    void tick(float time) {
 
-    auto health_percentage = target->health  / target->max_health * 100.0f;
-    if (healthHasChanged())
-        updateHealthBar();
+      auto health_percentage = target->health / target->max_health * 100.0f;
+      if (healthHasChanged()) updateHealthBar();
 
     
-    //health_sprite_dimensions.width = health_percentage * 3;
-
-    //auto [x, y, w, h] = health_sprite_dimensions;
-   // billboard->plot = BoxModel(w / 2, h / 2, w, h);
-    //billboard->dst = RelativeAnchor{-1, 1};
-    //billboard->src = {-1, 1};
     
     previous_health = target->health;
   }
