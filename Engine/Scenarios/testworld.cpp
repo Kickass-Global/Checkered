@@ -344,16 +344,16 @@ void TestWorld::load() {
           }
 
           auto nextPoint = meta->path.pathToGoal[0];
-          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 4.5f), 2)) +
-                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 4.5f)), 2));
+          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 5.5f), 2)) +
+                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 5.5f)), 2));
 
           auto player_direction =
-              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
+              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                      ai_location),
                       ai_direction);
           // check if the point is in front or behind the ai.
           auto heading =
-              [p = glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
+              [p = glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                   ai_location),
                b = glm::vec3(ai_direction)]() { return glm::dot(p, b); };
 
@@ -386,7 +386,7 @@ void TestWorld::load() {
                   nextPoint = meta->path.pathToGoal[1];
 
                   player_direction = perpdot(
-                      glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
+                      glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                      ai_location),
                       ai_direction);
                   if (player_direction > 0.3) meta->pxVehicleInputData.setAnalogSteer(-1);
@@ -413,6 +413,7 @@ void TestWorld::load() {
           meta->path.CheckInit = false;
           meta->path.FindPath(player_location, ai_location);
           meta->path.CleanPath();
+          meta->path.PrintPath();
         }
       };
   std::shared_ptr<EventHandler<Vehicle *>> ticker =
@@ -420,10 +421,11 @@ void TestWorld::load() {
 
   //   spawn some ai bois into the world
   auto dim = 1;
-  int spacing = 40;
-  for (int x = -dim; x <= dim; x++) {
-    for (int y = dim; y <= dim; y++) {
-      auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
+  int spacing = 200;
+  for (int x = -dim; x <= -dim; x++) {
+    for (int y = -dim; y <= 0; y++) {
+      std::cout << "Creating taxi at:" << x * spacing << ", " << y * spacing + 10 << std::endl;
+      auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 25 - 10*y, y * spacing + 10)));
       ai_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
       ai_vehicle->path.graphNodes = nav;
       ai_vehicle->tickHandler += ticker;// give them brain
