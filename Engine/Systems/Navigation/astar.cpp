@@ -73,9 +73,10 @@ void AStar::FindPath(glm::vec3 sPos, glm::vec3 tPos) {
 }
 
 void AStar::ReachedPoint(glm::vec3 cPos) {
-	if (pathToGoal.size() && samef(cPos.x - 4.5f, pathToGoal[0]->my_x, (float)pow(my_stepsize, 2))
-			&& samef(cPos.z - 4.5f, pathToGoal[0]->my_z, (float)pow(my_stepsize, 1.5))) {
+	if (pathToGoal.size() && samef(cPos.x - 5.5f, pathToGoal[0]->my_x, (float)pow(my_stepsize, 2))
+			&& samef(cPos.z - 5.5f, pathToGoal[0]->my_z, (float)pow(my_stepsize, 1.5))) {
 		pathToGoal.erase(pathToGoal.begin());
+		std::cout << "Reached grid: " << static_cast<int>((cPos.x + 384.0f) / 12.0f) << ", " << static_cast<int>((cPos.z + 384.0f) / 12.0f) << std::endl;
 	}
 	return;
 }
@@ -107,8 +108,8 @@ PathNode* AStar::GetNext() {
 
 void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 
-	int col = static_cast<int>(x + 390) / 12;
-	int row = static_cast<int>(z + 380) / 12;
+	int col = static_cast<int>((x + 384.0f) / 12.0f);
+	int row = static_cast<int>((z + 374.0f) / 12.0f);
 
 	if (col < 0) col = 0;
 	else if (col > 63) col = 63;
@@ -116,13 +117,14 @@ void AStar::PathOpened(float x, float z, float newCost, PathNode* parent) {
 	else if (row > 63) row = 63;
 
         //This lowers the priority on non-roads and wrong direction roads
-    if ((int)graphNodes[row * 64 + col] == 9) { newCost += 1000* my_stepsize;}
-    else if ((int)graphNodes[row * 64 + col] == 0 && parent->my_z > z) { newCost += 10* my_stepsize; }
-    else if ((int)graphNodes[row * 64 + col] == 1 && parent->my_x > x) { newCost += 10* my_stepsize; }
-    else if ((int)graphNodes[row * 64 + col] == 2 && parent->my_x < x) { newCost += 10* my_stepsize; }
-    else if ((int)graphNodes[row * 64 + col] == 3 && parent->my_z < z) { newCost += 10* my_stepsize; }
-	else if ((int)graphNodes[row * 64 + col] > 3  && (int)graphNodes[row * 64 + col] < 8) { newCost += 200 * my_stepsize; }
+    if ((int)graphNodes[row * 64 + col] == 9) { newCost += 40000* my_stepsize;}
+    else if ((int)graphNodes[row * 64 + col] == 0 && parent->my_z > z) { newCost += 400* my_stepsize; }
+    else if ((int)graphNodes[row * 64 + col] == 1 && parent->my_x > x) { newCost += 400* my_stepsize; }
+    else if ((int)graphNodes[row * 64 + col] == 2 && parent->my_x < x) { newCost += 400* my_stepsize; }
+    else if ((int)graphNodes[row * 64 + col] == 3 && parent->my_z < z) { newCost += 400* my_stepsize; }
+	else if ((int)graphNodes[row * 64 + col] > 3  && (int)graphNodes[row * 64 + col] < 8) { newCost += 2000 * my_stepsize; }
 	else if ((int)graphNodes[row * 64 + col] == 8) { newCost += 2000000 * my_stepsize; }
+	else { newCost += 0;}
 
 	int id = static_cast<int>((x + 384)/my_stepsize)* static_cast <int>(768/my_stepsize) + static_cast<int>((z + 374)/my_stepsize);
 	for (auto node : visitList) {
@@ -208,7 +210,7 @@ void AStar::CleanPath() {
 void AStar::PrintPath() {
     if (CheckFound)
         for (auto node : pathToGoal)
-            cout << node->my_x << ", " << node->my_z << std::endl;
+            std::cout << static_cast<int>((node->my_x + 384.0f) / 12.0f) << ", " << static_cast<int>((node->my_z + 374.0f)/12.0f) << std::endl;
     else
         cout << "No Path Found\n";
 }
