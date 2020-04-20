@@ -33,8 +33,8 @@ namespace Component {
         float font_size = 12;
         glm::vec3 color = {0, 0, 0};
         Engine::Rectangle plot;
-        Engine::RelativeAnchor dst;
-        Engine::RelativeAnchor src;
+        Engine::RelativeAnchor dst = {0, 0};
+        Engine::RelativeAnchor src = {0, 0};
         eAlign align = eAlign::center;
         eVerticalAlign vertical_align = eVerticalAlign::top;
 

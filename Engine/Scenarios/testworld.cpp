@@ -16,6 +16,7 @@
 #include "Component/scenecomponentsystem.hpp"
 #include "Engine.h"
 #include "WorldTransform.h"
+#include "timer.hpp"
 #include <Billboard.h>
 #include <PlayerVehicle.hpp>
 #include <Rendering/BillboardSystem.h>
@@ -87,7 +88,7 @@ void TestWorld::load() {
       "Assets/Programs/basic.json");
 
   timer = getEngine()->createComponent<Timer>();
-  timer->start();
+//  timer->start();
 
   // create a scene object to hold the ground components to follow.
   Instance<DrivableScenery> drivable_instances;
@@ -160,23 +161,7 @@ void TestWorld::load() {
 
   // setup a HUD element...
 
-  auto billboard_mesh = getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Mesh>(
-      "Assets/Meshes/billboard_quad.obj");
-  billboard_mesh->getStore().emplaceComponent<WorldTransform>();
-
-  auto sprite = getEngine()->createComponent<Component::Billboard>();
-  sprite->plot = BoxModel{10, 10, 100, 100};
-  {
-    auto material = getEngine()->createComponent<Component::Material>(
-        getEngine()->getSubSystem<Pipeline::Library>()->getAsset<Program>(
-            "Assets/Programs/billboard.json"));
-
-    material->textures.push_back(
-        getEngine()->createComponent<Component::Texture>("Assets/Textures/Nature_Trees.png"));
-
-    sprite->mesh_instance = getEngine()->createNamedComponent<PaintedMesh>(
-        "billboard_mesh_instance", billboard_mesh, material);
-  }
+  getEngine()->createComponent<Map>();
 
   // setup the mesh used for the cars...
 

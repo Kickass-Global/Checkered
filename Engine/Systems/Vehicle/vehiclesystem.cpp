@@ -19,7 +19,7 @@ namespace physx {
     return out << vec.x << " " << vec.y << " " << vec.z;
   }
 }// namespace physx
-void Engine::vehicleSystem::update(Engine::deltaTime) {
+void Engine::vehicleSystem::update(Engine::deltaTime elapsed) {
 
   auto vehicles =
       getEngine()->getSubSystem<EngineStore>()->getRoot().getComponentsOfType<Component::Vehicle>();
@@ -56,15 +56,24 @@ void Engine::vehicleSystem::update(Engine::deltaTime) {
       auto is_flipped = physx::PxVec3{0, 1, 0}.dot(
                             vehicle->pxVehicle->getRigidDynamicActor()->getGlobalPose().transform(
                                 physx::PxVec3{0, 1, 0})) < 0.15;
+
+      static auto time_flipped = elapsed;
       if (is_flipped) {
+        time_flipped += elapsed;
+
         // if the vehicle is flipped apply some force to right it.
         auto T = vehicle->pxVehicle->getRigidDynamicActor()->getGlobalPose();
         auto local_up = T.rotate(physx::PxVec3{0, 1, 0});
         auto global_up = physx::PxVec3{0, 1, 0};
-        auto force = 2500 * (global_up - local_up);
-        vehicle->pxVehicle->getRigidDynamicActor()->addTorque(force);
+        auto force =
+            time_flipped * 100 * (global_up - local_up + physx::PxVec3(1, 0, 0)).getNormalized();
 
-        Engine::log<module, medium>("Applying torque: ", force);
+        vehicle->pxVehicle->getRigidDynamicActor()
+                         ->addTorque(force);
+
+        Engine::log<module, high>("Applying torque: ", force);
+      } else {
+        time_flipped = 0;
       }
 
       if (vehicle->model) {
