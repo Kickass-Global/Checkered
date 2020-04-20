@@ -71,10 +71,12 @@ struct MenuState : ComponentBase {
     text->dst = anchor;
   }
 
+  
   MenuState(std::shared_ptr<Texture> background_image, std::string menu_text)
       : background(getEngine()->createComponent<Billboard>(background_image)),
         text(getEngine()->createComponent<Text>(menu_text)) {
     text->vertical_align = eVerticalAlign::middle;
+    
   }
 
   MenuState(std::string menu_text) : text(getEngine()->createComponent<Text>(menu_text)) {
@@ -106,8 +108,22 @@ struct MenuItem : ComponentBase {
         defaultState.active = true;
       }
     }
+    //Title Screen Background
+    auto title_screen_billboard = getEngine()->createComponent<Component::Billboard>(
+        getEngine()->createComponent<Component::Texture>("Assets/Textures/Checkered_Title_Screen.png")
+        );
+    title_screen_billboard->src(0, 1);
+    title_screen_billboard->dst(0, 1);
+    title_screen_billboard->plot = BoxModel(0, 0, 1920, 1080);
+
+
+    defaultState.background = title_screen_billboard;
+    selectedState.background = title_screen_billboard;
+
+
     selectedState.layout(anchor);
     defaultState.layout(anchor);
+    
   }
 
   MenuItem(MenuState normal, MenuState selected) : selectedState(selected), defaultState(normal) {}
@@ -150,8 +166,14 @@ struct MainMenu : public ComponentBase {
   std::shared_ptr<MenuList> menu;
   EventDelegate<int> onStart{"onStart"};
 
+  
+
+
   MainMenu() {
+    
     menu = getEngine()->createComponent<MenuList>();
+    
+
     MenuItem press_start_item{{"Get Checkered!"}, {"Get Checkered!"}};
     press_start_item.anchor = {0, 0, 0, 40};
 

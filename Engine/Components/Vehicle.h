@@ -306,7 +306,7 @@ public:
 
       auto previous = std::get<0>(args.values);
       auto current = std::get<1>(args.values);
-      float control_deadzone = 0.03f;
+      float control_deadzone = 0.3f;
 
       float reverse_throttle_value = norm(current.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]);
       float throttle_value = norm(current.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER]);
