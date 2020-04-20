@@ -361,11 +361,8 @@ void Physics::PhysicsSystem::stepPhysics(Engine::deltaTime timestep) {
 
 void Physics::PhysicsSystem::update(Engine::deltaTime deltaTime) {
 
-  //deltaTime = std::min(deltaTime, 32.0f);
-  const auto step_target = 16.0;
-  int steps = std::floor(deltaTime / step_target);
-  float step_delta = deltaTime / steps;
-  for (auto step = 0; step < steps; ++step) { stepPhysics(step_delta); }
+  deltaTime = std::min(deltaTime, 32.0f);
+  stepPhysics(deltaTime);
 }
 
 std::ostream &physx::operator<<(std::ostream &out, const physx::PxTransform &transform) {
