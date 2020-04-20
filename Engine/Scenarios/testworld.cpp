@@ -25,6 +25,7 @@
 #include <soundSystem/SoundSystem.h>
 #include <texture.hpp>
 
+
 void TestWorld::load() {
   auto cameraSystem = getEngine()->addSubSystem<::Camera::CameraSystem>();
   auto renderingSystem = getEngine()->addSubSystem<Rendering::RenderingSystem>();
@@ -88,7 +89,7 @@ void TestWorld::load() {
       "Assets/Programs/basic.json");
 
   timer = getEngine()->createComponent<Timer>();
-//  timer->start();
+  //  timer->start();
 
   // create a scene object to hold the ground components to follow.
   Instance<DrivableScenery> drivable_instances;
@@ -322,16 +323,16 @@ void TestWorld::load() {
           }
 
           auto nextPoint = meta->path.pathToGoal[0];
-          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 4.5f), 2)) +
-                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 4.5f)), 2));
+          auto player_distance = (float) (pow(ai_location.x - (nextPoint->my_x + 5.5f), 2)) +
+                                 (float) (pow(ai_location.z - ((nextPoint->my_z + 5.5f)), 2));
 
           auto player_direction =
-              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
+              perpdot(glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                      ai_location),
                       ai_direction);
           // check if the point is in front or behind the ai.
           auto heading =
-              [p = glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
+              [p = glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                   ai_location),
                b = glm::vec3(ai_direction)]() { return glm::dot(p, b); };
 
@@ -364,7 +365,7 @@ void TestWorld::load() {
                   nextPoint = meta->path.pathToGoal[1];
 
                   player_direction = perpdot(
-                      glm::normalize(glm::vec3(nextPoint->my_x + 4.5f, 0, nextPoint->my_z + 4.5f) -
+                      glm::normalize(glm::vec3(nextPoint->my_x + 5.5f, 0, nextPoint->my_z + 5.5f) -
                                      ai_location),
                       ai_direction);
                   if (player_direction > 0.3) meta->pxVehicleInputData.setAnalogSteer(-1);
@@ -389,24 +390,26 @@ void TestWorld::load() {
           }
         } else {
           meta->path.CheckInit = false;
+
           meta->path.FindPath(player_location, ai_location);
           meta->path.CleanPath();
+          meta->path.PrintPath();
         }
       };
   std::shared_ptr<EventHandler<Vehicle *>> ticker =
       getEngine()->getSubSystem<EventSystem>()->createHandler(ai_tick_callback);
 
   //   spawn some ai bois into the world
-  auto dim = 1;
-  int spacing = 40;
-  for (int x = -dim; x <= dim; x++) {
-    for (int y = dim; y <= dim; y++) {
-      auto ai_vehicle = make_ai(glm::translate(glm::vec3(x * spacing, 30, y * spacing + 10)));
-      ai_vehicle->player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
-      ai_vehicle->player_vehicle->path.graphNodes = nav;
-      ai_vehicle->player_vehicle->tickHandler += ticker;// give them brain
-    }
+  origin = {0, 0, 20};
+  for (int i = 1; i <= 5; i++) {
+    auto ai_vehicle = make_ai(glm::translate(
+        i / 50.0f * 200.0f * glm::vec3{std::cos(i), std::acos(i / 200.0), std::sin(i)} -
+        glm::vec3{0, 5, 0} + origin));
+    ai_vehicle->player_vehicle->local_rotation = glm::rotate(3.14159f, glm::vec3(0, 1, 0));
+    ai_vehicle->player_vehicle->path.graphNodes = nav;
+    ai_vehicle->player_vehicle->tickHandler += ticker;
   }
+
 
   // make a default camera
   // auto camera =  getEngine()->createComponent<Component::Camera>();
