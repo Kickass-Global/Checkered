@@ -10,7 +10,7 @@ int main() {
   using namespace Engine;
 
   // disable std::out 
-  std::cout.setstate(std::ios_base::failbit);
+  //std::cout.setstate(std::ios_base::failbit);
 
 
   auto running = true;

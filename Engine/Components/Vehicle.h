@@ -78,6 +78,7 @@ public:
 
     enum Type { Player, Taxi } type = Taxi;
     AStar path;
+    int framesStopped = 0;
     glm::vec3 scale = {1, 1, 1};
     glm::quat rotation = {1, 0, 0, 0};
     glm::quat local_rotation = glm::rotate(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
