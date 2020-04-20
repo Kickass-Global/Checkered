@@ -156,6 +156,7 @@ namespace snippetvehicle {
             chassisShape->setQueryFilterData(chassisQryFilterData);
             chassisShape->setSimulationFilterData(chassisSimFilterData);
             chassisShape->setLocalPose(chassis_local_pose);
+            chassisShape->setName("chassis");
         }
 
         vehActor->setMass(chassisData.mMass);

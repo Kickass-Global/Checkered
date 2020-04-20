@@ -51,7 +51,10 @@ namespace Component {
 			int current_damage = 0;
 			int max_damage = 10;
 			bool apply_damage_to_health = false;
+            bool is_wheel = false;
 			bool is_destroyed = false;
+
+			glm::mat4 transform{1};
 
 			Variation& getActiveVariation() {
 				return variations[active_variation];
@@ -61,7 +64,7 @@ namespace Component {
 		int health = 100;
 		int max_health = 100;
 		bool is_outdated = false;
-		glm::mat4 transform;
+        glm::mat4 transform{1};
 		std::vector<Part> parts;
 
 		Part& getRegionByName(std::string name) {
